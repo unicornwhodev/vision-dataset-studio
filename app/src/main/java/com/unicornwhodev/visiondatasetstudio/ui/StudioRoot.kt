@@ -36,7 +36,7 @@ fun StudioRoot(viewModel: MainViewModel) {
     val editorBusy by viewModel.editorBusy.collectAsState()
     val holder = rememberSaveableStateHolder()
     val destinations = remember { listOf(
-        StudioDestination(Screen.Home, "Atelier", Icons.Default.DashboardCustomize),
+        StudioDestination(Screen.Home, "Atelier", Icons.Default.SpaceDashboard),
         StudioDestination(Screen.BatchGrid, "Lot", Icons.Default.GridView),
         StudioDestination(Screen.Models, "Modèles", Icons.Default.Memory),
         StudioDestination(Screen.Publication, "Export", Icons.Default.IosShare),
@@ -48,15 +48,22 @@ fun StudioRoot(viewModel: MainViewModel) {
         val showNavigation = !editor && screen !is Screen.Setup && screen !is Screen.Preferences && screen !is Screen.Controls
         val rail = maxWidth >= 840.dp && showNavigation
         Row(Modifier.fillMaxSize()) {
-            if (rail) NavigationRail(windowInsets = WindowInsets(0), header = {
-                Icon(Icons.Default.CenterFocusStrong, "Vision Dataset Studio", Modifier.padding(20.dp), tint = MaterialTheme.colorScheme.primary)
-            }) {
-                destinations.forEach { item -> NavigationRailItem(
-                    selected = screen == item.screen, enabled = !editorBusy && !busy,
-                    onClick = { viewModel.navigateTo(item.screen) }, modifier = Modifier.testTag("nav_${item.screen.javaClass.simpleName}"), icon = { Icon(item.icon, item.label) }, label = { Text(item.label) }
-                ) }
-                Spacer(Modifier.weight(1f))
-                NavigationRailItem(selected = false, onClick = { viewModel.navigateTo(Screen.Preferences) }, icon = { Icon(Icons.Default.Tune, "Préférences") }, label = { Text("Réglages") })
+            if (rail) {
+                Column(Modifier.width(68.dp).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainerLowest), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.CenterFocusStrong, "Vision Dataset Studio", Modifier.size(22.dp), tint = MaterialTheme.colorScheme.primary)
+                    }
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
+                    Spacer(Modifier.height(12.dp))
+                    destinations.forEach { item ->
+                        StudioRailItem(item.label, item.icon, screen == item.screen, !editorBusy && !busy,
+                            Modifier.testTag("nav_${item.screen.javaClass.simpleName}")) { viewModel.navigateTo(item.screen) }
+                    }
+                    Spacer(Modifier.weight(1f))
+                    StudioRailItem("Réglages", Icons.Default.Tune, false, !editorBusy && !busy) { viewModel.navigateTo(Screen.Preferences) }
+                    Spacer(Modifier.height(8.dp))
+                }
+                VerticalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
             }
             Column(Modifier.weight(1f)) {
                 Box(Modifier.weight(1f)) {
@@ -85,14 +92,13 @@ fun StudioRoot(viewModel: MainViewModel) {
                         destinations.forEach { item ->
                             val selected = screen == item.screen
                             val color by animateColorAsState(if (selected) MaterialTheme.colorScheme.primary else Color.Transparent, label = "navigation")
-                            val scale by animateFloatAsState(if (selected) 1.08f else 1f, label = "selected icon")
                             Column(Modifier.weight(1f).testTag("nav_${item.screen.javaClass.simpleName}").clip(RoundedCornerShape(4.dp))
                                 .clickable(enabled = !editorBusy && !busy, role = Role.Tab) { viewModel.navigateTo(item.screen) }
-                                .semantics { this.selected = selected }.heightIn(min = 60.dp).padding(bottom = 7.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                .semantics { this.selected = selected }.heightIn(min = 54.dp).padding(bottom = 5.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
                                 Box(Modifier.width(24.dp).height(2.dp).background(color))
                                 Spacer(Modifier.height(3.dp))
-                                Icon(item.icon, null, Modifier.size(22.dp).graphicsLayer { scaleX = scale; scaleY = scale },
+                                Icon(item.icon, null, Modifier.size(19.dp),
                                     tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text(item.label, style = MaterialTheme.typography.labelSmall,
                                     color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
@@ -101,6 +107,22 @@ fun StudioRoot(viewModel: MainViewModel) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun StudioRailItem(label: String, icon: ImageVector, selected: Boolean, enabled: Boolean,
+                           modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val accent by animateColorAsState(if(selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant, label = "rail selection")
+    Box(modifier.fillMaxWidth().heightIn(min = 62.dp).clickable(enabled = enabled, role = Role.Tab, onClick = onClick)
+        .semantics { this.selected = selected }, contentAlignment = Alignment.Center) {
+        if (selected) Box(Modifier.align(Alignment.CenterStart).width(2.dp).height(22.dp).background(accent))
+        Column(Modifier.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Box(Modifier.size(32.dp).clip(RoundedCornerShape(5.dp)).background(if(selected) MaterialTheme.colorScheme.surfaceContainerHigh else Color.Transparent), contentAlignment = Alignment.Center) {
+                Icon(icon, null, Modifier.size(19.dp), tint = accent)
+            }
+            Text(label, style = MaterialTheme.typography.labelSmall, color = accent)
         }
     }
 }

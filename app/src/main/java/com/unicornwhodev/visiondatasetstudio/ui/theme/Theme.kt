@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-val StudioCyan = Color(0xFF6ED6DA)
-val StudioViolet = Color(0xFFAB9DEE)
+val StudioCyan = Color(0xFF7CCAD1)
+val StudioViolet = Color(0xFFA79BCB)
 private val DarkStudio = darkColorScheme(
     primary = StudioCyan, onPrimary = Color(0xFF06282D),
     primaryContainer = Color(0xFF12383F), onPrimaryContainer = Color(0xFFACF4F3),
@@ -16,12 +16,12 @@ private val DarkStudio = darkColorScheme(
     secondaryContainer = Color(0xFF2C2648), onSecondaryContainer = Color(0xFFE4DDFF),
     tertiary = Color(0xFFFFC782), onTertiary = Color(0xFF432807),
     tertiaryContainer = Color(0xFF43321D), onTertiaryContainer = Color(0xFFFFDCA6),
-    background = Color(0xFF101217), onBackground = Color(0xFFF1F3FA),
-    surface = Color(0xFF171A21), onSurface = Color(0xFFF1F3FA),
-    surfaceVariant = Color(0xFF242932), onSurfaceVariant = Color(0xFFA3ADC2),
-    surfaceContainerLowest = Color(0xFF0C0E12), surfaceContainerLow = Color(0xFF171A21),
-    surfaceContainer = Color(0xFF1C2028), surfaceContainerHigh = Color(0xFF242932), surfaceContainerHighest = Color(0xFF2C323E),
-    outline = Color(0xFF74819A), outlineVariant = Color(0xFF303641),
+    background = Color(0xFF151719), onBackground = Color(0xFFE6E9EB),
+    surface = Color(0xFF1B1E21), onSurface = Color(0xFFE6E9EB),
+    surfaceVariant = Color(0xFF282C30), onSurfaceVariant = Color(0xFFA3A9B0),
+    surfaceContainerLowest = Color(0xFF101214), surfaceContainerLow = Color(0xFF191C1F),
+    surfaceContainer = Color(0xFF202427), surfaceContainerHigh = Color(0xFF2A2F33), surfaceContainerHighest = Color(0xFF353B40),
+    outline = Color(0xFF727B83), outlineVariant = Color(0xFF343A3F),
     error = Color(0xFFFF9AAB), errorContainer = Color(0xFF46202E), onErrorContainer = Color(0xFFFFD9E1)
 )
 private val LightStudio = lightColorScheme(
@@ -39,7 +39,7 @@ private val LightStudio = lightColorScheme(
 @Composable
 fun VisionDatasetStudioTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = if (darkTheme) DarkStudio else LightStudio, typography = Typography,
-        shapes = Shapes(extraSmall = RoundedCornerShape(4.dp), small = RoundedCornerShape(8.dp),
-            medium = RoundedCornerShape(12.dp), large = RoundedCornerShape(16.dp), extraLarge = RoundedCornerShape(20.dp)),
+        shapes = Shapes(extraSmall = RoundedCornerShape(3.dp), small = RoundedCornerShape(5.dp),
+            medium = RoundedCornerShape(8.dp), large = RoundedCornerShape(10.dp), extraLarge = RoundedCornerShape(14.dp)),
         content = content)
 }

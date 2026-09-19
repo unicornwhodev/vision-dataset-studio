@@ -6,7 +6,7 @@ Atelier mobile générique de préparation de datasets image pour la vision par 
 
 **Version en qualification sur le poste Runpod.** Les résultats courants sont consignés dans [le rapport du pod](docs/POD_VALIDATION.md). Les tests portables ne remplacent pas la recette Android, les essais sur téléphone et les échanges HF réels.
 
-La refonte **Studio sombre cyan/violet** est décrite dans [le guide UI](docs/UI_REDESIGN.md).
+La refonte **Studio sombre cyan/violet** est décrite dans [le guide UI](docs/UI_REDESIGN.md). Son affinage compact et la nouvelle file de travail sont illustrés dans [la recette de cette révision](docs/UI_REFINEMENT.md).
 
 **Audit fonctionnel : implémentation incomplète.** Huit essais Android ciblés
 passent, dont l’inférence de trois vrais modèles. L’entraînement continu des poids,

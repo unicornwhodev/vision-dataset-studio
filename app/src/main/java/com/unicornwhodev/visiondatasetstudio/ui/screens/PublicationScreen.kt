@@ -57,7 +57,8 @@ fun PublicationScreen(viewModel: MainViewModel) {
     Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0), topBar = {
         StudioTopBar("Exporter", "LOT $number")
     }) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
+        Column(Modifier.widthIn(max = 800.dp).fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (samples.isEmpty()) Text("Aucune image validée à exporter.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (samples.isNotEmpty()) Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 MetricTile("$validated", "Validés", Modifier.weight(1f)); MetricTile("$unfinished", "À terminer", Modifier.weight(1f)); MetricTile("$rejected", "Rejetés", Modifier.weight(1f))
@@ -69,12 +70,12 @@ fun PublicationScreen(viewModel: MainViewModel) {
                 ExportToggle("COCO", "Boîtes uniquement; ne remplace pas les points ou légendes.", coco, !busy) { coco = it }
                 ExportToggle("YOLO", "Boîtes et classes. Une classe inconnue bloque l’export.", yolo, !busy) { yolo = it }
                 ExportToggle("Vision-langage", "Conserve les paires saisies et les abstentions; n’invente pas de réponse.", vl, !busy) { vl = it }
-                Button(onClick = { viewModel.exportActiveBatchToLocalZip(tar, true, coco, yolo, vl) }, enabled = !busy && available > 0 && batch?.status !in com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Archive, null); Spacer(Modifier.width(8.dp)); Text("Créer l’archive · $available")
+                Button(onClick = { viewModel.exportActiveBatchToLocalZip(tar, true, coco, yolo, vl) }, enabled = !busy && available > 0 && batch?.status !in com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates, modifier = Modifier.heightIn(min = 40.dp)) {
+                    Icon(Icons.Default.Archive, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Créer l’archive · $available")
                 }
                 lastZip?.takeIf { it.isFile }?.let { file ->
                     Text("Archive prête · %.1f Mo".format(file.length() / 1048576.0), style = MaterialTheme.typography.labelLarge)
-                    OutlinedButton(onClick = { saveArchive.launch(file.name) }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Enregistrer une copie") }
+                    OutlinedButton(onClick = { saveArchive.launch(file.name) }, enabled = !busy) { Text("Enregistrer une copie") }
                 }
                 StudioDetails("Pour clôturer le lot local, tous les cas doivent être validés ou rejetés. Les cas rejetés ou différés ne sont pas inclus. Un export local ne déclenche aucune suppression.", style = MaterialTheme.typography.bodySmall)
             }
@@ -84,7 +85,7 @@ fun PublicationScreen(viewModel: MainViewModel) {
                 if (project?.hfDestRepo.isNullOrBlank()) OutlinedButton(onClick = { viewModel.navigateTo(Screen.Setup) }) { Text("Configurer la destination") }
                 StudioDetails("Le lot distant utilise les formats enregistrés dans Moteur et transferts, avec images et JSONL canonique obligatoires. Tous les cas doivent avoir une décision finale. Les fichiers sont relus à distance et comparés par SHA-256.", style = MaterialTheme.typography.bodyMedium)
                 if (unfinished > 0) Text("$unfinished cas non terminés : reprenez les différés ou rejetez-les avec un motif.", color = MaterialTheme.colorScheme.error)
-                Button(onClick = { confirmPublish = true }, enabled = !busy && validated > 0 && unfinished == 0 && !project?.hfDestRepo.isNullOrBlank() && batch?.status !in setOf("PURGING","PURGED") && (batch?.status != "VERIFIED" || batch.verificationKind == "local"), modifier = Modifier.fillMaxWidth()) { Text(when(batch?.status) { "PUBLISHED" -> "Reprendre la vérification"; "PREPARED","PUBLISHING","CONFLICT" -> "Réconcilier l’envoi"; else -> "Publier & vérifier" }) }
+                Button(onClick = { confirmPublish = true }, enabled = !busy && validated > 0 && unfinished == 0 && !project?.hfDestRepo.isNullOrBlank() && batch?.status !in setOf("PURGING","PURGED") && (batch?.status != "VERIFIED" || batch.verificationKind == "local"), modifier = Modifier.heightIn(min = 40.dp)) { Text(when(batch?.status) { "PUBLISHED" -> "Reprendre la vérification"; "PREPARED","PUBLISHING","CONFLICT" -> "Réconcilier l’envoi"; else -> "Publier & vérifier" }) }
                 batch?.lastTransferError?.let { Text(it, color=MaterialTheme.colorScheme.error) }
                 if(batch?.status=="CONFLICT" && batch.hfCommitSha==null) OutlinedButton(onClick={confirmIsolate=true},enabled=!busy) { Text("Isoler une nouvelle tentative") }
                 batch?.hfCommitSha?.let { sha -> SelectionContainer { Text("Commit : $sha", style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace) } }
@@ -103,6 +104,7 @@ fun PublicationScreen(viewModel: MainViewModel) {
                 SelectionContainer { Text(preview?.take(16000) ?: "Chargement…", style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace) }
             }
             Spacer(Modifier.height(12.dp))
+        }
         }
     }
     if(confirmIsolate) AlertDialog(onDismissRequest={confirmIsolate=false},title={Text("Isoler une nouvelle tentative ?")},text={Text("Le commit et les chemins de l’ancien envoi resteront inchangés. Une nouvelle publication utilisera un chemin unique; cela peut créer un doublon distant si la première réponse a été perdue. Aucune suppression distante automatique.")},confirmButton={TextButton(onClick={confirmIsolate=false;viewModel.isolateConflict()}){Text("Créer un chemin isolé")}},dismissButton={TextButton(onClick={confirmIsolate=false}){Text("Annuler")}})

@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import com.unicornwhodev.visiondatasetstudio.ui.components.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -115,6 +117,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
     var more by remember { mutableStateOf(false) }
     var labelMenu by remember { mutableStateOf(false) }
     val position = samples.indexOfFirst { it.sampleId == sampleId }.let { if (it < 0) 1 else it + 1 }
+    val wideCommands = LocalConfiguration.current.screenWidthDp >= 600
     val locked = busy || editing
     val update: (SampleAnnotations) -> Unit = viewModel::updateAnnotations
     val regionTab = tab == EditorTab.REGIONS || tab == EditorTab.GROUNDING
@@ -162,9 +165,14 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                 EditorCommand(Icons.AutoMirrored.Filled.ArrowBack, "Revenir au lot après enregistrement", onClick = viewModel::back, enabled = !locked)
                 Column(Modifier.weight(1f)) {
-                    Text("$position / ${samples.size.coerceAtLeast(1)} · ${sample?.assetId ?: "Image"}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelLarge)
-                    Text(if (saving == "Enregistré sur cet appareil") "Enregistré" else saving, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    Text(sample?.assetId ?: "Image", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelLarge)
+                    Text("$position / ${samples.size.coerceAtLeast(1)}  ·  " + if (saving == "Enregistré sur cet appareil") "Enregistré" else saving, maxLines = 1, overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.labelSmall, color = if (saving.startsWith("Échec")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if(wideCommands) {
+                    EditorCommand(Icons.Default.ChevronLeft, "Image précédente", onClick = { viewModel.moveSample(-1) }, enabled = position > 1 && !locked)
+                    EditorCommand(Icons.Default.ChevronRight, "Image suivante", onClick = { viewModel.moveSample(1) }, enabled = position < samples.size && !locked)
+                    VerticalDivider(Modifier.height(18.dp), color = MaterialTheme.colorScheme.outlineVariant)
                 }
                 EditorCommand(Icons.AutoMirrored.Filled.Undo, "Annuler la dernière modification", onClick = viewModel::undo, enabled = canUndo && !locked, modifier = Modifier.testTag("undo_button"))
                 EditorCommand(Icons.AutoMirrored.Filled.Redo, "Rétablir", onClick = viewModel::redo, enabled = canRedo && !locked, modifier = Modifier.testTag("redo_button"))
@@ -228,7 +236,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
             val wide = maxWidth >= 840.dp
             Row(Modifier.fillMaxSize()) {
                 Column(Modifier.weight(1f).fillMaxHeight()) {
-                    Box(Modifier.weight(1f).fillMaxWidth().background(Color(0xFF080B12)).clipToBounds()) {
+                    Box(Modifier.weight(1f).fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerLowest).clipToBounds()) {
                         InteractiveAnnotationCanvas(sample, a, if (locked || (propertiesOpen && !regionTab)) EditorTool.PAN_ZOOM else tool,
                             label, selected, zoom, pan, { z, o -> zoom = z; pan = o }, { selected = it }, { next ->
                                 if (StudioTask.POINTING in tasks && next.points.size > 1 && next.points.size > a.points.size) viewModel.reportError("Mode Point unique : déplacez le point existant ou activez Points multiples.") else update(next)
@@ -237,6 +245,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                     Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 12.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text("$label · ${a.boxes.size + a.points.size} régions", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        if(wideCommands) Text("${sample?.imageWidth ?: 0} × ${sample?.imageHeight ?: 0}  ·  ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text("${(zoom * 100).toInt()} %", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -404,8 +413,8 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if(box==null && point==null) {
             Row(verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.spacedBy(10.dp)) {
-                Text("${a.boxes.size+a.points.size} régions", Modifier.weight(1f), style=MaterialTheme.typography.titleMedium)
-                FilledTonalButton(onClick=onInfer,enabled=!locked) { Icon(Icons.Default.AutoAwesome,null,Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if(modelPresent) "Préannoter" else "Modèle") }
+                Text("${a.boxes.size+a.points.size} régions", Modifier.weight(1f), style=MaterialTheme.typography.titleSmall)
+                StudioAction(if(modelPresent) "Préannoter" else "Modèle", onInfer, icon=Icons.Default.Memory, enabled=!locked)
             }
             if (a.boxes.isEmpty() && a.points.isEmpty()) Text("Choisissez Boîte ou Point.", style=MaterialTheme.typography.bodySmall)
         } else {
@@ -433,10 +442,22 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
                 onUpdate(if(box!=null) a.copy(boxes=a.boxes.map { if(it.id==box.id) it.copy(isHumanVerified=true) else it }) else a.copy(points=a.points.map { if(it.id==point?.id) it.copy(isHumanVerified=true) else it }))
             }) { Text("J’ai relu cette proposition") }
         }
-        FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-            a.boxes.forEachIndexed { i,b -> FilterChip(selected=b.id==selected,onClick={onSelect(b.id)},label={Text("Boîte ${i+1} · ${b.label}")}) }
-            a.points.forEachIndexed { i,p -> FilterChip(selected=p.id==selected,onClick={onSelect(p.id)},label={Text("Point ${i+1} · ${p.label}")}) }
+        a.boxes.forEachIndexed { i,b -> RegionRow("Boîte ${i+1}",b.label,b.id==selected,b.isHumanVerified,Icons.Default.CropSquare) { onSelect(b.id) } }
+        a.points.forEachIndexed { i,p -> RegionRow("Point ${i+1}",p.label,p.id==selected,p.isHumanVerified,Icons.Default.MyLocation) { onSelect(p.id) } }
+    }
+}
+
+@Composable
+private fun RegionRow(title:String, label:String, selected:Boolean, verified:Boolean, icon:ImageVector, onClick:()->Unit) {
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(if(selected) MaterialTheme.colorScheme.surfaceContainerHigh else Color.Transparent)
+        .clickable(role=androidx.compose.ui.semantics.Role.Tab,onClick=onClick).semantics { this.selected=selected }
+        .heightIn(min=48.dp).padding(horizontal=8.dp,vertical=6.dp),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalAlignment=Alignment.CenterVertically) {
+        Icon(icon,null,Modifier.size(17.dp),tint=if(selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(Modifier.weight(1f)) {
+            Text(label,style=MaterialTheme.typography.labelMedium,maxLines=1,overflow=TextOverflow.Ellipsis)
+            Text(title,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        Icon(if(verified) Icons.Default.Check else Icons.Default.RadioButtonUnchecked,if(verified) "Revue humaine" else "Proposition à relire",Modifier.size(14.dp),tint=if(verified) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)
     }
 }
 

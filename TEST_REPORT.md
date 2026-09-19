@@ -73,3 +73,10 @@ Ces défauts restent ouverts, comme l’échec JVM et le blocage SAF précédent
 
 L’entraînement continu des poids, le moteur d’agent et les workflows automatisés
 sont absents. Voir [la matrice et les preuves](docs/IMPLEMENTATION_AUDIT.md).
+
+## Affinage du poste d’annotation
+
+Build `20260919T213548Z-f221e25ccc2f` : 2/2 tests Compose à 960 dp, puis 2/2 à
+320 dp. Sélection d’image, conservation des annotations et dessin/annuler/rétablir
+vérifiés. [Captures et limites](docs/UI_REFINEMENT.md). Le défaut JVM de reprise
+HTTP persiste ; aucun verdict global de publication n’est modifié.

@@ -80,8 +80,8 @@
     },
     {
       "path": "README.md",
-      "bytes": 5495,
-      "sha256": "f488ba35cf38b24c76c417b74ad1ce3c55c54622e6643cd218f6c0f128fd7d5d"
+      "bytes": 5624,
+      "sha256": "50516ec2ffe14178a0b4c517fcdfa458383419c71797e0427011a3020cfcd8c2"
     },
     {
       "path": "SOURCES.md",
@@ -90,8 +90,8 @@
     },
     {
       "path": "TEST_REPORT.md",
-      "bytes": 4573,
-      "sha256": "4e9847f5af0cbb05f829b47a02464c8974cfe0a84d486ec00d11461b22c994cf"
+      "bytes": 4933,
+      "sha256": "5d5c3fb09e6ac156ee0c4d6c50b11b71659a0525db4c5490da7cee0601acd25d"
     },
     {
       "path": "V4_2_CHANGES.md",
@@ -155,8 +155,8 @@
     },
     {
       "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/StudioComposeV4Test.kt",
-      "bytes": 1824,
-      "sha256": "6c11826db134fb8139aad0d3da997a8d76407f0a51958c849dc72d6a9f34cb08"
+      "bytes": 1913,
+      "sha256": "aedf8076221492db878751a2606c825c322d945ba7ebd428309b786d85d954c3"
     },
     {
       "path": "app/src/main/AndroidManifest.xml",
@@ -380,33 +380,33 @@
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/StudioRoot.kt",
-      "bytes": 6982,
-      "sha256": "d95e3155717f35f89af20f8c2b2b764f08dce4816e2dc09180cd9ef7aa700dd2"
+      "bytes": 8461,
+      "sha256": "072d3235ac88dc78f72a721d4e1ae59a738899d332c6a06b31821f21ec15ef2a"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/components/StudioComponents.kt",
-      "bytes": 11259,
-      "sha256": "ddd139079c3785a32909fcc31b2afa5f62babb4dd037af71471a343b25a45aec"
+      "bytes": 12755,
+      "sha256": "29bbca63d075ad4542d170e1237c5f42e6dad5e17924e7a852cbf94a5d6cc0e6"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/AnnotationEditorScreen.kt",
-      "bytes": 46454,
-      "sha256": "f0c16694c33cee123f8d3938296fdcbf61a7822fe151174f23aba9a094610e0e"
+      "bytes": 48460,
+      "sha256": "c44b6c27758001027d46daa01e84487f5c04f3131893214895be9ff4258c6a44"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/BatchGridScreen.kt",
-      "bytes": 15369,
-      "sha256": "63868e887e61ad67b9123a8eccb0a5da19de896e413a294e7a81200b680d7014"
+      "bytes": 16691,
+      "sha256": "0377435a0c275ff531a6e5662f6470b19c6b500be08dc22f80ba8effd301e0bd"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/ModelLibraryScreen.kt",
-      "bytes": 8754,
-      "sha256": "6ec785b66f395a2239cbe2be040317ab0057e0b37d6a2b1b0506c5b3522f55e8"
+      "bytes": 10995,
+      "sha256": "d6998d0b735b2d254cfa42e9349498967a9a7ebb8ab53bd56b6c5e1d7713481d"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/PublicationScreen.kt",
-      "bytes": 13475,
-      "sha256": "3e5613fc819f1c07fc227f134e5373a0e72e573aef6b16b353ca5bc9d4675e57"
+      "bytes": 13585,
+      "sha256": "970e2631e7f252c4f68d0199e42403192bb508c1a06051853b3f431d001cd68e"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/QualityDashboardScreen.kt",
@@ -425,8 +425,8 @@
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioHomeScreen.kt",
-      "bytes": 11946,
-      "sha256": "afae4f30ccca31794557fd15ddb91ff91e2c2e8c065ae09597e602925e730d4a"
+      "bytes": 15672,
+      "sha256": "5e15aaf6fb741155b9bafcf5072a81b2003d92eae67a470093b4ec22e5eb818f"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioPreferencesScreen.kt",
@@ -440,13 +440,13 @@
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Theme.kt",
-      "bytes": 2655,
-      "sha256": "b113a2a50f08d4161d5411e0baf360344374e756c060c646e53d0b78facedaa2"
+      "bytes": 2654,
+      "sha256": "3e2fa83a1b17dd5af70cc2d769ff1c68e7406bd41b1206599f9696d7c5fe6bc1"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Type.kt",
-      "bytes": 1861,
-      "sha256": "ad717059e97bdccfb0d2470cef698d761555aa14bae4bd60b2767b13f67632dc"
+      "bytes": 1859,
+      "sha256": "de0fddcf5324a2a4912cc8cf1f682df6083ada9440ca627c40e55c9ee3659e7e"
     },
     {
       "path": "app/src/main/res/drawable/ic_launcher_background.xml",
@@ -639,6 +639,11 @@
       "sha256": "42d27a1ecbac0d803a91c205b0ea01db209fb3b0f7fb1243a29bcbe103a68ae3"
     },
     {
+      "path": "docs/UI_REFINEMENT.md",
+      "bytes": 3390,
+      "sha256": "40bba619f770623e93e32f354e3a8117fd5b602362f6db2d2830cd6bf44de3ad"
+    },
+    {
       "path": "docs/WORKSTATION.md",
       "bytes": 4989,
       "sha256": "40bf4dd70a6da6360c1ff5f7d510d97acb68f15ea29d10fa09c001ed9990e227"
@@ -647,6 +652,21 @@
       "path": "docs/implementation-audit.json",
       "bytes": 16463,
       "sha256": "891c5e530d95d1e60b3c54d123f7e7b418c6fffdaac5bc702153465e2814a246"
+    },
+    {
+      "path": "docs/ui-refined/refined-editor-persisted.png",
+      "bytes": 53834,
+      "sha256": "af42c7c531efd4bd5ca870bdb81127d17580dae5adc04ff604abd900aa8eac55"
+    },
+    {
+      "path": "docs/ui-refined/refined-home-final.png",
+      "bytes": 71904,
+      "sha256": "a9fb978cc0053f9504ac94ae66712db0e3762df4b2f5f1341069e83d68b1d1fc"
+    },
+    {
+      "path": "docs/ui-refined/refined-phone-home.png",
+      "bytes": 61126,
+      "sha256": "06b4362b6356f435037bff583c6ccd869c3d4b206b853dfbec0fb0364fc77834"
     },
     {
       "path": "docs/ui/batch.png",

@@ -1,34 +1,37 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.*
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.unicornwhodev.visiondatasetstudio.core.workflow.StudioWorkflow
+import com.unicornwhodev.visiondatasetstudio.data.model.SampleEntity
 import com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings
 import com.unicornwhodev.visiondatasetstudio.ui.*
 import com.unicornwhodev.visiondatasetstudio.ui.components.*
 import java.io.File
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StudioHomeScreen(viewModel: MainViewModel) {
     val project by viewModel.projectFlow.collectAsState()
@@ -39,94 +42,104 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
     val policy = project?.let(ProjectSettings::read)
     val configured = !project?.hfSourceRepo.isNullOrBlank() || (policy?.sourceMode == "LOCAL_INDEX" && policy.sourceIndexReady)
     val reviewed = samples.count { it.annotationStatus in setOf("VALIDATED", "REJECTED") }
-    val pending = samples.count { StudioWorkflow.isPending(it.annotationStatus) && it.localImagePath != null }
-    val previews = remember(samples) { samples.filter { it.localImagePath != null }.take(3) }
-    val completion by animateFloatAsState(if (samples.isEmpty()) 0f else reviewed.toFloat() / samples.size, tween(350), label = "batch progress")
+    val completion by animateFloatAsState(if(samples.isEmpty()) 0f else reviewed.toFloat() / samples.size, label = "batch review")
+    var previewId by rememberSaveable(project?.id, batch) { mutableStateOf<String?>(null) }
+    val preview = samples.firstOrNull { it.sampleId == previewId }
+        ?: samples.firstOrNull { StudioWorkflow.isPending(it.annotationStatus) && it.localImagePath != null }
+        ?: samples.firstOrNull()
+    val previewEditable = preview?.let { StudioWorkflow.canEdit(it.acquisitionStatus, it.syncStatus, it.localImagePath != null) } == true
+    var presetMenu by remember { mutableStateOf(false) }
     var presetId by remember { mutableStateOf<String?>(null) }
+    val currentPreset = StudioWorkflow.presets.firstOrNull { it.tasks == StudioWorkflow.parseTasks(project?.activeTasksCsv ?: "DETECTION") }
+    val openPreview: () -> Unit = {
+        preview?.takeIf { previewEditable && !busy }?.let { viewModel.openSampleInEditor(it.sampleId) }
+    }
+    val primary: @Composable () -> Unit = {
+        StudioAction(if (!configured) "Importer" else if(samples.isEmpty()) "Préparer le lot" else if(previewEditable) "Annoter" else "Ouvrir le lot",
+            onClick = { if(!configured) viewModel.navigateTo(Screen.Setup) else if(samples.isEmpty()) viewModel.fetchAndPrepareBatch(batch)
+                else if(previewEditable) openPreview() else viewModel.navigateTo(Screen.BatchGrid) },
+            icon = if(samples.isEmpty()) Icons.Default.Add else Icons.Default.ArrowForward,
+            primary = true, enabled = !busy && project != null, modifier = Modifier.testTag("home_primary"))
+    }
+    val details: @Composable () -> Unit = {
+        WorkspaceLink("Source", if(policy?.sourceMode == "LOCAL_INDEX") "Dossier local" else project?.hfSourceRepo?.ifBlank { "À configurer" } ?: "À configurer",
+            Icons.Default.FolderOpen, !busy) { viewModel.navigateTo(Screen.Setup) }
+        WorkspaceLink("Modèle", if(project?.modelPath != null || project?.modelConfigJson?.contains("local_http") == true) "Profil du projet"
+            else if(models.isEmpty()) "Aucun modèle actif" else "${models.size} disponible(s)", Icons.Default.Memory, !busy) { viewModel.navigateTo(Screen.Models) }
+        Box {
+            WorkspaceLink("Outils", currentPreset?.title ?: "Personnalisés", Icons.Default.CropFree, !busy) { presetMenu = true }
+            DropdownMenu(expanded = presetMenu, onDismissRequest = { presetMenu = false }) {
+                StudioWorkflow.presets.forEach { preset -> DropdownMenuItem(text = { Text(preset.title) }, onClick = { presetMenu = false; presetId = preset.id }) }
+                HorizontalDivider()
+                DropdownMenuItem(text = { Text("Personnaliser les outils") }, onClick = { presetMenu = false; viewModel.navigateTo(Screen.Preferences) })
+            }
+        }
+    }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
-        StudioTopBar("Vision Studio", actions = {
-            IconButton(onClick = { viewModel.navigateTo(Screen.Preferences) }) { Icon(Icons.Default.Tune, "Réglages", Modifier.size(22.dp)) }
+        StudioTopBar(project?.name ?: "Atelier", "Atelier  /  Lot ${batch.toString().padStart(2, '0')}", actions = {
+            IconButton(onClick = { viewModel.navigateTo(Screen.Controls) }, enabled = !busy, modifier = Modifier.testTag("controls_shortcut")) {
+                Icon(Icons.Default.FolderOpen, "Gérer les projets", Modifier.size(19.dp))
+            }
+            IconButton(onClick = { viewModel.navigateTo(Screen.Preferences) }) { Icon(Icons.Default.Tune, "Réglages", Modifier.size(19.dp)) }
         })
     }) { inset ->
-        Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
-            LazyColumn(Modifier.widthIn(max = 960.dp).fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                item {
-                    Row(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small).clickable(enabled = !busy, role = Role.Button) { viewModel.navigateTo(Screen.Controls) }
-                        .testTag("controls_shortcut").heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surfaceVariant) {
-                            Icon(Icons.Default.FolderOpen, null, Modifier.padding(10.dp).size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text("PROJET ACTIF", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(project?.name ?: "Chargement…", style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
-                        Icon(Icons.Default.UnfoldMore, "Gérer les projets", Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        BoxWithConstraints(Modifier.fillMaxSize().padding(inset)) {
+            if (maxWidth >= 760.dp) {
+                Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 8.dp)) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text("Espace d’annotation", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                        primary()
                     }
-                }
-                item {
-                    Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surface,
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .7f))) {
-                        Column {
-                            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(if (samples.isEmpty()) "Lot de travail" else "Lot ${batch.toString().padStart(2, '0')}", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-                                Text(if (samples.isEmpty()) "Aucune image" else "${samples.size} images", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(8.dp))
+                    Row(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                        Column(Modifier.weight(1f).fillMaxHeight()) {
+                            WorkspacePreview(preview, Modifier.weight(1f).fillMaxWidth(), previewEditable && !busy, openPreview)
+                            PreviewCaption(preview)
+                        }
+                        Column(Modifier.width(236.dp).fillMaxHeight()) {
+                            Row(Modifier.fillMaxWidth().height(28.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text("FILE DE TRAVAIL", Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text("${samples.size}", style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace)
+                            }
+                            LinearProgressIndicator(progress = { completion }, modifier = Modifier.fillMaxWidth().height(2.dp), trackColor = MaterialTheme.colorScheme.outlineVariant)
+                            Text("$reviewed / ${samples.size} traitées", Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                if(samples.isEmpty()) item { Text("Aucune image importée", Modifier.padding(vertical = 16.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                                itemsIndexed(samples, key = { _, s -> s.sampleId }) { index, sample ->
+                                    QueueRow(sample, index, sample.sampleId == preview?.sampleId) { previewId = sample.sampleId }
+                                }
                             }
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .6f))
-                            if (previews.isNotEmpty()) {
-                                BoxWithConstraints(Modifier.fillMaxWidth().padding(8.dp)) {
-                                    val previewHeight = (maxWidth / previews.size / .85f).coerceAtMost(194.dp)
-                                    Row(Modifier.fillMaxWidth().height(previewHeight), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        previews.forEach { sample ->
-                                            AsyncImage(model = File(sample.localImagePath!!), contentDescription = "Aperçu ${sample.assetId}", contentScale = ContentScale.Crop,
-                                                modifier = Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(4.dp)))
-                                        }
-                                    }
-                                }
-                            } else if (samples.isEmpty()) {
-                                Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Icon(Icons.Default.AddPhotoAlternate, null, Modifier.size(34.dp), tint = MaterialTheme.colorScheme.primary)
-                                    Text(if (configured) "Source prête" else "Connectez vos images", style = MaterialTheme.typography.titleMedium)
-                                    Text(if (configured) "Préparez jusqu’à ${policy?.batchSize ?: 100} images." else "Dossier local ou dataset Hugging Face",
-                                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                            }
-                            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                                if (samples.isNotEmpty()) {
-                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                        Text("$reviewed / ${samples.size} traitées", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        Text("${(completion * 100).toInt()} %", style = MaterialTheme.typography.labelMedium)
-                                    }
-                                    LinearProgressIndicator(progress = { completion }, modifier = Modifier.fillMaxWidth().height(3.dp), trackColor = MaterialTheme.colorScheme.surfaceVariant)
-                                }
-                                Button(enabled = !busy && project != null, onClick = {
-                                    if (!configured) viewModel.navigateTo(Screen.Setup)
-                                    else if (samples.isEmpty()) viewModel.fetchAndPrepareBatch(batch)
-                                    else viewModel.resumeWork()
-                                }, shape = MaterialTheme.shapes.small, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("home_primary")) {
-                                    Icon(if (!configured) Icons.Default.Add else Icons.Default.PlayArrow, null, Modifier.size(18.dp))
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(if (!configured) "Configurer la source" else if (samples.isEmpty()) "Préparer le lot" else if (pending > 0) "Annoter · $pending restantes" else "Ouvrir le lot")
-                                }
-                            }
+                            details()
                         }
                     }
                 }
-                item {
-                    Column {
-                        WorkspaceRow("Source", if (policy?.sourceMode == "LOCAL_INDEX") "Dossier ou manifeste local" else project?.hfSourceRepo?.ifBlank { "Non configurée" } ?: "Non configurée",
-                            Icons.Default.Storage, !busy) { viewModel.navigateTo(Screen.Setup) }
-                        WorkspaceRow("Assistance", if (models.isEmpty()) "Annotation manuelle" else "${models.size} modèle(s) installé(s)",
-                            Icons.Default.Memory, !busy) { viewModel.navigateTo(Screen.Models) }
-                    }
-                }
-                item {
-                    StudioDisclosure("Outils d’annotation", Icons.Default.CropFree) {
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            StudioWorkflow.presets.forEach { preset -> FilterChip(
-                                selected = StudioWorkflow.parseTasks(project?.activeTasksCsv ?: "DETECTION") == preset.tasks,
-                                enabled = !busy, onClick = { presetId = preset.id }, label = { Text(preset.title) }) }
+            } else {
+                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)) {
+                    item {
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text("Lot ${batch.toString().padStart(2, '0')}", style = MaterialTheme.typography.titleSmall)
+                                Text("$reviewed / ${samples.size} traitées", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            primary()
                         }
-                        TextButton(onClick = { viewModel.navigateTo(Screen.Preferences) }) { Text("Personnaliser les outils") }
+                        Spacer(Modifier.height(8.dp))
+                        WorkspacePreview(preview, Modifier.fillMaxWidth().aspectRatio(4f / 3f), previewEditable && !busy, openPreview)
+                        PreviewCaption(preview)
+                        LinearProgressIndicator(progress = { completion }, modifier = Modifier.fillMaxWidth().height(2.dp), trackColor = MaterialTheme.colorScheme.outlineVariant)
+                        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text("Images du lot", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                            TextButton(onClick = { viewModel.navigateTo(Screen.BatchGrid) }) { Text("Tout voir", style = MaterialTheme.typography.labelMedium) }
+                        }
+                    }
+                    itemsIndexed(samples.take(3), key = { _, s -> s.sampleId }) { index, sample ->
+                        QueueRow(sample, index, sample.sampleId == preview?.sampleId) { previewId = sample.sampleId }
+                    }
+                    item {
+                        Spacer(Modifier.height(12.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        details()
                     }
                 }
             }
@@ -141,17 +154,53 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
 }
 
 @Composable
-private fun WorkspaceRow(title: String, detail: String, icon: ImageVector, enabled: Boolean, onClick: () -> Unit) {
-    Column {
-        Row(Modifier.fillMaxWidth().clickable(enabled = enabled, role = Role.Button, onClick = onClick).padding(vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Icon(icon, null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(title, style = MaterialTheme.typography.titleSmall)
-                Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-            Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+private fun WorkspacePreview(sample: SampleEntity?, modifier: Modifier, editable: Boolean, onClick: () -> Unit) {
+    Box(modifier.clip(RoundedCornerShape(5.dp)).background(MaterialTheme.colorScheme.surfaceContainerLowest)
+        .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .6f), RoundedCornerShape(5.dp))
+        .clickable(enabled = editable, role = Role.Button, onClickLabel = "Annoter cette image", onClick = onClick), contentAlignment = Alignment.Center) {
+        if(sample?.localImagePath != null) AsyncImage(model = File(sample.localImagePath), contentDescription = "Aperçu ${sample.assetId}", contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().padding(8.dp))
+        else Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(Icons.Default.CropFree, null, Modifier.size(30.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(if(sample == null) "Votre espace de travail" else "Aperçu indisponible", style = MaterialTheme.typography.titleSmall)
+            Text(if(sample == null) "Importez un dossier ou un dataset." else "Ouvrez le lot pour vérifier l’acquisition.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .6f))
+    }
+}
+
+@Composable
+private fun PreviewCaption(sample: SampleEntity?) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 36.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(sample?.assetId ?: "Aucune image sélectionnée", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if(sample?.imageWidth != null && sample.imageHeight != null) Text("${sample.imageWidth} × ${sample.imageHeight}", style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun QueueRow(sample: SampleEntity, index: Int, selected: Boolean, onClick: () -> Unit) {
+    val background by animateColorAsState(if(selected) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.background, label = "preview selection")
+    val status = when(sample.annotationStatus) { "VALIDATED" -> "Validée"; "REJECTED" -> "Rejetée"; "IN_PROGRESS" -> "En cours"; "DEFERRED" -> "À revoir"; "PROPOSALS_AVAILABLE" -> "Suggestions"; else -> "À traiter" }
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(background).clickable(role = Role.Tab, onClick = onClick)
+        .semantics { this.selected = selected }.padding(horizontal = 8.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text((index+1).toString().padStart(2,'0'), style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Box(Modifier.size(44.dp, 36.dp).clip(RoundedCornerShape(3.dp)).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
+            if(sample.localImagePath != null) AsyncImage(File(sample.localImagePath), null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            else Icon(Icons.Default.Image, null, Modifier.size(16.dp))
+        }
+        Column(Modifier.weight(1f)) {
+            Text(sample.assetId, style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(status, style = MaterialTheme.typography.labelSmall, color = if(selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun WorkspaceLink(title: String, detail: String, icon: ImageVector, enabled: Boolean, onClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth().clickable(enabled = enabled, role = Role.Button, onClick = onClick).heightIn(min = 56.dp).padding(vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, Modifier.size(17.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(detail, style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Icon(Icons.Default.ChevronRight, null, Modifier.size(15.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

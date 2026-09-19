@@ -29,12 +29,33 @@ import com.unicornwhodev.visiondatasetstudio.ui.OperationProgress
 @Composable
 fun StudioTopBar(title: String, eyebrow: String? = null, onBack: (() -> Unit)? = null,
                  actions: @Composable RowScope.() -> Unit = {}) {
-    Column { TopAppBar(windowInsets = WindowInsets(0), colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-        title = { Column {
-            Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (eyebrow != null) Text(eyebrow, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        } }, navigationIcon = { if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour") } }, actions = actions)
+    Column {
+        Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background).heightIn(min = 52.dp).padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour", Modifier.size(20.dp)) }
+            else Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (eyebrow != null) Text(eyebrow, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            actions()
+        }
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .55f))
+    }
+}
+
+/** A small visible command inside a full-height touch target. */
+@Composable
+fun StudioAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier,
+                 icon: ImageVector? = null, enabled: Boolean = true, primary: Boolean = false) {
+    val foreground = if (!enabled) MaterialTheme.colorScheme.onSurface.copy(alpha = .38f)
+        else if (primary) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+    val background = if (primary && enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh
+    Box(modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(5.dp)).clickable(enabled = enabled, role = Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
+        Row(Modifier.clip(RoundedCornerShape(5.dp)).background(background).padding(horizontal = 12.dp, vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (icon != null) Icon(icon, null, Modifier.size(16.dp), tint = foreground)
+            Text(label, style = MaterialTheme.typography.labelMedium, color = foreground, maxLines = 1)
+        }
     }
 }
 
@@ -42,8 +63,8 @@ fun StudioTopBar(title: String, eyebrow: String? = null, onBack: (() -> Unit)? =
 @Composable
 fun StudioRouteMotion(route: String, content: @Composable () -> Unit) {
     val enter = remember { Animatable(1f) }
-    val offset = with(LocalDensity.current) { 12.dp.toPx() }
-    LaunchedEffect(route) { enter.snapTo(0f); enter.animateTo(1f, tween(240, easing = FastOutSlowInEasing)) }
+    val offset = with(LocalDensity.current) { 4.dp.toPx() }
+    LaunchedEffect(route) { enter.snapTo(0f); enter.animateTo(1f, tween(160, easing = FastOutSlowInEasing)) }
     Box(Modifier.fillMaxSize().graphicsLayer { alpha = enter.value; translationY = offset * (1f - enter.value) }) { content() }
 }
 
@@ -51,7 +72,7 @@ fun StudioRouteMotion(route: String, content: @Composable () -> Unit) {
 fun StudioSection(title: String, subtitle: String? = null, icon: ImageVector? = null,
                   modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     var help by remember { mutableStateOf(false) }
-    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
             if (icon != null) Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
             Text(title, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
@@ -74,11 +95,11 @@ fun StudioDisclosure(title: String, icon: ImageVector = Icons.Default.Tune, init
     Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surface, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .65f)), modifier = Modifier.fillMaxWidth()) {
         Column {
             Row(Modifier.fillMaxWidth().clickable(role = Role.Button) { expanded = !expanded }
-                .semantics { stateDescription = if (expanded) "Déplié" else "Replié" }.heightIn(min = 56.dp).padding(horizontal = 14.dp, vertical = 12.dp),
+                .semantics { stateDescription = if (expanded) "Déplié" else "Replié" }.heightIn(min = 48.dp).padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
-                Text(title, Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
-                Icon(Icons.Default.ExpandMore, null, Modifier.graphicsLayer { rotationZ = rotation })
+                Text(title, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp).graphicsLayer { rotationZ = rotation })
             }
             AnimatedVisibility(expanded, enter = expandVertically(tween(200)) + fadeIn(), exit = shrinkVertically(tween(160)) + fadeOut()) {
                 Column(Modifier.padding(start = 14.dp, end = 14.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(12.dp), content = content)
@@ -91,7 +112,7 @@ fun StudioDisclosure(title: String, icon: ImageVector = Icons.Default.Tune, init
 fun StudioTabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
     // All destinations remain visible at 320 dp; the active rule moves without resizing labels.
     Column(modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth()) {
+        Row(Modifier.widthIn(max = 520.dp).fillMaxWidth()) {
             labels.forEachIndexed { index, label ->
                 val active = index == selected
                 val color by animateColorAsState(if (active) MaterialTheme.colorScheme.primary else Color.Transparent, label = "tab rule")
@@ -110,10 +131,10 @@ fun StudioTabs(labels: List<String>, selected: Int, onSelect: (Int) -> Unit, mod
 
 @Composable
 fun StatusPill(text: String, icon: ImageVector = Icons.Default.Circle, attention: Boolean = false) {
-    Surface(shape = RoundedCornerShape(50), color = if (attention) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, Modifier.size(12.dp))
-            Text(text, style = MaterialTheme.typography.labelMedium)
+    Surface(shape = RoundedCornerShape(4.dp), color = if (attention) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh) {
+        Row(Modifier.padding(horizontal = 7.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, Modifier.size(11.dp), tint = if(attention) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary)
+            Text(text, style = MaterialTheme.typography.labelSmall)
         }
     }
 }
@@ -130,7 +151,7 @@ fun MetricTile(value: String, label: String, modifier: Modifier = Modifier) {
 fun OperationBanner(progress: OperationProgress?, busy: Boolean, onDismiss: () -> Unit) {
     if (progress == null) return
     var expanded by remember(progress.message) { mutableStateOf(false) }
-    Surface(color = if (progress.isError) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
+    Surface(color = if (progress.isError) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surfaceContainer,
         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp).animateContentSize()) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {

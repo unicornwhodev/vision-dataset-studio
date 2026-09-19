@@ -4,6 +4,7 @@ import com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -68,8 +70,11 @@ fun BatchGridScreen(viewModel: MainViewModel) {
             .let { list -> if (priority) list.sortedBy { when { it.acquisitionStatus.startsWith("ERROR") -> 0; it.annotationStatus == "DEFERRED" -> 1; it.annotationStatus == "PROPOSALS_AVAILABLE" -> 2; else -> 3 } } else list }
     }
     val validated = samples.count { it.annotationStatus == "VALIDATED" }
+    val gridWidth = if(LocalConfiguration.current.screenWidthDp >= 840) {
+        if(preferences.gridDensity == GridDensity.COMPACT) 188.dp else 240.dp
+    } else preferences.gridDensity.minCellDp.dp
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
-        StudioTopBar("Lot $batchNumber", "${samples.size} IMAGES · $validated VALIDÉES", actions = {
+        StudioTopBar("Lot ${batchNumber.toString().padStart(2, '0')}", "${samples.size} images  /  $validated validées", actions = {
             if (samples.isNotEmpty()) IconButton(onClick = viewModel::resumeWork,
                 enabled = !busy && samples.any { StudioWorkflow.isPending(it.annotationStatus) && it.localImagePath != null },
                 modifier = Modifier.testTag("start_annotating_button")) {
@@ -114,14 +119,22 @@ fun BatchGridScreen(viewModel: MainViewModel) {
                 }
             } else {
                 Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    OutlinedTextField(search, { search = it }, leadingIcon = { Icon(Icons.Default.Search, null) }, label = { Text("Rechercher") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        BatchFilter.entries.forEach { f -> FilterChip(selected = filter == f, onClick = { filter = f }, label = { Text("${f.title} · ${samples.count { matches(it, f) }}") }) }
+                    OutlinedTextField(search, { search = it }, leadingIcon = { Icon(Icons.Default.Search, null, Modifier.size(18.dp)) }, placeholder = { Text("Rechercher une image", style = MaterialTheme.typography.bodySmall) }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 12.dp))
+                    Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        BatchFilter.entries.forEach { f ->
+                            Column(Modifier.width(IntrinsicSize.Max).clickable(role = Role.Tab) { filter = f }.semantics { this.selected = filter == f }, horizontalAlignment = Alignment.CenterHorizontally) {
+                                Row(Modifier.heightIn(min = 46.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(f.title, style = MaterialTheme.typography.labelMedium, color = if(filter == f) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text("${samples.count { matches(it, f) }}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                Box(Modifier.fillMaxWidth().height(2.dp).background(if(filter == f) MaterialTheme.colorScheme.primary else androidx.compose.ui.graphics.Color.Transparent))
+                            }
+                        }
                     }
                     if (priority) Text("Priorité aux révisions", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
                 }
                 if (filtered.isEmpty()) EmptyWorkspace("Aucun résultat", "Essayez un autre filtre.", Icons.Default.FilterAltOff, "Tout afficher") { filter = BatchFilter.ALL; search = "" }
-                else LazyVerticalGrid(columns = GridCells.Adaptive(preferences.gridDensity.minCellDp.dp), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                else LazyVerticalGrid(columns = GridCells.Adaptive(gridWidth), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(filtered, key = { it.sampleId }) { sample ->
                         val editable = StudioWorkflow.canEdit(sample.acquisitionStatus, sample.syncStatus, sample.localImagePath != null)
                         SampleThumbnailCard(sample, selected = sample.sampleId in selected, onLongClick = {
@@ -163,20 +176,20 @@ fun SampleThumbnailCard(sample: SampleEntity, onClick: () -> Unit, selected: Boo
     }
     val icon = when(label) { "Copie vérifiée" -> Icons.Default.CloudDone; "Validé" -> Icons.Default.CheckCircleOutline; "À revoir" -> Icons.Default.Schedule; "À récupérer" -> Icons.Default.ErrorOutline; "Rejeté" -> Icons.Default.Block; else -> Icons.Default.Edit }
     val outline by androidx.compose.animation.animateColorAsState(if(selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, label = "sample selection")
-    Column(Modifier.clip(RoundedCornerShape(8.dp)).border(if(selected) 2.dp else 1.dp, outline, RoundedCornerShape(8.dp))
+    Column(Modifier.clip(RoundedCornerShape(4.dp)).border(if(selected) 2.dp else 1.dp, outline, RoundedCornerShape(4.dp))
         .background(MaterialTheme.colorScheme.surface).combinedClickable(onClick = onClick, onLongClickLabel = "Sélectionner cette image", onLongClick = onLongClick)
         .semantics(mergeDescendants = true) { contentDescription = "${sample.assetId}, $label"; this.selected = selected }
         .testTag("sample_${sample.sampleId}")) {
-        Box(Modifier.fillMaxWidth().aspectRatio(1.2f).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {
-            if (sample.localImagePath != null) AsyncImage(model = File(sample.localImagePath), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+        Box(Modifier.fillMaxWidth().aspectRatio(4f / 3f).background(MaterialTheme.colorScheme.surfaceContainerLowest), contentAlignment = Alignment.Center) {
+            if (sample.localImagePath != null) AsyncImage(model = File(sample.localImagePath), contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
             else Icon(if (published) Icons.Default.CloudDone else Icons.Default.BrokenImage, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(32.dp))
             if (selected) Surface(Modifier.align(Alignment.TopEnd).padding(8.dp), shape = RoundedCornerShape(50), color = MaterialTheme.colorScheme.primary) { Icon(Icons.Default.Check, "Sélectionné", Modifier.padding(5.dp).size(18.dp)) }
         }
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(sample.assetId, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelLarge)
+            Text(sample.assetId, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelMedium)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 Icon(icon, null, Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

@@ -29,6 +29,7 @@ class StudioComposeV4Test {
         rule.onNodeWithTag("nav_QualityDashboard").assertIsSelected()
         rule.onNodeWithText("Stockage").assertExists()
         rule.onNodeWithTag("nav_Home").performClick()
-        rule.onNodeWithTag("home_primary").performScrollTo().assertIsDisplayed()
+        // The workspace command must now be immediately available on both layouts.
+        rule.onNodeWithTag("home_primary").assertIsDisplayed().assertHasClickAction()
     }
 }
