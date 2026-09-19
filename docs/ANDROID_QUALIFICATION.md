@@ -54,8 +54,8 @@ P0 : APK construite, installée, tests dépendances/lint réussis, schémas gén
 
 Le nouvel applicationId est `com.unicornwhodev.visiondatasetstudio`. Une ancienne application sous un autre identifiant n’est pas mise à jour ; aucune migration automatique de sa base privée ni des permissions SAF n’est promise. Ne pas fusionner ce contrôle avec les migrations de schéma Room.
 
-Les schémas JSON seront générés sous `app/schemas/com.unicornwhodev.visiondatasetstudio.data.db.AppDatabase/`. Ne pas inventer leurs hashes en attendant KSP.
+Les schémas JSON sont générés sous `app/schemas/com.unicornwhodev.visiondatasetstudio.data.db.AppDatabase/`. Ne pas inventer leurs hashes en attendant KSP.
 
 Les émulateurs API 28/35 du workflow complètent les tests hôte, mais ne prouvent ni le comportement d’un téléphone réel, ni un test d’inférence ARM, ni un aller-retour HF. Le script refuse les APK absents, dont le reçu ne correspond pas à la dernière tentative ou dont les octets ont changé. Le premier lancement de ce workflow reste à effectuer.
 
-Avant une distribution publique : choix de licence explicite, inventaire des droits et notices de dépendances résolues. Le statut de licence reste `decision_required`.
+Avant une distribution publique : choix de licence explicite, inventaire des droits et notices de dépendances résolues. Le titulaire a choisi Apache-2.0 ; voir `LICENSING_STATUS.md`. Les notices transitives restent à vérifier.

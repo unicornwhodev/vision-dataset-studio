@@ -86,7 +86,7 @@ fun PublicationScreen(viewModel: MainViewModel) {
                 batch?.lastTransferError?.let { Text(it, color=MaterialTheme.colorScheme.error) }
                 if(batch?.status=="CONFLICT" && batch.hfCommitSha==null) OutlinedButton(onClick={confirmIsolate=true},enabled=!busy) { Text("Créer un nouvel emplacement sans écrasement…") }
                 batch?.hfCommitSha?.let { sha -> SelectionContainer { Text("Commit : $sha", style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace) } }
-                if (batch?.status in setOf("VERIFIED","PURGING")) {
+                if (batch != null && batch.status in setOf("VERIFIED","PURGING")) {
                     StatusPill(if(batch.verificationKind=="local")"Archive externe vérifiée" else if(batch.verificationKind=="rejection_only")"Rejets explicitement confirmés" else "Contenus distants vérifiés", Icons.Default.VerifiedUser)
                     OutlinedButton(onClick = { confirmPurge = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(if(batch?.status=="PURGING") "Reprendre le nettoyage interrompu" else "Libérer le stockage de ce lot") }
                 }

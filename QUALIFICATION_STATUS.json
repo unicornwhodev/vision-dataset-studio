@@ -2,30 +2,55 @@
   "schema": 1,
   "product": "Vision Dataset Studio",
   "brand": "Unicorn Who Dev",
-  "version": "4.2.0-rc1",
+  "version": "4.2.0-rc2",
   "date": "2026-09-19",
   "namespace": "com.unicornwhodev.visiondatasetstudio",
   "application_id": "com.unicornwhodev.visiondatasetstudio",
   "room_schema_version": 3,
-  "source_only": true,
+  "source_only": false,
   "public_release_ready": false,
-  "license": "decision_required",
+  "license": "Apache-2.0",
   "rights_and_transitive_notices_review": "pending",
   "android": {
-    "build_script_invoked": true,
-    "compilation_started": false,
-    "apk_built": false,
-    "instrumented_tests_executed": false,
-    "real_room_migration_executed": false,
-    "real_moshi_tests_executed": false,
-    "real_compose_tests_executed": false,
-    "real_saf_tests_executed": false,
+    "compilation_started": true,
+    "apk_built": true,
+    "instrumented_tests_executed": true,
+    "real_room_migration_executed": true,
+    "real_moshi_tests_executed": true,
+    "real_compose_tests_executed": true,
+    "real_saf_tests_executed": true,
     "physical_device_tested": false,
-    "build_outcome": "blocked_before_compilation",
+    "build_outcome": "failed_dependency_tests",
     "blockers": [
-      "Android SDK absent dans l’environnement de préparation"
+      "HfTransferV4Test.disconnectedDownloadResumesHashedPrefix: echec de reprise",
+      "SafFaultProvider: dependance Kotlin absente du processus fournisseur",
+      "Recette produit et CI API 28/35 a terminer"
     ],
-    "evidence": "test-results/v4.2/android-build-status.json"
+    "evidence": "docs/POD_VALIDATION.md",
+    "test_apk_built": true,
+    "unit_tests": {
+      "total": 26,
+      "passed": 25,
+      "failed": 1
+    },
+    "lint": {
+      "errors": 0,
+      "warnings": 68
+    },
+    "room_schema_generated": true,
+    "real_compose_test_scope": "Robolectric screenshot component test; device results separate",
+    "build_script_invoked": true,
+    "instrumented_tests": {
+      "scheduled": 8,
+      "completed_passed": 3,
+      "suite_completed": false,
+      "status": "blocked_and_stopped",
+      "blocker": "SafFaultProvider: NoClassDefFoundError kotlin.jvm.internal.Intrinsics",
+      "compose_separate_run": {
+        "tests": 1,
+        "passed": 1
+      }
+    }
   },
   "portable_tests": {
     "policy": 44,
@@ -40,7 +65,7 @@
   "syntax": {
     "kotlin_and_kts_files": 75,
     "syntax_errors": 0,
-    "type_resolution_performed": false
+    "type_resolution_performed": true
   },
   "stress": {
     "rows": 200000,
@@ -71,5 +96,12 @@
     "in_place_update_from_previous_application_id": false,
     "cross_application_data_import_implemented": false
   },
-  "remote_repository_modified": false
+  "remote_repository_modified": false,
+  "workstation": {
+    "project_path": "/workspace/projects/vision-dataset-studio",
+    "persistent_volume": true,
+    "kvm_available": false,
+    "vnc_transport": "SSH loopback",
+    "emulator": "API 28 AOSP x86_64 software"
+  }
 }

@@ -41,7 +41,7 @@ jobs:
           python3 tools/qa/test_build_evidence.py
       - name: Install exact compile platform and build tools
         run: |
-          sdkmanager 'platforms;android-36.1' 'build-tools;36.0.0'
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
           sdkmanager --list_installed > sdk-packages.txt
       - name: Build APKs, run dependency tests, lint and verify signatures
         env:

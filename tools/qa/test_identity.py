@@ -37,7 +37,7 @@ class IdentityTests(unittest.TestCase):
         text=next((ROOT/'app/src/androidTest').rglob('SafV4Test.kt')).read_text()
         self.assertIn('context.packageName}.documents/',text)
     def test_version_and_database_versions_distinct(self):
-        self.assertIn('versionName = "4.2.0-rc1"',(ROOT/'app/build.gradle.kts').read_text())
+        self.assertIn('versionName = "4.2.0-rc2"',(ROOT/'app/build.gradle.kts').read_text())
         db=next((ROOT/'app/src/main').rglob('AppDatabase.kt')).read_text()
         self.assertIn('version = 3',db)
         self.assertNotIn('fallbackToDestructiveMigration',db)
@@ -51,11 +51,12 @@ class IdentityTests(unittest.TestCase):
             self.assertNotIn(path.suffix,{'.tflite','.onnx','.safetensors','.keystore','.jks'},path)
     def test_no_archived_docs_in_candidate(self):
         self.assertFalse((ROOT/'docs/history').exists())
-    def test_license_is_explicitly_pending(self):
+    def test_selected_apache_license_and_notices_are_present(self):
         text=(ROOT/'LICENSING_STATUS.md').read_text()
-        self.assertIn('decision_required',text)
+        self.assertIn('Apache-2.0',text)
         self.assertTrue((ROOT/'NOTICE').is_file())
-        self.assertFalse((ROOT/'LICENSE').exists())
+        self.assertIn('Apache License', (ROOT/'LICENSE').read_text())
+        self.assertIn('Version 2.0, January 2004', (ROOT/'LICENSE').read_text())
     def test_gradle_aliases_resolve(self):
         data=tomllib.loads((ROOT/'gradle/libs.versions.toml').read_text())
         libraries={key.replace('-','.') for key in data['libraries']}

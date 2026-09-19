@@ -1,20 +1,27 @@
 {
   "schema": 2,
   "product": "Vision Dataset Studio",
-  "version": "4.2.0-rc1",
+  "version": "4.2.0-rc2",
+  "scope": "reviewed sources; runtime artifacts described in build receipts",
   "apk_included": false,
   "manifest_self_excluded": true,
   "archive_sha256_recorded_separately": true,
+  "original_archive_sha256": "394867d550e41d94957ff5d07d94f2b8edae449cebe498a52b3e2c86be408464",
   "files": [
     {
       "path": ".github/workflows/android-qualification.yml",
-      "bytes": 3995,
-      "sha256": "7b1ead9db8dc42fbae6da2de389961ae61ae56e69de43e7534adaa3912bfbb3e"
+      "bytes": 3993,
+      "sha256": "8dba3c80368aca28e10c013b39e8048db3a4364d0b3162ccacd865377e583b43"
     },
     {
       "path": ".gitignore",
       "bytes": 508,
       "sha256": "5798543e8c17ec86ca021501bee754638775ff880a812d0fc1a3e7792650143c"
+    },
+    {
+      "path": ".vscode/tasks.json",
+      "bytes": 685,
+      "sha256": "a654f188106371fd2c466787e43bc784c9e8e11722dcccb38d735cbfcfa8234c"
     },
     {
       "path": "AGENTS.md",
@@ -25,6 +32,11 @@
       "path": "ARCHITECTURE.md",
       "bytes": 1866,
       "sha256": "7fcb888efcbf0bc18ecb6d6e96eb1d8e606872725be09ab7a836d51f4001e037"
+    },
+    {
+      "path": "CHROMEBOOK_BUILD.md",
+      "bytes": 714,
+      "sha256": "2f4e8a140cdfac8f8086f7a629c11b8597495bdb65e16717c886892f3a936a64"
     },
     {
       "path": "DATA_SCHEMA.md",
@@ -38,13 +50,18 @@
     },
     {
       "path": "KNOWN_LIMITATIONS.md",
-      "bytes": 3315,
-      "sha256": "a2223105bd2e3c12a223c9e0711b3b0a25a1f9538c3e6c30c12f35c844105ee6"
+      "bytes": 4157,
+      "sha256": "bd7defd33120aac0110974a8557f68ade719cdd933a91ad6ed33fcfb4f2d7f64"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
     },
     {
       "path": "LICENSING_STATUS.md",
-      "bytes": 1605,
-      "sha256": "a5f51cdbaf85e80eef95ba5b1a6dc344f3ab3498d9defbb1cc663800a741ba72"
+      "bytes": 921,
+      "sha256": "fbb30d460aab3a5f9b84b73ec37851babf126f034e1e9a2d29c81b995fced8be"
     },
     {
       "path": "MODEL_ADAPTERS.md",
@@ -53,18 +70,18 @@
     },
     {
       "path": "NOTICE",
-      "bytes": 1030,
-      "sha256": "1bab8f6f37ca7b38c9d0d139e4e50b9330d5cc552e879e3486405dbff378b5ff"
+      "bytes": 997,
+      "sha256": "30884762e06591ef794612ce97fa516e4e2d3804ffefd570e1a3bce2cd3d2682"
     },
     {
       "path": "QUALIFICATION_STATUS.json",
-      "bytes": 2083,
-      "sha256": "90798f1484abfe9cfa12ee1ac22410cefd4edc1be41b74fc0de850f58b9f7c55"
+      "bytes": 3055,
+      "sha256": "0be6d80c7b0c9ca991d6436c6599577b34a9e1a80abd0925802c0194ec6b1658"
     },
     {
       "path": "README.md",
-      "bytes": 4589,
-      "sha256": "3418e261ce192a163f067e4446f19fa9c16257aa8358fd2c5451a6f236bd8b25"
+      "bytes": 5047,
+      "sha256": "e5257773bee56fd1539af9b2e1eede06faa16efc6f77b6974f52975dae256f4a"
     },
     {
       "path": "SOURCES.md",
@@ -73,8 +90,8 @@
     },
     {
       "path": "TEST_REPORT.md",
-      "bytes": 2865,
-      "sha256": "f7cb59751d7193e609cb8ff5ce4b81c139365360a0177f8b23f00216d191935c"
+      "bytes": 2045,
+      "sha256": "3a24fc560fa18ede3460cdf5f47014eb9758d6efcb18b935fab5dbdb98ee1a15"
     },
     {
       "path": "V4_2_CHANGES.md",
@@ -87,14 +104,19 @@
       "sha256": "3e5ee6e95bf7c7fcfdfddc84f1e03a6b998c3ea442045643d9523ded23f039ef"
     },
     {
+      "path": "V4_2_RC2_CHANGES.md",
+      "bytes": 694,
+      "sha256": "a3330c2241a1c1a165d45892a1fe3da9510126b2cc0f42fa1c39f8ea2fac6eb9"
+    },
+    {
       "path": "app/.gitignore",
       "bytes": 7,
       "sha256": "5b46eb48d96e8571e8c93e4ef4f6ffbe6807b6d7350664a36a064e1167a32718"
     },
     {
       "path": "app/build.gradle.kts",
-      "bytes": 4078,
-      "sha256": "dbe551dcc9388cc8340c94640ae4d14927ddcef96a360c20da25bf78c434abab"
+      "bytes": 4035,
+      "sha256": "5b38485928f919f9740a2de6e367793bc930cfcd4635e2bc40bd6f333faa80c0"
     },
     {
       "path": "app/proguard-rules.pro",
@@ -103,8 +125,13 @@
     },
     {
       "path": "app/schemas/README.md",
-      "bytes": 602,
-      "sha256": "8d914206707d4e4aea82f7bef8c7687bcb9c566a02cf00b04f2bcc9fca54cfb0"
+      "bytes": 612,
+      "sha256": "adba202598d2f0108f5e7801f5ddd4072c38d067d39615ceb8d264a37e15e541"
+    },
+    {
+      "path": "app/schemas/com.unicornwhodev.visiondatasetstudio.data.db.AppDatabase/3.json",
+      "bytes": 20565,
+      "sha256": "41a1f674fa79fcb9f1c31b78de351e834b1927af395ba39c9f3b3cea491c422a"
     },
     {
       "path": "app/src/androidTest/AndroidManifest.xml",
@@ -258,8 +285,8 @@
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/BatchEngine.kt",
-      "bytes": 40019,
-      "sha256": "7d165ca362e9d8b8f3828de922d4ae78505d09974b388792af14657c0acb4098"
+      "bytes": 40093,
+      "sha256": "231f46b6a4a7a00a08c2fd7d238337634abf6acd6032a8ec7dd8434d9c60637a"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/WorkClaimCoordinator.kt",
@@ -288,8 +315,8 @@
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/CommunityModelCatalog.kt",
-      "bytes": 7118,
-      "sha256": "e054406039fb3ab40a6b361985194a6db68b9d305e278b2368a16cfbdfc7b1e4"
+      "bytes": 9726,
+      "sha256": "416ba3f4eca989e86aec219de31ded938173a63f5f947e34f50523d8eed7e718"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/DeviceBenchmark.kt",
@@ -328,8 +355,8 @@
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/PublicModelCatalog.kt",
-      "bytes": 7492,
-      "sha256": "957c1f564b4a41e2c0429151c1763f9cc68b6a0dddc7f5b3a156d69436562a26"
+      "bytes": 7628,
+      "sha256": "847881231b43defd3513a13f836c9a3a9fcd954bbe3b021675df55bbb2bcdcb3"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/StudioPack.kt",
@@ -378,8 +405,8 @@
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/PublicationScreen.kt",
-      "bytes": 13007,
-      "sha256": "ab235c5b4ce296eb8229679eeed339a71478b5a9db166f10509aa07b4018c9d7"
+      "bytes": 13023,
+      "sha256": "eca63e50d05f1efe67a252e9472cfeeec2a9cafb81979654ece6ad5ee04266d3"
     },
     {
       "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/QualityDashboardScreen.kt",
@@ -577,9 +604,34 @@
       "sha256": "71a325324526b83f32b37433f07fc5777b745eaf8a79b116fb50ecb309675038"
     },
     {
+      "path": "build_on_chromebook.sh",
+      "bytes": 3464,
+      "sha256": "7b92b40b5aa16d068de885ba034699a02ee70cb4fbc5a4217d1d7f038c0d29cc"
+    },
+    {
       "path": "docs/ANDROID_QUALIFICATION.md",
-      "bytes": 6538,
-      "sha256": "5c969b433e04788034912e81cf253288f062e35bfa1d980ee6dd0eb31f836ded"
+      "bytes": 6597,
+      "sha256": "4777eeacc92ce3488e08716d88af12431298d7800182d13f947604dbd4521140"
+    },
+    {
+      "path": "docs/POD_VALIDATION.md",
+      "bytes": 5525,
+      "sha256": "f05ff98a5a1b6a5688214b99f82053af15167f47ba1be5e9718a30eb2ed75f92"
+    },
+    {
+      "path": "docs/RELEASE_PLAN.md",
+      "bytes": 2951,
+      "sha256": "fe65a03f545612dc07166b9257dd25fbea746e76a6634dcee4f233f8d52937b6"
+    },
+    {
+      "path": "docs/ROADMAP.md",
+      "bytes": 3534,
+      "sha256": "9e122ea5160bc190dce18d9ff5241aa2489cc35a51d178563f3f18c3868e5645"
+    },
+    {
+      "path": "docs/WORKSTATION.md",
+      "bytes": 3811,
+      "sha256": "3a5493e48f2a89accb667728b764800b118b3ee632eb11c9ac6b32103583091e"
     },
     {
       "path": "examples/README.md",
@@ -672,6 +724,11 @@
       "sha256": "23430bf326e487a1af830869f0a58a8cc189b60238cb42afb59692c21b732460"
     },
     {
+      "path": "gradle.properties",
+      "bytes": 1414,
+      "sha256": "f448172179c9ff90cb6e97a3ee1d5666e668c2c3740e5256066dca86b8dcf79e"
+    },
+    {
       "path": "gradle/libs.versions.toml",
       "bytes": 5467,
       "sha256": "f295fcb702414b0e499c923c7b432f760595aa0f66306d47c4c18df35f5e468b"
@@ -680,11 +737,6 @@
       "path": "gradle/wrapper/gradle-wrapper.properties",
       "bytes": 339,
       "sha256": "40c4ac801fa3d3029cc46957c91216f9fcff52a05a011a0579357bae3dc4c441"
-    },
-    {
-      "path": "gradle.properties",
-      "bytes": 1414,
-      "sha256": "f448172179c9ff90cb6e97a3ee1d5666e668c2c3740e5256066dca86b8dcf79e"
     },
     {
       "path": "gradlew",
@@ -698,8 +750,8 @@
     },
     {
       "path": "metadata.json",
-      "bytes": 795,
-      "sha256": "5a6d90d79f3d93afc87a3e34680cece678cd44e0ba0ec068b57a269baa16f2c3"
+      "bytes": 738,
+      "sha256": "cd5fa7cd91f02bae77728647dd3131e570b55a6fcd4dff48b3ec22aba2d511eb"
     },
     {
       "path": "settings.gradle.kts",
@@ -707,79 +759,9 @@
       "sha256": "b317c4b2fea3620978fbe71a59fab0323947f48d520a7b61c9b3a508aee0681b"
     },
     {
-      "path": "test-results/v4.2/android-build-status.json",
-      "bytes": 689,
-      "sha256": "d623d3fba5ffbd7f179f8b2bd6ff01559ae4a46b60d80e602e7fe1becab16999"
-    },
-    {
-      "path": "test-results/v4.2/build-evidence-tests.txt",
-      "bytes": 1867,
-      "sha256": "6bfee5f9a892cbcb5220df43d7d2e9966c489bb0b7566fe5a319ec9571c3e202"
-    },
-    {
-      "path": "test-results/v4.2/engine-tests.txt",
-      "bytes": 3851,
-      "sha256": "5e085f9ca3f0245088bcc7559cebee353f99f37b5ad013963fb4de855b190070"
-    },
-    {
-      "path": "test-results/v4.2/export-validator.txt",
-      "bytes": 582,
-      "sha256": "b3381134f9f7455539b156c2e6430e390ec30d8edb79f43487b274fc0353b91b"
-    },
-    {
-      "path": "test-results/v4.2/identity.txt",
-      "bytes": 1431,
-      "sha256": "97e9fa5ff27624f1e5f39fd2e2b2b646c4f3e74c77f7412e5dd864fbba533ceb"
-    },
-    {
-      "path": "test-results/v4.2/java-version.log",
-      "bytes": 183,
-      "sha256": "396eaa6c73c38012211ff4228112340c294c8c7639e11ce8494715249f959c09"
-    },
-    {
-      "path": "test-results/v4.2/kotlin-syntax.txt",
-      "bytes": 95,
-      "sha256": "2bd3b1a6ec20d8edc33e9adc5b08a62d0b5cd8f9c358cd2a7209384e367d6b96"
-    },
-    {
-      "path": "test-results/v4.2/policy-tests.txt",
-      "bytes": 2087,
-      "sha256": "a9ab7a56b3e375ca6be03c4d0a33538227f836c9b5e57d417f76b74d0faa96d0"
-    },
-    {
-      "path": "test-results/v4.2/reliability.txt",
-      "bytes": 1763,
-      "sha256": "f6b8cdffdaca664c973b0669a9cd84554d6220232a01978836c5f7f122203387"
-    },
-    {
-      "path": "test-results/v4.2/sqlite-stress.json",
-      "bytes": 430,
-      "sha256": "4e1be3607916e7b1420029b6b5624641542b8294edb40ee3070daf5ce66fde21"
-    },
-    {
-      "path": "test-results/v4.2/sqlite.txt",
-      "bytes": 1433,
-      "sha256": "2798dc76a96b743cd11a5759d17f630ea12c792cbef8b9559d18c0de947cb886"
-    },
-    {
-      "path": "tools/__pycache__/build_android.cpython-313.pyc",
-      "bytes": 16112,
-      "sha256": "5b1b6e5dabe2555eb810ab70462d5cd1a9a31c658568c05bab526dac0017fef5"
-    },
-    {
-      "path": "tools/__pycache__/gradle_bootstrap.cpython-313.pyc",
-      "bytes": 5060,
-      "sha256": "c0dec266c8cda6e28059f5eccd183142d5453ec45dc074cba6e26159bdc06f7b"
-    },
-    {
-      "path": "tools/__pycache__/hf_validate_and_convert.cpython-313.pyc",
-      "bytes": 12968,
-      "sha256": "47bdd0bfdc8b970dcbcd3953d1ba8e501519a145c714e50b30de9cd2520b7dea"
-    },
-    {
       "path": "tools/build_android.py",
-      "bytes": 8985,
-      "sha256": "867eb04ac8a97fd017a25b48d60c12ef365ede8e876c14abc9d7c5f6292d70ec"
+      "bytes": 8981,
+      "sha256": "ab9b5f0597d6366f0d2044a0b838a98fd724b13b8b7242d088e70d11445f1a50"
     },
     {
       "path": "tools/build_android.sh",
@@ -795,6 +777,11 @@
       "path": "tools/hf_validate_and_convert.py",
       "bytes": 7224,
       "sha256": "273047d5da3999fd31be86ffdf37248d8abf94b154462e67a6fbd08f1ca0c172"
+    },
+    {
+      "path": "tools/package_qualification.py",
+      "bytes": 2709,
+      "sha256": "51d0fa6b2dc975525925ab2d9378fcfd473608770a66d8616788bafb2e7d0a4a"
     },
     {
       "path": "tools/qa/EngineRegression.kt",
@@ -820,11 +807,6 @@
       "path": "tools/qa/V4Reliability.kt",
       "bytes": 8101,
       "sha256": "6fc9c3cdd199c095851ba4cad41cfddf3f8c92c2614ae38ec2f8f2461c50fcfb"
-    },
-    {
-      "path": "tools/qa/__pycache__/resolve_apks.cpython-313.pyc",
-      "bytes": 3998,
-      "sha256": "5a1d86fac312d29b2c0943597d740b754c00ea22241a74dd57147a0fb8a376fc"
     },
     {
       "path": "tools/qa/capture_device_metrics.sh",
@@ -868,13 +850,38 @@
     },
     {
       "path": "tools/qa/test_identity.py",
-      "bytes": 4647,
-      "sha256": "e10889c62d6eb556e0b3e6d94124c80a0b58790804e2bf1b283d31f3b37c1589"
+      "bytes": 4757,
+      "sha256": "cae14f5420bbe91e3386afd9aec37d72ed4bf58c51314199e5a2f30d40e3e720"
     },
     {
       "path": "tools/qa/test_v4_sqlite.py",
       "bytes": 7156,
       "sha256": "ccefb2d6f42c4bcc0997cf7c5fa51a72be2fef9e55c9bf3cfb6887e1392ce8cc"
+    },
+    {
+      "path": "tools/workstation/android-env.sh",
+      "bytes": 484,
+      "sha256": "c8a962321286eec8eb13315249b17a5072dd9d3af112b442e86bf7e6e7d76386"
+    },
+    {
+      "path": "tools/workstation/install-android-native-tools.sh",
+      "bytes": 435,
+      "sha256": "f93d9328df6a919ecdcedca3f06b4d13e911eb6c14e93fba6639d123f60fc730"
+    },
+    {
+      "path": "tools/workstation/run.sh",
+      "bytes": 891,
+      "sha256": "d89f30aa77b8a92250dff3d808e97cfe26aa835e493179c0557d06e2eeed5aaa"
+    },
+    {
+      "path": "tools/workstation/setup-android-toolchain.py",
+      "bytes": 3986,
+      "sha256": "5bd19add63c3c9c4997757a79902d565ddcebb93501ad36a737c991ebd5bc3c1"
+    },
+    {
+      "path": "tools/workstation/start-android-emulator.sh",
+      "bytes": 1985,
+      "sha256": "df0de93b0ee46eb6a3f3543e0843c779cf15f114deb89d254b7bf5b680bed7aa"
     }
   ]
 }

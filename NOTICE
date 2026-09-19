@@ -1,7 +1,7 @@
 Vision Dataset Studio — Unicorn Who Dev
-Candidate 4.2.0-rc1
+Candidate 4.2.0-rc2
 
-No project-wide reuse licence is granted by this candidate. See LICENSING_STATUS.md.
+The project code is licensed under Apache License 2.0. See LICENSE and LICENSING_STATUS.md.
 No claim of legal ownership of every pre-existing contribution is made by a branding change.
 
 The build references third-party AndroidX, Kotlin, TensorFlow Lite, Moshi, OkHttp,
@@ -13,6 +13,6 @@ This notice is not a substitute for the licences/notices of those components.
 Model weights are NOT bundled. Their download, use and redistribution require
 review of the terms at their respective sources. Dataset rights remain separate.
 
-Before public distribution, complete the rights review, add the owner's chosen
-project licence and distribute all required third-party notices. Do not remove
+Before public distribution, complete the rights review and distribute all
+required third-party notices. Do not remove
 required attribution merely to make the source tree appear independent.

@@ -21,6 +21,7 @@ import com.unicornwhodev.visiondatasetstudio.data.model.PointTarget
 import com.unicornwhodev.visiondatasetstudio.data.model.ProjectEntity
 import com.unicornwhodev.visiondatasetstudio.data.model.SampleAnnotations
 import com.unicornwhodev.visiondatasetstudio.data.model.SampleEntity
+import com.unicornwhodev.visiondatasetstudio.data.model.SourceEntryEntity
 import com.unicornwhodev.visiondatasetstudio.data.model.SyncStatus
 import com.unicornwhodev.visiondatasetstudio.data.model.TagTarget
 import com.unicornwhodev.visiondatasetstudio.domain.export.DatasetExporters

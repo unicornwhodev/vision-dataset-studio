@@ -1,19 +1,19 @@
 {
   "name": "Vision Dataset Studio",
   "brand": "Unicorn Who Dev",
-  "version": "4.2.0-rc1",
-  "description": "Catalogue LiteRT UWD dynamique, réservations coopératives HF, correction adaptative points/boîtes et interface modèles dédiée. Compilation Android toujours bloquée par SDK absent; aucune APK.",
+  "version": "4.2.0-rc2",
+  "description": "Atelier Android de datasets vision. Poste Runpod prepare, APK Debug et tests construites ; qualification en cours avec echecs documentes.",
   "platform": "Android",
-  "source_only": true,
-  "apk_built": false,
+  "source_only": false,
+  "apk_built": true,
   "remote_backend_required": false,
-  "delivery_status": "v4_2_rc1_sources_android_build_blocked",
+  "delivery_status": "v4_2_rc2_android_qualification_incomplete",
   "delivery_date": "2026-09-19",
   "application_id": "com.unicornwhodev.visiondatasetstudio",
   "namespace": "com.unicornwhodev.visiondatasetstudio",
-  "android_apk_produced": false,
+  "android_apk_produced": true,
   "executed_portable_tests": 196,
   "room_schema_version": 3,
-  "android_tests_executed": false,
-  "license_decision": "pending"
+  "android_tests_executed": true,
+  "license_decision": "Apache-2.0"
 }

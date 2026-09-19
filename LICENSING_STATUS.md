@@ -1,14 +1,16 @@
-# Statut de licence — décision du titulaire requise
+# Licence du projet
 
-**Statut : `decision_required`. Aucune licence de réutilisation du projet n’est accordée par cette livraison.**
+**Apache-2.0**, choisie explicitement par le propriétaire du projet le 19 septembre 2026.
+Le texte complet figure dans [LICENSE](LICENSE). La destination de publication retenue
+est le compte GitHub `unicornwhodev`, avec un dépôt public.
 
-Cette note n’est ni une licence MIT/Apache/AGPL, ni une décision définitive de commercialisation propriétaire. Aucun fichier `LICENSE` n’a été ajouté arbitrairement et aucun transfert de propriété n’est affirmé. Le nom Unicorn Who Dev est l’identité produit retenue, pas une preuve juridique de titularité pour chaque contribution.
+Cette licence s'applique au code du projet dont les contributeurs détiennent les droits.
+Les composants tiers conservent leurs licences, copyrights et attributions ; leur
+inventaire et les notices accompagnent la préparation de la distribution. Le nom
+Unicorn Who Dev n'est pas une preuve d'origine des contributions antérieures.
 
-Avant publication, le titulaire doit confirmer le périmètre des droits détenus, choisir les conditions de distribution et ajouter le texte de licence correspondant. Les composants tiers restent soumis à leurs propres conditions : cette décision ne doit ni les relicencier ni supprimer leurs attributions requises. Le nettoyage de marques et de références de développement ne dispense pas de cet inventaire.
+Les poids des modèles et les datasets ne sont pas inclus. Leur téléchargement,
+utilisation et redistribution restent soumis à leurs propres conditions.
 
-Le catalogue de modèles propose des téléchargements séparés. La licence du code ne vaut pas licence des poids, des labels ni des datasets traités. Leur SHA local identifie des octets ; il ne certifie pas les droits d’utilisation.
-
-Les licences et notices transitives n’ont pas pu être extraites des dépendances résolues, faute de build. `NOTICE` est une information d’état, pas une déclaration de conformité exhaustive.
-
-Référence : GitHub, « Licensing a repository », consultée le 18 septembre 2026 :
-https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository
+Le choix de licence ne vaut pas qualification technique : les résultats de compilation,
+tests et recette sont consignés séparément dans les rapports de validation.

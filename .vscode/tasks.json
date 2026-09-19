@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {"label": "Android: build et tests JVM", "type": "shell", "command": "bash tools/workstation/run.sh build", "group": {"kind": "build", "isDefault": true}, "problemMatcher": []},
+    {"label": "Android: tests portables", "type": "shell", "command": "bash tools/workstation/run.sh portable", "group": "test", "problemMatcher": []},
+    {"label": "Android: démarrer émulateur", "type": "shell", "command": "bash tools/workstation/run.sh emulator", "problemMatcher": []},
+    {"label": "Android: tests sur émulateur dédié", "type": "shell", "command": "bash tools/workstation/run.sh device-tests", "group": "test", "problemMatcher": []}
+  ]
+}

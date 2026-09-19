@@ -1,8 +1,25 @@
-# V4.2 RC1 — limitations actuelles
+# V4.2 RC2 — limitations actuelles
 
 ## Bloquants de qualification
 
-Aucune APK construite, aucune installation, aucun typage Compose/Room/Moshi complet. Les dépendances KSP/Room/Moshi/MetadataExtractor et le SDK mineur hérité doivent être résolus par un vrai build. Les schémas Room JSON historiques ne sont pas disponibles ; les fixtures SQL sont reconstruites, pas récupérées sur une installation. Une mise à jour depuis des bases réellement utilisées reste nécessaire.
+Deux APK Debug réelles sont produites et vérifiées. Compose/Room/Moshi/LiteRT
+compilent ; le schéma Room v3 est généré par KSP. Le build global reste en échec :
+25/26 tests JVM Android réussissent ; la reprise d’un téléchargement interrompu
+échoue dans `HfTransferV4Test.disconnectedDownloadResumesHashedPrefix`. Lint :
+0 erreur, 68 avertissements. Voir `docs/POD_VALIDATION.md` pour les preuves et
+les résultats instrumentés. Sur API 28, les deux migrations et l’identité ont
+réussi avant le blocage de la suite SAF : `SafFaultProvider` ne trouve pas
+`kotlin.jvm.internal.Intrinsics` dans le processus de l’APK de tests.
+
+Les schémas Room JSON historiques v1/v2 ne sont pas disponibles ; les fixtures
+SQL sont reconstruites, pas récupérées sur une installation. Une mise à jour
+depuis des bases réellement utilisées reste nécessaire.
+
+Le pod n’a pas KVM. L’émulateur AOSP démarre et affiche l’application, mais le
+premier affichage a pris environ 28 secondes et des blocages System UI ont été
+observés. À 320 dp de largeur, l’action « Importer » de la bibliothèque de modèles
+est comprimée et son libellé n’est pas lisible sur la capture. La navigation
+initiale ne remplace pas la recette complète sur un téléphone.
 
 Pas de test HF de bout en bout, ni injection de panne réelle sur Android, ni mesure RAM/inférence sur téléphone. Les helpers JVM et le stress SQLite hôte n’établissent pas ces succès.
 
@@ -26,4 +43,4 @@ Pas de lecteur Parquet natif avec pixels embarqués, import COCO/YOLO universel,
 
 ## Identité et distribution
 
-L’identité Android UWD est nouvelle. Il n’y a pas de transfert automatique des bases ni des permissions depuis une application avec un autre applicationId. La licence du projet n’est pas choisie et les notices transitives résolues restent à auditer : ce candidat n’est pas prêt pour publication open source ou release Android.
+L’identité Android UWD est nouvelle. Il n’y a pas de transfert automatique des bases ni des permissions depuis une application avec un autre applicationId. La licence Apache-2.0 a été choisie. Les notices transitives restent à auditer et la qualification doit être terminée avant publication de la version validée.

@@ -39,7 +39,7 @@ object PublicModelCatalog {
                 val input=interpreter.getInputTensor(0)
                 require(input.shape().contentEquals(intArrayOf(1,entry.size,entry.size,3))) { "Dimensions différentes de la version cataloguée" }
                 require(input.dataType().name in setOf("UINT8","FLOAT32")) { "Type d’entrée non prévu pour cette entrée de catalogue" }
-                val md=metadata.getInputTensorMetadata(0)
+                val md=requireNotNull(metadata.getInputTensorMetadata(0)) { "Métadonnées du tenseur d’entrée absentes" }
                 val norms=(0 until md.processUnitsLength()).mapNotNull { index ->
                     val unit=md.processUnits(index) ?: return@mapNotNull null
                     if(unit.optionsType()==ProcessUnitOptions.NormalizationOptions) unit.options(NormalizationOptions()) as? NormalizationOptions else null
@@ -58,13 +58,13 @@ object PublicModelCatalog {
                     require(shapes[1]==listOf(1,shapes[0][1]) && shapes[2]==shapes[1] && shapes[3]==listOf(1))
                     require((0..3).all{interpreter.getOutputTensor(it).dataType().name=="FLOAT32"})
                     // Only the known DetectionPostProcess order is supported; ambiguous tensors are rejected.
-                    val className=metadata.getOutputTensorMetadata(1).name()?.lowercase().orEmpty()
-                    val scoreName=metadata.getOutputTensorMetadata(2).name()?.lowercase().orEmpty()
+                    val className=metadata.getOutputTensorMetadata(1)?.name()?.lowercase().orEmpty()
+                    val scoreName=metadata.getOutputTensorMetadata(2)?.name()?.lowercase().orEmpty()
                     require(className in setOf("category","classes","detection_classes") && scoreName in setOf("score","scores","detection_scores")) {
                         "Sémantique des sorties différente; contrat manuel requis"
                     }
                 } else require(interpreter.outputTensorCount==1)
-                val outputMd=metadata.getOutputTensorMetadata(labelOutput)
+                val outputMd=requireNotNull(metadata.getOutputTensorMetadata(labelOutput)) { "Métadonnées de sortie des labels absentes" }
                 val type=if(entry.family=="ssd")AssociatedFileType.TENSOR_VALUE_LABELS else AssociatedFileType.TENSOR_AXIS_LABELS
                 val associated=(0 until outputMd.associatedFilesLength()).mapNotNull{outputMd.associatedFiles(it)}
                     .firstOrNull{it.type()==type && it.locale().isNullOrBlank()} ?: error("Étiquettes indexées absentes; aucun vocabulaire inventé")
