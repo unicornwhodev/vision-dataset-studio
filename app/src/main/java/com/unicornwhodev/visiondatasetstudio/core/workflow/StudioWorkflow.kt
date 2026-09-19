@@ -58,10 +58,10 @@ object StudioWorkflow {
 }
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
-enum class GridDensity(val minCellDp: Int) { COMFORTABLE(152), COMPACT(112) }
+enum class GridDensity(val minCellDp: Int) { COMFORTABLE(136), COMPACT(112) }
 
 data class StudioPreferences(
-    val theme: ThemeMode = ThemeMode.SYSTEM,
+    val theme: ThemeMode = ThemeMode.DARK,
     val gridDensity: GridDensity = GridDensity.COMFORTABLE,
     val autoAdvance: Boolean = true,
     val showGuidance: Boolean = true,

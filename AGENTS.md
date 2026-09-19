@@ -1,6 +1,6 @@
 # Vision Dataset Studio UWD — cadre de qualification
 
-Lire README.md, TEST_REPORT.md, KNOWN_LIMITATIONS.md, LICENSING_STATUS.md et docs/ANDROID_QUALIFICATION.md. Le code existant reste la base ; aucune nouvelle refonte de l’interface n’est requise.
+Lire README.md, TEST_REPORT.md, KNOWN_LIMITATIONS.md, LICENSING_STATUS.md et docs/ANDROID_QUALIFICATION.md. Le code métier existant reste la base. Le propriétaire a demandé le 19 septembre 2026 une refonte complète de l’UI : studio sombre cyan/violet, textes courts, interactions animées. Conserver les protections des données et les confirmations de publication/suppression.
 
 L’identité stable est `com.unicornwhodev.visiondatasetstudio`. Ne pas réintroduire de namespace de template, de preset métier imposé, de références à des dépôts privés ni d’archives documentaires externes au produit. Conserver les attributions requises : le branding ne prouve pas l’origine des droits. Ne pas choisir une licence sans décision explicite du titulaire.
 

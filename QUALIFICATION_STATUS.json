@@ -38,7 +38,7 @@
       "warnings": 68
     },
     "room_schema_generated": true,
-    "real_compose_test_scope": "Robolectric screenshot component test; device results separate",
+    "real_compose_test_scope": "Robolectric component capture and two on-device navigation/catalogue tests",
     "build_script_invoked": true,
     "instrumented_tests": {
       "scheduled": 8,
@@ -47,10 +47,21 @@
       "status": "blocked_and_stopped",
       "blocker": "SafFaultProvider: NoClassDefFoundError kotlin.jvm.internal.Intrinsics",
       "compose_separate_run": {
-        "tests": 1,
-        "passed": 1
+        "tests": 2,
+        "passed": 2,
+        "build_run": "20260919T203710Z-e9cd5c4ddbbe",
+        "runtime_seconds": 75.807,
+        "device_width_dp": 960
+      },
+      "compose_phone_run": {
+        "tests": 2,
+        "passed": 2,
+        "build_run": "20260919T200729Z-bec11e4607bc",
+        "runtime_seconds": 74.293,
+        "device_width_dp": 320
       }
-    }
+    },
+    "current_build_run": "20260919T203710Z-e9cd5c4ddbbe"
   },
   "portable_tests": {
     "policy": 44,
@@ -78,7 +89,7 @@
     "hf_write_test": false,
     "phone_memory_measured": false,
     "phone_model_time_measured": false,
-    "community_model_catalog_live_test": false,
+    "community_model_catalog_live_test": true,
     "cooperative_claim_live_hf_test": false
   },
   "ci": {
@@ -102,6 +113,50 @@
     "persistent_volume": true,
     "kvm_available": false,
     "vnc_transport": "SSH loopback",
-    "emulator": "API 28 AOSP x86_64 software"
+    "emulator": "API 28 AOSP x86_64 software",
+    "preview": {
+      "width_px": 960,
+      "height_px": 720,
+      "density_dpi": 160,
+      "profile": "workstation"
+    }
+  },
+  "ui_redesign": {
+    "status": "canvas_runtime_passed_with_product_blockers",
+    "direction": "dark_cyan_violet",
+    "requested_by_owner": true,
+    "report": "docs/UI_REDESIGN.md",
+    "build_run": "20260919T203710Z-e9cd5c4ddbbe",
+    "compose_tests": {
+      "total": 2,
+      "passed": 2
+    },
+    "apk_sha256": "abf2f50fe63835ab885f23efc50f0db5033f167f2db72a778061355f8bc03c2d",
+    "manual_editor_checks": {
+      "device": "API 28, 320 dp, software emulator",
+      "fixture": "3 synthetic QA images in separate Recette-UI project",
+      "box_creation": true,
+      "undo_redo": true,
+      "properties_open_close": true,
+      "saved_box_after_activity_restart": true,
+      "canvas_px": [
+        480,
+        515
+      ],
+      "displayed_image_px": [
+        480,
+        360
+      ],
+      "zoom_125_and_fit_100": true,
+      "font_scale_1_3": true,
+      "build_run": "20260919T200729Z-bec11e4607bc",
+      "properties_sidebar_960dp": true,
+      "saved_box_after_emulator_restart": true
+    },
+    "final_home_preview_fix": {
+      "build_run": "20260919T203710Z-e9cd5c4ddbbe",
+      "validated_width_dp": 960,
+      "saved_box_after_apk_update": true
+    }
   }
 }

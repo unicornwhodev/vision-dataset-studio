@@ -1,6 +1,9 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
 import android.graphics.Paint
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.unicornwhodev.visiondatasetstudio.ui.components.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.*
@@ -14,9 +17,12 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -31,6 +37,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -44,6 +51,19 @@ import java.io.File
 import java.util.UUID
 import kotlin.math.abs
 import kotlin.math.hypot
+
+/** Compact visible controls with a full 48 dp touch target. */
+@Composable
+private fun EditorCommand(icon: ImageVector, description: String, onClick: () -> Unit,
+                          modifier: Modifier = Modifier, enabled: Boolean = true, selected: Boolean? = null, accent: Boolean = false) {
+    val background by animateColorAsState(when { !enabled -> Color.Transparent; accent -> MaterialTheme.colorScheme.primary; selected == true -> MaterialTheme.colorScheme.primaryContainer; else -> Color.Transparent }, label = "editor command")
+    val tint = when { !enabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = .38f); accent -> MaterialTheme.colorScheme.onPrimary; selected == true -> MaterialTheme.colorScheme.primary; else -> MaterialTheme.colorScheme.onSurfaceVariant }
+    IconButton(onClick = onClick, enabled = enabled, modifier = modifier.size(48.dp).semantics { if (selected != null) this.selected = selected }) {
+        Box(Modifier.size(28.dp).clip(RoundedCornerShape(5.dp)).background(background), contentAlignment = Alignment.Center) {
+            Icon(icon, description, Modifier.size(20.dp), tint = tint)
+        }
+    }
+}
 
 /** Selection and creation are separate tools: moving an existing target never creates another. */
 enum class EditorTool { SELECT, BOX, POINT, PAN_ZOOM }
@@ -89,7 +109,6 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
     var selected by remember(sampleId) { mutableStateOf<String?>(null) }
     var zoom by remember(sampleId) { mutableFloatStateOf(1f) }
     var pan by remember(sampleId) { mutableStateOf(Offset.Zero) }
-    var focus by rememberSaveable { mutableStateOf(false) }
     var rejectDialog by remember { mutableStateOf(false) }
     var acceptDialog by remember { mutableStateOf(false) }
     var reason by remember { mutableStateOf("") }
@@ -103,107 +122,133 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
     val pointAllowed = StudioTask.POINTING in tasks || StudioTask.POINTING_MULTI in tasks || StudioTask.GROUNDING in tasks
     val hasProposals = a.boxes.any { !it.isHumanVerified } || a.points.any { !it.isHumanVerified } || a.tags.any { !it.isHumanVerified } || a.captions.any { !it.isHumanVerified } || a.vqaList.any { !it.isHumanVerified } || a.counts.any { !it.isHumanVerified } || a.groundings.any { !it.isHumanVerified }
     val hasModel = !project?.modelPath.isNullOrBlank() || project?.modelConfigJson?.contains("local_http") == true
-    val selectedExists = a.boxes.any { it.id == selected } || a.points.any { it.id == selected }
 
-    Scaffold(contentWindowInsets = WindowInsets(0), modifier = Modifier.imePadding(), topBar = {
-        TopAppBar(windowInsets = WindowInsets(0), title = {
-            Column {
-                Text("$position / ${samples.size.coerceAtLeast(1)} · ${sample?.assetId ?: "Cas"}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.titleMedium)
-                Text(saving, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall, color = if (saving.startsWith("Échec")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+    val inspectorState = rememberSaveableStateHolder()
+    var propertiesOpen by rememberSaveable { mutableStateOf(false) }
+    val inspector: @Composable (Modifier) -> Unit = { modifier ->
+        Column(modifier.background(MaterialTheme.colorScheme.surface)) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("Annotations", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                EditorCommand(Icons.Default.Close, "Fermer les propriétés", onClick = { propertiesOpen = false })
             }
-        }, navigationIcon = { IconButton(onClick = viewModel::back, enabled = !locked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Revenir au lot après enregistrement") } }, actions = {
-            IconButton(onClick = viewModel::undo, enabled = canUndo && !locked, modifier = Modifier.testTag("undo_button")) { Icon(Icons.AutoMirrored.Filled.Undo, "Annuler la dernière modification") }
-            IconButton(onClick = viewModel::redo, enabled = canRedo && !locked, modifier = Modifier.testTag("redo_button")) { Icon(Icons.AutoMirrored.Filled.Redo, "Rétablir") }
-            Box {
-                IconButton(onClick = { more = true }) { Icon(Icons.Default.MoreVert, "Actions du cas") }
-                DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
-                    DropdownMenuItem(text = { Text(if(focus) "Afficher les panneaux" else "Image en plein espace") }, onClick = { focus = !focus; more = false })
-                    DropdownMenuItem(text = { Text("Réessayer l’enregistrement") }, onClick = { viewModel.retrySave(); more = false })
-                    DropdownMenuItem(text = { Text("Accepter les propositions relues") }, enabled = hasProposals && !locked, onClick = { acceptDialog = true; more = false })
-                    DropdownMenuItem(text = { Text("Personnaliser les outils") }, onClick = { viewModel.navigateTo(Screen.Preferences); more = false })
-                    DropdownMenuItem(text = { Text("Rejeter avec un motif") }, enabled = !locked, onClick = { rejectDialog = true; more = false })
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp)) {
+                tabs.forEach { t -> TextButton(onClick = { tab = t }, colors = ButtonDefaults.textButtonColors(contentColor = if (tab == t) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)) { Text(t.title, style = MaterialTheme.typography.labelMedium) } }
+            }
+            if (regionTab) Box(Modifier.padding(horizontal = 8.dp)) {
+                TextButton(onClick = { labelMenu = true }) { Text("Classe · $label", style = MaterialTheme.typography.labelMedium); Icon(Icons.Default.ArrowDropDown, null, Modifier.size(18.dp)) }
+                DropdownMenu(expanded = labelMenu, onDismissRequest = { labelMenu = false }) {
+                    classes.forEach { cls -> DropdownMenuItem(text = { Text(cls) }, onClick = { label = cls; labelMenu = false }) }
                 }
             }
-        })
-    }, bottomBar = {
-        Surface(tonalElevation = 3.dp) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val validateButton: @Composable RowScope.() -> Unit = {
-                    Button(onClick = viewModel::validateCurrentAndNext, enabled = !locked && !saving.startsWith("Échec"), modifier = Modifier.weight(1f).heightIn(min = 50.dp).testTag("validate_next_button")) {
-                        Icon(Icons.Default.Check, null); Spacer(Modifier.width(6.dp)); Text(if(prefs.autoAdvance) "Valider et suivant" else "Valider")
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Box(Modifier.weight(1f)) {
+                inspectorState.SaveableStateProvider("$sampleId:${tab.name}") {
+                    when(tab) {
+                        EditorTab.REGIONS -> RegionInspector(a, classes, selected, { selected = it; tool = EditorTool.SELECT }, update,
+                            onInfer = { if (!hasModel) viewModel.navigateTo(Screen.Models) else viewModel.runLiteRtOnCurrentSample() }, modelPresent = hasModel, locked = locked)
+                        EditorTab.CAPTION -> CaptionEditorTab(a, prefs.captionLanguage, update)
+                        EditorTab.TAGS -> TagsEditorTab(a, classes, update)
+                        EditorTab.GROUNDING -> GroundingEditorTab(a, update)
+                        EditorTab.VQA -> VqaEditorTab(a, update)
+                        EditorTab.COUNTING -> CountingEditorTab(a, classes, update)
+                        EditorTab.QUALITY -> QualityEditorTab(a, update)
                     }
                 }
-                if (prefs.leftHanded) validateButton()
-                IconButton(onClick = { viewModel.moveSample(-1) }, enabled = position > 1 && !locked) { Icon(Icons.Default.ChevronLeft, "Cas précédent sans validation") }
-                OutlinedButton(onClick = viewModel::deferCurrent, enabled = !locked, modifier = Modifier.heightIn(min = 48.dp).testTag("defer_button")) { Text("Différer") }
-                if (!prefs.leftHanded) validateButton()
+            }
+        }
+    }
+    Scaffold(contentWindowInsets = WindowInsets(0), modifier = Modifier.imePadding(), topBar = {
+        Column {
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                EditorCommand(Icons.AutoMirrored.Filled.ArrowBack, "Revenir au lot après enregistrement", onClick = viewModel::back, enabled = !locked)
+                Column(Modifier.weight(1f)) {
+                    Text("$position / ${samples.size.coerceAtLeast(1)} · ${sample?.assetId ?: "Image"}", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelLarge)
+                    Text(if (saving == "Enregistré sur cet appareil") "Enregistré" else saving, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.labelSmall, color = if (saving.startsWith("Échec")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                EditorCommand(Icons.AutoMirrored.Filled.Undo, "Annuler la dernière modification", onClick = viewModel::undo, enabled = canUndo && !locked, modifier = Modifier.testTag("undo_button"))
+                EditorCommand(Icons.AutoMirrored.Filled.Redo, "Rétablir", onClick = viewModel::redo, enabled = canRedo && !locked, modifier = Modifier.testTag("redo_button"))
+                Box {
+                    EditorCommand(Icons.Default.MoreVert, "Actions du cas", onClick = { more = true })
+                    DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
+                        DropdownMenuItem(text = { Text("Zoom avant") }, onClick = { zoom = (zoom * 1.25f).coerceAtMost(12f); more = false })
+                        DropdownMenuItem(text = { Text("Zoom arrière") }, onClick = { zoom = (zoom / 1.25f).coerceAtLeast(1f); more = false })
+                        DropdownMenuItem(text = { Text("Ajuster l’image à l’écran") }, onClick = { zoom = 1f; pan = Offset.Zero; more = false })
+                        HorizontalDivider()
+                        DropdownMenuItem(text = { Text("Image précédente") }, enabled = position > 1 && !locked, onClick = { viewModel.moveSample(-1); more = false })
+                        DropdownMenuItem(text = { Text("Image suivante") }, enabled = position < samples.size && !locked, onClick = { viewModel.moveSample(1); more = false })
+                        DropdownMenuItem(text = { Text("Différer cette image") }, enabled = !locked, onClick = { viewModel.deferCurrent(); more = false }, modifier = Modifier.testTag("defer_button"))
+                        DropdownMenuItem(text = { Text("Rejeter avec un motif") }, enabled = !locked, onClick = { rejectDialog = true; more = false })
+                        HorizontalDivider()
+                        DropdownMenuItem(text = { Text("Réessayer l’enregistrement") }, onClick = { viewModel.retrySave(); more = false })
+                        DropdownMenuItem(text = { Text("Accepter les propositions relues") }, enabled = hasProposals && !locked, onClick = { acceptDialog = true; more = false })
+                        DropdownMenuItem(text = { Text("Personnaliser les outils") }, onClick = { viewModel.navigateTo(Screen.Preferences); more = false })
+                    }
+                }
+            }
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        }
+    }, bottomBar = {
+        Surface(color = MaterialTheme.colorScheme.surface) {
+            Column {
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                    val roomy = maxWidth >= 600.dp
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        val validate: @Composable () -> Unit = {
+                            EditorCommand(Icons.Default.Check, if (prefs.autoAdvance) "Valider et passer à l’image suivante" else "Valider l’image",
+                                onClick = viewModel::validateCurrentAndNext, enabled = !locked && !saving.startsWith("Échec"), accent = true, modifier = Modifier.testTag("validate_next_button"))
+                        }
+                        if (prefs.leftHanded) validate()
+                        listOf(EditorTool.SELECT, EditorTool.BOX, EditorTool.POINT, EditorTool.PAN_ZOOM)
+                            .filter { (it != EditorTool.BOX || boxAllowed) && (it != EditorTool.POINT || pointAllowed) && (it != EditorTool.SELECT || boxAllowed || pointAllowed) }
+                            .forEach { t ->
+                                val icon = when(t) { EditorTool.SELECT -> Icons.Default.NearMe; EditorTool.BOX -> Icons.Default.CropSquare; EditorTool.POINT -> Icons.Default.MyLocation; EditorTool.PAN_ZOOM -> Icons.Default.PanTool }
+                                val description = when(t) { EditorTool.SELECT -> "Sélectionner et déplacer"; EditorTool.BOX -> "Dessiner une boîte"; EditorTool.POINT -> "Placer un point"; EditorTool.PAN_ZOOM -> "Déplacer et zoomer l’image" }
+                                EditorCommand(icon, description, selected = tool == t, enabled = !locked, onClick = {
+                                    tool = t
+                                    if (t != EditorTool.PAN_ZOOM && EditorTab.REGIONS in tabs) tab = EditorTab.REGIONS
+                                })
+                            }
+                        Spacer(Modifier.weight(1f))
+                        if (roomy) {
+                            EditorCommand(Icons.Default.Remove, "Zoom arrière", onClick = { zoom = (zoom / 1.25f).coerceAtLeast(1f) })
+                            TextButton(onClick = { zoom = 1f; pan = Offset.Zero }) { Text("${(zoom * 100).toInt()} %", style = MaterialTheme.typography.labelMedium) }
+                            EditorCommand(Icons.Default.Add, "Zoom avant", onClick = { zoom = (zoom * 1.25f).coerceAtMost(12f) })
+                            Spacer(Modifier.weight(1f))
+                        }
+                        EditorCommand(Icons.Default.Tune, "Annotations et propriétés", onClick = { propertiesOpen = !propertiesOpen }, selected = propertiesOpen)
+                        if (!prefs.leftHanded) validate()
+                    }
+                }
             }
         }
     }) { inset ->
-        Column(Modifier.fillMaxSize().padding(inset)) {
-            if (!focus) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                tabs.forEach { t -> FilterChip(selected = tab == t, onClick = { tab = t }, label = { Text(t.title) }) }
-            }
-            if (regionTab || focus) {
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    listOf(EditorTool.SELECT, EditorTool.BOX, EditorTool.POINT, EditorTool.PAN_ZOOM).filter { it != EditorTool.BOX || boxAllowed }.filter { it != EditorTool.POINT || pointAllowed }.forEach { t ->
-                        val icon = when(t) { EditorTool.SELECT -> Icons.Default.NearMe; EditorTool.BOX -> Icons.Default.CropSquare; EditorTool.POINT -> Icons.Default.MyLocation; EditorTool.PAN_ZOOM -> Icons.Default.PanTool }
-                        val description = when(t) { EditorTool.SELECT -> "Sélectionner et déplacer"; EditorTool.BOX -> "Dessiner une boîte"; EditorTool.POINT -> "Placer un point"; EditorTool.PAN_ZOOM -> "Déplacer et zoomer l’image" }
-                        if (tool == t) FilledIconButton(onClick = {}, enabled = !locked, modifier = Modifier.size(48.dp)) { Icon(icon, description) }
-                        else IconButton(onClick = { tool = t }, enabled = !locked, modifier = Modifier.size(48.dp)) { Icon(icon, description) }
-                    }
-                    VerticalDivider(Modifier.height(26.dp).padding(horizontal = 6.dp))
-                    Box {
-                        TextButton(onClick = { labelMenu = true }) { Text(label); Icon(Icons.Default.ArrowDropDown, null) }
-                        DropdownMenu(expanded = labelMenu, onDismissRequest = { labelMenu = false }) {
-                            classes.forEach { cls -> DropdownMenuItem(text = { Text(cls) }, onClick = { label = cls; labelMenu = false }) }
-                        }
-                    }
-                    IconButton(onClick = { zoom = 1f; pan = Offset.Zero }) { Icon(Icons.Default.FitScreen, "Ajuster l’image à l’écran") }
-                    IconButton(onClick = { focus = !focus }) { Icon(if(focus) Icons.Default.FullscreenExit else Icons.Default.Fullscreen, if(focus) "Afficher les panneaux" else "Masquer les panneaux") }
-                }
-            }
-            BoxWithConstraints(Modifier.weight(1f)) {
-                val sideBySide = maxWidth >= 840.dp || (maxWidth >= 620.dp && maxHeight < 500.dp)
-                val canvas: @Composable (Modifier) -> Unit = { modifier ->
-                    Box(modifier.background(Color(0xFF101817)).clipToBounds()) {
-                        InteractiveAnnotationCanvas(sample, a, if (locked || (!regionTab && !focus)) EditorTool.PAN_ZOOM else tool,
+        BoxWithConstraints(Modifier.fillMaxSize().padding(inset)) {
+            val wide = maxWidth >= 840.dp
+            Row(Modifier.fillMaxSize()) {
+                Column(Modifier.weight(1f).fillMaxHeight()) {
+                    Box(Modifier.weight(1f).fillMaxWidth().background(Color(0xFF080B12)).clipToBounds()) {
+                        InteractiveAnnotationCanvas(sample, a, if (locked || (propertiesOpen && !regionTab)) EditorTool.PAN_ZOOM else tool,
                             label, selected, zoom, pan, { z, o -> zoom = z; pan = o }, { selected = it }, { next ->
                                 if (StudioTask.POINTING in tasks && next.points.size > 1 && next.points.size > a.points.size) viewModel.reportError("Mode Point unique : déplacez le point existant ou activez Points multiples.") else update(next)
                             }, showLabels = prefs.showCanvasLabels)
-                        if (prefs.showGuidance && regionTab && !focus && !selectedExists) Surface(Modifier.align(Alignment.TopStart).padding(12.dp), color = Color(0xE61E2C25), contentColor = Color.White, shape = MaterialTheme.shapes.small) {
-                            Text(when(tool) { EditorTool.SELECT -> "Touchez une région pour la corriger"; EditorTool.BOX -> "Glissez pour dessiner · Sélection pour corriger"; EditorTool.POINT -> "Touchez une cible · Sélection pour déplacer"; EditorTool.PAN_ZOOM -> "Pincez pour zoomer · Glissez pour déplacer" }, Modifier.padding(10.dp), style = MaterialTheme.typography.labelSmall)
-                        }
-                        Surface(Modifier.align(Alignment.BottomStart).padding(10.dp), color = Color(0xDD101817), contentColor = Color.White, shape = MaterialTheme.shapes.small) {
-                            Text("${a.boxes.size} boîtes · ${a.points.count { !it.isAbsent && !it.isAbstained }} points · ${(zoom*100).toInt()} %", Modifier.padding(8.dp), style = MaterialTheme.typography.labelSmall)
-                        }
+                    }
+                    Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 12.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text("$label · ${a.boxes.size + a.points.size} régions", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("${(zoom * 100).toInt()} %", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-                val panel: @Composable (Modifier) -> Unit = { modifier ->
-                    Surface(modifier) {
-                        key(sampleId) {
-                            when(tab) {
-                                EditorTab.REGIONS -> RegionInspector(a, classes, selected, { selected = it; tool = EditorTool.SELECT }, update,
-                                    onInfer = { if (!hasModel) viewModel.navigateTo(Screen.Controls) else viewModel.runLiteRtOnCurrentSample() }, modelPresent = hasModel, locked = locked)
-                                EditorTab.CAPTION -> CaptionEditorTab(a, prefs.captionLanguage, update)
-                                EditorTab.TAGS -> TagsEditorTab(a, classes, update)
-                                EditorTab.GROUNDING -> GroundingEditorTab(a, update)
-                                EditorTab.VQA -> VqaEditorTab(a, update)
-                                EditorTab.COUNTING -> CountingEditorTab(a, classes, update)
-                                EditorTab.QUALITY -> QualityEditorTab(a, update)
-                            }
-                        }
-                    }
+                if (wide && propertiesOpen) {
+                    VerticalDivider()
+                    inspector(Modifier.width(300.dp).fillMaxHeight())
                 }
-                when {
-                    focus -> canvas(Modifier.fillMaxSize())
-                    sideBySide -> Row(Modifier.fillMaxSize()) { canvas(Modifier.weight(1f).fillMaxHeight()); panel(Modifier.width(340.dp).fillMaxHeight()) }
-                    tab == EditorTab.REGIONS -> Column(Modifier.fillMaxSize()) {
-                        canvas(Modifier.weight(1f).fillMaxWidth())
-                        panel(Modifier.fillMaxWidth().height(if(selectedExists) 210.dp else 112.dp))
-                    }
-                    else -> Column(Modifier.fillMaxSize()) { canvas(Modifier.weight(.42f).fillMaxWidth()); panel(Modifier.weight(.58f).fillMaxWidth()) }
-                }
+            }
+            if (!wide && propertiesOpen) ModalBottomSheet(onDismissRequest = { propertiesOpen = false },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = MaterialTheme.colorScheme.surface,
+                dragHandle = null) {
+                inspector(Modifier.fillMaxWidth().fillMaxHeight(.8f))
             }
         }
     }
@@ -362,10 +407,10 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
                 Text("${a.boxes.size+a.points.size} régions", Modifier.weight(1f), style=MaterialTheme.typography.titleMedium)
                 FilledTonalButton(onClick=onInfer,enabled=!locked) { Icon(Icons.Default.AutoAwesome,null,Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if(modelPresent) "Préannoter" else "Modèle") }
             }
-            if (a.boxes.isEmpty() && a.points.isEmpty()) Text("Sélectionnez l’outil Boîte ou Point au-dessus de l’image.", style=MaterialTheme.typography.bodySmall)
+            if (a.boxes.isEmpty() && a.points.isEmpty()) Text("Choisissez Boîte ou Point.", style=MaterialTheme.typography.bodySmall)
         } else {
             Row(verticalAlignment=Alignment.CenterVertically) {
-                Text(if(box!=null) "Corriger cette boîte" else "Corriger ce point",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium)
+                Text(if(box!=null) "Boîte sélectionnée" else "Point sélectionné",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium)
                 IconButton(onClick={ onUpdate(withoutTarget(a, selected!!)); onSelect(null) }) { Icon(Icons.Default.DeleteOutline,"Supprimer la région sélectionnée") }
                 IconButton(onClick={onSelect(null)}) { Icon(Icons.Default.Close,"Désélectionner") }
             }
@@ -374,7 +419,7 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
                     onUpdate(if(box!=null) a.copy(boxes=a.boxes.map { if(it.id==box.id) it.copy(label=label,isHumanVerified=true) else it }) else a.copy(points=a.points.map { if(it.id==point?.id) it.copy(label=label,isHumanVerified=true) else it }))
                 },label={Text(label)}) }
             }
-            Text(if(box!=null) "Glissez la boîte pour la déplacer, ses quatre coins pour la redimensionner." else "Déplacez le point avec l’outil Sélection. Les flèches affinent sa position.",style=MaterialTheme.typography.bodySmall)
+            Text(if(box!=null) "Glissez les coins pour redimensionner." else "Glissez ou utilisez les flèches.",style=MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement=Arrangement.spacedBy(4.dp),verticalAlignment=Alignment.CenterVertically) {
                 listOf(Icons.Default.KeyboardArrowLeft to (-.002f to 0f),Icons.Default.KeyboardArrowUp to (0f to -.002f),Icons.Default.KeyboardArrowDown to (0f to .002f),Icons.Default.KeyboardArrowRight to (.002f to 0f)).forEachIndexed { i,(icon,d) ->
                     OutlinedIconButton(onClick={
@@ -399,7 +444,7 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
 private fun EditorPanel(title: String, hint: String? = null, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         Text(title,style=MaterialTheme.typography.titleMedium)
-        if(hint!=null) Text(hint,style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
+        if(hint!=null) StudioDetails(hint)
         content()
     }
 }

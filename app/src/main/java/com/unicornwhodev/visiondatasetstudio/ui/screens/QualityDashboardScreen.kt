@@ -1,124 +1,94 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.unicornwhodev.visiondatasetstudio.data.model.AuditLogEntity
 import com.unicornwhodev.visiondatasetstudio.ui.MainViewModel
-import com.unicornwhodev.visiondatasetstudio.ui.Screen
+import com.unicornwhodev.visiondatasetstudio.ui.components.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QualityDashboardScreen(viewModel: MainViewModel) {
     val samples by viewModel.batchSamples.collectAsState()
     val project by viewModel.projectFlow.collectAsState()
     val logsFlow = remember(project?.id) { viewModel.db.auditDao().getRecentLogs(project?.id ?: 1L) }
     val logs by logsFlow.collectAsState(initial = emptyList())
-
-    val totalCases = samples.size
-    val validatedCases = samples.count { it.annotationStatus == "VALIDATED" }
-    val rejectedCases = samples.count { it.annotationStatus == "REJECTED" }
-    val deferredCases = samples.count { it.annotationStatus == "DEFERRED" }
-
-    // Disk usage
+    val validated = samples.count { it.annotationStatus == "VALIDATED" }
+    val rejected = samples.count { it.annotationStatus == "REJECTED" }
+    val deferred = samples.count { it.annotationStatus == "DEFERRED" }
+    val reviewed = validated + rejected
+    val progress by animateFloatAsState(if (samples.isEmpty()) 0f else reviewed.toFloat() / samples.size, tween(600), label = "review progress")
     val metrics by produceState(0L to 0L, samples) {
         value = withContext(Dispatchers.IO) { viewModel.storageManager.getFreeSpaceBytes() / (1024 * 1024) to viewModel.storageManager.getUsedSpaceBytes() / (1024 * 1024) }
     }
-    val freeSpaceMb = metrics.first
-    val usedSpaceMb = metrics.second
-
-    Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopAppBar(windowInsets = WindowInsets(0, 0, 0, 0),
-                title = { Text("Métriques de Qualité & Audit", fontWeight = FontWeight.Bold, fontSize = 18.sp) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { viewModel.navigateTo(Screen.BatchGrid) },
-                        modifier = Modifier.testTag("dashboard_back_button")
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Storage Budget Card
-            item {
-                Card(shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Storage, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                            Spacer(Modifier.width(8.dp))
-                            Text("Stockage Borné & Quota Disque", fontWeight = FontWeight.Bold)
+    Scaffold(contentWindowInsets = WindowInsets(0), topBar = { StudioTopBar("Qualité", project?.name) }) { inset ->
+        Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
+            LazyColumn(Modifier.widthIn(max = 900.dp).fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                if (samples.isEmpty()) item {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("Aucun lot à analyser", style = MaterialTheme.typography.titleLarge)
+                        Text("Les résultats apparaîtront après l’import des images.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        OutlinedButton(onClick = { viewModel.navigateTo(com.unicornwhodev.visiondatasetstudio.ui.Screen.BatchGrid) }) {
+                            Text("Ouvrir les lots"); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ArrowForward, null, Modifier.size(18.dp))
                         }
-                        Text("Espace utilisé par l'application : ${usedSpaceMb} Mo / ${project?.diskBudgetMb ?: 500} Mo (Budget)", fontSize = 13.sp)
-                        Text("Espace libre disponible sur l'appareil : ${freeSpaceMb} Mo", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        LinearProgressIndicator(
-                            progress = { (usedSpaceMb.toFloat() / (project?.diskBudgetMb ?: 500L)).coerceIn(0f, 1f) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
-                }
-            }
-
-            // Quality metrics overview
-            item {
-                Card(shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("Indicateurs du lot actif", fontWeight = FontWeight.Bold)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-                            MetricColumn("Total", "$totalCases", MaterialTheme.colorScheme.primary)
-                            MetricColumn("Validés", "$validatedCases", Color(0xFF10B981))
-                            MetricColumn("Rejetés", "$rejectedCases", MaterialTheme.colorScheme.error)
-                            MetricColumn("Différés", "$deferredCases", Color(0xFFF59E0B))
+                } else {
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween) {
+                                Column {
+                                    Text("REVUE DU LOT", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text("$reviewed / ${samples.size}", style = MaterialTheme.typography.headlineLarge)
+                                }
+                                Text("${(progress * 100).toInt()} %", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+                            }
+                            LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().height(4.dp), trackColor = MaterialTheme.colorScheme.surfaceVariant)
+                            Row(Modifier.fillMaxWidth()) {
+                                MetricTile("$validated", "Validés", Modifier.weight(1f))
+                                MetricTile("$deferred", "À revoir", Modifier.weight(1f))
+                                MetricTile("$rejected", "Rejetés", Modifier.weight(1f))
+                            }
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         }
                     }
                 }
-            }
-
-            // Audit Logs Title
-            item {
-                Text("Journal d'audit horodaté", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            }
-
-            // Audit Logs List
-            if (logs.isEmpty()) {
                 item {
-                    Text("Aucun événement d'audit enregistré.", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    StudioSection("Stockage", icon = Icons.Default.Storage) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("${metrics.second} Mo", style = MaterialTheme.typography.titleLarge)
+                            Text("/ ${project?.diskBudgetMb ?: 500} Mo", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        LinearProgressIndicator(progress = { (metrics.second.toFloat() / (project?.diskBudgetMb ?: 500L).coerceAtLeast(1L)).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(3.dp), color = MaterialTheme.colorScheme.secondary, trackColor = MaterialTheme.colorScheme.surfaceVariant)
+                        Text("${metrics.first} Mo libres sur l’appareil", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
-            } else {
-                items(logs) { log ->
-                    AuditLogItem(log)
+                item { Text("Activité récente", style = MaterialTheme.typography.titleMedium) }
+                if (logs.isEmpty()) item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.History, null, tint = MaterialTheme.colorScheme.secondary)
+                        Text("Aucune activité enregistrée.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
+                items(logs) { AuditLogItem(it) }
             }
         }
     }
@@ -127,53 +97,27 @@ fun QualityDashboardScreen(viewModel: MainViewModel) {
 @Composable
 fun MetricColumn(label: String, value: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = color)
-        Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, style = MaterialTheme.typography.titleLarge, color = color)
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Composable
 fun AuditLogItem(log: AuditLogEntity) {
-    val dateFormat = remember { SimpleDateFormat("HH:mm:ss", Locale.getDefault()) }
-    val timeStr = remember(log.timestamp) { dateFormat.format(Date(log.timestamp)) }
-
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                when (log.action) {
-                    "VALIDATE" -> Icons.Default.CheckCircle
-                    "REJECT" -> Icons.Default.Cancel
-                    "DEFER" -> Icons.Default.Schedule
-                    "PUBLISHED_AND_PURGED" -> Icons.Default.CloudDone
-                    else -> Icons.Default.Info
-                },
-                contentDescription = null,
-                tint = when (log.action) {
-                    "VALIDATE" -> Color(0xFF10B981)
-                    "REJECT" -> MaterialTheme.colorScheme.error
-                    "DEFER" -> Color(0xFFF59E0B)
-                    else -> MaterialTheme.colorScheme.primary
-                },
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(log.action, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                    Text(timeStr, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Text(log.details, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+    var expanded by remember(log) { mutableStateOf(false) }
+    val format = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+    val title = when (log.action) { "VALIDATE" -> "Image validée"; "REJECT" -> "Image rejetée"; "DEFER" -> "Image à revoir"; "PUBLISHED_AND_PURGED" -> "Publication terminée"; else -> log.action }
+    Column(Modifier.fillMaxWidth().clickable { expanded = !expanded }.animateContentSize()) {
+        Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(when (log.action) { "VALIDATE" -> Icons.Default.CheckCircleOutline; "REJECT" -> Icons.Default.Block; "DEFER" -> Icons.Default.Schedule; else -> Icons.Default.History },
+                null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                Text(log.details, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = if (expanded) Int.MAX_VALUE else 1, overflow = TextOverflow.Ellipsis)
             }
+            Text(format.format(Date(log.timestamp)), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }

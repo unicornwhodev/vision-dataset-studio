@@ -15,5 +15,11 @@
   "executed_portable_tests": 196,
   "room_schema_version": 3,
   "android_tests_executed": true,
-  "license_decision": "Apache-2.0"
+  "license_decision": "Apache-2.0",
+  "ui_redesign": {
+    "status": "canvas_runtime_passed_with_product_blockers",
+    "direction": "graphite_cyan_violet",
+    "report": "docs/UI_REDESIGN.md",
+    "build_run": "20260919T203710Z-e9cd5c4ddbbe"
+  }
 }

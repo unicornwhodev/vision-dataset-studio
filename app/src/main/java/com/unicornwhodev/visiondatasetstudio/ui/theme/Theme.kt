@@ -7,37 +7,39 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-private val LightStudio = lightColorScheme(
-    primary = Color(0xFF186858), onPrimary = Color.White,
-    primaryContainer = Color(0xFFD9F2E9), onPrimaryContainer = Color(0xFF083B30),
-    secondary = Color(0xFF53645D), onSecondary = Color.White,
-    secondaryContainer = Color(0xFFE4EBE6), onSecondaryContainer = Color(0xFF24362D),
-    tertiary = Color(0xFF765B1D), onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFFFEDC3), onTertiaryContainer = Color(0xFF4B390C),
-    background = Color(0xFFF6F8F5), onBackground = Color(0xFF1B2420),
-    surface = Color(0xFFFCFDFB), onSurface = Color(0xFF1B2420),
-    surfaceVariant = Color(0xFFEBEFEB), onSurfaceVariant = Color(0xFF505D55),
-    outline = Color(0xFF76847B), outlineVariant = Color(0xFFD8DFD8)
-)
+val StudioCyan = Color(0xFF6ED6DA)
+val StudioViolet = Color(0xFFAB9DEE)
 private val DarkStudio = darkColorScheme(
-    primary = Color(0xFF9FDAC5), onPrimary = Color(0xFF073C2F),
-    primaryContainer = Color(0xFF234E40), onPrimaryContainer = Color(0xFFD3F5E6),
-    secondary = Color(0xFFBDCCC1), onSecondary = Color(0xFF28382E),
-    secondaryContainer = Color(0xFF34483C), onSecondaryContainer = Color(0xFFDAE8DD),
-    tertiary = Color(0xFFE5C676), onTertiary = Color(0xFF403207),
-    tertiaryContainer = Color(0xFF584519), onTertiaryContainer = Color(0xFFFFEABD),
-    background = Color(0xFF111815), onBackground = Color(0xFFE4EBE5),
-    surface = Color(0xFF17201B), onSurface = Color(0xFFE4EBE5),
-    surfaceVariant = Color(0xFF25332B), onSurfaceVariant = Color(0xFFC2CEC5),
-    outline = Color(0xFF89988E), outlineVariant = Color(0xFF3C4B41)
+    primary = StudioCyan, onPrimary = Color(0xFF06282D),
+    primaryContainer = Color(0xFF12383F), onPrimaryContainer = Color(0xFFACF4F3),
+    secondary = StudioViolet, onSecondary = Color(0xFF241B4D),
+    secondaryContainer = Color(0xFF2C2648), onSecondaryContainer = Color(0xFFE4DDFF),
+    tertiary = Color(0xFFFFC782), onTertiary = Color(0xFF432807),
+    tertiaryContainer = Color(0xFF43321D), onTertiaryContainer = Color(0xFFFFDCA6),
+    background = Color(0xFF101217), onBackground = Color(0xFFF1F3FA),
+    surface = Color(0xFF171A21), onSurface = Color(0xFFF1F3FA),
+    surfaceVariant = Color(0xFF242932), onSurfaceVariant = Color(0xFFA3ADC2),
+    surfaceContainerLowest = Color(0xFF0C0E12), surfaceContainerLow = Color(0xFF171A21),
+    surfaceContainer = Color(0xFF1C2028), surfaceContainerHigh = Color(0xFF242932), surfaceContainerHighest = Color(0xFF2C323E),
+    outline = Color(0xFF74819A), outlineVariant = Color(0xFF303641),
+    error = Color(0xFFFF9AAB), errorContainer = Color(0xFF46202E), onErrorContainer = Color(0xFFFFD9E1)
+)
+private val LightStudio = lightColorScheme(
+    primary = Color(0xFF086973), onPrimary = Color.White,
+    primaryContainer = Color(0xFFC4F3F3), onPrimaryContainer = Color(0xFF083940),
+    secondary = Color(0xFF6550AB), onSecondary = Color.White,
+    secondaryContainer = Color(0xFFE9E1FF), onSecondaryContainer = Color(0xFF342267),
+    background = Color(0xFFF5F6FB), onBackground = Color(0xFF172033),
+    surface = Color(0xFFFCFCFF), onSurface = Color(0xFF172033),
+    surfaceVariant = Color(0xFFE9EDF5), onSurfaceVariant = Color(0xFF546179),
+    surfaceContainer = Color(0xFFEEF1F8), surfaceContainerHigh = Color(0xFFE8ECF5),
+    outline = Color(0xFF74819A), outlineVariant = Color(0xFFD9DFEC)
 )
 
 @Composable
 fun VisionDatasetStudioTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = if (darkTheme) DarkStudio else LightStudio,
-        typography = Typography,
-        shapes = Shapes(extraSmall = RoundedCornerShape(8.dp), small = RoundedCornerShape(12.dp), medium = RoundedCornerShape(18.dp), large = RoundedCornerShape(24.dp), extraLarge = RoundedCornerShape(28.dp)),
-        content = content
-    )
+    MaterialTheme(colorScheme = if (darkTheme) DarkStudio else LightStudio, typography = Typography,
+        shapes = Shapes(extraSmall = RoundedCornerShape(4.dp), small = RoundedCornerShape(8.dp),
+            medium = RoundedCornerShape(12.dp), large = RoundedCornerShape(16.dp), extraLarge = RoundedCornerShape(20.dp)),
+        content = content)
 }

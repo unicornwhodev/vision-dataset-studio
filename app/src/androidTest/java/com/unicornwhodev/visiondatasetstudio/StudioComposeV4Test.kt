@@ -10,11 +10,25 @@ import org.junit.runner.RunWith
 class StudioComposeV4Test {
     @get:Rule val rule=createAndroidComposeRule<MainActivity>()
     @Test fun controlsAndCatalogueRenderWithoutDownloadingModels() {
-        rule.waitUntil(10000) { rule.onAllNodesWithText("Projets, sources, lots et modèles").fetchSemanticsNodes().isNotEmpty() }
-        rule.onNodeWithText("Projets, sources, lots et modèles").performScrollTo().performClick()
-        rule.onNodeWithText("Moteur et transferts").assertIsDisplayed()
-        rule.onNodeWithText("Modèles").performScrollTo().performClick()
+        rule.waitUntil(10000) { rule.onAllNodesWithTag("home_primary").fetchSemanticsNodes().isNotEmpty() }
+        rule.onNodeWithTag("controls_shortcut").assertIsDisplayed()
+        rule.onNodeWithTag("controls_shortcut").performClick()
+        rule.onNodeWithText("Mon espace").assertIsDisplayed()
+        rule.onNodeWithText("Modèles").performClick()
         rule.onNodeWithText("Catalogue public téléchargeable").assertExists()
         rule.onNodeWithText("SSD MobileNet V1").assertExists()
+    }
+    @Test fun compactNavigationKeepsImportAndExportAccessible() {
+        rule.waitUntil(10000) { rule.onAllNodesWithTag("nav_Models").fetchSemanticsNodes().isNotEmpty() }
+        rule.onNodeWithTag("nav_Models").performClick()
+        rule.onNodeWithText("Importer", useUnmergedTree = true).assertIsDisplayed().performClick()
+        rule.onNodeWithText("Choisir un .tflite").assertIsDisplayed()
+        rule.onNodeWithTag("nav_Publication").performClick()
+        rule.onNodeWithText("Archive locale").assertExists()
+        rule.onNodeWithTag("nav_QualityDashboard").performClick()
+        rule.onNodeWithTag("nav_QualityDashboard").assertIsSelected()
+        rule.onNodeWithText("Stockage").assertExists()
+        rule.onNodeWithTag("nav_Home").performClick()
+        rule.onNodeWithTag("home_primary").performScrollTo().assertIsDisplayed()
     }
 }

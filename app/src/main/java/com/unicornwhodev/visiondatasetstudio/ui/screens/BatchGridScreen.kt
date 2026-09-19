@@ -69,9 +69,12 @@ fun BatchGridScreen(viewModel: MainViewModel) {
     }
     val validated = samples.count { it.annotationStatus == "VALIDATED" }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
-        TopAppBar(windowInsets = WindowInsets(0), title = {
-            Column { Text("Lot $batchNumber", style = MaterialTheme.typography.titleLarge); Text("${samples.size} cas · $validated validés", style = MaterialTheme.typography.bodySmall) }
-        }, actions = {
+        StudioTopBar("Lot $batchNumber", "${samples.size} IMAGES · $validated VALIDÉES", actions = {
+            if (samples.isNotEmpty()) IconButton(onClick = viewModel::resumeWork,
+                enabled = !busy && samples.any { StudioWorkflow.isPending(it.annotationStatus) && it.localImagePath != null },
+                modifier = Modifier.testTag("start_annotating_button")) {
+                Icon(Icons.Default.PlayArrow, "Reprendre", tint = MaterialTheme.colorScheme.primary)
+            }
             Box {
                 IconButton(onClick = { batchMenu = true }, enabled = !busy) { Icon(Icons.Default.History, "Choisir un lot") }
                 DropdownMenu(expanded = batchMenu, onDismissRequest = { batchMenu = false }) {
@@ -94,37 +97,30 @@ fun BatchGridScreen(viewModel: MainViewModel) {
             }
         })
     }, bottomBar = {
-        if (samples.isNotEmpty()) Surface(tonalElevation = 2.dp) {
+        if (selected.isNotEmpty()) Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (selected.isNotEmpty()) {
-                    IconButton(onClick = { selected = emptySet() }) { Icon(Icons.Default.Close, "Annuler la sélection") }
-                    Text("${selected.size}", style = MaterialTheme.typography.titleMedium)
-                    OutlinedButton(onClick = { actionDialog = "defer" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text("Différer") }
-                    Button(onClick = { actionDialog = "tag" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text("Ajouter tag") }
-                } else {
-                    OutlinedButton(onClick = { viewModel.navigateTo(Screen.Publication) }, enabled = validated > 0 && !busy, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text("Exporter ($validated)") }
-                    Button(onClick = viewModel::resumeWork, enabled = !busy && samples.any { StudioWorkflow.isPending(it.annotationStatus) && it.localImagePath != null }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("start_annotating_button")) {
-                        Icon(Icons.Default.PlayArrow, null); Spacer(Modifier.width(4.dp)); Text("Reprendre")
-                    }
-                }
+                IconButton(onClick = { selected = emptySet() }) { Icon(Icons.Default.Close, "Annuler la sélection") }
+                Text("${selected.size}", style = MaterialTheme.typography.titleMedium)
+                OutlinedButton(onClick = { actionDialog = "defer" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text("Différer") }
+                Button(onClick = { actionDialog = "tag" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text("Ajouter tag") }
             }
         }
     }) { inset ->
         Column(Modifier.fillMaxSize().padding(inset)) {
             if (samples.isEmpty()) {
-                EmptyWorkspace("Votre prochain lot commence ici", "Configurez une source, puis préparez de 1 à 1 000 images selon vos réglages. Aucun exemple fictif n’est ajouté au corpus.", Icons.Default.PhotoLibrary,
+                EmptyWorkspace("Aucun lot préparé", "Configurez une source, puis préparez vos images.", Icons.Default.PhotoLibrary,
                     if (!sourceReady) "Configurer la source" else "Préparer le lot") {
                     if (!sourceReady) viewModel.navigateTo(Screen.Setup) else viewModel.fetchAndPrepareBatch(batchNumber)
                 }
             } else {
                 Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    OutlinedTextField(search, { search = it }, leadingIcon = { Icon(Icons.Default.Search, null) }, label = { Text("Rechercher un identifiant ou un motif") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(search, { search = it }, leadingIcon = { Icon(Icons.Default.Search, null) }, label = { Text("Rechercher") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         BatchFilter.entries.forEach { f -> FilterChip(selected = filter == f, onClick = { filter = f }, label = { Text("${f.title} · ${samples.count { matches(it, f) }}") }) }
                     }
-                    if (preferences.showGuidance) Text("Appui long pour sélectionner · ${filtered.size} cas affichés${if (priority) " · Priorité révision" else ""}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (priority) Text("Priorité aux révisions", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
                 }
-                if (filtered.isEmpty()) EmptyWorkspace("Aucun cas dans cette vue", "Changez le filtre ou effacez la recherche. Les autres images du lot restent conservées.", Icons.Default.FilterAltOff, "Afficher tous les cas") { filter = BatchFilter.ALL; search = "" }
+                if (filtered.isEmpty()) EmptyWorkspace("Aucun résultat", "Essayez un autre filtre.", Icons.Default.FilterAltOff, "Tout afficher") { filter = BatchFilter.ALL; search = "" }
                 else LazyVerticalGrid(columns = GridCells.Adaptive(preferences.gridDensity.minCellDp.dp), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(filtered, key = { it.sampleId }) { sample ->
                         val editable = StudioWorkflow.canEdit(sample.acquisitionStatus, sample.syncStatus, sample.localImagePath != null)
@@ -140,10 +136,10 @@ fun BatchGridScreen(viewModel: MainViewModel) {
             }
         }
     }
-    if (confirmInference) AlertDialog(onDismissRequest = { confirmInference = false }, title = { Text("Préannoter ce lot ?") },
+    if (confirmInference) AlertDialog(onDismissRequest = { confirmInference = false }, title = { Text("Préannoter ?") },
         text = { Text("Le modèle traitera une image à la fois, parmi les cas à traiter. Vos corrections et les cas validés, différés ou rejetés seront conservés. Aucune proposition ne sera validée automatiquement. Gardez l’application ouverte.") },
         confirmButton = { Button(onClick = { confirmInference = false; viewModel.preannotateActiveBatch() }) { Text("Lancer") } }, dismissButton = { TextButton(onClick = { confirmInference = false }) { Text("Annuler") } })
-    if (rejectErrors) AlertDialog(onDismissRequest = { rejectErrors = false }, title = { Text("Rejeter les cas en échec ?") },
+    if (rejectErrors) AlertDialog(onDismissRequest = { rejectErrors = false }, title = { Text("Rejeter les échecs ?") },
         text = { Text("Les images non récupérées seront exclues du corpus, avec leur motif d’échec conservé. Cette action ne corrige pas les fichiers et ne valide aucune image.") },
         confirmButton = { Button(onClick = { rejectErrors = false; viewModel.rejectFailedAcquisitions() }) { Text("Exclure ces cas") } }, dismissButton = { TextButton(onClick = { rejectErrors = false }) { Text("Annuler") } })
     if (actionDialog != null) AlertDialog(onDismissRequest = { actionDialog = null }, title = { Text(if (actionDialog == "tag") "Ajouter un tag à ${selected.size} cas" else "Différer ${selected.size} cas") }, text = {
@@ -166,8 +162,9 @@ fun SampleThumbnailCard(sample: SampleEntity, onClick: () -> Unit, selected: Boo
         else -> when(sample.annotationStatus) { "VALIDATED" -> "Validé"; "REJECTED" -> "Rejeté"; "DEFERRED" -> "À revoir"; "PROPOSALS_AVAILABLE" -> "Suggestions"; "IN_PROGRESS" -> "En cours"; else -> "À traiter" }
     }
     val icon = when(label) { "Copie vérifiée" -> Icons.Default.CloudDone; "Validé" -> Icons.Default.CheckCircleOutline; "À revoir" -> Icons.Default.Schedule; "À récupérer" -> Icons.Default.ErrorOutline; "Rejeté" -> Icons.Default.Block; else -> Icons.Default.Edit }
-    Column(Modifier.clip(RoundedCornerShape(16.dp)).border(if(selected) 2.dp else 1.dp, if(selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-        .background(MaterialTheme.colorScheme.surface).combinedClickable(onClick = onClick, onLongClick = onLongClick)
+    val outline by androidx.compose.animation.animateColorAsState(if(selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, label = "sample selection")
+    Column(Modifier.clip(RoundedCornerShape(8.dp)).border(if(selected) 2.dp else 1.dp, outline, RoundedCornerShape(8.dp))
+        .background(MaterialTheme.colorScheme.surface).combinedClickable(onClick = onClick, onLongClickLabel = "Sélectionner cette image", onLongClick = onLongClick)
         .semantics(mergeDescendants = true) { contentDescription = "${sample.assetId}, $label"; this.selected = selected }
         .testTag("sample_${sample.sampleId}")) {
         Box(Modifier.fillMaxWidth().aspectRatio(1.2f).background(MaterialTheme.colorScheme.surfaceVariant), contentAlignment = Alignment.Center) {

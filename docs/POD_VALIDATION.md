@@ -69,8 +69,9 @@ System UI en émulation logicielle. Un démarrage réussi n’établit donc pas 
 stabilité de la session ni celle de l’application. L’APK a été installée puis
 Atelier et Modèles affichés. Premier affichage : 28,082 s selon ActivityManager,
 après expiration de l’attente `am start -W`. Le buffer crash consulté était vide.
-À 320 dp, le bouton « Importer » est comprimé dans la bibliothèque de modèles :
-point de recette UI à corriger. Captures et hiérarchies ADB :
+La capture initiale à 320 dp montrait un onglet « Importer » comprimé. La
+refonte décrite dans [UI_REDESIGN.md](UI_REDESIGN.md) corrige ce point ; les
+captures initiales ci-dessous restent des preuves historiques. Captures et hiérarchies ADB :
 `/workspace/qa/vision-dataset-studio/ui/`.
 
 Une recette accélérée CI
@@ -102,3 +103,26 @@ publication sont préparés. Le conteneur GHCR reste à construire et tester.
 Pas de test HF en écriture, d’inférence ARM, de benchmark téléphone ni de recette
 complète lots 2 + 1 / purge / reprise. Ne pas présenter cette préparation comme
 une qualification produit achevée.
+
+## Révision visuelle
+
+Dernière tentative installée : `20260919T203710Z-e9cd5c4ddbbe`.
+
+| APK | Octets | SHA-256 |
+|---|---:|---|
+| Debug | 82311479 | `abf2f50fe63835ab885f23efc50f0db5033f167f2db72a778061355f8bc03c2d` |
+| Tests | 2546324 | `4fdf9afdd49672c0e9c358f9700234a61e5c53998bc42101285027f789519981` |
+
+Les APK ont été vérifiées puis mises à jour avec `adb install -r`.
+`StudioComposeV4Test` : **2/2 réussis**, 75.807 s JUnit, 94.41 s avec lancement,
+à 960 × 720 px / 160 dpi. Preuves : `/workspace/qa/vision-dataset-studio/canvas-final/`.
+Le passage à 320 dp de la révision `20260919T200729Z-bec11e4607bc` est conservé
+séparément dans `canvas-first/` (2/2, 74,293 s JUnit).
+
+Les tests JVM restent à 25/26 ; lint 0 erreur / 68 avertissements. Le reçu global
+reste failed et aucun artefact n’est promu comme release qualifiée. La recette
+visuelle ne corrige pas les blocages HTTP/SAF.
+
+La [recette UI](UI_REDESIGN.md) rassemble les captures, mesures et périmètres
+exécutés. Le [guide du poste](WORKSTATION.md) décrit le profil grand écran et
+l’incident de démarrage système observé. Aucun dépôt externe n’a été publié.

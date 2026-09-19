@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "fixtures": "Synthetic QA images, separate Recette-UI project",
+  "captures": {
+    "editor.png": {
+      "captured_at": "2026-09-19T20:13:33.542433+00:00",
+      "apk_sha256": "253c4c71e62697f869fa67ef2bfb47c23ce352bc06f731f804a9f2b96ce6bf24",
+      "size": "Physical size: 480x800",
+      "density": "Physical density: 240",
+      "font_scale": "null",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/canvas-editor-320",
+      "image_sha256": "7e8c3ab4f32ac058ff6bf32ef6ae25a471691d7c353e125c341f8428afe56222"
+    },
+    "editor-annotated.png": {
+      "captured_at": "2026-09-19T20:14:22.858634+00:00",
+      "apk_sha256": "253c4c71e62697f869fa67ef2bfb47c23ce352bc06f731f804a9f2b96ce6bf24",
+      "size": "Physical size: 480x800",
+      "density": "Physical density: 240",
+      "font_scale": "null",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/canvas-box-created",
+      "image_sha256": "8abc1c44fb485c7629810aa7715de1e3356601498273c77f01c35e0dbe78189b"
+    },
+    "editor-properties.png": {
+      "captured_at": "2026-09-19T20:16:36.113696+00:00",
+      "apk_sha256": "253c4c71e62697f869fa67ef2bfb47c23ce352bc06f731f804a9f2b96ce6bf24",
+      "size": "Physical size: 480x800",
+      "density": "Physical density: 240",
+      "font_scale": "null",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/canvas-properties",
+      "image_sha256": "6d2688e6b0daa9082c2e90ef26649f6eb38e7d4a1fc11db272d102a04bf71299"
+    },
+    "editor-persisted.png": {
+      "captured_at": "2026-09-19T20:23:32.390154+00:00",
+      "apk_sha256": "253c4c71e62697f869fa67ef2bfb47c23ce352bc06f731f804a9f2b96ce6bf24",
+      "size": "Physical size: 480x800",
+      "density": "Physical density: 240",
+      "font_scale": "null",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/canvas-persisted",
+      "image_sha256": "9aa287998243812dad41b8286702a9525d17fdce534e53a5d3c31826c09a89a3"
+    },
+    "batch.png": {
+      "captured_at": "2026-09-19T20:12:52.249793+00:00",
+      "apk_sha256": "253c4c71e62697f869fa67ef2bfb47c23ce352bc06f731f804a9f2b96ce6bf24",
+      "size": "Physical size: 480x800",
+      "density": "Physical density: 240",
+      "font_scale": "null",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/canvas-grid",
+      "image_sha256": "ea675e66d3fb63f5dd8bd6d5d50392838ab6c331d0977391b93d54fadaa3205f"
+    },
+    "editor-workstation-properties.png": {
+      "captured_at": "2026-09-19T20:37:20.435995+00:00",
+      "apk_sha256": "253c4c71e62697f869fa67ef2bfb47c23ce352bc06f731f804a9f2b96ce6bf24",
+      "size": "Physical size: 960x720",
+      "density": "Physical density: 160",
+      "font_scale": "1",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/workstation-properties",
+      "image_sha256": "fb1e0293033f95898b22605810e2a66d50fae4254c6b4f11155089ee47b27aca"
+    },
+    "home-workstation.png": {
+      "captured_at": "2026-09-19T20:45:44.722426+00:00",
+      "apk_sha256": "abf2f50fe63835ab885f23efc50f0db5033f167f2db72a778061355f8bc03c2d",
+      "size": "Physical size: 960x720",
+      "density": "Physical density: 160",
+      "font_scale": "1",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/final-home-workstation",
+      "image_sha256": "1cd9164e93c5427d9e1f05f910ac989a8bbeb7789301ec3cb6f0874324bb3950"
+    },
+    "editor-workstation.png": {
+      "captured_at": "2026-09-19T20:46:27.013797+00:00",
+      "apk_sha256": "abf2f50fe63835ab885f23efc50f0db5033f167f2db72a778061355f8bc03c2d",
+      "size": "Physical size: 960x720",
+      "density": "Physical density: 160",
+      "font_scale": "1",
+      "remote_evidence": "/workspace/qa/vision-dataset-studio/redesign/final-editor-workstation",
+      "image_sha256": "3cb6aabb55d471b6c7fbc1d1bb2fa12a51e0ff6caff45473f3d6c1f53c4ce9e6"
+    }
+  },
+  "latest_build_run": "20260919T203710Z-e9cd5c4ddbbe"
+}

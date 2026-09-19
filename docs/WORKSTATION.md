@@ -26,9 +26,19 @@ Les tâches VS Code du projet permettent aussi de lancer build, tests portables,
 
 Le pod ne dispose pas de `/dev/kvm`. L'émulateur utilise donc la virtualisation
 logicielle, avec rendu SwiftShader. Des blocages de l’interface système ont été
-observés : le démarrage ne constitue pas une validation de stabilité. Pour une
+observés, y compris un crash natif de `system_server` au premier redémarrage
+du profil grand écran (journal conservé dans `canvas-first/workstation-boot-system-crash.log`).
+Le système a redémarré automatiquement ; le lancement suivant de l’application
+a affiché sa première frame en 41,836 s selon ActivityManager. Ce délai mesure
+cette émulation logicielle, pas un téléphone ni les performances du modèle. Le démarrage ne constitue pas une validation de stabilité. Pour une
 recette fiable, prévoir aussi un appareil dédié ou les émulateurs accélérés de
 la CI. Cet émulateur ne fournit pas de benchmark représentatif d’un appareil ARM.
+
+Le profil par défaut est un écran de travail de 960 × 720 px à 160 dpi.
+Il utilise la résolution réelle de l’émulateur : un simple `wm size` redimensionne
+le contenu Android mais le laisse réduit dans la fenêtre physique du téléphone.
+Le profil `phone` conserve 480 × 800 px à 240 dpi pour la recette à 320 dp.
+Le script ne change pas une instance déjà en cours.
 
 Sur le pod :
 
@@ -37,6 +47,17 @@ bash tools/workstation/run.sh emulator
 source /workspace/toolchains/android-env.sh
 adb devices
 adb -s emulator-5554 shell getprop sys.boot_completed
+```
+
+Pour basculer de profil sur cet AVD dédié sans effacer ses données :
+
+```bash
+adb -s emulator-5554 shell wm size reset
+adb -s emulator-5554 shell wm density reset
+adb -s emulator-5554 emu kill
+# Attendre l’arrêt complet avant le lancement.
+VDS_EMULATOR_PROFILE=phone bash tools/workstation/run.sh emulator
+# Ou VDS_EMULATOR_PROFILE=workstation pour revenir au grand écran.
 ```
 
 Sur le Chromebook, laisser ce tunnel ouvert :

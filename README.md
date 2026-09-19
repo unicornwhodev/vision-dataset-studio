@@ -6,6 +6,8 @@ Atelier mobile générique de préparation de datasets image pour la vision par 
 
 **Version en qualification sur le poste Runpod.** Les résultats courants sont consignés dans [le rapport du pod](docs/POD_VALIDATION.md). Les tests portables ne remplacent pas la recette Android, les essais sur téléphone et les échanges HF réels.
 
+La refonte **Studio sombre cyan/violet** est décrite dans [le guide UI](docs/UI_REDESIGN.md).
+
 Licence du code : **Apache-2.0**, choisie par le propriétaire. Les modèles, datasets et composants tiers conservent leurs propres conditions.
 
 ## Périmètre conservé

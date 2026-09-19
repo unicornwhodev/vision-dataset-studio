@@ -15,7 +15,8 @@ une commande exécutée, son résultat et les artefacts correspondants.
 État du 19 septembre : APK et schéma produits, 25/26 tests JVM réussis, lint sans
 erreur. Priorité : diagnostiquer/corriger la reprise HTTP interrompue puis refaire
 le build complet. Corriger le chargement Kotlin du fournisseur SAF de test et
-réexécuter la suite instrumentée entière. Corriger aussi le bouton Importer comprimé sur écran étroit.
+réexécuter la suite instrumentée entière. La refonte corrige les onglets sur écran
+étroit ; ses deux tests Compose passent sur API 28.
 Les détails et les échecs instrumentés sont dans `POD_VALIDATION.md`.
 
 
@@ -27,6 +28,9 @@ Les détails et les échecs instrumentés sont dans `POD_VALIDATION.md`.
 - Exécuter les tests instrumentés API 28 et 35 et collecter logs/captures.
 
 ## 3. Recette fonctionnelle P1
+
+La refonte sombre cyan/violet est implémentée ; la composition et les preuves
+de contrôle sont dans [UI_REDESIGN.md](UI_REDESIGN.md).
 
 - Parcourir Atelier, Lot, Modèles, Export, Qualité et réglages sans crash.
 - Exécuter le cycle local sur les fixtures : lots 2 + 1, corrections, export,
@@ -60,5 +64,4 @@ La matrice détaillée et les critères de sortie restent dans
 - Automatisation de la matrice de non-régression et des preuves de livraison.
 - Import inter-application explicite et vérifié des données existantes.
 - Support des modèles multi-entrées uniquement après validation des contrats.
-- Améliorations ergonomiques guidées par les parcours observés, sans refonte
-  préalable de l'interface existante.
+- Ajustements ergonomiques guidés par les usages réels de l’atelier et de l’éditeur.

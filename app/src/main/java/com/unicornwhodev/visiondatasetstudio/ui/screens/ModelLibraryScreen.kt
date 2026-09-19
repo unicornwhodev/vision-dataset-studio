@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.unicornwhodev.visiondatasetstudio.ui.MainViewModel
 import com.unicornwhodev.visiondatasetstudio.ui.Screen
-import com.unicornwhodev.visiondatasetstudio.ui.components.StatusPill
+import com.unicornwhodev.visiondatasetstudio.ui.components.*
 import com.unicornwhodev.visiondatasetstudio.ui.components.StudioSection
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -31,62 +31,61 @@ fun ModelLibraryScreen(vm: MainViewModel) {
     var deleteId by remember { mutableStateOf<String?>(null) }
     val weights=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){it?.let(vm::importModel)}
     Scaffold(contentWindowInsets=WindowInsets(0),topBar={
-        TopAppBar(windowInsets=WindowInsets(0),title={Column{Text("Bibliothèque de modèles");Text("Préannotation locale, sans validation automatique",style=MaterialTheme.typography.labelMedium)}},actions={
+        StudioTopBar("Modèles", "Bibliothèque locale", actions={
             IconButton(onClick=vm::refreshCommunityModelCatalog,enabled=!busy){Icon(Icons.Default.Refresh,"Actualiser le catalogue")}
         })
     }) { inset ->
         Column(Modifier.fillMaxSize().padding(inset)) {
-            Row(Modifier.fillMaxWidth().padding(horizontal=16.dp,vertical=8.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected=tab==0,onClick={tab=0},label={Text("Disponibles")},leadingIcon={Icon(Icons.Default.CloudDownload,null)})
-                FilterChip(selected=tab==1,onClick={tab=1},label={Text("Installés")},leadingIcon={Icon(Icons.Default.Inventory2,null)})
-                FilterChip(selected=tab==2,onClick={tab=2},label={Text("Importer")},leadingIcon={Icon(Icons.Default.AddCircleOutline,null)})
-            }
+            StudioTabs(listOf("Explorer", "Installés", "Importer"), tab, { tab = it }, Modifier.padding(horizontal = 16.dp))
             LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 if(tab==0) {
                     item {
-                        Card(colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.primaryContainer)) {
-                            Row(Modifier.fillMaxWidth().padding(18.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(14.dp)) {
-                                Icon(Icons.Default.AutoAwesome,null,Modifier.size(30.dp),tint=MaterialTheme.colorScheme.primary)
-                                Column(Modifier.weight(1f)) { Text("Catalogue LiteRT pour Android",style=MaterialTheme.typography.titleMedium);Text("Les poids restent téléchargés à la demande depuis Hugging Face. Une conversion non publiée n’est pas affichée comme disponible.",style=MaterialTheme.typography.bodySmall) }
-                            }
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text("Catalogue", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                            Text("${remote.count { it.installableNow }} installables", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
-                    if(remote.isEmpty()) item { StudioSection("Catalogue non chargé","Actualisez pour lire ${com.unicornwhodev.visiondatasetstudio.domain.inference.CommunityModelCatalog.repoId}.",Icons.Default.CloudOff){Button(onClick=vm::refreshCommunityModelCatalog,enabled=!busy){Text("Actualiser")}} }
+                    if(remote.isEmpty()) item { EmptyWorkspace("Catalogue non chargé", "Actualisez pour voir les modèles disponibles.", Icons.Default.Memory, if (!busy) "Explorer le catalogue" else null, vm::refreshCommunityModelCatalog) }
                     items(remote.size,key={remote[it].entry.id}) { index ->
                         val item=remote[index]
-                        OutlinedCard(shape=MaterialTheme.shapes.large) {
-                            Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+                        Card(shape=MaterialTheme.shapes.large, colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface)) {
+                            Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                                 Row(verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.spacedBy(12.dp)) {
-                                    Surface(shape=MaterialTheme.shapes.medium,color=MaterialTheme.colorScheme.secondaryContainer){Icon(Icons.Default.Memory,null,Modifier.padding(12.dp),tint=MaterialTheme.colorScheme.onSecondaryContainer)}
-                                    Column(Modifier.weight(1f)) { Text(item.entry.title,style=MaterialTheme.typography.titleMedium);Text(item.entry.purpose,style=MaterialTheme.typography.bodyMedium,color=MaterialTheme.colorScheme.onSurfaceVariant) }
-                                    StatusPill(if(item.available)"Disponible" else "En attente",if(item.available)Icons.Default.CheckCircle else Icons.Default.Schedule,attention=!item.installableNow)
+                                    Icon(Icons.Default.Memory,null,Modifier.padding(top=2.dp).size(20.dp),tint=MaterialTheme.colorScheme.secondary)
+                                    Column(Modifier.weight(1f)) { Text(item.entry.title,style=MaterialTheme.typography.titleMedium);Text(item.entry.purpose,style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) }
                                 }
-                                FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalArrangement=Arrangement.spacedBy(6.dp)) {
-                                    SuggestionChip(onClick={},label={Text(item.entry.accent)});SuggestionChip(onClick={},label={Text(item.entry.upstreamLicense)});SuggestionChip(onClick={},label={Text("${item.entry.expectedFiles.size} fichier(s)")})
+                                Text(if(item.installableNow) "Compatible · ${item.entry.upstreamLicense}" else "Non installable · ${item.entry.upstreamLicense}", style=MaterialTheme.typography.labelMedium, color=if(item.installableNow) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                                Row(Modifier.fillMaxWidth(), verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.SpaceBetween) {
+                                    var showInfo by remember { mutableStateOf(false) }
+                                    TextButton(onClick={showInfo=true}) { Text("Détails") }
+                                    if(item.installableNow) FilledTonalButton(onClick={vm.downloadCommunityModel(item.entry.id)},enabled=!busy,shape=MaterialTheme.shapes.small){Icon(Icons.Default.Download,null,Modifier.size(18.dp));Spacer(Modifier.width(6.dp));Text("Installer")}
+                                    if(showInfo) AlertDialog(onDismissRequest={showInfo=false},title={Text(item.entry.title)},text={Text("${item.entry.accent} · ${item.entry.expectedFiles.size} fichier(s)\n\n${item.note}")},confirmButton={TextButton(onClick={showInfo=false}){Text("Fermer")}})
                                 }
-                                Text(item.note,style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
-                                if(item.installableNow) Button(onClick={vm.downloadCommunityModel(item.entry.id)},enabled=!busy){Icon(Icons.Default.Download,null);Spacer(Modifier.width(8.dp));Text("Télécharger dans l’app")}
                             }
                         }
                     }
                 } else if(tab==1) {
-                    if(local.isEmpty()) item { StudioSection("Aucun modèle local","Téléchargez une conversion disponible ou importez vos propres poids LiteRT.",Icons.Default.Inventory2){} }
+                    if(local.isEmpty()) item { EmptyWorkspace("Aucun modèle installé", "Importez un fichier .tflite compatible.", Icons.Default.Memory, "Importer", { tab = 2 }) }
                     items(local.size,key={local[it].id}) { index ->
                         val profile=local[index];val active=project?.modelPath==profile.modelPath && profile.modelPath.isNotBlank()
-                        OutlinedCard(shape=MaterialTheme.shapes.large) {
-                            Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+                        Card(shape=MaterialTheme.shapes.large, colors=CardDefaults.cardColors(containerColor=MaterialTheme.colorScheme.surface)) {
+                            Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                                 Row(verticalAlignment=Alignment.CenterVertically) { Column(Modifier.weight(1f)){Text(profile.name,style=MaterialTheme.typography.titleMedium);Text(profile.tensorReport.lineSequence().firstOrNull().orEmpty(),maxLines=1,overflow=TextOverflow.Ellipsis,style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)};if(active)StatusPill("Actif",Icons.Default.CheckCircle) }
                                 Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) { Button(onClick={vm.selectModelProfile(profile.id)},enabled=!busy&&!active){Text(if(active)"Sélectionné" else "Utiliser")};OutlinedButton(onClick={deleteId=profile.id},enabled=!busy){Icon(Icons.Default.DeleteOutline,null);Spacer(Modifier.width(6.dp));Text("Supprimer")} }
                             }
                         }
                     }
-                    item { OutlinedButton(onClick=vm::detachModel,enabled=!busy,modifier=Modifier.fillMaxWidth()){Text("Détacher le modèle du projet actif")} }
+                    if (!project?.modelPath.isNullOrBlank() || project?.modelConfigJson != null) item { OutlinedButton(onClick=vm::detachModel,enabled=!busy,modifier=Modifier.fillMaxWidth()){Text("Détacher du projet")} }
                 } else {
-                    item { StudioSection("Importer vos poids","Aucun modèle privé n’est embarqué. Les poids restent dans le stockage privé de l’application.",Icons.Default.UploadFile) {
-                        Button(onClick={weights.launch(arrayOf("application/octet-stream","*/*"))},enabled=!busy){Text("Choisir un .tflite")}
+                    item { StudioSection("Importer un modèle","Aucun modèle privé n’est embarqué. Les poids restent dans le stockage privé de l’application.",Icons.Default.UploadFile) {
+                        Text("Fichier LiteRT", style=MaterialTheme.typography.titleLarge)
+                        Text("Sélectionnez les poids sur cet appareil.", style=MaterialTheme.typography.bodySmall, color=MaterialTheme.colorScheme.onSurfaceVariant)
+                        Button(onClick={weights.launch(arrayOf("application/octet-stream","*/*"))},enabled=!busy,shape=MaterialTheme.shapes.small,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){Icon(Icons.Default.UploadFile,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text("Choisir un .tflite")}
+                    } }
+                    item { StudioDisclosure("Depuis une URL", Icons.Default.Link) {
                         OutlinedTextField(url,{url=it},label={Text("URL HTTPS directe")},singleLine=true,modifier=Modifier.fillMaxWidth())
-                        OutlinedButton(onClick={vm.importModelUrl(url)},enabled=!busy&&url.startsWith("https://")){Text("Télécharger cette URL")}
-                        TextButton(onClick={vm.navigateTo(Screen.Controls)},enabled=!busy){Text("Contrat, prétraitement et options avancées")}
+                        OutlinedButton(onClick={vm.importModelUrl(url)},enabled=!busy&&url.startsWith("https://")){Text("Importer l’URL")}
+                        TextButton(onClick={vm.navigateTo(Screen.Controls)},enabled=!busy){Text("Options avancées")}
                     } }
                 }
             }

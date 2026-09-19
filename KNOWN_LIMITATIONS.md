@@ -17,9 +17,9 @@ depuis des bases réellement utilisées reste nécessaire.
 
 Le pod n’a pas KVM. L’émulateur AOSP démarre et affiche l’application, mais le
 premier affichage a pris environ 28 secondes et des blocages System UI ont été
-observés. À 320 dp de largeur, l’action « Importer » de la bibliothèque de modèles
-est comprimée et son libellé n’est pas lisible sur la capture. La navigation
-initiale ne remplace pas la recette complète sur un téléphone.
+observés. La refonte corrige les onglets comprimés : « Importer » est maintenant
+lisible et accessible à 320 dp. Les captures et la recette de l’interface sont
+décrites dans `docs/UI_REDESIGN.md`. L’émulation ne remplace pas une recette sur téléphone.
 
 Pas de test HF de bout en bout, ni injection de panne réelle sur Android, ni mesure RAM/inférence sur téléphone. Les helpers JVM et le stress SQLite hôte n’établissent pas ces succès.
 
@@ -33,7 +33,7 @@ Les gros dossiers SAF peuvent être lents malgré une lecture bornée ; aucune p
 
 ## Modèles
 
-Runtime CPU Interpreter conservé. Pas de CompiledModel/GPU/NPU intégré. Le catalogue UWD est résolu dynamiquement et les téléchargements utilisent le SHA du dépôt au moment de la découverte, mais ce parcours n’a pas été exécuté sur Android dans cette livraison. L’import doit toujours inspecter les tenseurs réels et peut refuser un modèle inattendu. La bibliothèque ne garantit ni exactitude métier ni licence universelle de redistribution.
+Runtime CPU Interpreter conservé. Pas de CompiledModel/GPU/NPU intégré. Le catalogue UWD est résolu dynamiquement et les téléchargements utilisent le SHA du dépôt au moment de la découverte, La découverte et l’affichage du catalogue ont été exécutés sur Android ; le téléchargement et l’inférence restent à qualifier. L’import doit toujours inspecter les tenseurs réels et peut refuser un modèle inattendu. La bibliothèque ne garantit ni exactitude métier ni licence universelle de redistribution.
 
 Pas de VLM intégré ; le client HTTP exige un serveur séparé sur le même appareil et reste loopback-only. Les mesures mémoire du client n’incluent pas ce serveur. Aucun poids privé ni modèle de pointing non vérifié n’est fourni.
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 /** Non-sensitive display preferences only. The HF credential remains in KeystoreManager. */
 class StudioPreferenceStore(context: Context) {
     private val prefs = context.getSharedPreferences("studio_ui_v2", Context.MODE_PRIVATE)
-    private fun theme() = ThemeMode.entries.firstOrNull { it.name == prefs.getString("theme", "SYSTEM") } ?: ThemeMode.SYSTEM
+    private fun theme() = ThemeMode.entries.firstOrNull { it.name == prefs.getString("theme", "DARK") } ?: ThemeMode.DARK
     private fun density() = GridDensity.entries.firstOrNull { it.name == prefs.getString("density", "COMFORTABLE") } ?: GridDensity.COMFORTABLE
     private val mutable = MutableStateFlow(StudioPreferences(
         theme = theme(), gridDensity = density(), autoAdvance = prefs.getBoolean("auto_advance", true),

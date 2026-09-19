@@ -32,3 +32,28 @@ refuse cette tentative comme attendu. La première tentative de compilation
 Le [rapport du pod](docs/POD_VALIDATION.md) donne chemins, limites et suites à
 terminer. Les preuves brutes restent sur le pod et une copie légère est dans
 `test-results/pod-20260919/` sur le Chromebook (hors Git).
+
+## Refonte de l’interface
+
+Tentative `20260919T200729Z-bec11e4607bc` : APK principale et de tests compilées,
+signées, vérifiées puis installées. Les **2 tests Compose instrumentés passent**
+sur l’AVD API 28 (74,293 s de suite JUnit). Ils couvrent l’accès aux projets et au
+catalogue sans téléchargement, puis Importer/Export/Qualité/Atelier à 320 dp.
+
+Les 26 tests JVM ont été réexécutés : 25 réussissent, le même test de reprise HTTP
+échoue (sur cette exécution, à la ligne 21). Lint : 0 erreur, 68 avertissements.
+Les contrôles d’identité ont été relancés localement : 12/12 réussis.
+Recette manuelle sur trois images synthétiques importées par SAF dans un projet
+séparé : création d’une boîte, annuler/rétablir, propriétés, fermeture et reprise
+avec conservation de la boîte. Le canevas mesure 480 × 515 px à 320 dp.
+La suite SAF bloquée n’a pas été relancée par ces tests UI.
+
+Le reçu global reste **failed**, malgré les tests UI réussis. La refonte ne rend
+pas la version publiable. Voir [la recette visuelle](docs/UI_REDESIGN.md).
+
+Dernière correction : `20260919T203710Z-e9cd5c4ddbbe` borne les aperçus de l’accueil pour éviter leur
+débordement sur grand écran. Les deux tests Compose repassent à 960 dp
+(75.807 s JUnit). L’accueil est contrôlé visuellement après installation ;
+la boîte enregistrée reste présente dans l’éditeur. Les vérifications détaillées
+des gestes à 320 dp ci-dessus portent sur `20260919T200729Z-bec11e4607bc` ;
+le code de l’éditeur est identique entre les deux tentatives.
