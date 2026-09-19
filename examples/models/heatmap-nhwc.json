@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "task": "pointing",
+  "adapter": "heatmap",
+  "labels": [
+    "object"
+  ],
+  "inputWidth": 256,
+  "inputHeight": 256,
+  "mean": 0.0,
+  "std": 255.0,
+  "resizeMode": "stretch",
+  "outputLayout": "NHWC"
+}

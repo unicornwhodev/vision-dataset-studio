@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "adapter": "ssd",
+  "labels": [
+    "class_a",
+    "class_b"
+  ],
+  "inputWidth": 300,
+  "inputHeight": 300,
+  "mean": 127.5,
+  "std": 127.5,
+  "resizeMode": "letterbox",
+  "coordinates": "normalized",
+  "boxFormat": "ymin_xmin_ymax_xmax",
+  "outputIndexBoxes": 0,
+  "outputIndexClasses": 1,
+  "outputIndexScores": 2,
+  "outputIndexCount": 3,
+  "classOffset": 0
+}

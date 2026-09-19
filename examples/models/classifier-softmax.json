@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "task": "classification",
+  "adapter": "classification",
+  "labels": [
+    "class_a",
+    "class_b"
+  ],
+  "inputWidth": 224,
+  "inputHeight": 224,
+  "mean": 127.5,
+  "std": 127.5,
+  "resizeMode": "center_crop",
+  "scoreActivation": "softmax",
+  "topK": 1
+}

@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Focus / Bounding Box Corners (66dp safe zone: 21 to 87) -->
+    <path
+        android:pathData="M28,38 L28,28 L38,28 M70,28 L80,28 L80,38 M80,70 L80,80 L70,80 M38,80 L28,80 L28,70"
+        android:strokeWidth="3.5"
+        android:strokeColor="#38BDF8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Center Reticle / Optical Crosshair -->
+    <path
+        android:pathData="M54,34 L54,42 M54,66 L54,74 M34,54 L42,54 M66,54 L74,54"
+        android:strokeWidth="2.5"
+        android:strokeColor="#94A3B8"
+        android:strokeLineCap="round" />
+
+    <!-- Center Target Node / Point -->
+    <path
+        android:pathData="M54,54m-4.5,0a4.5,4.5 0,1 1,9 0a4.5,4.5 0,1 1,-9 0"
+        android:fillColor="#F59E0B" />
+
+    <!-- Center Aperture Ring -->
+    <path
+        android:pathData="M54,54m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0"
+        android:strokeWidth="1.8"
+        android:strokeColor="#FFFFFF" />
+
+    <!-- Dataset / Multimodal Tag Badge at Top-Right -->
+    <path
+        android:pathData="M66,32 L78,32 A2,2 0 0 1 80,34 L80,44 A2,2 0 0 1 78,46 L66,46 A2,2 0 0 1 64,44 L64,34 A2,2 0 0 1 66,32 Z"
+        android:fillColor="#10B981" />
+    <path
+        android:pathData="M68,39 L71,42 L76,36"
+        android:strokeWidth="1.8"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

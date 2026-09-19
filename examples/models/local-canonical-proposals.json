@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "runtime": "local_http",
+  "task": "multitask",
+  "endpoint": "http://127.0.0.1:8080/predict",
+  "httpModel": "user-selected-model",
+  "prompt": "Return the configured canonical proposals.",
+  "responsePath": "predictions",
+  "httpOutputMode": "proposals",
+  "threshold": 0.35
+}

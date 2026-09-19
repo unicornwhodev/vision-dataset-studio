@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "task": "pointing",
+  "adapter": "points",
+  "labels": [
+    "object"
+  ],
+  "inputWidth": 224,
+  "inputHeight": 224,
+  "mean": 0.0,
+  "std": 255.0,
+  "resizeMode": "stretch",
+  "coordinates": "normalized"
+}

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "runtime": "litert_interpreter",
+  "task": "object_detection",
+  "adapter": "xyxy_score_class",
+  "inputWidth": 640,
+  "inputHeight": 640,
+  "inputChannels": 3,
+  "inputType": "FLOAT32",
+  "inputLayout": "NHWC",
+  "mean": 0.0,
+  "std": 255.0,
+  "isRgb": true,
+  "resizeMode": "letterbox",
+  "padValue": 114,
+  "labels": [
+    "class_a",
+    "class_b"
+  ],
+  "coordinates": "normalized",
+  "outputLayout": "BCN",
+  "outputIndex": 0,
+  "yoloObjectness": false,
+  "scoreActivation": "none",
+  "threshold": 0.35,
+  "nmsIou": 0.45,
+  "maxDetections": 100,
+  "threads": 2,
+  "outputMode": "boxes"
+}

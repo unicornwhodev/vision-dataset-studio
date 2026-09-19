@@ -1,0 +1,3 @@
+{"id": "fixture-001", "image": "images/001.png", "group_id": "test-group-1", "annotations": {"points": [{"id": "p1", "x": 0.5, "y": 0.5, "label": "object"}]}}
+{"id": "fixture-002", "image": "images/002.png", "group_id": "test-group-2", "annotations": {"points": [{"id": "p2", "x": 0.5, "y": 0.5, "label": "object"}]}}
+{"id": "fixture-003", "image": "images/003.png", "group_id": "test-group-3", "annotations": {"points": [{"id": "p3", "x": 0.5, "y": 0.5, "label": "object"}]}}

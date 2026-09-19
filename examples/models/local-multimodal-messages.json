@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "runtime": "local_http",
+  "task": "captioning",
+  "endpoint": "http://127.0.0.1:8080/v1/chat/completions",
+  "httpModel": "user-selected-model",
+  "prompt": "Describe only visible objects.",
+  "requestTemplate": "{\"model\": \"$model\", \"messages\": [{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"$prompt\"}, {\"type\": \"image_url\", \"image_url\": {\"url\": \"$image_data_url\"}}]}], \"stream\": false}",
+  "responsePath": "choices.0.message.content",
+  "httpOutputMode": "caption_text",
+  "httpTimeoutSeconds": 120
+}

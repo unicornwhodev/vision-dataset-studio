@@ -1,0 +1,880 @@
+{
+  "schema": 2,
+  "product": "Vision Dataset Studio",
+  "version": "4.2.0-rc1",
+  "apk_included": false,
+  "manifest_self_excluded": true,
+  "archive_sha256_recorded_separately": true,
+  "files": [
+    {
+      "path": ".github/workflows/android-qualification.yml",
+      "bytes": 3995,
+      "sha256": "7b1ead9db8dc42fbae6da2de389961ae61ae56e69de43e7534adaa3912bfbb3e"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 508,
+      "sha256": "5798543e8c17ec86ca021501bee754638775ff880a812d0fc1a3e7792650143c"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 2123,
+      "sha256": "f7fc68731cfbf4a847588ccef8a8bf17f517a1c2ec4df49ee4da0a6c8b5ab349"
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "bytes": 1866,
+      "sha256": "7fcb888efcbf0bc18ecb6d6e96eb1d8e606872725be09ab7a836d51f4001e037"
+    },
+    {
+      "path": "DATA_SCHEMA.md",
+      "bytes": 3340,
+      "sha256": "ce14cd2021302da48b5bd72f0af8d2ca7af80f60acfbcc7b795d88bbe139dd30"
+    },
+    {
+      "path": "HF_IO.md",
+      "bytes": 2120,
+      "sha256": "d0c60a33a5d916ba0a4caa76672299b0eece5eb4f6256ea2b2b2a0c8ac3f15d7"
+    },
+    {
+      "path": "KNOWN_LIMITATIONS.md",
+      "bytes": 3315,
+      "sha256": "a2223105bd2e3c12a223c9e0711b3b0a25a1f9538c3e6c30c12f35c844105ee6"
+    },
+    {
+      "path": "LICENSING_STATUS.md",
+      "bytes": 1605,
+      "sha256": "a5f51cdbaf85e80eef95ba5b1a6dc344f3ab3498d9defbb1cc663800a741ba72"
+    },
+    {
+      "path": "MODEL_ADAPTERS.md",
+      "bytes": 6407,
+      "sha256": "9fcd4e8b80d05dfbf2b4fc79f8971c8d1f31d4641d2a8b59d2a6ab7b289427fc"
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 1030,
+      "sha256": "1bab8f6f37ca7b38c9d0d139e4e50b9330d5cc552e879e3486405dbff378b5ff"
+    },
+    {
+      "path": "QUALIFICATION_STATUS.json",
+      "bytes": 2083,
+      "sha256": "90798f1484abfe9cfa12ee1ac22410cefd4edc1be41b74fc0de850f58b9f7c55"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4589,
+      "sha256": "3418e261ce192a163f067e4446f19fa9c16257aa8358fd2c5451a6f236bd8b25"
+    },
+    {
+      "path": "SOURCES.md",
+      "bytes": 2495,
+      "sha256": "d7dd8b0a1a51512ef193b730f3abf5bdff1d3341d7c3f169b923bc6a8c26a75a"
+    },
+    {
+      "path": "TEST_REPORT.md",
+      "bytes": 2865,
+      "sha256": "f7cb59751d7193e609cb8ff5ce4b81c139365360a0177f8b23f00216d191935c"
+    },
+    {
+      "path": "V4_2_CHANGES.md",
+      "bytes": 1757,
+      "sha256": "585aa574608881ffe7b1e0256b1b439c1c74405775c7f965a56029c6d1bf9df5"
+    },
+    {
+      "path": "V4_2_LIRE_AVANT.md",
+      "bytes": 4030,
+      "sha256": "3e5ee6e95bf7c7fcfdfddc84f1e03a6b998c3ea442045643d9523ded23f039ef"
+    },
+    {
+      "path": "app/.gitignore",
+      "bytes": 7,
+      "sha256": "5b46eb48d96e8571e8c93e4ef4f6ffbe6807b6d7350664a36a064e1167a32718"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 4078,
+      "sha256": "dbe551dcc9388cc8340c94640ae4d14927ddcef96a360c20da25bf78c434abab"
+    },
+    {
+      "path": "app/proguard-rules.pro",
+      "bytes": 751,
+      "sha256": "1cf8c57e8f79c250b0af9c1a5a4edad71a5c348a79ab70243b6bae086c150ad2"
+    },
+    {
+      "path": "app/schemas/README.md",
+      "bytes": 602,
+      "sha256": "8d914206707d4e4aea82f7bef8c7687bcb9c566a02cf00b04f2bcc9fca54cfb0"
+    },
+    {
+      "path": "app/src/androidTest/AndroidManifest.xml",
+      "bytes": 324,
+      "sha256": "5b4cd4e90363c550c86e76c4a675cb6d16c7c16f9af9a4cce6b01f50b5bd9948"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/ApplicationIdentityTest.kt",
+      "bytes": 669,
+      "sha256": "d524b248dd2dedf9e4ecb862ee5d58575e8295c1dfe18688c3a344b4a56e621f"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/RoomMigrationOnDeviceTest.kt",
+      "bytes": 3812,
+      "sha256": "4b0391ea45cf7924eb569b8c612855ae26e52d9f9a525d471e0d68849c2635d1"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/SafV4Test.kt",
+      "bytes": 3439,
+      "sha256": "3cd4f1b5105be0f4e01a180f020109aba5c549b6c61644bc7b30794073791727"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/StudioComposeV4Test.kt",
+      "bytes": 992,
+      "sha256": "7cd88775f8f7443f8e6c14a60665689a590efe1984bfcc471880faaf59b750e8"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "bytes": 1632,
+      "sha256": "cad16e81cbadda2367575c89ab7d927ad4019612bd03a9d96f6d5b26c27f5f72"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/MainActivity.kt",
+      "bytes": 1248,
+      "sha256": "261f8961b039e96777dd402551210754a34a0dfcf82442a2f9bb962dbbe08393"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/crypto/KeystoreManager.kt",
+      "bytes": 3834,
+      "sha256": "ffe5361dcac4500c0724d04e5d06cfb3d170e5b0fc4fccfbd55d031868dc49b1"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/geometry/Geometry.kt",
+      "bytes": 4420,
+      "sha256": "efaef382e23c1ca687c81ff837a3da38ffcd18132456e03e38d8952f6a6bcbb6"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/geometry/HashUtils.kt",
+      "bytes": 1627,
+      "sha256": "3386605ecce8b170368a94b97202818c03ee0adf51e5de06f0f0ec7f44f53057"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/geometry/ImageViewport.kt",
+      "bytes": 1556,
+      "sha256": "7b5052b7f542bbd6f8589e2d81da5ae6c327a8c7822b935501c73997183b0dde"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/DownloadCheckpoint.kt",
+      "bytes": 1705,
+      "sha256": "17d589d8f684094704b6565c1d116ce780a63999177e529e30ae6853810b7ac2"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/DurableFiles.kt",
+      "bytes": 3535,
+      "sha256": "1128002f2dee9e9112fc22692015c70176e4f575a3166d2d6e2514c70b37dece"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/ImageNormalizer.kt",
+      "bytes": 2114,
+      "sha256": "1ff1abafa2b361c3b7730740aba242494d11b24dd56a304ce55164179f01c7d4"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/SafArchives.kt",
+      "bytes": 1865,
+      "sha256": "d3771cb1228633c5945be033d2f8ae5b8975487327c11b86f75996f0dbe0fe59"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/StorageManager.kt",
+      "bytes": 5264,
+      "sha256": "2a0a6873acd9c6c4166ba4ec6d298f0cb12d515d14cd6f8b4c5b0cf40ef5604f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/workflow/ProcessingSettings.kt",
+      "bytes": 5034,
+      "sha256": "76c666c1890735f193ca97523a5e02f5168439d02db06ae3247cdc17a568050c"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/workflow/StudioWorkflow.kt",
+      "bytes": 4155,
+      "sha256": "9d01233f05ad4e8324830b6d879a10d6db3b59fb49ffa36701f648a64981a71a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/workflow/TransferSafety.kt",
+      "bytes": 2330,
+      "sha256": "b396e22eab1e0a941a591c8a10561fd0c3891e38bb4cea39cbc2504e703c4594"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/db/AppDatabase.kt",
+      "bytes": 2381,
+      "sha256": "a1f68d53522f8a838c32497074c452c2508286ff35e94476c7764735769c290b"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/db/Daos.kt",
+      "bytes": 5972,
+      "sha256": "5fec4db4639643d90da3bb9b781177f6a6110362bf313b81393b30b9ca334fd8"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/db/SchemaMigrations.kt",
+      "bytes": 2588,
+      "sha256": "ef81dc76f7218080ff8f3322b6df6bc819007ec0131d412a69a49cbb4b44c014"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/hf/HfApiClient.kt",
+      "bytes": 38508,
+      "sha256": "f788ad9e316a44982b989af48437c44e13bc3f10b3bd7f3fb1a1ff72ce6befab"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/hf/RepoFileSource.kt",
+      "bytes": 5612,
+      "sha256": "a21b274dc22ec5cb0cfa65525f5de465f9635a84049706e656394c960c81bf36"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/json/StudioJson.kt",
+      "bytes": 362,
+      "sha256": "3b8fb61945c2a83f7c435baa41c29f938cfa2f9af29ee3802549c08cd92d1623"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/model/DatasetModels.kt",
+      "bytes": 5146,
+      "sha256": "4786e1a1e454d60cdc35d0491e0c6e829ca2e67dab769e21597b736644b7cbc0"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/model/Entities.kt",
+      "bytes": 4693,
+      "sha256": "d65868788cf8f7c7e02179c73aec12c35ecd0db6de725e2e23d66d79239ca53a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/preferences/ProjectSettings.kt",
+      "bytes": 694,
+      "sha256": "79b8fe72bb3955326c52e708acfcacb09742304c2911f2c5057618cf08335f5f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/preferences/StudioPreferenceStore.kt",
+      "bytes": 2362,
+      "sha256": "33df241f93f85ab81e3b14b875335ee0617a0d16dc3fb92b5f54b35cf453fe18"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/source/SourceCatalog.kt",
+      "bytes": 13943,
+      "sha256": "ffd3a4b39261732417ae1c17797cffce7842ffc640b3a77152bb625dd08a4202"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/BatchEngine.kt",
+      "bytes": 40019,
+      "sha256": "7d165ca362e9d8b8f3828de922d4ae78505d09974b388792af14657c0acb4098"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/WorkClaimCoordinator.kt",
+      "bytes": 6782,
+      "sha256": "345a92cf21e035c0c0a0ddc530aab201942f07cbcc7456d37c934a21dd3e9837"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/export/DatasetExporters.kt",
+      "bytes": 17013,
+      "sha256": "dde81ba2e2a2cf1550febdacfb3c4bda1650478da3b23d98e1cce9ab4481015a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/export/WebDatasetTarWriter.kt",
+      "bytes": 4392,
+      "sha256": "377bec51c17acc579b33bfca49c2d24892853202c0429a680fbd71e4cae2fcb7"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/AdaptiveCorrection.kt",
+      "bytes": 7776,
+      "sha256": "87412d06bf5934f92e1f6c7f794355b2f2190095383fab61ed4937b3d7a6ff0a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/AdaptiveCorrectionStore.kt",
+      "bytes": 4855,
+      "sha256": "8492097c75787a51ec4b44d8ab3120a723ef036e4b860c5d3f0500029eee7b1b"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/CommunityModelCatalog.kt",
+      "bytes": 7118,
+      "sha256": "e054406039fb3ab40a6b361985194a6db68b9d305e278b2368a16cfbdfc7b1e4"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/DeviceBenchmark.kt",
+      "bytes": 3029,
+      "sha256": "a90105d00bce4b3d4528eee35d99d1b97557a3420b99d3663b2b82d5e552d2d9"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LiteRtEngine.kt",
+      "bytes": 6429,
+      "sha256": "5a57ecbd7716bd8f4fb35c0d116db37fc37852295f180a95e8c03adc090a1b82"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LocalModelClient.kt",
+      "bytes": 4926,
+      "sha256": "6a983f6e030c67ea8d9eb4228257fe4bdb224cc3a8ec14c2356b279dcb975b34"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ModelAdapters.kt",
+      "bytes": 16443,
+      "sha256": "301d3d97bb4a2a74bec4fe9034a6aeeedd0c6cf2166c54713b13b2db69217d41"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ModelConfig.kt",
+      "bytes": 4172,
+      "sha256": "0dc4bc757cebcd75ca845819ae67136cae8b30d4f3dbba557d89bce84b2b647c"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ModelPresets.kt",
+      "bytes": 1563,
+      "sha256": "0dcaa98b404c3e09544edcfc60e75a8633dd35d6b9fae435475b014d5fad1460"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ProposalMerger.kt",
+      "bytes": 4064,
+      "sha256": "f6810acbff1e739446556361db83315d5de28b799444b8bb551a0dfd54b5a4a7"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/PublicModelCatalog.kt",
+      "bytes": 7492,
+      "sha256": "957c1f564b4a41e2c0429151c1763f9cc68b6a0dddc7f5b3a156d69436562a26"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/StudioPack.kt",
+      "bytes": 962,
+      "sha256": "facee9114c1ee8aa4a73013b076328f6d02acc0dd6b1696228c3cb01395300ba"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/TensorCodec.kt",
+      "bytes": 2327,
+      "sha256": "dbc3b684f766294fccf21e20a733de874443beec8e8b4fe6e3744c5fda0d3c7e"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/validation/AnnotationReview.kt",
+      "bytes": 4864,
+      "sha256": "e748e2e7f7cdd31d322e1e324f447c0b9c3dbe5a136b749356b655a095ada925"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/MainViewModel.kt",
+      "bytes": 62130,
+      "sha256": "5f9b91cd9bdcf8e2a07f7ccbdb7c9526bd76e8be25f146512a1286e12bb77c56"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/StudioRoot.kt",
+      "bytes": 4837,
+      "sha256": "d5c993e27dbd7632647a74f69d70e49faade0d031110ab3c3c24da34176ed7e3"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/components/StudioComponents.kt",
+      "bytes": 4969,
+      "sha256": "30d5042550e0fe9e0794081194a389743df3e761eb9464ea36314815da16cbc9"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/AnnotationEditorScreen.kt",
+      "bytes": 43903,
+      "sha256": "1e3916a66128cd78d582bc015bd30ab61d7f5c9168c7bda8db4e02995eecbfb3"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/BatchGridScreen.kt",
+      "bytes": 15993,
+      "sha256": "72e4ac97acc2b95ac12be77f865e331143896621e689e52d9057fe0b7f32828e"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/ModelLibraryScreen.kt",
+      "bytes": 8906,
+      "sha256": "cb27cc01df549a7c0d0cf250c7d5a0c1bdde5822a399ca865dddc813a9c5b0f8"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/PublicationScreen.kt",
+      "bytes": 13007,
+      "sha256": "ab235c5b4ce296eb8229679eeed339a71478b5a9db166f10509aa07b4018c9d7"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/QualityDashboardScreen.kt",
+      "bytes": 8126,
+      "sha256": "28aab411b770e4ee61ca980752b44b00b4fc6c069b0c21b239008c8dd5e3d380"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/SetupScreen.kt",
+      "bytes": 16667,
+      "sha256": "5086b40260fa0262feab455ae05ba2efc221ee437e53f83a867255c6c6eaa83e"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioControlsScreen.kt",
+      "bytes": 30276,
+      "sha256": "164899265f3bfd810e66217dc97f06e2d9849d91b519ad13c3eede5cc88781a2"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioHomeScreen.kt",
+      "bytes": 9316,
+      "sha256": "4ee163c78c248f62b3b6057d3db28c4153681cc6f8f906afa29600f2771ad1a8"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioPreferencesScreen.kt",
+      "bytes": 5804,
+      "sha256": "e30ffec130a8d1b6bc2d2a3ef62a828706a85716311b49b5c6a7ee885eace04a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Color.kt",
+      "bytes": 1016,
+      "sha256": "1db4d8435aa2a2cef2ff81c2875f986abe3927eb2f40cadaf9c7d5b08a0ad965"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Theme.kt",
+      "bytes": 2343,
+      "sha256": "35297ee8e41bd882bbb56dd105a5a6f34a4e1a9664fa2e01a9c1ddddd9d931fb"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Type.kt",
+      "bytes": 1439,
+      "sha256": "cee03c8061e0b77530ea89a4a9d7aa635bc85e3d614ebf467e24b0b4146cfe63"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_background.xml",
+      "bytes": 1093,
+      "sha256": "76ae8c517e5f97eeadd060ad5d3eb703c616e036b23c8ae41e88614892174eb6"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "bytes": 1611,
+      "sha256": "d3d35736931b78efcbeb0933c45a4232619fe5a99bfb932e4bb01b4eb853dd94"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "bytes": 344,
+      "sha256": "6d0988175971f41bdc83eadb144af3d84c40052fa125e90edbe7d89227be4b25"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "bytes": 344,
+      "sha256": "6d0988175971f41bdc83eadb144af3d84c40052fa125e90edbe7d89227be4b25"
+    },
+    {
+      "path": "app/src/main/res/mipmap-hdpi/ic_launcher.webp",
+      "bytes": 2096,
+      "sha256": "99221f2905af79868986b0dd1701ea91a5387146ba701c18b2ee2252a67be481"
+    },
+    {
+      "path": "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp",
+      "bytes": 4305,
+      "sha256": "7c93f81de792b7216b0db55c1471abe5fccbbcde8278a25264d83ebf8464f498"
+    },
+    {
+      "path": "app/src/main/res/mipmap-mdpi/ic_launcher.webp",
+      "bytes": 1485,
+      "sha256": "b9089fe59f9049e993f92646161e0723496224a44436a2500087e2d05409e8f7"
+    },
+    {
+      "path": "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp",
+      "bytes": 2634,
+      "sha256": "943bd647827e0e7f0fa51be8164f9f1835202d90af6d95ffae44dbb094f44060"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xhdpi/ic_launcher.webp",
+      "bytes": 2854,
+      "sha256": "b3a0802c4fc82b3fd796cc2d57c0c1ea93e64fdfc46aab1e74a0bfa45fcef4f4"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp",
+      "bytes": 5934,
+      "sha256": "2df674233ecc4e9fe6c8d4dfceb6c3257995e6613b0447b93c4a4893ff61c675"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp",
+      "bytes": 4360,
+      "sha256": "b479b07551ee8fd8ba4f96dc0e5d34ae675d485d8a341c369443b397a2defdbf"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp",
+      "bytes": 8887,
+      "sha256": "cb1b8197fa5009f511a5e9aea71e2eff952355cadaf776a83ab99db28fadb24f"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp",
+      "bytes": 5743,
+      "sha256": "fe039e8aff6718652748d5d2daa5743cbf38759392a7feb723e7c032349b6e81"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp",
+      "bytes": 11709,
+      "sha256": "4d95c8cb035a1827eef9c0cf065e4be0f8fc0b86d6c420e9f3bccc366fba921d"
+    },
+    {
+      "path": "app/src/main/res/values/colors.xml",
+      "bytes": 379,
+      "sha256": "57681038afd005dcd260eabdd6d16619709c4a3fe20324362ea00e093e85b5fd"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "bytes": 84,
+      "sha256": "9ecf43762f8bd03d56d4ea9a85ca3924bb44b058f0725e400649c1e7f909fe40"
+    },
+    {
+      "path": "app/src/main/res/values/themes.xml",
+      "bytes": 161,
+      "sha256": "ea41f98f2cc88a0a31d045085f068dd4aa8c680a885cb920761ccc0b0c68d401"
+    },
+    {
+      "path": "app/src/main/res/xml/backup_rules.xml",
+      "bytes": 225,
+      "sha256": "7169ef847d08531864882661b06d743d85305f781585ac35799d3754a52f32b4"
+    },
+    {
+      "path": "app/src/main/res/xml/data_extraction_rules.xml",
+      "bytes": 476,
+      "sha256": "bdd4b2c8a3e18d1970767e8f7c7696b66a20cf566112619f847985ad0425b6ff"
+    },
+    {
+      "path": "app/src/main/res/xml/file_paths.xml",
+      "bytes": 159,
+      "sha256": "50e326d007a09536f77b9b170a07340d6167d4b98e89bc55f1694ed2bde961f9"
+    },
+    {
+      "path": "app/src/main/res/xml/network_security_config.xml",
+      "bytes": 342,
+      "sha256": "c869d1fafdd3261c25f2973afa1d7f77e4e0f476d3dbfe5cfe00028fe81a513a"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/BasicJvmTest.kt",
+      "bytes": 348,
+      "sha256": "0cad73de6617b67f3185f0b46b01d0df58c7da382ae2aceb4b96fdc49302a129"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/CoreArchitectureTest.kt",
+      "bytes": 5243,
+      "sha256": "c6ca2dd9ec368ef44c7aa38cf0c53b061d425d9bca44ae3f0e9b60071bc0ab39"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/HfTransferV4Test.kt",
+      "bytes": 6374,
+      "sha256": "d44d28f52cb0298f202ede8f501897d75e0afe5e94fd4c4c960375e10bdc17eb"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/MoshiV4Test.kt",
+      "bytes": 2449,
+      "sha256": "b4650f4752e0eddc5aac6d9ab8a67db9724d3da1fd699c3df1dd011f28e88954"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/RoomMigrationV4Test.kt",
+      "bytes": 3765,
+      "sha256": "c9e33c304136d4d3e5b5f1cda3f56affff1ce46e3b447e0347d73e460e249c81"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/RuntimeSmokeTest.kt",
+      "bytes": 3456,
+      "sha256": "1d0dcb53e9e876a431901be54ffe7f5bb0b863952d4a905afee538dd458108a4"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/StudioScreenshotTest.kt",
+      "bytes": 1630,
+      "sha256": "598fd70552b9ca970560b12f41ff4fe6c70c1658e029c13cf18376a4ee925597"
+    },
+    {
+      "path": "app/src/test/resources/legacy-v1.sql",
+      "bytes": 2028,
+      "sha256": "a35117f51a1147ebe69079ecc89f09a41404f3cba72548c704f90426664b58c4"
+    },
+    {
+      "path": "app/src/test/resources/legacy-v2.sql",
+      "bytes": 2850,
+      "sha256": "96bda39e7498a6a72f25d6c63baad47fea43ad1b08e6ea0eb780c7df606ffbc8"
+    },
+    {
+      "path": "build.gradle.kts",
+      "bytes": 313,
+      "sha256": "71a325324526b83f32b37433f07fc5777b745eaf8a79b116fb50ecb309675038"
+    },
+    {
+      "path": "docs/ANDROID_QUALIFICATION.md",
+      "bytes": 6538,
+      "sha256": "5c969b433e04788034912e81cf253288f062e35bfa1d980ee6dd0eb31f836ded"
+    },
+    {
+      "path": "examples/README.md",
+      "bytes": 545,
+      "sha256": "f58a264a7fcf44f760c126ce672ee9a96f8788bcc2d2c74a2036d0ef8aae0255"
+    },
+    {
+      "path": "examples/fixtures/README.txt",
+      "bytes": 274,
+      "sha256": "1c3d6ec358c56c4963edc6a2fab1e096547d9a03b0b9e4943397040bc41916eb"
+    },
+    {
+      "path": "examples/fixtures/images/001.png",
+      "bytes": 2194,
+      "sha256": "670f4c8ca8d260abfc21bebbd99cbb21ced567f9d820fe0d6f64a724c6b259c4"
+    },
+    {
+      "path": "examples/fixtures/images/002.png",
+      "bytes": 2929,
+      "sha256": "3493a0d89a580e28cfa4404f45d78f6e90ff477ad32dd5b52ddd6c7e1727cd56"
+    },
+    {
+      "path": "examples/fixtures/images/003.png",
+      "bytes": 2055,
+      "sha256": "091bb85649e9e9216dfc5265364d811c0dcaf818f357d53a87f28575a2a7e58b"
+    },
+    {
+      "path": "examples/fixtures/metadata.jsonl",
+      "bytes": 477,
+      "sha256": "dfa84a6ee809ad91115141b671007b2ac4df561eb294bc5890901a8cdae19805"
+    },
+    {
+      "path": "examples/models/boxes-post-nms.json",
+      "bytes": 619,
+      "sha256": "3e7f6a2dfb553563c5a7479833f289e90802186ba85534b68f7855d420d4acce"
+    },
+    {
+      "path": "examples/models/classifier-softmax.json",
+      "bytes": 284,
+      "sha256": "ea3ca1b1552f9383001da654825b3378162bf7e8281f31e8fddb1f07d568be7d"
+    },
+    {
+      "path": "examples/models/heatmap-nhwc.json",
+      "bytes": 230,
+      "sha256": "b2594ff84fe9bb9f548d19d6658b0444e5975acdc792e16434e5e28f73d442fa"
+    },
+    {
+      "path": "examples/models/int8-tensor-example.json",
+      "bytes": 632,
+      "sha256": "3d1dd70d61d17e57a28cdab064f11a8d43925bd287696b9e8df08d62dd3f9044"
+    },
+    {
+      "path": "examples/models/local-canonical-proposals.json",
+      "bytes": 305,
+      "sha256": "8a6e64c09d1aae0b4ac6ba66931e19678f42c1c6127d6b13cec38c74c8b8a094"
+    },
+    {
+      "path": "examples/models/local-caption.json",
+      "bytes": 410,
+      "sha256": "6d301f116c2c5d9b7abdaae2dfe74ce458553bee4b19257c3bdc96c121202690"
+    },
+    {
+      "path": "examples/models/local-multimodal-messages.json",
+      "bytes": 570,
+      "sha256": "4d9aa908de04deb292ed3e9614f25c4531e6bf555aebd3cf8db693bcb1a0ecc3"
+    },
+    {
+      "path": "examples/models/points-direct.json",
+      "bytes": 234,
+      "sha256": "bb1c7b22c0fcefafcb54658d35a8f066c11104cd628899f0e2b5643c5cd77367"
+    },
+    {
+      "path": "examples/models/ssd-explicit.json",
+      "bytes": 390,
+      "sha256": "82199b79b91e246af97d92a85f983c2f4569f4a426394fa6fb70726fba6aa484"
+    },
+    {
+      "path": "examples/models/yolo-bcn.json",
+      "bytes": 603,
+      "sha256": "d4de3575f5ea8b68dcf71cbb3ebea6a84aef8ea45c8f3b25819b5cfe4248a905"
+    },
+    {
+      "path": "examples/models/yolo-objectness-bnc.json",
+      "bytes": 602,
+      "sha256": "03af626cfeebc7eb12bdc4450e270fe9a69e471675f565aba8c7bf52a9a6b97a"
+    },
+    {
+      "path": "examples/packs/generic-detection.json",
+      "bytes": 862,
+      "sha256": "23430bf326e487a1af830869f0a58a8cc189b60238cb42afb59692c21b732460"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "bytes": 5467,
+      "sha256": "f295fcb702414b0e499c923c7b432f760595aa0f66306d47c4c18df35f5e468b"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "bytes": 339,
+      "sha256": "40c4ac801fa3d3029cc46957c91216f9fcff52a05a011a0579357bae3dc4c441"
+    },
+    {
+      "path": "gradle.properties",
+      "bytes": 1414,
+      "sha256": "f448172179c9ff90cb6e97a3ee1d5666e668c2c3740e5256066dca86b8dcf79e"
+    },
+    {
+      "path": "gradlew",
+      "bytes": 205,
+      "sha256": "8487261877b796030b2d6d13616fa6601e3f42d6500fbf2df5fab4223720303c"
+    },
+    {
+      "path": "gradlew.bat",
+      "bytes": 139,
+      "sha256": "a8d98b8ebd2c076cdc3aac053b4ee4afa0d879148b3752236e776b65a30fa1b3"
+    },
+    {
+      "path": "metadata.json",
+      "bytes": 795,
+      "sha256": "5a6d90d79f3d93afc87a3e34680cece678cd44e0ba0ec068b57a269baa16f2c3"
+    },
+    {
+      "path": "settings.gradle.kts",
+      "bytes": 478,
+      "sha256": "b317c4b2fea3620978fbe71a59fab0323947f48d520a7b61c9b3a508aee0681b"
+    },
+    {
+      "path": "test-results/v4.2/android-build-status.json",
+      "bytes": 689,
+      "sha256": "d623d3fba5ffbd7f179f8b2bd6ff01559ae4a46b60d80e602e7fe1becab16999"
+    },
+    {
+      "path": "test-results/v4.2/build-evidence-tests.txt",
+      "bytes": 1867,
+      "sha256": "6bfee5f9a892cbcb5220df43d7d2e9966c489bb0b7566fe5a319ec9571c3e202"
+    },
+    {
+      "path": "test-results/v4.2/engine-tests.txt",
+      "bytes": 3851,
+      "sha256": "5e085f9ca3f0245088bcc7559cebee353f99f37b5ad013963fb4de855b190070"
+    },
+    {
+      "path": "test-results/v4.2/export-validator.txt",
+      "bytes": 582,
+      "sha256": "b3381134f9f7455539b156c2e6430e390ec30d8edb79f43487b274fc0353b91b"
+    },
+    {
+      "path": "test-results/v4.2/identity.txt",
+      "bytes": 1431,
+      "sha256": "97e9fa5ff27624f1e5f39fd2e2b2b646c4f3e74c77f7412e5dd864fbba533ceb"
+    },
+    {
+      "path": "test-results/v4.2/java-version.log",
+      "bytes": 183,
+      "sha256": "396eaa6c73c38012211ff4228112340c294c8c7639e11ce8494715249f959c09"
+    },
+    {
+      "path": "test-results/v4.2/kotlin-syntax.txt",
+      "bytes": 95,
+      "sha256": "2bd3b1a6ec20d8edc33e9adc5b08a62d0b5cd8f9c358cd2a7209384e367d6b96"
+    },
+    {
+      "path": "test-results/v4.2/policy-tests.txt",
+      "bytes": 2087,
+      "sha256": "a9ab7a56b3e375ca6be03c4d0a33538227f836c9b5e57d417f76b74d0faa96d0"
+    },
+    {
+      "path": "test-results/v4.2/reliability.txt",
+      "bytes": 1763,
+      "sha256": "f6b8cdffdaca664c973b0669a9cd84554d6220232a01978836c5f7f122203387"
+    },
+    {
+      "path": "test-results/v4.2/sqlite-stress.json",
+      "bytes": 430,
+      "sha256": "4e1be3607916e7b1420029b6b5624641542b8294edb40ee3070daf5ce66fde21"
+    },
+    {
+      "path": "test-results/v4.2/sqlite.txt",
+      "bytes": 1433,
+      "sha256": "2798dc76a96b743cd11a5759d17f630ea12c792cbef8b9559d18c0de947cb886"
+    },
+    {
+      "path": "tools/__pycache__/build_android.cpython-313.pyc",
+      "bytes": 16112,
+      "sha256": "5b1b6e5dabe2555eb810ab70462d5cd1a9a31c658568c05bab526dac0017fef5"
+    },
+    {
+      "path": "tools/__pycache__/gradle_bootstrap.cpython-313.pyc",
+      "bytes": 5060,
+      "sha256": "c0dec266c8cda6e28059f5eccd183142d5453ec45dc074cba6e26159bdc06f7b"
+    },
+    {
+      "path": "tools/__pycache__/hf_validate_and_convert.cpython-313.pyc",
+      "bytes": 12968,
+      "sha256": "47bdd0bfdc8b970dcbcd3953d1ba8e501519a145c714e50b30de9cd2520b7dea"
+    },
+    {
+      "path": "tools/build_android.py",
+      "bytes": 8985,
+      "sha256": "867eb04ac8a97fd017a25b48d60c12ef365ede8e876c14abc9d7c5f6292d70ec"
+    },
+    {
+      "path": "tools/build_android.sh",
+      "bytes": 128,
+      "sha256": "2f2e1e24e368d75c8685bb49af6a64ae611d024ea219dff9e5ac1fa672446063"
+    },
+    {
+      "path": "tools/gradle_bootstrap.py",
+      "bytes": 2823,
+      "sha256": "66f34aa8fe801025ed4d81dd02effb8f173a097e9445c61f3c8079b92e2fb10d"
+    },
+    {
+      "path": "tools/hf_validate_and_convert.py",
+      "bytes": 7224,
+      "sha256": "273047d5da3999fd31be86ffdf37248d8abf94b154462e67a6fbd08f1ca0c172"
+    },
+    {
+      "path": "tools/qa/EngineRegression.kt",
+      "bytes": 19928,
+      "sha256": "3b339f23eee13de37c95865870d61d871e9fbb07824a2e2a076aafab0aedd5ed"
+    },
+    {
+      "path": "tools/qa/MetadataAnnotation.kt",
+      "bytes": 229,
+      "sha256": "fe7e26dabd765806cf2d2113644747ccbfa44a5387251daf5b551c49f1bc4a33"
+    },
+    {
+      "path": "tools/qa/ParseKotlin.java",
+      "bytes": 1750,
+      "sha256": "a40356615a86df23c510d6a35f673d24e69bfd0da89814df1cbc6efd4c71407e"
+    },
+    {
+      "path": "tools/qa/PolicyRegression.kt",
+      "bytes": 10027,
+      "sha256": "34e47f9436e55b273f98015042d372eb6e46be36be4b4dca80ffff2274bab22f"
+    },
+    {
+      "path": "tools/qa/V4Reliability.kt",
+      "bytes": 8101,
+      "sha256": "6fc9c3cdd199c095851ba4cad41cfddf3f8c92c2614ae38ec2f8f2461c50fcfb"
+    },
+    {
+      "path": "tools/qa/__pycache__/resolve_apks.cpython-313.pyc",
+      "bytes": 3998,
+      "sha256": "5a1d86fac312d29b2c0943597d740b754c00ea22241a74dd57147a0fb8a376fc"
+    },
+    {
+      "path": "tools/qa/capture_device_metrics.sh",
+      "bytes": 797,
+      "sha256": "a2e5a36e45e8910e3fb30ab0cc8a234b3dca60a41d39e63ea519e234a516e290"
+    },
+    {
+      "path": "tools/qa/resolve_apks.py",
+      "bytes": 2074,
+      "sha256": "b60601e9d4fc5f9d7b2af61fc308e525edf3937d5e144501ce74add9af50f2d9"
+    },
+    {
+      "path": "tools/qa/run_device_qualification.sh",
+      "bytes": 2450,
+      "sha256": "dc705f08d192c531340c417eea41651699264c16e32cbdee567bebf76dc64c40"
+    },
+    {
+      "path": "tools/qa/run_engine_tests.sh",
+      "bytes": 828,
+      "sha256": "1e5b9f9f06abcb0fa1bc101bc8a9fe555ae7a3c7287a0a62b4f84cbeb62e908a"
+    },
+    {
+      "path": "tools/qa/run_policy_tests.sh",
+      "bytes": 1392,
+      "sha256": "8c9a906a8c115f5881b159a9f2c87194aed1696c0c71c55856e4d741cf3b85c4"
+    },
+    {
+      "path": "tools/qa/run_v4_reliability.sh",
+      "bytes": 515,
+      "sha256": "d7b60da338b4519a9ed384a8a843105f54de03240bbefbe071a81c9bedeaf564"
+    },
+    {
+      "path": "tools/qa/test_build_evidence.py",
+      "bytes": 4290,
+      "sha256": "6f040f09915d20a12021548b49ea12b3f8e6e4d27dd22a441e3128aad4402699"
+    },
+    {
+      "path": "tools/qa/test_export_validator.py",
+      "bytes": 2879,
+      "sha256": "79be1e08a741722ed3e45f34e991df37970f3105c3e58f02af4fd980e4f4cb24"
+    },
+    {
+      "path": "tools/qa/test_identity.py",
+      "bytes": 4647,
+      "sha256": "e10889c62d6eb556e0b3e6d94124c80a0b58790804e2bf1b283d31f3b37c1589"
+    },
+    {
+      "path": "tools/qa/test_v4_sqlite.py",
+      "bytes": 7156,
+      "sha256": "ccefb2d6f42c4bcc0997cf7c5fa51a72be2fef9e55c9bf3cfb6887e1392ce8cc"
+    }
+  ]
+}

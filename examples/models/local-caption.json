@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "runtime": "local_http",
+  "task": "captioning",
+  "endpoint": "http://127.0.0.1:8080/predict",
+  "httpModel": "user-selected-model",
+  "prompt": "Describe only what is visible.",
+  "requestTemplate": "{\"model\": \"$model\", \"prompt\": \"$prompt\", \"image_base64\": \"$image_base64\"}",
+  "responsePath": "caption",
+  "httpOutputMode": "caption_text",
+  "httpTimeoutSeconds": 60
+}

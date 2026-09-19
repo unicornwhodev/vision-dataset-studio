@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "product": "Vision Dataset Studio",
+  "brand": "Unicorn Who Dev",
+  "version": "4.2.0-rc1",
+  "date": "2026-09-19",
+  "namespace": "com.unicornwhodev.visiondatasetstudio",
+  "application_id": "com.unicornwhodev.visiondatasetstudio",
+  "room_schema_version": 3,
+  "source_only": true,
+  "public_release_ready": false,
+  "license": "decision_required",
+  "rights_and_transitive_notices_review": "pending",
+  "android": {
+    "build_script_invoked": true,
+    "compilation_started": false,
+    "apk_built": false,
+    "instrumented_tests_executed": false,
+    "real_room_migration_executed": false,
+    "real_moshi_tests_executed": false,
+    "real_compose_tests_executed": false,
+    "real_saf_tests_executed": false,
+    "physical_device_tested": false,
+    "build_outcome": "blocked_before_compilation",
+    "blockers": [
+      "Android SDK absent dans l’environnement de préparation"
+    ],
+    "evidence": "test-results/v4.2/android-build-status.json"
+  },
+  "portable_tests": {
+    "policy": 44,
+    "numeric_engine": 67,
+    "reliability_helpers": 43,
+    "sqlite_host": 9,
+    "export_validator": 6,
+    "identity": 12,
+    "build_evidence": 15,
+    "passed": 196
+  },
+  "syntax": {
+    "kotlin_and_kts_files": 75,
+    "syntax_errors": 0,
+    "type_resolution_performed": false
+  },
+  "stress": {
+    "rows": 200000,
+    "kind": "metadata_only",
+    "runtime": "host SQLite/Python",
+    "android": false
+  },
+  "runtime_validation": {
+    "model_downloaded_and_executed": false,
+    "hf_write_test": false,
+    "phone_memory_measured": false,
+    "phone_model_time_measured": false,
+    "community_model_catalog_live_test": false,
+    "cooperative_claim_live_hf_test": false
+  },
+  "ci": {
+    "prepared": true,
+    "published": false,
+    "executed": false,
+    "api_levels": [
+      28,
+      35
+    ],
+    "publishes_release": false,
+    "requires_hf_secret": false
+  },
+  "data_transition": {
+    "in_place_update_from_previous_application_id": false,
+    "cross_application_data_import_implemented": false
+  },
+  "remote_repository_modified": false
+}

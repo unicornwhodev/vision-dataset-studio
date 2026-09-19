@@ -1,0 +1,35 @@
+*.iml
+.gradle
+.kotlin
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.env
+debug.keystore
+
+# Generated, potentially device-specific evidence
+dist/
+app/schemas/*.tmp
+
+# Private credentials, model weights, generated APKs and device-specific evidence
+*.apk
+*.aab
+*.jks
+*.keystore
+*.tflite
+*.onnx
+*.safetensors
+*.pt
+__pycache__/
+*.pyc
+test-results/

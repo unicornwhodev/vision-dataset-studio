@@ -1,0 +1,1 @@
+SYNTHETIC TEST FIXTURES ONLY. 3 images, no external corpus, no model output. Create a project with class object and pointing task; import metadata.jsonl and select this directory as the image root. Batch size 2 tests the local 2 + 1 cycle. All annotations must be reviewed.
