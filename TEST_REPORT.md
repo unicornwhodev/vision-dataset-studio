@@ -57,3 +57,19 @@ débordement sur grand écran. Les deux tests Compose repassent à 960 dp
 la boîte enregistrée reste présente dans l’éditeur. Les vérifications détaillées
 des gestes à 320 dp ci-dessus portent sur `20260919T200729Z-bec11e4607bc` ;
 le code de l’éditeur est identique entre les deux tentatives.
+
+## Audit de complétude fonctionnelle
+
+Sur la même APK principale (`abf2f50f…03c2d`), huit nouveaux tests instrumentés
+réussissent en deux suites : 6 tests en 51,818 s JUnit, puis 2 en 15,243 s.
+Ils couvrent trois téléchargements/inférences avec de vrais poids, préannotation
+de lot, HTTP local, export, pack/prompt et correcteur de points persistant.
+Les 67 tests numériques existants ont également été relancés avec succès.
+
+Deux contrôles supplémentaires échouent : provenance brute des boîtes après
+correction adaptative et validateur Python face au ZIP réellement produit par
+Android. L’inspection indépendante de l’archive passe (CRC, SHA et projections).
+Ces défauts restent ouverts, comme l’échec JVM et le blocage SAF précédents.
+
+L’entraînement continu des poids, le moteur d’agent et les workflows automatisés
+sont absents. Voir [la matrice et les preuves](docs/IMPLEMENTATION_AUDIT.md).

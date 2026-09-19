@@ -20,4 +20,8 @@ Le reçu distant survit au cache et est revérifié au commit exact. La copie lo
 
 ## Qualification
 
-Tests MockWebServer ajoutés mais non exécutés ; aucun push sur HF réel effectué. Voir la recette V4, notamment réponse perdue après commit, LFS et conflit inter-client. Le journal hôte de logique n’est pas une preuve de service HF.
+Tests JVM avec MockWebServer exécutés : l’essai de reprise interrompue échoue,
+voir `TEST_REPORT.md`. Trois téléchargements publics complets ont réussi dans
+l’audit Android ; cela ne valide pas la reprise interrompue. Aucun push sur HF
+réel effectué. Voir la recette V4, notamment réponse perdue après commit, LFS
+et conflit inter-client. Le journal hôte de logique n’est pas une preuve de service HF.

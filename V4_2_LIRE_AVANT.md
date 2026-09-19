@@ -1,5 +1,9 @@
 # Vision Dataset Studio — V4.2 RC1 UWD
 
+> Note historique de préparation RC1. L’état courant de compilation, licence,
+> exécution et complétude figure dans [TEST_REPORT.md](TEST_REPORT.md),
+> [LICENSING_STATUS.md](LICENSING_STATUS.md) et [l’audit](docs/IMPLEMENTATION_AUDIT.md).
+
 **19 septembre 2026 — sources renforcées, aucune APK construite dans cet environnement.**
 
 Cette passe conserve l’architecture V4.1 et termine les changements fonctionnels discutés autour du catalogue de modèles, du travail partagé et de l’apprentissage des corrections géométriques. Elle ne réintroduit aucune dépendance FireViewer.

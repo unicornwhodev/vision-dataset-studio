@@ -85,12 +85,19 @@
     "android": false
   },
   "runtime_validation": {
-    "model_downloaded_and_executed": false,
+    "model_downloaded_and_executed": true,
     "hf_write_test": false,
     "phone_memory_measured": false,
     "phone_model_time_measured": false,
     "community_model_catalog_live_test": true,
-    "cooperative_claim_live_hf_test": false
+    "cooperative_claim_live_hf_test": false,
+    "model_downloaded_and_executed_scope": "3 public models on API 28 x86_64 software CPU; synthetic input, no accuracy or ARM benchmark",
+    "real_batch_inference_test": true,
+    "local_http_prompt_fixture_test": true,
+    "studio_pack_android_roundtrip": true,
+    "point_correction_store_android_fixture": true,
+    "export_archive_android_produced": true,
+    "shipped_export_validator_accepts_current_android_archive": false
   },
   "ci": {
     "prepared": true,
@@ -158,5 +165,29 @@
       "validated_width_dp": 960,
       "saved_box_after_apk_update": true
     }
+  },
+  "implementation_audit": {
+    "date": "2026-09-19",
+    "source_commit": "22b9cc332638ab02c98b7de732d4a62cc706643e",
+    "report": "docs/IMPLEMENTATION_AUDIT.md",
+    "evidence": "docs/implementation-audit.json",
+    "complete": false,
+    "android_tests": {
+      "total": 8,
+      "passed": 8,
+      "runs": 2
+    },
+    "new_regression_failures": [
+      "box_raw_coordinate_provenance",
+      "export_validator_batch_path"
+    ],
+    "missing_capabilities": [
+      "continuous_visual_model_training",
+      "integrated_agent_and_tools",
+      "workflow_step_runner",
+      "multi_graph_multimodal_runtime",
+      "usable_embedding_storage_and_search"
+    ],
+    "production_changed": false
   }
 }

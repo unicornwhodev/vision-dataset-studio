@@ -1,6 +1,10 @@
-# UWD 4.1 — recette de qualification bloquante
+# UWD 4.2 — recette de qualification bloquante
 
-Tous les éléments ci-dessous sont NON EXÉCUTÉS sur Android dans la livraison. Utiliser une copie des données et un appareil dédié. Aucun téléchargement de modèle ni push HF n’est lancé automatiquement par cette recette.
+Cette matrice définit les critères de sortie ; elle n’est pas un journal de succès.
+Des contrôles ont maintenant été exécutés sur le pod : consulter
+[POD_VALIDATION.md](POD_VALIDATION.md) et [IMPLEMENTATION_AUDIT.md](IMPLEMENTATION_AUDIT.md)
+pour leurs résultats et limites. Utiliser une copie des données et un appareil dédié.
+Aucun push HF n’est lancé automatiquement par cette recette.
 
 ## P0 : assembler, résoudre et installer
 

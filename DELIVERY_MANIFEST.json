@@ -45,13 +45,13 @@
     },
     {
       "path": "HF_IO.md",
-      "bytes": 2120,
-      "sha256": "d0c60a33a5d916ba0a4caa76672299b0eece5eb4f6256ea2b2b2a0c8ac3f15d7"
+      "bytes": 2297,
+      "sha256": "3074cda094a0651cd2e48dfe5beab07c48cd110c6496e7f5ed6d17e8c920d46d"
     },
     {
       "path": "KNOWN_LIMITATIONS.md",
-      "bytes": 4247,
-      "sha256": "306d7a891136470aa899e6feb0b1cd35083fb39800d04262b304ee738b40141f"
+      "bytes": 5508,
+      "sha256": "55c64645cb15eaa55828e5930bdb5405815070da50308e7ed0d5898495e037bf"
     },
     {
       "path": "LICENSE",
@@ -65,8 +65,8 @@
     },
     {
       "path": "MODEL_ADAPTERS.md",
-      "bytes": 6407,
-      "sha256": "9fcd4e8b80d05dfbf2b4fc79f8971c8d1f31d4641d2a8b59d2a6ab7b289427fc"
+      "bytes": 6856,
+      "sha256": "e66979dee8174d4eaa2d11ab635236ae24702c72b1006d0bc9c1a7b5d989c748"
     },
     {
       "path": "NOTICE",
@@ -75,13 +75,13 @@
     },
     {
       "path": "QUALIFICATION_STATUS.json",
-      "bytes": 4754,
-      "sha256": "063befcdab1c099f8135a5a9f94a8827b986df8934db159d10c0e3ff22d566c0"
+      "bytes": 5888,
+      "sha256": "c455ed3caac0bca2c514d189a06e6db0dd1bf2e2c31d13bdc8462cfa9f0817a4"
     },
     {
       "path": "README.md",
-      "bytes": 5143,
-      "sha256": "5cf543f189a2fa2bdaba19c85456099fd05645a89ecd013ef384865065ca06d1"
+      "bytes": 5495,
+      "sha256": "f488ba35cf38b24c76c417b74ad1ce3c55c54622e6643cd218f6c0f128fd7d5d"
     },
     {
       "path": "SOURCES.md",
@@ -90,8 +90,8 @@
     },
     {
       "path": "TEST_REPORT.md",
-      "bytes": 3635,
-      "sha256": "25b38ce7e7d942a4ca08f8a886e684992fb8b02427f58ee562b1695f916d7477"
+      "bytes": 4573,
+      "sha256": "4e9847f5af0cbb05f829b47a02464c8974cfe0a84d486ec00d11461b22c994cf"
     },
     {
       "path": "V4_2_CHANGES.md",
@@ -100,13 +100,13 @@
     },
     {
       "path": "V4_2_LIRE_AVANT.md",
-      "bytes": 4030,
-      "sha256": "3e5ee6e95bf7c7fcfdfddc84f1e03a6b998c3ea442045643d9523ded23f039ef"
+      "bytes": 4278,
+      "sha256": "f76ab407292e522414e90680da061acf928013f13dfea57a837cd8045bf096dd"
     },
     {
       "path": "V4_2_RC2_CHANGES.md",
-      "bytes": 694,
-      "sha256": "a3330c2241a1c1a165d45892a1fe3da9510126b2cc0f42fa1c39f8ea2fac6eb9"
+      "bytes": 926,
+      "sha256": "6b71327bd6345d41b1e44b672b38976fbc68bde0c3bf77683df66387109acd2f"
     },
     {
       "path": "app/.gitignore",
@@ -610,8 +610,13 @@
     },
     {
       "path": "docs/ANDROID_QUALIFICATION.md",
-      "bytes": 6597,
-      "sha256": "4777eeacc92ce3488e08716d88af12431298d7800182d13f947604dbd4521140"
+      "bytes": 6770,
+      "sha256": "3ca22dfb401aa0fd9345874d762b4955a3ac71526edfad8c31f5d3e3e0689c7a"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_AUDIT.md",
+      "bytes": 15411,
+      "sha256": "5f64b44f4bd0cde2f24d64e0c6b707e39054974b036812d27d34ddb5f89299b6"
     },
     {
       "path": "docs/POD_VALIDATION.md",
@@ -625,8 +630,8 @@
     },
     {
       "path": "docs/ROADMAP.md",
-      "bytes": 3676,
-      "sha256": "605031b0373ce9eedcf66a6775904fc49da8d84421eee09bb7065339bf43dcc9"
+      "bytes": 6870,
+      "sha256": "a9f1529ff790f54c0e642d50b045da2c6fca454f36f8a0b340ef12538d66ce61"
     },
     {
       "path": "docs/UI_REDESIGN.md",
@@ -637,6 +642,11 @@
       "path": "docs/WORKSTATION.md",
       "bytes": 4989,
       "sha256": "40bf4dd70a6da6360c1ff5f7d510d97acb68f15ea29d10fa09c001ed9990e227"
+    },
+    {
+      "path": "docs/implementation-audit.json",
+      "bytes": 16463,
+      "sha256": "891c5e530d95d1e60b3c54d123f7e7b418c6fffdaac5bc702153465e2814a246"
     },
     {
       "path": "docs/ui/batch.png",
@@ -882,6 +892,26 @@
       "path": "tools/qa/V4Reliability.kt",
       "bytes": 8101,
       "sha256": "6fc9c3cdd199c095851ba4cad41cfddf3f8c92c2614ae38ec2f8f2461c50fcfb"
+    },
+    {
+      "path": "tools/qa/audit/CorrectionProvenanceAudit.kt",
+      "bytes": 1226,
+      "sha256": "b9f1d78487dece061e76e5bf9222993aeb046bb022081b1f3b830c9acf3b7705"
+    },
+    {
+      "path": "tools/qa/audit/FeatureImplementationAuditTest.kt",
+      "bytes": 16140,
+      "sha256": "d6e4ba12ac9030903ac26251d16d48d23689499bd22588f988079a825b6ec0d6"
+    },
+    {
+      "path": "tools/qa/audit/README.md",
+      "bytes": 4701,
+      "sha256": "cc83644fd7f8582307e84cc417854ff7895816bd0ed2379f28c571017f51623f"
+    },
+    {
+      "path": "tools/qa/audit/check_android_export.py",
+      "bytes": 4538,
+      "sha256": "67c81d385863130162fb4a378525ed3759ad4f6548db45a2e5b464cde5b1a3e2"
     },
     {
       "path": "tools/qa/capture_device_metrics.sh",

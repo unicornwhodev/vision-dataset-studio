@@ -1,0 +1,517 @@
+{
+  "schema": 1,
+  "date": "2026-09-19",
+  "verdict": "incomplete_not_release_ready",
+  "production_changed": false,
+  "runtime": {
+    "source_commit": "22b9cc332638ab02c98b7de732d4a62cc706643e",
+    "main_apk_sha256": "abf2f50fe63835ab885f23efc50f0db5033f167f2db72a778061355f8bc03c2d",
+    "test_apk_sha256": "d723bae9ce85372a3dc4c276041a18ee97d1b244d8859c286b49267d61f2f1a4",
+    "device": "API 28 x86_64 software, 960x720 160 dpi",
+    "isolated_test_data": true,
+    "external_writes": false
+  },
+  "android_runs": [
+    {
+      "tests": 6,
+      "elapsed_seconds": 73.33,
+      "exit_code": 0,
+      "passed": true,
+      "junit_summary": [
+        "Time: 51.818",
+        "OK (6 tests)"
+      ]
+    },
+    {
+      "tests": 2,
+      "exit_code": 0,
+      "passed": true,
+      "elapsed_seconds": 30.71,
+      "test_apk_sha256": "8127622a2a8c53e6bc675c4f35a9a85a2eb6475f3fe187e47e716c733e59f9cd",
+      "junit_summary": [
+        "Time: 15.243",
+        "OK (2 tests)"
+      ]
+    }
+  ],
+  "models": [
+    {
+      "id": "ssd-mobilenet-v1",
+      "url": "https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite",
+      "bytes": 4185175,
+      "sha256": "cbdecd08b44c5dea3821f77c5468e2936ecfbf43cde0795a2729fdb43401e58b",
+      "input": [
+        300,
+        300,
+        "UINT8"
+      ],
+      "execution": {
+        "success": true,
+        "backend": "LiteRT Interpreter CPU · 2 threads",
+        "latency_ms": 3826,
+        "proposal_count": 1,
+        "tensor_report": "Runtime CPU · 2 threads · SHA-256 cbdecd08b44c5dea3821f77c5468e2936ecfbf43cde0795a2729fdb43401e58b\ninput[0] normalized_input_image_tensor [1, 300, 300, 3] UINT8 q=0.0078125/128\noutput[0] TFLite_Detection_PostProcess [1, 10, 4] FLOAT32 q=0.0/0\noutput[1] TFLite_Detection_PostProcess:1 [1, 10] FLOAT32 q=0.0/0\noutput[2] TFLite_Detection_PostProcess:2 [1, 10] FLOAT32 q=0.0/0\noutput[3] TFLite_Detection_PostProcess:3 [1] FLOAT32 q=0.0/0\n",
+        "fixture": "synthetic coloured rectangle; no accuracy claim"
+      }
+    },
+    {
+      "id": "efficientdet-lite0",
+      "url": "https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite",
+      "bytes": 4563519,
+      "sha256": "2e04c53bfeac0ac2a30c057c7e2a777594ce39baaac35a92f74fb1e8c4fc4e0b",
+      "input": [
+        320,
+        320,
+        "UINT8"
+      ],
+      "execution": {
+        "success": true,
+        "backend": "LiteRT Interpreter CPU · 2 threads",
+        "latency_ms": 5651,
+        "proposal_count": 0,
+        "tensor_report": "Runtime CPU · 2 threads · SHA-256 2e04c53bfeac0ac2a30c057c7e2a777594ce39baaac35a92f74fb1e8c4fc4e0b\ninput[0] serving_default_images:0 [1, 320, 320, 3] UINT8 q=0.0078125/127\noutput[0] StatefulPartitionedCall:3 [1, 25, 4] FLOAT32 q=0.0/0\noutput[1] StatefulPartitionedCall:2 [1, 25] FLOAT32 q=0.0/0\noutput[2] StatefulPartitionedCall:1 [1, 25] FLOAT32 q=0.0/0\noutput[3] StatefulPartitionedCall:0 [1] FLOAT32 q=0.0/0\n",
+        "fixture": "synthetic coloured rectangle; no accuracy claim"
+      }
+    },
+    {
+      "id": "mobilenet-v1-classification",
+      "url": "https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/image_classification/android/mobilenet_v1_1.0_224_quantized_1_metadata_1.tflite",
+      "bytes": 4287874,
+      "sha256": "d3949e8a3556c79739cb675e0be7476503bcce76938031c6a1048e13e0cb7d8b",
+      "input": [
+        224,
+        224,
+        "UINT8"
+      ],
+      "execution": {
+        "success": true,
+        "backend": "LiteRT Interpreter CPU · 2 threads",
+        "latency_ms": 2132,
+        "proposal_count": 1,
+        "tensor_report": "Runtime CPU · 2 threads · SHA-256 d3949e8a3556c79739cb675e0be7476503bcce76938031c6a1048e13e0cb7d8b\ninput[0] input [1, 224, 224, 3] UINT8 q=0.0078125/128\noutput[0] MobilenetV1/Predictions/Reshape_1 [1, 1001] UINT8 q=0.00390625/0\n",
+        "fixture": "synthetic coloured rectangle; no accuracy claim"
+      }
+    }
+  ],
+  "community_catalogue": {
+    "repo": "Charlbi/Lite_rt_prepared_for_android_dataset_builder",
+    "revision": "92e53670853e0f298b2469b2038fd1552cfcc15e",
+    "remote_files": 64,
+    "tflite_files": 11,
+    "entries": [
+      {
+        "id": "tinyclip",
+        "adapter_status": "bundle",
+        "expected_files": [
+          "image_encoder.tflite",
+          "text_encoder.tflite"
+        ],
+        "published": true,
+        "download_enabled": false
+      },
+      {
+        "id": "dinov2",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": true,
+        "download_enabled": true
+      },
+      {
+        "id": "vitpose",
+        "adapter_status": "heatmap",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": true,
+        "download_enabled": true
+      },
+      {
+        "id": "efficientvit_sam",
+        "adapter_status": "bundle",
+        "expected_files": [
+          "image_encoder.tflite",
+          "decoder_point.tflite",
+          "decoder_box.tflite"
+        ],
+        "published": true,
+        "download_enabled": false
+      },
+      {
+        "id": "rfdetr",
+        "adapter_status": "inspect",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": true,
+        "download_enabled": true
+      },
+      {
+        "id": "florence2",
+        "adapter_status": "bundle",
+        "expected_files": [
+          "image_encoder.tflite",
+          "multimodal_encoder.tflite",
+          "decoder.tflite"
+        ],
+        "published": true,
+        "download_enabled": false
+      },
+      {
+        "id": "grounding_dino_base",
+        "adapter_status": "multi_input",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "owlv2_base_patch16",
+        "adapter_status": "multi_input",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "depth_anything_v2_small",
+        "adapter_status": "inspect",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "rtmdet_tiny",
+        "adapter_status": "inspect",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "efficientformer_l1",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "repvit_m1",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "edgenext_xx_small",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "edgenext_x_small",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "edgenext_small_usi",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "hgnetv2_b0",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "caformer_s18",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "convformer_s18",
+        "adapter_status": "embedding",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "picodet_layout_1x",
+        "adapter_status": "inspect",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "picodet_l_layout_3cls",
+        "adapter_status": "inspect",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "table_transformer_detection",
+        "adapter_status": "inspect",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      },
+      {
+        "id": "table_transformer_structure",
+        "adapter_status": "inspect",
+        "expected_files": [
+          "model.tflite"
+        ],
+        "published": false,
+        "download_enabled": false
+      }
+    ]
+  },
+  "batch": {
+    "processed": 1,
+    "machine_tags": 3,
+    "human_tag_preserved": true,
+    "final_cases_skipped": true
+  },
+  "local_http": {
+    "prompt_delivered": true,
+    "jpeg_delivered": true,
+    "response_path_decoded": true,
+    "server": "synthetic HTTP responder, not an LLM or agent"
+  },
+  "studio_pack": {
+    "roundtrip": true,
+    "prompt_preserved": true,
+    "unknown_field_rejected": true,
+    "scope": "actual Android Moshi serializer and validation; SAF/project creation UI not exercised"
+  },
+  "point_corrections": {
+    "examples": 160,
+    "promoted": true,
+    "persisted_and_reloaded": true,
+    "accepted_only_excluded": true,
+    "unfinished_batch_rejected": true,
+    "reset": true,
+    "training_report": "Activé · 134 images train / 26 contrôle · MSE brute=3.0096115355336364E-4 calibration=2.812899231243736E-5 précédent=2.812899231243736E-5 candidat=2.7122746478093355E-7. Contrôle réutilisé, pas une évaluation indépendante.",
+    "scope": "synthetic numeric residuals, not visual model training or generalization"
+  },
+  "export": {
+    "archive_sha256": "13d8c43cc3a90b2b24d6b60e5665ae9035920d782e6200049a9b3fdca548dc0f",
+    "shipped_validator": {
+      "passed": false,
+      "exit_code": 1,
+      "output": "FAIL No V2 manifest found. Legacy exports require their legacy validator."
+    },
+    "independent_integrity_and_fixture_projection": {
+      "passed": true,
+      "zip_entries": 11,
+      "manifest_files": 10,
+      "canonical_image_hash": "45e84634e14302f3939f6072d315b6d032dacc563d7890dc8fd4a588463d874a",
+      "coco_pixels": true,
+      "yolo_normalized": true,
+      "webdataset_matches_canonical": true
+    }
+  },
+  "box_provenance": {
+    "status": "failed",
+    "raw_xmin": 0.2,
+    "corrected_xmin": 0.23,
+    "stored_model_xmin": 0.23,
+    "reproduction": "tools/qa/audit/CorrectionProvenanceAudit.kt"
+  },
+  "numeric_engine": {
+    "passed": 67,
+    "scope": "existing numeric suite; not Android or accuracy"
+  },
+  "missing_capabilities": [
+    "continuous_visual_model_training",
+    "integrated_agent_and_tools",
+    "workflow_step_runner",
+    "multi_graph_multimodal_runtime",
+    "usable_embedding_storage_and_search"
+  ],
+  "known_blockers_preserved": [
+    "JVM interrupted download test failing (25/26)",
+    "SAF provider Kotlin dependency",
+    "full product cycle and ARM/device qualification not complete"
+  ],
+  "raw_evidence_locations": {
+    "pod": "/workspace/qa/vision-dataset-studio/feature-audit/",
+    "local": "test-results/feature-audit/"
+  },
+  "raw_file_hashes": [
+    {
+      "file": "additional-instrumentation.log",
+      "bytes": 1565,
+      "sha256": "3618ccf82b90d776f089fc2c87a939768840e9f8a35488256180f6d9650ab6d1"
+    },
+    {
+      "file": "additional-runtime-result.json",
+      "bytes": 220,
+      "sha256": "dc1959186391124379ac4f672083fec38831ff475645697d245a8ee5aff94967"
+    },
+    {
+      "file": "batch.json",
+      "bytes": 103,
+      "sha256": "5b86e3422143ba402b7ae9fb6e9978f31020044f6d414ca4ac95eeee4a27e5a4"
+    },
+    {
+      "file": "build-additional.log",
+      "bytes": 3232,
+      "sha256": "d47c5c3db8451456198b12d0be164a7f56eaed852718242c4299747f53259d81"
+    },
+    {
+      "file": "build-audit-tests.log",
+      "bytes": 3210,
+      "sha256": "7631b3d84e5d78d8a72e1414a2dce801f719b6780a6951e4ae69cd639d032e84"
+    },
+    {
+      "file": "catalogue-live.json",
+      "bytes": 3031,
+      "sha256": "339cd9c3f0346a954a0924e988d6a49355d50d8eab514ac8287b8e5b3ea8bbdc"
+    },
+    {
+      "file": "correction-provenance-compile.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "correction-provenance.log",
+      "bytes": 384,
+      "sha256": "d6c950a60f0e1d0f241417c7111466f9c98a925308ff3468ee93bb119728c054"
+    },
+    {
+      "file": "engine.log",
+      "bytes": 3851,
+      "sha256": "5e085f9ca3f0245088bcc7559cebee353f99f37b5ad013963fb4de855b190070"
+    },
+    {
+      "file": "export-fixture.zip",
+      "bytes": 5530,
+      "sha256": "13d8c43cc3a90b2b24d6b60e5665ae9035920d782e6200049a9b3fdca548dc0f"
+    },
+    {
+      "file": "export-host-validation.json",
+      "bytes": 569,
+      "sha256": "3b8732b586632eba33c80b7279bcb725a4d230a7589a2f82b971c91447451cf1"
+    },
+    {
+      "file": "export.json",
+      "bytes": 818,
+      "sha256": "a7c83e63fba8a7d164214b866fb41eced25d7384924595c5342ad7a6e07c5c8c"
+    },
+    {
+      "file": "inference-efficientdet-lite0.json",
+      "bytes": 624,
+      "sha256": "bdd670d45cafce463353a3d619ee5bf135cd4005dc9fe6b46825efde553487d4"
+    },
+    {
+      "file": "inference-mobilenet-v1-classification.json",
+      "bytes": 438,
+      "sha256": "d40d01a40c63b2cab11a0abb8ae69cb3588203cac894dd38a0e5480ba8dc7dda"
+    },
+    {
+      "file": "inference-ssd-mobilenet-v1.json",
+      "bytes": 647,
+      "sha256": "648e3a882755aad4f0791c3ec085d0f48d336fd0eeb7be8d85844826e130871b"
+    },
+    {
+      "file": "instrumentation.log",
+      "bytes": 4375,
+      "sha256": "87e3081f328e2633394be4a5e23e448f5cd23af06aa95b5ce85b1a1cdea64f08"
+    },
+    {
+      "file": "local-http.json",
+      "bytes": 150,
+      "sha256": "b84e5504a857b61718840dde9b8180803530049aee1776d602636e9164b7f8c3"
+    },
+    {
+      "file": "main-apk-final-check.json",
+      "bytes": 190,
+      "sha256": "b8a25abea68ae8a0a8a2b0fa70fb3aa7b5bbb9c6ac76654bac8b8d6a82b6889b"
+    },
+    {
+      "file": "model-efficientdet-lite0.json",
+      "bytes": 2841,
+      "sha256": "22a620d5f5808eaa7986ff099da40a31c351dba4af3d127597c40782a38b6087"
+    },
+    {
+      "file": "model-mobilenet-v1-classification.json",
+      "bytes": 16255,
+      "sha256": "93ffc105549ee41b3a93ab7328b27551c7fd051f6b1f0a1ec4da27d1550a1028"
+    },
+    {
+      "file": "model-ssd-mobilenet-v1.json",
+      "bytes": 2831,
+      "sha256": "33bd3756c439523205d334172598ee75c69fd5a419e4d9ae1dd6d9a8d61e302d"
+    },
+    {
+      "file": "point-corrections.json",
+      "bytes": 508,
+      "sha256": "1f3b9210e57c4886b910cff159279cd657bc2f5516ac58a4957da5bf35ecdbf4"
+    },
+    {
+      "file": "runtime-receipt.json",
+      "bytes": 356,
+      "sha256": "a0048f206687f4cf3325ab54666d77bc1f6efc9ef485a4159d6f247d874f8880"
+    },
+    {
+      "file": "runtime-result.json",
+      "bytes": 131,
+      "sha256": "00825721b0635c315cd935e660d39b85da41bbbe6f875f00b3fa5ed678e422f0"
+    },
+    {
+      "file": "studio-pack.json",
+      "bytes": 185,
+      "sha256": "dfe288fefd7276c574b257fb1dc78221c8d34863f28c41fa55b7c1369017f53b"
+    }
+  ],
+  "main_apk_final_check": {
+    "main_apk_sha256": "abf2f50fe63835ab885f23efc50f0db5033f167f2db72a778061355f8bc03c2d",
+    "matches_baseline_receipt": true,
+    "source_commit": "22b9cc332638ab02c98b7de732d4a62cc706643e"
+  },
+  "audit_source_sha256": {
+    "tools/qa/audit/CorrectionProvenanceAudit.kt": "b9f1d78487dece061e76e5bf9222993aeb046bb022081b1f3b830c9acf3b7705",
+    "tools/qa/audit/FeatureImplementationAuditTest.kt": "d6e4ba12ac9030903ac26251d16d48d23689499bd22588f988079a825b6ec0d6",
+    "tools/qa/audit/README.md": "cc83644fd7f8582307e84cc417854ff7895816bd0ed2379f28c571017f51623f",
+    "tools/qa/audit/check_android_export.py": "67c81d385863130162fb4a378525ed3759ad4f6548db45a2e5b464cde5b1a3e2"
+  }
+}

@@ -8,6 +8,11 @@ Atelier mobile générique de préparation de datasets image pour la vision par 
 
 La refonte **Studio sombre cyan/violet** est décrite dans [le guide UI](docs/UI_REDESIGN.md).
 
+**Audit fonctionnel : implémentation incomplète.** Huit essais Android ciblés
+passent, dont l’inférence de trois vrais modèles. L’entraînement continu des poids,
+le moteur d’agent et les workflows automatisés restent absents ; deux défauts de
+correction/export sont reproduits. Voir [la matrice complète](docs/IMPLEMENTATION_AUDIT.md).
+
 Licence du code : **Apache-2.0**, choisie par le propriétaire. Les modèles, datasets et composants tiers conservent leurs propres conditions.
 
 ## Périmètre conservé

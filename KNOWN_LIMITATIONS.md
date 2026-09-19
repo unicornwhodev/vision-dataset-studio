@@ -1,5 +1,21 @@
 # V4.2 RC2 — limitations actuelles
 
+## Complétude fonctionnelle
+
+L’[audit de complétude](docs/IMPLEMENTATION_AUDIT.md) confirme que le modèle visuel
+n’est pas réentraîné : seul un correcteur géométrique local se déclenche manuellement.
+Il reproduit une perte des coordonnées brutes des boîtes après correction adaptative.
+Les points ont passé un essai Android d’apprentissage/persistance sur données synthétiques.
+
+Les six presets et les packs sont des configurations, sans moteur de workflows.
+Le prompt est conservé et transmis, mais aucun agent, serveur VLM ou appel d’outils
+n’est intégré. Les embeddings ne sont ni exposés ni stockés pour similarité,
+clustering ou apprentissage actif. Les bundles multi-graphes ne sont pas exécutables.
+
+Le validateur Python fourni cherche encore `batches/batch-*` et refuse les archives
+Android actuelles sous `batches/p-<projet>-batch-*`. Le ZIP synthétique contrôlé est
+intact ; le défaut concerne l’intégration export/validation et reste à corriger.
+
 ## Bloquants de qualification
 
 Deux APK Debug réelles sont produites et vérifiées. Compose/Room/Moshi/LiteRT
@@ -33,13 +49,13 @@ Les gros dossiers SAF peuvent être lents malgré une lecture bornée ; aucune p
 
 ## Modèles
 
-Runtime CPU Interpreter conservé. Pas de CompiledModel/GPU/NPU intégré. Le catalogue UWD est résolu dynamiquement et les téléchargements utilisent le SHA du dépôt au moment de la découverte, La découverte et l’affichage du catalogue ont été exécutés sur Android ; le téléchargement et l’inférence restent à qualifier. L’import doit toujours inspecter les tenseurs réels et peut refuser un modèle inattendu. La bibliothèque ne garantit ni exactitude métier ni licence universelle de redistribution.
+Runtime CPU Interpreter conservé. Pas de CompiledModel/GPU/NPU intégré. SSD MobileNet V1, EfficientDet Lite0 et MobileNet V1 classification ont été téléchargés et exécutés sur l’émulateur API 28 ; aucune précision métier ou performance ARM n’est établie. Le catalogue UWD est résolu dynamiquement au SHA du dépôt. À la révision auditée : six familles publiées sur 22 références configurées, trois téléchargeables, poids communautaires non exécutés par cet audit. L’import inspecte les tenseurs et peut refuser un modèle inattendu. La bibliothèque ne garantit ni exactitude métier ni licence universelle de redistribution.
 
 Pas de VLM intégré ; le client HTTP exige un serveur séparé sur le même appareil et reste loopback-only. Les mesures mémoire du client n’incluent pas ce serveur. Aucun poids privé ni modèle de pointing non vérifié n’est fourni.
 
 ## Hors périmètre maintenu
 
-Pas de lecteur Parquet natif avec pixels embarqués, import COCO/YOLO universel, vidéo, segmentation/masques, OCR/pose, audio/3D ni annotation collaborative temps réel. La V4.2 ajoute des réservations coopératives HF (claim/DONE) pour éviter le travail en double, mais pas un serveur collaboratif ou des verrous instantanés. La correction adaptative géométrique reste locale et n’est pas une preuve de généralisation.
+Pas de lecteur Parquet natif avec pixels embarqués, import COCO/YOLO universel, vidéo, segmentation/masques, OCR, édition de squelette, audio/3D ni annotation collaborative temps réel. Un contrat ViTPose heatmap peut produire des points, sans qualification de ce modèle ni outil complet de pose. La V4.2 ajoute des réservations coopératives HF (claim/DONE) pour éviter le travail en double, mais pas un serveur collaboratif ou des verrous instantanés. La correction adaptative géométrique reste locale et n’est pas une preuve de généralisation.
 
 ## Identité et distribution
 

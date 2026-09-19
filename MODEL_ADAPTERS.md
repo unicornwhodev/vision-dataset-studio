@@ -33,7 +33,7 @@ NMS par classe pour les détections YOLO brutes ; seuil et maximum de propositio
 
 Aucun runtime spécifique à un checkpoint DINOv3 n’est livré. Une tête exportée vers un des contrats ci-dessus pourra être intégrée après inspection et essais. Un encodeur d’embeddings seul n’a pas de sortie de pointing à interpréter.
 
-Le runtime intégré demeure l’Interpreter CPU TensorFlow Lite 2.16.1 hérité du projet. La migration vers LiteRT CompiledModel et les délégués GPU/NPU n’est pas implémentée. Aucun modèle réel n’a été exécuté dans cet environnement.
+Le runtime intégré demeure l’Interpreter CPU TensorFlow Lite 2.16.1 hérité du projet. La migration vers LiteRT CompiledModel et les délégués GPU/NPU n’est pas implémentée. Trois modèles réels ont été exécutés sur l’émulateur API 28 ; voir l’[audit](docs/IMPLEMENTATION_AUDIT.md). Aucun résultat ARM ou de précision métier n’est établi.
 
 ## Serveur de modèles local facultatif
 
@@ -59,4 +59,8 @@ Aucun en-tête d’authentification arbitraire, streaming de tokens ou outil age
 
 ## Delta V4 : catalogue et mesures
 
-PublicModelCatalog configure trois entrées publiques à partir de leurs métadonnées lues à l’import ; poids absents de l’archive et essais réels non exécutés. Les références sont dans SOURCES.md. DeviceBenchmark ajoute les durées et mémoire échantillonnée sans modifier les annotations ; aucun résultat Android n’a été produit ici. Les adaptateurs V3 restent inchangés dans leur périmètre.
+PublicModelCatalog configure trois entrées publiques à partir de leurs métadonnées lues à l’import ; les poids restent absents de l’archive source. Téléchargement, inspection et inférence CPU des trois entrées ont passé l’audit Android. Les références sont dans SOURCES.md. DeviceBenchmark ajoute les durées et mémoire échantillonnée sans modifier les annotations ; son protocole de benchmark n’a pas été exécuté ici. Les durées ponctuelles de l’audit ne constituent pas un benchmark.
+
+Les adaptateurs `embedding` et `inspect_only` ne renvoient aucune annotation.
+Le premier ne publie ni ne persiste le vecteur calculé : similarité, clustering,
+détection de doublons et apprentissage actif restent à implémenter.
