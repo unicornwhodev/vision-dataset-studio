@@ -15,11 +15,29 @@ import shutil
 import subprocess
 import sys
 import uuid
+import zipfile
 from datetime import datetime, timezone
 
 APP_ID = 'com.unicornwhodev.visiondatasetstudio'
 GRADLE_VERSION = '9.3.1'
 ROOT = Path(__file__).resolve().parents[1]
+
+def weight_inventory(apk: Path) -> dict:
+    suffixes = {'.tflite', '.litert', '.onnx', '.safetensors', '.pt', '.pth', '.gguf', '.task', '.ckpt', '.h5'}
+    weights = []
+    native_bytes = 0
+    with zipfile.ZipFile(apk) as archive:
+        for info in archive.infolist():
+            if info.filename.endswith('.so'):
+                native_bytes += info.file_size
+            suspect = Path(info.filename).suffix.lower() in suffixes
+            if info.filename.startswith(('assets/', 'res/raw/')) and not info.is_dir():
+                with archive.open(info) as stream:
+                    header = stream.read(8)
+                suspect |= header[4:8] == b'TFL3' or header[:4] == b'GGUF'
+            if suspect:
+                weights.append(info.filename)
+    return {'weight_files': weights, 'native_library_bytes_uncompressed': native_bytes, 'apk_bytes': apk.stat().st_size}
 
 class Blocked(RuntimeError):
     pass
@@ -107,6 +125,11 @@ class Attempt:
         self.fail_on_command(key + '-signature', [str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs', str(source)])
         self.fail_on_command(key + '-identity', [str(tools / 'aapt'), 'dump', 'badging', str(source)])
         verify_badging((self.out / (key + '-identity.log')).read_text(), app_id)
+        if key == 'app':
+            inventory = weight_inventory(source)
+            (self.out / 'app-contents.json').write_text(json.dumps(inventory, indent=2) + '\n')
+            if inventory['weight_files']:
+                raise RuntimeError('Model weights must be downloaded after installation, never bundled in the APK.')
         dest = self.out / name
         shutil.copyfile(source, dest)
         value = digest(dest)

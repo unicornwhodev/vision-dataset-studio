@@ -121,3 +121,13 @@ data class ModelProfileEntity(
     val tensorReport: String,
     val createdAt: Long = System.currentTimeMillis()
 )
+
+/** Persistent across cache purges; one canonical owner per project and content fingerprint. */
+@Entity(tableName = "image_identities", primaryKeys = ["projectId", "kind", "digest"])
+data class ImageIdentityEntity(
+    val projectId: Long,
+    val kind: String,
+    val digest: String,
+    val firstSampleId: String,
+    val firstBatchNumber: Int
+)

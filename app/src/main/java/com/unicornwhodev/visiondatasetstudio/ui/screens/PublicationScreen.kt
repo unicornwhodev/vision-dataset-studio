@@ -32,6 +32,7 @@ fun PublicationScreen(viewModel: MainViewModel) {
     val project by viewModel.projectFlow.collectAsState()
     val batches by viewModel.batches.collectAsState()
     val busy by viewModel.isBusy.collectAsState()
+    val training by viewModel.trainingRun.collectAsState()
     val lastZip by viewModel.lastExportedZip.collectAsState()
     val preview by viewModel.previewSnippet.collectAsState()
     val policy = project?.let(ProjectSettings::read)
@@ -39,6 +40,8 @@ fun PublicationScreen(viewModel: MainViewModel) {
     val validated = samples.count { it.annotationStatus == "VALIDATED" }
     val rejected = samples.count { it.annotationStatus == "REJECTED" }
     val unfinished = samples.size - validated - rejected
+    val learningDone=training?.let{it.sourceBatchNumber==number && it.phase in setOf("completed","rejected")}==true
+    val learningRequired=validated>0 && (policy?.continuousTraining==true || training?.let{it.sourceBatchNumber==number && it.phase !in setOf("completed","rejected")}==true)
     val available = samples.count { it.annotationStatus == "VALIDATED" && it.localImagePath != null }
     var tar by rememberSaveable { mutableStateOf(false) }
     var coco by rememberSaveable { mutableStateOf(false) }
@@ -79,6 +82,15 @@ fun PublicationScreen(viewModel: MainViewModel) {
                 }
                 StudioDetails("Pour clôturer le lot local, tous les cas doivent être validés ou rejetés. Les cas rejetés ou différés ne sont pas inclus. Un export local ne déclenche aucune suppression.", style = MaterialTheme.typography.bodySmall)
             }
+            if(batch?.status in setOf("VERIFIED","PURGING","PURGED","EMPTY")) StudioSection("Suite du lot", icon = Icons.Default.SkipNext) {
+                if (batch != null && batch.status in setOf("VERIFIED","PURGING")) {
+                    StatusPill(if(batch.verificationKind=="local")"Archive externe vérifiée" else if(batch.verificationKind=="rejection_only")"Rejets explicitement confirmés" else "Contenus distants vérifiés", Icons.Default.VerifiedUser)
+                    if(learningRequired && !learningDone) TextButton(onClick={viewModel.navigateTo(Screen.Training)}){Text("Terminer l’apprentissage du lot")}
+                    OutlinedButton(onClick = { confirmPurge = true }, enabled = !busy && (!learningRequired || learningDone), modifier = Modifier.heightIn(min = 40.dp)) { Text(if(batch?.status=="PURGING") "Reprendre le nettoyage" else "Libérer le stockage") }
+                }
+                if (batch?.status in setOf("PURGED","EMPTY") || (batch?.status=="VERIFIED" && policy?.keepVerifiedBatches==true && (!learningRequired || learningDone))) Button(onClick = { viewModel.nextBatch() }, enabled = !busy, modifier = Modifier.heightIn(min = 40.dp)) { Text("Préparer le lot suivant") }
+                if(batch?.status=="EMPTY") Text("Fin de source · aucune nouvelle image",style=MaterialTheme.typography.bodySmall)
+            }
             StudioDisclosure("Hugging Face", Icons.Default.CloudUpload, initiallyExpanded = batch?.status in setOf("PUBLISHING", "CONFLICT", "VERIFIED", "PURGING")) {
                 Text((batch?.remoteRepoId ?: project?.hfDestRepo)?.ifBlank { "Destination à configurer" } ?: "Destination à configurer", style = MaterialTheme.typography.bodyMedium)
                 TextButton(onClick = { viewModel.navigateTo(Screen.Controls) },enabled=!busy){Text("Options de transfert")}
@@ -89,11 +101,6 @@ fun PublicationScreen(viewModel: MainViewModel) {
                 batch?.lastTransferError?.let { Text(it, color=MaterialTheme.colorScheme.error) }
                 if(batch?.status=="CONFLICT" && batch.hfCommitSha==null) OutlinedButton(onClick={confirmIsolate=true},enabled=!busy) { Text("Isoler une nouvelle tentative") }
                 batch?.hfCommitSha?.let { sha -> SelectionContainer { Text("Commit : $sha", style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace) } }
-                if (batch != null && batch.status in setOf("VERIFIED","PURGING")) {
-                    StatusPill(if(batch.verificationKind=="local")"Archive externe vérifiée" else if(batch.verificationKind=="rejection_only")"Rejets explicitement confirmés" else "Contenus distants vérifiés", Icons.Default.VerifiedUser)
-                    OutlinedButton(onClick = { confirmPurge = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(if(batch?.status=="PURGING") "Reprendre le nettoyage" else "Libérer le stockage") }
-                }
-                if (batch?.status == "PURGED" || (batch?.status=="VERIFIED" && policy?.keepVerifiedBatches==true)) Button(onClick = { viewModel.nextBatch() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Préparer le lot suivant") }
                 StudioDetails("L’application doit rester ouverte pendant le transfert. Une coupure ne supprime pas les originaux. Le premier essai doit utiliser un dépôt privé de test.", style = MaterialTheme.typography.bodySmall)
             }
             TextButton(onClick = { showPreview = !showPreview }) { Icon(Icons.Default.DataObject, null); Spacer(Modifier.width(8.dp)); Text(if (showPreview) "Masquer l’aperçu" else "Aperçu des données") }

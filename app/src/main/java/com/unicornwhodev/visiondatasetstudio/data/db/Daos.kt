@@ -67,6 +67,9 @@ interface SampleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSamples(samples: List<SampleEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insertNewSamples(samples: List<SampleEntity>)
+
     @Update
     suspend fun updateSample(sample: SampleEntity)
 
@@ -131,4 +134,12 @@ interface ModelProfileDao {
     suspend fun save(profile: ModelProfileEntity)
     @Query("DELETE FROM model_profiles WHERE id = :id")
     suspend fun delete(id:String)
+}
+
+@Dao
+interface ImageIdentityDao {
+    @Query("SELECT * FROM image_identities WHERE projectId=:projectId AND kind=:kind AND digest=:digest")
+    suspend fun owner(projectId:Long, kind:String, digest:String): com.unicornwhodev.visiondatasetstudio.data.model.ImageIdentityEntity?
+    @Insert(onConflict=OnConflictStrategy.ABORT)
+    suspend fun insert(identity:com.unicornwhodev.visiondatasetstudio.data.model.ImageIdentityEntity)
 }

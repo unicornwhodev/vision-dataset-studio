@@ -148,6 +148,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
                             ControlField("Budget de l’application, Mio · 128 à 65 536",budget,true){budget=it}
                             ControlInt("Espace libre à conserver, Mio · 32 à 4 096",policy.reserveFreeMb){policy=policy.copy(reserveFreeMb=it)}
                             ControlInt("Taille maximale d’une image, Mio · 1 à 256",policy.maxImageMb){policy=policy.copy(maxImageMb=it)}
+                            ControlSwitch("Préannoter les nouvelles images à l’import",policy.autoPreannotate){policy=policy.copy(autoPreannotate=it)}
                             ControlSwitch("Conserver les lots vérifiés pour passer au suivant",policy.keepVerifiedBatches){policy=policy.copy(keepVerifiedBatches=it)}
                             ControlSwitch("Normaliser l’orientation EXIF de la copie cache",policy.normalizeExif){policy=policy.copy(normalizeExif=it)}
                             StudioDetails("La normalisation ne redimensionne pas l’image, mais la réencode; les deux hashes et la transformation sont conservés. Une rotation avec annotations importées ambiguës ou plus de 8 mégapixels est refusée. La copie source reste intacte.", style =MaterialTheme.typography.bodySmall)

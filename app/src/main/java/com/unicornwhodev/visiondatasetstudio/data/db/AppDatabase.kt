@@ -22,9 +22,10 @@ import com.unicornwhodev.visiondatasetstudio.data.model.SampleEntity
         AnnotationRecord::class,
         AuditLogEntity::class,
         SourceEntryEntity::class,
-        ModelProfileEntity::class
+        ModelProfileEntity::class,
+        com.unicornwhodev.visiondatasetstudio.data.model.ImageIdentityEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -36,7 +37,12 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun sourceEntryDao(): SourceEntryDao
     abstract fun modelProfileDao(): ModelProfileDao
 
+    abstract fun imageIdentityDao(): ImageIdentityDao
+
     companion object {
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db:SupportSQLiteDatabase) { SchemaMigrations.from3to4.forEach { db.execSQL(it) } }
+        }
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db:SupportSQLiteDatabase) { SchemaMigrations.from1to2.forEach { db.execSQL(it) } }
         }
@@ -55,7 +61,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "vision_dataset_studio.db"
                 )
 
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                 INSTANCE = instance
                 instance

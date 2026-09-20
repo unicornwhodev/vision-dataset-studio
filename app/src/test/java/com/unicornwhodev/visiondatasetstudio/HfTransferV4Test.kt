@@ -19,10 +19,12 @@ import java.util.concurrent.TimeUnit
 class HfTransferV4Test {
     @get:Rule val temp=TemporaryFolder()
     private fun exercise(block:suspend (MockWebServer,HfApiClient)->Unit) = runBlocking {
-        val server=MockWebServer();server.start()
+        // Pin the fault-injection server to IPv4. After the injected disconnect,
+        // OkHttp can try localhost's ::1 route although this server listens on IPv4 only.
+        val server=MockWebServer();server.start(java.net.InetAddress.getByName("127.0.0.1"),0)
         try {
             val client=OkHttpClient.Builder().readTimeout(3,TimeUnit.SECONDS).retryOnConnectionFailure(false).addInterceptor{ chain ->
-                val request=chain.request();val target=server.url(request.url.encodedPath).newBuilder().encodedQuery(request.url.encodedQuery).build()
+                val request=chain.request();val target=server.url(request.url.encodedPath).newBuilder().host("127.0.0.1").encodedQuery(request.url.encodedQuery).build()
                 chain.proceed(request.newBuilder().url(target).build())
             }.build()
             block(server,HfApiClient(client){"test-only-placeholder"})

@@ -32,7 +32,9 @@ data class ProcessingSettings(
     val hfCoco: Boolean = false,
     val hfYolo: Boolean = false,
     val hfVl: Boolean = true,
+    val autoPreannotate: Boolean = true,
     val adaptiveCorrection: Boolean = false,
+    val continuousTraining: Boolean = false,
     // Optional cooperative claiming for several people processing the same HF-backed corpus.
     // Claims are stored in the destination dataset repo using optimistic Hub commits.
     val collaborationEnabled: Boolean = false,

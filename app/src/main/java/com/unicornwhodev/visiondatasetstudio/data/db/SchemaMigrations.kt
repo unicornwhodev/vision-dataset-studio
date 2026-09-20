@@ -31,4 +31,8 @@ object SchemaMigrations {
         "CREATE INDEX IF NOT EXISTS index_audit_logs_projectId_timestamp ON audit_logs(projectId, timestamp)",
         "UPDATE batches SET status='CONFLICT', lastTransferError='Ancien transfert sans parent persistant : réconciliation manuelle requise' WHERE status='PUBLISHING' AND hfCommitSha IS NULL"
     )
+    val from3to4=listOf(
+        "CREATE TABLE IF NOT EXISTS image_identities (projectId INTEGER NOT NULL, kind TEXT NOT NULL, digest TEXT NOT NULL, firstSampleId TEXT NOT NULL, firstBatchNumber INTEGER NOT NULL, PRIMARY KEY(projectId, kind, digest))",
+        "INSERT OR IGNORE INTO image_identities SELECT projectId, 'file_sha256', digest, sampleId, batchNumber FROM (SELECT projectId, sha256 AS digest, sampleId, batchNumber, createdAt FROM samples WHERE sha256 IS NOT NULL UNION ALL SELECT projectId, sourceSha256 AS digest, sampleId, batchNumber, createdAt FROM samples WHERE sourceSha256 IS NOT NULL) ORDER BY batchNumber, createdAt, sampleId"
+    )
 }

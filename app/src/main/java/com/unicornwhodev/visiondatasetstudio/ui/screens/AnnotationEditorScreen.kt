@@ -143,6 +143,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                     classes.forEach { cls -> DropdownMenuItem(text = { Text(cls) }, onClick = { label = cls; labelMenu = false }) }
                 }
             }
+            StudioAction("Images similaires",viewModel::findSimilarImages,icon=Icons.Default.ImageSearch,enabled=!locked,modifier=Modifier.padding(horizontal=12.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Box(Modifier.weight(1f)) {
                 inspectorState.SaveableStateProvider("$sampleId:${tab.name}") {

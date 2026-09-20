@@ -23,6 +23,13 @@ class ValidatorTests(unittest.TestCase):
         files=[{'path':str(p.relative_to(self.root)), 'size':p.stat().st_size, 'sha256':validator.compute_sha256(p)} for p in [self.image,self.dir/'annotations.jsonl']]
         (self.dir/'manifest.json').write_text(json.dumps({'schema_version':2,'sample_count':1,'files':files}))
     def test_valid_fixture(self):self.assertTrue(validator.validate_batch(self.root))
+    def test_project_scoped_android_batch(self):
+        renamed=self.dir.with_name('p-91902-batch-000001')
+        self.dir.rename(renamed);self.dir=renamed
+        self.image=self.dir/'images/a.png'
+        self.manifest()
+        self.assertTrue(validator.validate_batch(self.root))
+
     def test_tampered_image(self):
         self.image.write_bytes(b'changed')
         with self.assertRaises(ValueError):validator.validate_batch(self.root)

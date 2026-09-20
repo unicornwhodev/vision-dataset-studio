@@ -30,6 +30,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
     val weights = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { it?.let(vm::importModel) }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
         StudioTopBar("Modèles", "Bibliothèque  /  ${local.size} installé(s)", actions = {
+            IconButton(onClick = { vm.navigateTo(Screen.Training) }, enabled = !busy) { Icon(Icons.Default.ModelTraining, "Apprentissage sur cet appareil", Modifier.size(19.dp)) }
             IconButton(onClick = vm::refreshCommunityModelCatalog, enabled = !busy) { Icon(Icons.Default.Refresh, "Actualiser le catalogue", Modifier.size(19.dp)) }
         })
     }) { inset ->
@@ -53,7 +54,9 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                 !item.available -> "À venir"
                                 !item.installableNow -> "Bundle non pris en charge"
                                 item.entry.adapterStatus == "heatmap" -> "Contrat heatmap"
-                                item.entry.adapterStatus == "embedding" -> "Encodeur · inspection"
+                                item.entry.adapterStatus == "embedding" -> "Représentations visuelles"
+                                item.entry.adapterStatus == "bundle" -> "Pipeline local"
+                                item.entry.adapterStatus == "rfdetr" -> "Détection"
                                 else -> "Inspection"
                             }
                             Column {

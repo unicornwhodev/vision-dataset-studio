@@ -15,11 +15,11 @@ data class InputTransform(val imageWidth: Int, val imageHeight: Int, val width: 
         return ((px - left) / fittedWidth) to ((py - top) / fittedHeight)
     }
     companion object {
-        fun create(iw: Int, ih: Int, w: Int, h: Int, mode: String): InputTransform {
+        fun create(iw: Int, ih: Int, w: Int, h: Int, mode: String, cropFraction: Float = 1f): InputTransform {
             require(listOf(iw, ih, w, h).all { it > 0 })
             if (mode == "stretch") return InputTransform(iw, ih, w, h, w, h, 0, 0)
             require(mode in setOf("letterbox", "center_crop"))
-            val scale = if (mode == "letterbox") min(w.toDouble()/iw, h.toDouble()/ih) else max(w.toDouble()/iw, h.toDouble()/ih)
+            val scale = if (mode == "letterbox") min(w.toDouble()/iw, h.toDouble()/ih) else max(w.toDouble()/iw, h.toDouble()/ih)/cropFraction
             val fw = max(1, (iw * scale).roundToInt()); val fh = max(1, (ih * scale).roundToInt())
             return InputTransform(iw, ih, w, h, fw, fh, (w-fw)/2, (h-fh)/2)
         }
@@ -27,17 +27,30 @@ data class InputTransform(val imageWidth: Int, val imageHeight: Int, val width: 
 }
 
 object ModelContract {
-    val adapters = listOf("ssd", "yolo", "xyxy_score_class", "classification", "points", "heatmap", "embedding", "inspect_only")
+    val adapters = listOf("ssd", "rfdetr", "tinyclip", "sam_box", "florence2", "yolo", "xyxy_score_class", "classification", "points", "heatmap", "embedding", "inspect_only")
     fun adapter(c: ModelConfig) = if (c.adapter == "auto") when(c.task) {
         "object_detection" -> "ssd"; "classification" -> "classification"; "pointing" -> "points"; else -> c.task
     } else c.adapter
     fun resize(c: ModelConfig) = if (c.resizeMode == "auto") if (adapter(c) == "classification") "stretch" else "letterbox" else c.resizeMode
     fun outputTypes(c: ModelConfig): Set<String> {
+        if(c.bundleKind.isNotBlank())return when(c.bundleKind){"tinyclip"->setOf("tag");"efficientvit_sam"->setOf("box");"florence2"->setOf("caption","box");else->emptySet()}
         if(c.runtime=="local_http") return when(c.httpOutputMode) { "caption_text"->setOf("caption");else-> when(c.task){
             "classification"->setOf("tag");"captioning"->setOf("caption");"vqa"->setOf("vqa");"pointing"->setOf("point");"counting"->setOf("count");"multitask"->setOf("point","box","tag","caption","vqa","count");else->setOf("box")}}
         return when(adapter(c)) { "classification"->setOf("tag");"points","heatmap"->setOf("point");"embedding","inspect_only"->emptySet();else->when(c.outputMode){"points"->setOf("point");"both"->setOf("point","box");else->setOf("box")} } + if(c.deriveCounts) setOf("count") else emptySet()
     }
     fun validate(c: ModelConfig) {
+        require(c.bundleKind in setOf("","tinyclip","efficientvit_sam","florence2"))
+        require(c.cropFraction.isFinite() && c.cropFraction in .5f..1f)
+        require(c.embeddingOutputIndex in -1..128 && c.patchOutputIndex in -1..128)
+        require(c.dynamicMinSize in 1..2048 && c.dynamicMaxSize in c.dynamicMinSize..2048 && c.dynamicStride in 1..128)
+        require(c.extraIntInputs.size<=4 && c.extraIntInputs.all{(k,v)->k.toIntOrNull() in 1..4 && v.size in 1..4096})
+        c.training?.let { t ->
+            require(listOf(t.trainSignature,t.inferSignature,t.saveSignature,t.restoreSignature,t.imageInput,t.targetInput,t.lossOutput,t.checkpointInput).all{it.matches(Regex("[A-Za-z0-9_/.-]{1,100}"))})
+            require(t.targetEncoding in setOf("one_hot","multi_hot","points_xyv","heatmap_nchw","boxes_xyxy_class_mask"))
+            require(t.targetShape.isNotEmpty() && t.targetShape.size<=4 && t.targetShape.all{it in 1..4096} && t.targetShape.fold(1L){a,b->a*b}<=1_000_000)
+            require(t.inferOutputs.isNotEmpty() && t.inferOutputs.distinct().size==t.inferOutputs.size)
+        }
+        require(c.trainingCheckpoint.isBlank() || (c.training!=null && com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(c.trainingCheckpoint)))
         require(c.schemaVersion == 1) { "Version de contrat modèle non prise en charge" }
         require(c.runtime in setOf("litert_interpreter", "local_http")) { "Runtime non implémenté" }
         require(c.threshold.isFinite() && c.threshold in 0f..1f)
@@ -57,10 +70,10 @@ object ModelContract {
         require(c.channelStd.isEmpty() || (c.channelStd.size == c.inputChannels && c.channelStd.all { it.isFinite() && it > 0f }))
         require(c.padValue in 0..255 && c.threads in 1..8)
         require(c.coordinates in setOf("normalized", "pixels"))
-        require(c.scoreActivation in setOf("none", "sigmoid", "softmax"))
+        require(c.scoreActivation in setOf("none", "sigmoid", "softmax", "clamp"))
         require(c.outputMode in setOf("boxes", "points", "both"))
         require(c.pointAnchor in setOf("center", "bottom_center", "top_center"))
-        if (adapter(c) !in setOf("embedding", "inspect_only")) require(c.labels.isNotEmpty()) { "Définissez les classes du contrat" }
+        if (adapter(c) !in setOf("embedding", "inspect_only", "florence2")) require(c.labels.isNotEmpty()) { "Définissez les classes du contrat" }
         require(listOf(c.outputIndex, c.outputIndexBoxes, c.outputIndexClasses, c.outputIndexScores).all { it in 0..128 })
         require(c.outputIndexCount in -1..128)
         if (adapter(c) == "yolo") require(c.outputLayout in setOf("BCN", "BNC"))
@@ -80,6 +93,7 @@ object ModelAdapters {
         require(values.all(Float::isFinite)) { "Scores non finis" }
         return when(activation) {
             "softmax" -> { val max = values.maxOrNull() ?: 0f; val exp = values.map { exp((it-max).toDouble()) }; val total = exp.sum(); FloatArray(values.size) { (exp[it]/total).toFloat() } }
+            "clamp" -> FloatArray(values.size) { values[it].coerceIn(0f,1f) }
             "sigmoid" -> FloatArray(values.size) { (1.0/(1.0 + exp(-values[it].toDouble()))).toFloat() }
             else -> values.also { require(it.all { score -> score in 0f..1f }) { "Scores hors [0,1] : précisez leur activation" } }
         }
@@ -128,6 +142,21 @@ object ModelAdapters {
                     val x=v(i,0);val y=v(i,1);val w=v(i,2);val h=v(i,3)
                     box(c,t,x-w/2,y-h/2,x+w/2,y+h/2,score,c.labels[cls])?.let(all::add)
                 }; nms(all,c)
+            }
+            "rfdetr" -> {
+                val boxes=outputs.getValue(c.outputIndexBoxes);val logits=outputs.getValue(c.outputIndexScores)
+                require(boxes.shape.size==3 && boxes.shape[0]==1 && boxes.shape[2]==4)
+                require(logits.shape==listOf(1,boxes.shape[1],c.labels.size))
+                val candidates=mutableListOf<ModelProposal>()
+                for(q in 0 until boxes.shape[1]) {
+                    val probabilities=scores(logits.values.copyOfRange(q*c.labels.size,(q+1)*c.labels.size),"sigmoid")
+                    val b=boxes.values.copyOfRange(q*4,q*4+4)
+                    probabilities.forEachIndexed { index,score ->
+                        if(index!=0 && !c.labels[index].startsWith("unused_") && score>=c.threshold)
+                            box(c,t,b[0]-b[2]/2,b[1]-b[3]/2,b[0]+b[2]/2,b[1]+b[3]/2,score,c.labels[index])?.let(candidates::add)
+                    }
+                }
+                candidates.sortedByDescending{it.score}.take(c.maxDetections)
             }
             "ssd" -> {
                 val boxes=outputs.getValue(c.outputIndexBoxes);val cls=outputs.getValue(c.outputIndexClasses);val score=outputs.getValue(c.outputIndexScores)

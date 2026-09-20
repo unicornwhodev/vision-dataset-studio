@@ -64,6 +64,12 @@ dependencies {
   implementation(libs.coil.compose)
   implementation(libs.converter.moshi)
   implementation(libs.tensorflow.lite)
+  // Save/Restore and gradient operators used by on-device training signatures.
+  implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1") {
+    exclude(group = "org.tensorflow", module = "tensorflow-lite")
+    exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
+  }
+  implementation("androidx.work:work-runtime-ktx:2.11.2")
   implementation("org.tensorflow:tensorflow-lite-metadata:0.4.4")
 
   implementation(libs.kotlinx.coroutines.android)

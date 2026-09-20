@@ -21,7 +21,7 @@ class AdaptiveCorrectionStore(private val context:Context) {
         return (adapter.fromJson(atomic.openRead().bufferedReader().use{it.readText()}) ?: error("Journal de correction invalide")).also{require(it.schema==1)}
     }
     suspend fun train(project:ProjectEntity,pairs:List<Pair<SampleEntity,SampleAnnotations>>):String = withContext(Dispatchers.IO) {
-        check(pairs.isNotEmpty() && pairs.all{it.first.annotationStatus in setOf("VALIDATED","REJECTED")}) { "Le lot doit avoir une décision humaine finale pour chaque cas" }
+        check(pairs.isNotEmpty() && pairs.all{it.first.annotationStatus in setOf("VALIDATED","REJECTED","DUPLICATE")}) { "Le lot doit avoir une décision humaine finale pour chaque cas" }
         val additions=mutableMapOf<String,MutableList<CorrectionExample>>()
         pairs.filter{it.first.annotationStatus=="VALIDATED"}.forEach{(s,a)->
             val image=s.sha256 ?: return@forEach
@@ -29,7 +29,7 @@ class AdaptiveCorrectionStore(private val context:Context) {
                 val key=AdaptiveCorrection.groupKey(p.sourceProvenance,p.label)
                 additions.getOrPut(key){mutableListOf()}.add(CorrectionExample(AdaptiveCorrection.hash("$image:${p.id}"),image,p.modelX!!.toDouble(),p.modelY!!.toDouble(),p.boxWidth.toDouble(),p.boxHeight.toDouble(),(p.modelScore ?: .5f).toDouble(),p.x.toDouble(),p.y.toDouble(),true,true))
             }
-            a.boxes.filter{it.explicitlyAdjusted && it.isHumanVerified && it.modelXmin!=null && it.modelYmin!=null && it.modelXmax!=null && it.modelYmax!=null && it.sourceProvenance.startsWith("model_litert:")}.forEach{b->
+            a.boxes.filter{(it.correctionGeneration==null || it.modelCoordinatesVersion>=1) && it.explicitlyAdjusted && it.isHumanVerified && it.modelXmin!=null && it.modelYmin!=null && it.modelXmax!=null && it.modelYmax!=null && it.sourceProvenance.startsWith("model_litert:")}.forEach{b->
                 val mx=(b.modelXmin!!+b.modelXmax!!)/2.0;val my=(b.modelYmin!!+b.modelYmax!!)/2.0
                 val mw=(b.modelXmax!!-b.modelXmin!!).toDouble();val mh=(b.modelYmax!!-b.modelYmin!!).toDouble()
                 val cx=(b.xmin+b.xmax)/2.0;val cy=(b.ymin+b.ymax)/2.0;val w=(b.xmax-b.xmin).toDouble();val h=(b.ymax-b.ymin).toDouble()

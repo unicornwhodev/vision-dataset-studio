@@ -13,5 +13,8 @@ fun main() {
     check(kotlin.math.abs(persisted.modelXmin!!-raw.xmin)<.000001f) {
         "FAIL: original box coordinates are replaced by calibrated coordinates; subsequent correction training learns the wrong baseline"
     }
-    println("PASS original box provenance survives calibration")
+    val twice=AdaptiveCorrection.apply(adjusted,CorrectionLedger(groups=listOf(group))).single()
+    check(kotlin.math.abs(twice.xmin-adjusted.single().xmin)<.000001f) { "Calibration applied twice to an already calibrated box" }
+    check(persisted.modelCoordinatesVersion==1)
+    println("PASS original box provenance and version survive calibration; reapplication is idempotent")
 }

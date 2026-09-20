@@ -38,6 +38,8 @@ sealed class Screen {
     object Preferences : Screen()
     object Controls : Screen()
     object Models : Screen()
+    object Training : Screen()
+    object Similarity : Screen()
 }
 
 private sealed class EditCommand {
@@ -67,6 +69,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _modelDiagnostics = MutableStateFlow("")
     val modelDiagnostics = _modelDiagnostics.asStateFlow()
     private var operationJob: Job? = null
+    val deviceTraining=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining(application)
+    private val _trainingRun=MutableStateFlow<com.unicornwhodev.visiondatasetstudio.domain.training.DeviceTrainingRun?>(null)
+    val trainingRun=_trainingRun.asStateFlow()
+    private val _similarImages=MutableStateFlow<List<Pair<SampleEntity,Float>>>(emptyList())
+    val similarImages=_similarImages.asStateFlow()
     private val correctionStore=AdaptiveCorrectionStore(application)
     private val _correctionReport=MutableStateFlow("Aucune correction locale inspectée")
     val correctionReport=_correctionReport.asStateFlow()
@@ -149,6 +156,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val latest = db.batchDao().getLatestBatchSync(_activeProjectId.value)
             val previous = db.batchDao().getBatchSync(_activeProjectId.value, preferenceStore.lastBatch)
             loadBatch(previous?.batchNumber ?: latest?.batchNumber ?: 1)
+        }
+        viewModelScope.launch {
+            while(isActive) {
+                if(_currentScreen.value is Screen.Training || _currentScreen.value is Screen.Publication) _trainingRun.value=withContext(Dispatchers.IO){deviceTraining.readBatch(_activeProjectId.value,_activeBatchNumber.value)}
+                delay(1500)
+            }
         }
         checkTokenStatus()
         viewModelScope.launch { runCatching { _communityModels.value=CommunityModelCatalog.discover(hfApiClient) } }
@@ -269,7 +282,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _batchSamples.value = emptyList()
         batchObserver = viewModelScope.launch {
             _lastExportedZip.value = db.batchDao().getBatchSync(projectId,batchNumber)?.archivePath?.let(::File)?.takeIf { it.isFile }
-            db.sampleDao().getSamplesForBatch(projectId, batchNumber).collect { _batchSamples.value = it }
+            db.sampleDao().getSamplesForBatch(projectId, batchNumber).collect { _batchSamples.value = it.filter { sample -> sample.annotationStatus != "DUPLICATE" } }
         }
     }
     fun fetchAndPrepareBatch(batchNumber: Int) = operation {
@@ -278,7 +291,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun nextBatch() = operation {
         val latest = db.batchDao().getLatestBatchSync(_activeProjectId.value)
         val policy = ProjectSettings.read(db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent"))
-        check(latest == null || latest.status == "PURGED" || (latest.status == "VERIFIED" && policy.keepVerifiedBatches)) { "Vérifiez une copie locale ou HF, puis purgez le cache ou activez la conservation des lots vérifiés." }
+        check(latest == null || latest.status in setOf("PURGED","EMPTY") || (latest.status == "VERIFIED" && policy.keepVerifiedBatches)) { "Vérifiez une copie locale ou HF, puis purgez le cache ou activez la conservation des lots vérifiés." }
+        if(latest?.status=="VERIFIED")deviceTraining.requireCleanupAllowed(db.projectDao().getProjectSync(_activeProjectId.value)!!,latest.batchNumber,latest.validatedCases>0)
         prepareBatch(db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Atelier absent"), (latest?.batchNumber ?: 0) + 1)
     }
     private suspend fun prepareBatch(project: ProjectEntity, batchNumber: Int) {
@@ -288,17 +302,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val existing = db.batchDao().getBatchSync(project.id, batchNumber)
         if (existing == null) {
             val previous = db.batchDao().getLatestBatchSync(_activeProjectId.value)
-            check(previous == null || previous.status == "PURGED" || (previous.status == "VERIFIED" && policy.keepVerifiedBatches)) { "Un autre lot n’a pas encore de copie vérifiée." }
-            _operationProgress.value = OperationProgress("Découverte du lot $batchNumber…", 0, policy.batchSize)
-            val result = batchEngine.discoverViewerBatch(project, batchNumber, policy.batchSize)
-            check(result.success) { result.error ?: "Découverte impossible" }
-        } else check(existing.status !in setOf("VERIFIED", "PURGED", "PUBLISHED", "PUBLISHING")) { "Ce lot a déjà été publié." }
-        batchEngine.acquireBatchImages(project.id, batchNumber) { done, total -> _operationProgress.value = OperationProgress("Téléchargement des images", done, total) }
-        // Inference is explicitly launched by the curator: importing weights is not consent to replace proposals.
+            check(previous == null || previous.status in setOf("PURGED","EMPTY") || (previous.status == "VERIFIED" && policy.keepVerifiedBatches)) { "Un autre lot n’a pas encore de copie vérifiée." }
+            if(previous?.status=="VERIFIED")deviceTraining.requireCleanupAllowed(project,previous.batchNumber,previous.validatedCases>0)
+        } else check(existing.status !in com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates) { "Ce lot est clôturé ou en transfert." }
+        val exhausted=batchEngine.prepareUniqueBatch(project.id,batchNumber,policy.batchSize) { done,total ->
+            _operationProgress.value=OperationProgress("Import et contrôle des doublons",done,total)
+        }
         loadBatch(batchNumber)
-        val cases = db.sampleDao().getSamplesForBatchSync(project.id, batchNumber)
-        val failed = cases.count { it.acquisitionStatus != "AVAILABLE" }
-        _operationProgress.value = if (failed > 0) OperationProgress("$failed image(s) indisponible(s). Le lot reste récupérable avec Réessayer.", 0, cases.size, true) else null
+        val cases=db.sampleDao().getSamplesForBatchSync(project.id,batchNumber)
+        val unique=cases.filter{it.annotationStatus!="DUPLICATE"}
+        val failed=unique.count{it.acquisitionStatus!="AVAILABLE" && it.annotationStatus!="REJECTED"}
+        val duplicates=cases.size-unique.size
+        var inferenceError:String?=null
+        if(policy.autoPreannotate && project.modelPath!=null && unique.any{it.acquisitionStatus=="AVAILABLE" && it.annotationStatus=="PENDING"}) {
+            try {
+                val config=modelConfig(project)
+                loadForInference(project,config)
+                batchEngine.runBatchInference(project.id,batchNumber,config,freshOnly=true) { done,total ->
+                    _operationProgress.value=OperationProgress("Préannotation",done,total)
+                }
+            } catch(e:kotlinx.coroutines.CancellationException){throw e}
+            catch(e:Exception){inferenceError=e.message ?: "Préannotation interrompue"}
+            finally{liteRtEngine.close()}
+        }
+        val message=when {
+            inferenceError!=null -> "Import conservé. $inferenceError"
+            failed>0 -> "$failed image(s) à réessayer · $duplicates doublon(s) écarté(s)"
+            unique.isEmpty() && exhausted -> "Fin de source · $duplicates doublon(s) écarté(s)"
+            !exhausted && unique.size<policy.batchSize -> "${unique.size} image(s) · $duplicates doublon(s). Réessayer pour compléter le lot."
+            else -> "${unique.size} image(s) à contrôler · $duplicates doublon(s) écarté(s)" + if(exhausted) " · Fin de source" else ""
+        }
+        _operationProgress.value=OperationProgress(message,1,1,failed>0 || inferenceError!=null)
         _currentScreen.value = Screen.BatchGrid
     }
 
@@ -497,17 +531,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun runLiteRtOnCurrentSample() = operation {
         val s=_currentSample.value ?: error("Aucun cas actif")
         val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
-        val c=modelConfig(p)
+        val base=modelConfig(p)
+        val annotations=_currentAnnotations.value
+        val c=if(base.bundleKind=="efficientvit_sam") {
+            val box=annotations.boxes.firstOrNull{it.isHumanVerified}
+            val point=annotations.points.firstOrNull{it.isHumanVerified && !it.isAbsent && !it.isAbstained}
+            when{box!=null->base.copy(promptBox=listOf(box.xmin,box.ymin,box.xmax,box.ymax),promptPoint=emptyList());point!=null->base.copy(promptPoint=listOf(point.x,point.y),promptBox=emptyList());else->base}
+        }else base
         try {
             loadForInference(p,c);val bitmap=decodeSample(s)
             val raw=try { liteRtEngine.runInference(bitmap,c) } finally { bitmap.recycle() }
             val proposals=AdaptiveCorrection.apply(raw,if(ProjectSettings.read(p).adaptiveCorrection)withContext(Dispatchers.IO){correctionStore.read(p.id)} else CorrectionLedger())
             liteRtEngine.lastError?.let { error("Inférence échouée : $it") }
+            liteRtEngine.lastEmbedding?.let{vector->withContext(Dispatchers.IO){EmbeddingIndex(getApplication(),p.id).put(s.sampleId,s.sha256 ?: com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils.computeSha256(File(s.localImagePath!!)),liteRtEngine.embeddingSpaceHash,vector)}}
+
             val a=_currentAnnotations.value
             undoStack.add(a);redoStack.clear();refreshUndo()
             _currentAnnotations.value=ProposalMerger.merge(a,proposals,p.activeTasksCsv,c.captionLanguage,ModelContract.outputTypes(c))
             enqueueSave(_currentAnnotations.value)
-            _operationProgress.value=OperationProgress("${proposals.size} proposition(s) reçue(s), appliquées aux tâches actives; corrections conservées.",1,1)
+            _operationProgress.value=OperationProgress(if(liteRtEngine.lastEmbedding!=null) "Représentation visuelle enregistrée. Ouvrez Images similaires." else "${proposals.size} proposition(s). ${liteRtEngine.lastNote}",1,1)
         } finally { liteRtEngine.close() }
     }
     fun acceptCurrentProposals() {
@@ -562,31 +604,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun downloadCommunityModel(id:String)=operation {
         val item=_communityModels.value.firstOrNull{it.entry.id==id} ?: CommunityModelCatalog.discover(hfApiClient).firstOrNull{it.entry.id==id} ?: error("Modèle absent du catalogue")
-        require(item.available) { item.note }
-        require(item.installableNow) { "Ce modèle est un bundle ou nécessite encore un runtime spécialisé. Il est visible dans le catalogue mais n’est pas activé artificiellement." }
-        val remoteName=item.entry.expectedFiles.single()
-        val remote=item.files.firstOrNull{it.path.endsWith("/$remoteName")} ?: error("Artefact distant absent")
+        require(item.available && item.installableNow){item.note}
         val project=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
         val settings=ProjectSettings.read(project);batchEngine.checkNetwork(settings)
-        val reserve=(remote.size.takeIf{it>0} ?: 256L*1024*1024)+8L*1024*1024
-        check(reserve<=2L*1024*1024*1024 && storageManager.hasAvailableBudget(reserve,project.diskBudgetMb,settings.reserveFreeMb)) { "Budget disque insuffisant pour ce modèle" }
-        val file=storageManager.getModelFile("community-${item.entry.id}-$remoteName")
-        val profiles=db.modelProfileDao().observe().first()
-        check(profiles.none{it.modelPath==file.path}) { "Modèle déjà téléchargé; utilisez sa fiche locale" }
+        val reserve=CommunityModelInstaller.artifacts(item).sumOf{it.size}+8L*1024*1024
+        require(reserve<=2L*1024*1024*1024 && storageManager.hasAvailableBudget(reserve,project.diskBudgetMb,settings.reserveFreeMb)){"Budget disque insuffisant pour ce modèle et ses composants"}
+        val directory=File(getApplication<Application>().filesDir,"models/community-${item.entry.id}-${item.repoSha.take(12)}-${UUID.randomUUID()}")
         var saved=false
         try {
-            _operationProgress.value=OperationProgress("Téléchargement ${item.entry.title}…",0,1)
-            check(hfApiClient.downloadModelFile(CommunityModelCatalog.repoId,item.repoSha,remote.path,file,reserve)) { "Téléchargement interrompu" }
+            val file=CommunityModelInstaller.install(item,directory,hfApiClient){done,total->_operationProgress.value=OperationProgress("${item.entry.title} · $done/$total fichiers",done,total)}
             val config=withContext(Dispatchers.IO){CommunityModelCatalog.suggestedConfig(item,file)}
             val hash=withContext(Dispatchers.IO){com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils.computeSha256(file)}
             val report=try {
-                check(withContext(Dispatchers.IO){liteRtEngine.loadModel(file,config.threads)}) { liteRtEngine.lastError ?: "Runtime incapable de charger ce modèle" }
-                "Catalogue: ${CommunityModelCatalog.repoId}@${item.repoSha}\n${item.note}\nLicence upstream déclarée: ${item.entry.upstreamLicense}\n"+liteRtEngine.tensorReport()
-            } finally { liteRtEngine.close() }
+                check(withContext(Dispatchers.IO){liteRtEngine.loadModel(file,config.threads)}){liteRtEngine.lastError ?: "Modèle non chargeable"}
+                "Catalogue: ${CommunityModelCatalog.repoId}@${item.repoSha}\nLicence déclarée: ${item.entry.upstreamLicense}\n"+liteRtEngine.tensorReport()
+            }finally{liteRtEngine.close()}
             db.modelProfileDao().save(ModelProfileEntity(UUID.randomUUID().toString(),item.entry.title,file.path,hash,moshi.adapter(ModelConfig::class.java).toJson(config),report))
             saved=true;_modelDiagnostics.value=report
-            _operationProgress.value=OperationProgress("${item.entry.title} ajouté à la bibliothèque locale. Il n’est pas activé automatiquement.",1,1)
-        } finally { if(!saved && file.isFile)withContext(NonCancellable+Dispatchers.IO){file.delete()} }
+            _operationProgress.value=OperationProgress("${item.entry.title} installé sur cet appareil. Sélectionnez-le pour l’utiliser.",1,1)
+        }finally{if(!saved)withContext(NonCancellable+Dispatchers.IO){directory.deleteRecursively()}}
     }
     fun downloadCatalogModel(id:String)=operation {
         val entry=PublicModelCatalog.entries.single{it.id==id}
@@ -628,6 +664,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         check(db.batchDao().getBatchSync(_activeProjectId.value, _activeBatchNumber.value)?.status !in com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates) { "Le paquet publié doit rester inchangé pour vérification. Récupérez les fichiers depuis le commit HF ou conservez l’archive déjà prête." }
         val validated = db.sampleDao().getSamplesForBatchSync(_activeProjectId.value, _activeBatchNumber.value).filter { it.annotationStatus == "VALIDATED" && it.localImagePath != null }
         check(validated.isNotEmpty()) { "Aucun cas validé avec image locale." }
+        batchEngine.requireUniqueExport(validated)
         val pairs = validated.map { it to batchEngine.getSampleAnnotations(it.sampleId) }
         check(includeWebDataset || includeJsonl || includeCoco || includeYolo || includeVl) { "Sélectionnez au moins un format." }
         val result = withContext(Dispatchers.IO) { exporters.packageBatchToLocalZip(p, _activeBatchNumber.value, pairs, includeWebDataset, includeJsonl, includeCoco, includeYolo, includeVl) }
@@ -653,10 +690,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _operationProgress.value=OperationProgress("Copie relue mais droit de lecture non persistant. Lot non clôturé : choisissez un fournisseur SAF persistant pour autoriser le nettoyage après redémarrage.",1,1,true)
             return@operation
         }
-        val allDone=db.sampleDao().getSamplesForBatchSync(_activeProjectId.value,_activeBatchNumber.value).all { it.annotationStatus in setOf("VALIDATED","REJECTED") }
+        val allDone=db.sampleDao().getSamplesForBatchSync(_activeProjectId.value,_activeBatchNumber.value).all { it.annotationStatus in setOf("VALIDATED","REJECTED","DUPLICATE") }
         if(allDone) {
             batchEngine.verifyLocalArchive(_activeProjectId.value,_activeBatchNumber.value,uri.toString())
-            _operationProgress.value=OperationProgress("Copie externe relue et lot clôturé. Vous pouvez purger le cache ou conserver ce lot selon vos réglages.",1,1)
+            val learning=prepareOptionalExportTraining(_activeProjectId.value,_activeBatchNumber.value)
+            _operationProgress.value=OperationProgress("Export vérifié. $learning",1,1)
         } else _operationProgress.value=OperationProgress("Copie partielle relue. Terminez le lot et refaites un export pour autoriser sa purge.",1,1)
     }
     fun purgeActiveBatch() = operation {
@@ -758,7 +796,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun exportPack(uri:Uri)=operation {
         val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
         val pack=StudioPack(name=p.name,classes=p.classesCsv.split(',').map(String::trim),tasks=p.activeTasksCsv.split(','),
-            batchSize=ProjectSettings.read(p).batchSize,model=p.modelConfigJson?.let{modelConfig(p)})
+            batchSize=ProjectSettings.read(p).batchSize,model=p.modelConfigJson?.let{modelConfig(p).copy(trainingCheckpoint="")})
         val json=moshi.adapter(StudioPack::class.java).toJson(pack)
         withContext(Dispatchers.IO){getApplication<Application>().contentResolver.openOutputStream(uri,"wt")?.bufferedWriter()?.use{it.write(json)} ?: error("Fichier non accessible")}
         _operationProgress.value=OperationProgress("Pack exporté sans jeton HF du coffre, poids ni corpus. Le contrat et ses prompts sont inclus : relisez-les avant partage.",1,1)
@@ -797,10 +835,60 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if(profile.modelPath.isNotBlank() && otherProfiles.none{it.modelPath==profile.modelPath}) {
             val file=File(profile.modelPath)
             check(file.canonicalPath.startsWith(File(getApplication<Application>().filesDir,"models").canonicalPath+File.separator))
-            withContext(Dispatchers.IO){if(file.exists())check(file.delete()){ "Poids non supprimables" }}
+            withContext(Dispatchers.IO){
+                val parent=file.parentFile!!;val owned=parent.parentFile?.canonicalFile==File(getApplication<Application>().filesDir,"models").canonicalFile && (parent.name.startsWith("community-") || parent.name.startsWith("training-"))
+                if(owned && otherProfiles.none{it.modelPath.startsWith(parent.path+File.separator)})check(parent.deleteRecursively()){"Dossier modèle non supprimable"}
+                else if(file.exists())check(file.delete()){ "Poids non supprimables" }
+            }
         }
         db.modelProfileDao().delete(id)
         _operationProgress.value=OperationProgress("Profil supprimé. Les poids encore référencés par un autre profil sont conservés.",1,1)
+    }
+    fun findSimilarImages()=operation {
+        val sample=_currentSample.value ?: error("Ouvrez une image et calculez sa représentation avec DINOv2, RepViT, HGNetV2 ou TinyCLIP")
+        val index=EmbeddingIndex(getApplication(),sample.projectId)
+        val nearest=withContext(Dispatchers.IO){index.nearest(index.get(sample.sampleId) ?: error("Calculez d’abord la représentation de cette image"))}
+        _similarImages.value=nearest.mapNotNull{match->db.sampleDao().getSampleSync(match.sampleId)?.let{it to match.cosine}}
+        _currentScreen.value=Screen.Similarity
+    }
+    private suspend fun prepareOptionalExportTraining(projectId:Long,batchNumber:Int):String {
+        val p=db.projectDao().getProjectSync(projectId) ?: return ""
+        if(!ProjectSettings.read(p).continuousTraining)return "Nettoyage disponible."
+        return try {
+            val run=deviceTraining.prepare(p,batchNumber);_trainingRun.value=run;deviceTraining.enqueue(p.id)
+            "Apprentissage du lot planifié. Nettoyage après sa fin."
+        } catch(e:CancellationException){throw e}
+        catch(e:Exception){"Apprentissage en attente : ${e.message}. Export conservé."}
+    }
+    fun startDeviceTraining(epochs:Int=3,learningRate:Float=.001f)=operation {
+        val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
+        val run=deviceTraining.prepare(p,_activeBatchNumber.value,epochs,learningRate);_trainingRun.value=run;deviceTraining.enqueue(p.id)
+        _operationProgress.value=OperationProgress("Apprentissage planifié sur cet appareil. Aucun envoi au pod.",1,1)
+    }
+    fun cancelDeviceTraining()=operation {deviceTraining.cancel(_activeProjectId.value)}
+    fun resumeDeviceTraining()=operation {
+        deviceTraining.resume(_activeProjectId.value)
+    }
+    fun setContinuousTraining(enabled:Boolean)=operation {
+        val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
+        if(enabled)require(modelConfig(p).training!=null){"Un modèle avec signatures d’apprentissage est requis"}
+        db.projectDao().saveProject(p.copy(settingsJson=ProjectSettings.write(ProjectSettings.read(p).copy(continuousTraining=enabled))))
+    }
+    fun activateTrainedModel()=operation {
+        val run=withContext(Dispatchers.IO){deviceTraining.readBatch(_activeProjectId.value,_activeBatchNumber.value)} ?: error("Aucun apprentissage")
+        require(run.phase=="completed" && run.checkpoint!=null){"Le candidat doit réussir le contrôle avant activation"}
+        val file=File(run.modelFile)
+        require(withContext(Dispatchers.IO){com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils.computeSha256(file)}==run.modelSha256)
+        val checkpoint=withContext(Dispatchers.IO){com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.saveCheckpointReceipt(file,run.checkpoint)}
+        val config=run.config.copy(trainingCheckpoint=checkpoint)
+        val json=moshi.adapter(ModelConfig::class.java).toJson(config)
+        val report="Apprentissage Android · ${run.completedSteps} étapes · contrôle ${run.initialLoss} → ${run.validationLoss}. Contrôle réutilisé ; précision métier à évaluer."
+        val id="trained-${run.id}"
+        db.modelProfileDao().save(ModelProfileEntity(id,"Appris sur cet appareil · ${run.id.take(8)}",file.path,run.modelSha256,json,report))
+        val project=db.projectDao().getProjectSync(run.projectId) ?: error("Projet absent")
+        db.projectDao().saveProject(project.copy(modelPath=file.path,modelConfigJson=json,updatedAt=System.currentTimeMillis()))
+        liteRtEngine.close();_modelDiagnostics.value=report
+        _operationProgress.value=OperationProgress("Poids appris activés. Le profil précédent reste disponible dans la bibliothèque.",1,1)
     }
     fun inspectCorrections()=operation {
         _correctionReport.value=withContext(Dispatchers.IO){correctionStore.report(_activeProjectId.value)}
@@ -822,7 +910,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun publishActiveBatch() = operation {
         _operationProgress.value = OperationProgress("Publication et vérification distante…", 0, 1)
         val result = batchEngine.publishAndVerifyBatch(_activeProjectId.value, _activeBatchNumber.value)
-        _operationProgress.value = OperationProgress(result.message, if (result.success) 1 else 0, 1, !result.success)
+        val learning=if(result.success)prepareOptionalExportTraining(_activeProjectId.value,_activeBatchNumber.value) else ""
+        _operationProgress.value = OperationProgress(result.message+" "+learning, if (result.success) 1 else 0, 1, !result.success)
     }
 }
 

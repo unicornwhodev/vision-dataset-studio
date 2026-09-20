@@ -10,6 +10,7 @@ import java.io.File
  * Availability is discovered from the remote tree; this file does not pretend unpublished conversions exist.
  */
 object CommunityModelCatalog {
+    val cocoSlots = listOf("background","person","bicycle","car","motorcycle","airplane","bus","train","truck","boat","traffic light","fire hydrant","unused_12","stop sign","parking meter","bench","bird","cat","dog","horse","sheep","cow","elephant","bear","zebra","giraffe","unused_26","backpack","umbrella","unused_29","unused_30","handbag","tie","suitcase","frisbee","skis","snowboard","sports ball","kite","baseball bat","baseball glove","skateboard","surfboard","tennis racket","bottle","unused_45","wine glass","cup","fork","knife","spoon","bowl","banana","apple","sandwich","orange","broccoli","carrot","hot dog","pizza","donut","cake","chair","couch","potted plant","bed","unused_66","dining table","unused_68","unused_69","toilet","unused_71","tv","laptop","mouse","remote","keyboard","cell phone","microwave","oven","toaster","sink","refrigerator","unused_83","book","clock","vase","scissors","teddy bear","hair drier","toothbrush")
     const val repoId = "Charlbi/Lite_rt_prepared_for_android_dataset_builder"
 
     data class Entry(
@@ -35,7 +36,7 @@ object CommunityModelCatalog {
         Entry("dinov2", "DINOv2 Small", "Embeddings visuels, clustering, doublons et active learning", "Apache-2.0", listOf("model.tflite"), "embedding", "Représentation"),
         Entry("vitpose", "ViTPose+ Small", "Heatmaps de points-clés humains", "Apache-2.0", listOf("model.tflite"), "heatmap", "Keypoints"),
         Entry("efficientvit_sam", "EfficientViT-SAM L0", "Segmentation interactive guidée par point ou boîte", "Apache-2.0", listOf("image_encoder.tflite", "decoder_point.tflite", "decoder_box.tflite"), "bundle", "Segmentation"),
-        Entry("rfdetr", "RF-DETR Base", "Détection d’objets", "Apache-2.0", listOf("model.tflite"), "inspect", "Détection"),
+        Entry("rfdetr", "RF-DETR Base", "Détection d’objets", "Apache-2.0", listOf("model.tflite"), "rfdetr", "Détection"),
         Entry("florence2", "Florence-2 Base", "Captioning, OCR, grounding et tâches VL", "MIT", listOf("image_encoder.tflite", "multimodal_encoder.tflite", "decoder.tflite"), "bundle", "Vision-language"),
         Entry("grounding_dino_base", "Grounding DINO Base", "Détection open-vocabulary guidée par texte", "Apache-2.0", listOf("model.tflite"), "multi_input", "Open-vocabulary"),
         Entry("owlv2_base_patch16", "OWLv2 Base Patch16", "Détection zero-shot guidée par texte", "Apache-2.0", listOf("model.tflite"), "multi_input", "Open-vocabulary"),
@@ -63,12 +64,12 @@ object CommunityModelCatalog {
             val files = tree.filter { it.type != "directory" && it.path.startsWith(prefix) }
             val names = files.map { it.path.removePrefix(prefix) }.toSet()
             val available = spec.expectedFiles.all(names::contains)
-            val installable = available && spec.expectedFiles.size == 1 && spec.adapterStatus in setOf("embedding", "heatmap", "inspect")
+            val installable = available && (spec.expectedFiles.size == 1 && spec.adapterStatus in setOf("embedding", "heatmap", "inspect", "rfdetr") || spec.id in setOf("tinyclip","efficientvit_sam","florence2"))
             Availability(spec, sha, files, available, installable, when {
                 !available -> "Conversion non disponible dans le dépôt pour le moment"
-                spec.expectedFiles.size > 1 -> "Pack multi-fichiers détecté · runtime bundle à intégrer avant activation"
+                spec.expectedFiles.size > 1 -> "Pipeline multi-graphes local · RAM et temps à mesurer sur votre appareil"
                 spec.adapterStatus == "inspect" -> "Téléchargeable pour inspection · contrat de sortie à confirmer avant préannotation"
-                spec.adapterStatus == "embedding" -> "Encodeur utilisable pour inspection/représentation · aucune annotation n’est inventée sans tête adaptée"
+                spec.adapterStatus == "embedding" -> "Représentations visuelles accessibles · aucun label inventé"
                 else -> "Téléchargeable et contrat initial proposé automatiquement"
             })
         }
@@ -90,8 +91,34 @@ object CommunityModelCatalog {
 
     /** Build only contracts we can justify from the serialized tensor shapes. Unknown layouts stay inspect-only. */
     fun suggestedConfig(item: Availability, file: File): ModelConfig {
-        Interpreter(file, Interpreter.Options().setNumThreads(1)).use { i ->
-            require(i.inputTensorCount == 1) { "Le runtime intégré exige actuellement une entrée image unique" }
+        if(file.extension=="json") {
+            val common=ModelConfig(inputLayout="NCHW",inputType="FLOAT32",mean=0f,std=1f,
+                channelMean=listOf(123.675f,116.28f,103.53f),channelStd=listOf(58.395f,57.12f,57.375f),bundleKind=item.entry.id)
+            return when(item.entry.id) {
+                "tinyclip" -> common.copy(task="classification",adapter="tinyclip",inputWidth=224,inputHeight=224,resizeMode="center_crop",labels=listOf("object","background"),channelMean=listOf(122.77094f,116.74601f,104.09374f),channelStd=listOf(68.50053f,66.63216f,70.32316f))
+                "efficientvit_sam" -> common.copy(task="object_detection",adapter="sam_box",inputWidth=512,inputHeight=512,resizeMode="stretch",labels=listOf("object"))
+                "florence2" -> common.copy(task="multitask",adapter="florence2",inputWidth=768,inputHeight=768,resizeMode="stretch",prompt="<CAPTION>")
+                else -> error("Bundle non pris en charge")
+            }.also(ModelContract::validate)
+        }
+        Interpreter(file, LiteRtOptions.forFile(file,1)).use { i ->
+            val explicit = listOf("android_model_config.json","model_config.json").map{File(file.parentFile,it)}.firstOrNull{it.isFile} ?: File(file.parentFile,"android_model_config.json")
+            if(explicit.isFile()) {
+                val c=com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(ModelConfig::class.java).failOnUnknown().fromJson(explicit.readText()) ?: error("Contrat Android invalide")
+                ModelContract.validate(c)
+                if(c.training!=null)LiteRtTrainingSession(file,c).use{}
+                return c
+            }
+            require(i.inputTensorCount == 1 || (item.entry.id == "vitpose" && i.inputTensorCount == 2)) { "Entrées auxiliaires non décrites pour cette conversion" }
+            val dynamicContract=File(file.parentFile,"runtime_contract.json").takeIf{it.isFile}?.let{
+                com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(Any::class.java).fromJson(it.readText()) as? Map<*,*>
+            }
+            val dynamic=i.getInputTensor(0).shapeSignature().any{it<0}
+            if(dynamic) {
+                require(dynamicContract!=null){"Dimensions dynamiques : runtime_contract.json requis"}
+                require(dynamicContract["task"] in setOf("classification + visual embeddings","object detection"))
+                i.resizeInput(0,intArrayOf(1,3,224,224),true);i.allocateTensors()
+            }
             val input = i.getInputTensor(0)
             val shape = input.shape().toList()
             require(shape.size == 4 && shape[0] == 1) { "Entrée image 4D batch=1 attendue" }
@@ -106,8 +133,19 @@ object CommunityModelCatalog {
                 mean = 0f, std = 1f, channelMean = if (channels == 3) listOf(123.675f,116.28f,103.53f) else emptyList(),
                 channelStd = if (channels == 3) listOf(58.395f,57.12f,57.375f) else emptyList(), threshold = .1f
             )
+            if(dynamic && dynamicContract!!["task"]=="classification + visual embeddings") {
+                val sourceConfig=File(file.parentFile,"config.json")
+                require(sourceConfig.isFile()){"Prétraitement upstream absent"}
+                val metadata=com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(Any::class.java).fromJson(sourceConfig.readText()) as Map<*,*>
+                val prep=metadata["pretrained_cfg"] as Map<*,*>
+                val bounds=(dynamicContract!!["report"] as Map<*,*>)["spatial_bounds"] as Map<*,*>
+                require(i.outputTensorCount>=2 && i.getOutputTensor(1).shape().size==2)
+                return common.copy(task="embedding",adapter="embedding",outputIndex=1,embeddingOutputIndex=1,
+                    channelMean=(prep["mean"] as List<*>).map{(it as Number).toFloat()*255},channelStd=(prep["std"] as List<*>).map{(it as Number).toFloat()*255},
+                    cropFraction=(prep["crop_pct"] as Number).toFloat(),dynamicMinSize=(bounds["min"] as Number).toInt(),dynamicMaxSize=(bounds["max"] as Number).toInt(),dynamicStride=(bounds["stride"] as Number).toInt()).also(ModelContract::validate)
+            }
             return when(item.entry.id) {
-                "dinov2" -> common.copy(task="embedding", adapter="embedding", outputIndex=0)
+                "dinov2" -> common.copy(task="embedding", adapter="embedding", outputIndex=0,embeddingOutputIndex=0,patchOutputIndex=1,cropFraction=.875f)
                 "vitpose" -> {
                     require(i.outputTensorCount >= 1)
                     val out = i.getOutputTensor(0).shape().toList()
@@ -117,7 +155,11 @@ object CommunityModelCatalog {
                         out.size == 4 && out[3] == labels.size -> "NHWC"
                         else -> error("Sortie ViTPose inattendue : $out")
                     }
-                    common.copy(task="pointing",adapter="heatmap",labels=labels,outputIndex=0,outputLayout=layout,scoreActivation="none",threshold=.05f,resizeMode="stretch")
+                    common.copy(task="pointing",adapter="heatmap",labels=labels,outputIndex=0,outputLayout=layout,scoreActivation="clamp",threshold=.05f,resizeMode="stretch",extraIntInputs=if(i.inputTensorCount==2)mapOf("1" to listOf(0)) else emptyMap())
+                }
+                "rfdetr" -> {
+                    require(i.outputTensorCount==2 && i.getOutputTensor(0).shape().toList()==listOf(1,300,4) && i.getOutputTensor(1).shape().toList()==listOf(1,300,91))
+                    common.copy(task="object_detection",adapter="rfdetr",resizeMode="stretch",labels=cocoSlots,outputIndexBoxes=0,outputIndexScores=1,threshold=.35f)
                 }
                 else -> common
             }.also(ModelContract::validate)

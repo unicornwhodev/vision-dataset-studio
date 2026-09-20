@@ -85,12 +85,15 @@ object AdaptiveCorrection {
                 }
                 "box" -> {
                     val head=groups[groupKey(p.source,p.label,"box")]?.head
-                    val cx=(p.xmin+p.xmax)/2.0;val cy=(p.ymin+p.ymax)/2.0;val w=(p.xmax-p.xmin).toDouble();val h=(p.ymax-p.ymin).toDouble()
+                    val x1=p.modelXmin ?: p.xmin;val y1=p.modelYmin ?: p.ymin
+                    val x2=p.modelXmax ?: p.xmax;val y2=p.modelYmax ?: p.ymax
+                    val cx=(x1+x2)/2.0;val cy=(y1+y2)/2.0;val w=(x2-x1).toDouble();val h=(y2-y1).toDouble()
                     val delta=predict(head,doubleArrayOf(1.0,cx-.5,cy-.5,w,h,p.score-.5))
                     if(delta==null || delta.size<4)p else {
                         val ncx=(cx+delta[0]).coerceIn(0.0,1.0);val ncy=(cy+delta[1]).coerceIn(0.0,1.0)
                         val nw=(w+delta[2]).coerceIn(.001,1.0);val nh=(h+delta[3]).coerceIn(.001,1.0)
-                        p.copy(xmin=(ncx-nw/2).coerceIn(0.0,1.0).toFloat(),ymin=(ncy-nh/2).coerceIn(0.0,1.0).toFloat(),xmax=(ncx+nw/2).coerceIn(0.0,1.0).toFloat(),ymax=(ncy+nh/2).coerceIn(0.0,1.0).toFloat(),correctionGeneration=head?.generation)
+                        p.copy(xmin=(ncx-nw/2).coerceIn(0.0,1.0).toFloat(),ymin=(ncy-nh/2).coerceIn(0.0,1.0).toFloat(),xmax=(ncx+nw/2).coerceIn(0.0,1.0).toFloat(),ymax=(ncy+nh/2).coerceIn(0.0,1.0).toFloat(),correctionGeneration=head?.generation,
+                            modelXmin=x1,modelYmin=y1,modelXmax=x2,modelYmax=y2)
                     }
                 }
                 else -> p
@@ -98,4 +101,3 @@ object AdaptiveCorrection {
         }
     }
 }
-

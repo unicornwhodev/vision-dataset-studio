@@ -19,7 +19,8 @@ enum class AcquisitionStatus {
     DOWNLOADING,
     AVAILABLE,
     ERROR_RETRYABLE,
-    ERROR_FATAL
+    ERROR_FATAL,
+    DUPLICATE
 }
 
 enum class AnnotationStatus {
@@ -28,7 +29,8 @@ enum class AnnotationStatus {
     IN_PROGRESS,
     VALIDATED,
     REJECTED,
-    DEFERRED
+    DEFERRED,
+    DUPLICATE
 }
 
 enum class SyncStatus {
@@ -85,7 +87,8 @@ data class BoxTarget(
     val modelXmax: Float? = null,
     val modelYmax: Float? = null,
     val explicitlyAdjusted: Boolean = false,
-    val correctionGeneration: Int? = null
+    val correctionGeneration: Int? = null,
+    val modelCoordinatesVersion: Int = 0
 )
 
 @JsonClass(generateAdapter = true)

@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 import sys
 import tarfile
@@ -26,10 +27,17 @@ def child(root: Path, relative: str) -> Path:
     return result
 
 
+def batch_files(root: Path, filename: str) -> list[Path]:
+    # Both historical exports and project-scoped Android exports are canonical V2.
+    return sorted(p for p in root.glob(f'batches/*/{filename}')
+                  if re.fullmatch(r'(?:p-\d+-)?batch-\d+', p.parent.name)
+                  and p.resolve().is_relative_to(root.resolve()))
+
+
 def read_records(root: Path) -> list[tuple[Path, dict[str, Any]]]:
-    paths = sorted(root.glob('batches/batch-*/annotations.jsonl'))
+    paths = batch_files(root, 'annotations.jsonl')
     if not paths:
-        raise ValueError('No V2 batches/batch-*/annotations.jsonl found. Pass the extracted archive root.')
+        raise ValueError('No V2 batch annotations found. Pass the extracted archive root.')
     records, seen = [], set()
     for path in paths:
         with path.open(encoding='utf-8') as source:
@@ -67,7 +75,7 @@ def read_records(root: Path) -> list[tuple[Path, dict[str, Any]]]:
 
 def validate_batch(batch_dir: str | Path) -> bool:
     root = Path(batch_dir).resolve()
-    manifests = sorted(root.glob('batches/batch-*/manifest.json'))
+    manifests = batch_files(root, 'manifest.json')
     if not manifests:
         raise ValueError('No V2 manifest found. Legacy exports require their legacy validator.')
     records = read_records(root)

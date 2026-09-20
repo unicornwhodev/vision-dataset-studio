@@ -78,6 +78,8 @@ fun StudioRoot(viewModel: MainViewModel) {
                             is Screen.BatchGrid -> BatchGridScreen(viewModel)
                             is Screen.AnnotationEditor -> AnnotationEditorScreen(s.sampleId, viewModel)
                             is Screen.Models -> ModelLibraryScreen(viewModel)
+                            is Screen.Training -> TrainingScreen(viewModel)
+                            is Screen.Similarity -> SimilarityScreen(viewModel)
                             is Screen.Publication -> PublicationScreen(viewModel)
                             is Screen.QualityDashboard -> QualityDashboardScreen(viewModel)
                             is Screen.Preferences -> StudioPreferencesScreen(viewModel)

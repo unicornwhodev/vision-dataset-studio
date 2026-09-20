@@ -48,7 +48,19 @@ data class ModelConfig(
     val prompt: String = "",
     val captionLanguage: String = "fr",
     val httpTimeoutSeconds: Int = 60,
-    val schemaVersion: Int = 1
+    val schemaVersion: Int = 1,
+    val extraIntInputs: Map<String, List<Int>> = emptyMap(),
+    val embeddingOutputIndex: Int = -1,
+    val patchOutputIndex: Int = -1,
+    val cropFraction: Float = 1f,
+    val dynamicMinSize: Int = 1,
+    val dynamicMaxSize: Int = 2048,
+    val dynamicStride: Int = 1,
+    val bundleKind: String = "",
+    val promptPoint: List<Float> = emptyList(),
+    val promptBox: List<Float> = emptyList(),
+    val training: TrainingContract? = null,
+    val trainingCheckpoint: String = ""
 ) {
     companion object {
         fun defaultDetectionPreset(labels: List<String> = listOf("person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light")): ModelConfig {
@@ -81,6 +93,27 @@ data class ModelConfig(
     }
 }
 
+/** Explicit converter/app interface. An inference-only graph is never made trainable by this JSON. */
+@JsonClass(generateAdapter = true)
+data class TrainingContract(
+    val trainSignature: String = "train",
+    val inferSignature: String = "infer",
+    val saveSignature: String = "save",
+    val restoreSignature: String = "restore",
+    val imageInput: String = "x",
+    val targetInput: String = "y",
+    val lossOutput: String = "loss",
+    val checkpointInput: String = "checkpoint_path",
+    val learningRateInput: String = "",
+    val inferOutputs: List<String> = emptyList(),
+    val targetEncoding: String = "one_hot",
+    val targetShape: List<Int> = emptyList(),
+    val weightProbeSignature: String = "",
+    val weightProbeOutput: String = "",
+    val weightProbeInput: String = "probe",
+    val scope: String = "converter_declared"
+)
+
 data class ModelProposal(
     val type: String, // box, point, tag, caption, vqa, count
     val label: String,
@@ -99,7 +132,11 @@ data class ModelProposal(
     val modelY: Float? = null,
     val boxWidth: Float = 0f,
     val boxHeight: Float = 0f,
-    val correctionGeneration: Int? = null
+    val correctionGeneration: Int? = null,
+    val modelXmin: Float? = null,
+    val modelYmin: Float? = null,
+    val modelXmax: Float? = null,
+    val modelYmax: Float? = null
 )
 
 data class DryRunResult(

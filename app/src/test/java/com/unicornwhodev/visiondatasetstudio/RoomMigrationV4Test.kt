@@ -15,8 +15,8 @@ import org.robolectric.annotation.Config
 @Config(sdk=[28])
 class RoomMigrationV4Test {
     private fun loadFixture(version:Int):String=javaClass.classLoader!!.getResourceAsStream("legacy-v$version.sql")!!.bufferedReader().use{it.readText()}
-    @Test fun version1To3(){exercise(1)}
-    @Test fun version2To3(){exercise(2)}
+    @Test fun version1To4(){exercise(1)}
+    @Test fun version2To4(){exercise(2)}
     private fun seed(raw:android.database.sqlite.SQLiteDatabase,table:String,overrides:Map<String,Any?>) {
         val values=android.content.ContentValues()
         raw.rawQuery("PRAGMA table_info($table)",null).use { cursor -> while(cursor.moveToNext()) {
@@ -42,9 +42,9 @@ class RoomMigrationV4Test {
         var database:AppDatabase?=null
         try {
             val opened=Room.databaseBuilder(context,AppDatabase::class.java,name).allowMainThreadQueries()
-                .addMigrations(AppDatabase.MIGRATION_1_2,AppDatabase.MIGRATION_2_3).build()
+                .addMigrations(AppDatabase.MIGRATION_1_2,AppDatabase.MIGRATION_2_3,AppDatabase.MIGRATION_3_4).build()
             database=opened
-            assertEquals(3,opened.openHelper.writableDatabase.version) // KSP-generated Room schema validation is executed here.
+            assertEquals(4,opened.openHelper.writableDatabase.version) // KSP-generated Room schema validation is executed here.
             runBlocking {
                 assertEquals(123456L,opened.projectDao().getProjectSync(7)!!.lastRowCursor)
                 assertEquals(json,opened.annotationDao().getAnnotationSync("sample")!!.dataJson)

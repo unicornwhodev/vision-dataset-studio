@@ -15,6 +15,19 @@ class LiteRtEngine : AutoCloseable {
         private set
     var lastNativeDurationNanos:Long?=null
         private set
+    var lastEmbedding: FloatArray? = null
+        private set
+    var lastPatches: TensorValues? = null
+        private set
+    var lastTransform: InputTransform? = null
+        private set
+    var embeddingSpaceHash: String = ""
+        private set
+    private var bundle:LiteRtBundle?=null
+    var lastNote:String=""
+        private set
+    val lastMask:Bitmap? get()=bundle?.mask
+    private var trainingSession:LiteRtTrainingSession?=null
     private var interpreter: Interpreter?=null
     private var currentModelPath: String?=null
     private var modelHash=""
@@ -27,31 +40,60 @@ class LiteRtEngine : AutoCloseable {
             require(file.isFile && file.length()>8 && threads in 1..8)
             if(currentModelPath==file.absolutePath && interpreter!=null && currentThreads==threads) return@synchronized true
             close()
-            interpreter=Interpreter(file,Interpreter.Options().setNumThreads(threads).setCancellable(true))
+            if(file.extension=="json")bundle=LiteRtBundle(file) else interpreter=Interpreter(file,LiteRtOptions.forFile(file,threads).setCancellable(true))
             currentModelPath=file.absolutePath;currentThreads=threads;modelHash=HashUtils.computeSha256(file)
             true
         } catch(e:Exception) { lastError=e.message ?: "Modèle non chargeable";close();false }
     }
     fun tensorReport():String = synchronized(lock) {
+        bundle?.let{return@synchronized "Bundle ${it.manifest.kind} · ${it.manifest.revision} · ${it.manifest.files.size} fichiers vérifiés"}
         val i=interpreter ?: error("Aucun modèle chargé")
         buildString {
             appendLine("Runtime CPU · $currentThreads threads · SHA-256 $modelHash")
+            appendLine("Signatures : ${i.signatureKeys.joinToString()}")
             for(n in 0 until i.inputTensorCount) { val t=i.getInputTensor(n);appendLine("input[$n] ${t.name()} ${t.shape().toList()} ${t.dataType()} q=${t.quantizationParams().scale}/${t.quantizationParams().zeroPoint}") }
             for(n in 0 until i.outputTensorCount) { val t=i.getOutputTensor(n);appendLine("output[$n] ${t.name()} ${t.shape().toList()} ${t.dataType()} q=${t.quantizationParams().scale}/${t.quantizationParams().zeroPoint}") }
         }
     }
     suspend fun runInference(bitmap:Bitmap,config:ModelConfig):List<ModelProposal> = withContext(Dispatchers.Default) {
-        lastError=null;lastNativeDurationNanos=null
+        lastError=null;lastNativeDurationNanos=null;lastNote="";lastEmbedding=null;lastPatches=null;lastTransform=null
         try {
             ModelContract.validate(config)
+            embeddingSpaceHash=AdaptiveCorrection.hash(modelHash+config.toString())
             if(config.runtime=="local_http") return@withContext localClient.run(bitmap,config)
+            if(config.bundleKind.isNotBlank()) {
+                val runtime=requireNotNull(bundle){"Bundle non chargé"};require(runtime.manifest.kind==config.bundleKind)
+                val result=runtime.run(bitmap,config);lastEmbedding=runtime.embedding;lastNote=runtime.note
+                return@withContext result.map{it.copy(source="model_litert:$modelHash:${config.bundleKind}")}
+            }
             synchronized(lock) {
+                if(config.training!=null) {
+                    if(trainingSession==null) {
+                        val file=File(requireNotNull(currentModelPath))
+                        interpreter?.close();interpreter=null
+                        trainingSession=LiteRtTrainingSession(file,config)
+                        if(config.trainingCheckpoint.isNotBlank()) {
+                            val receipt=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.readCheckpoint(file,config.trainingCheckpoint)
+                            trainingSession!!.restore(receipt)
+                            modelHash=AdaptiveCorrection.hash(modelHash+receipt.files.toSortedMap().toString())
+                        }
+                    }
+                    val tensors=trainingSession!!.infer(bitmap).mapIndexed{i,v->i to v}.toMap()
+                    val transform=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config),config.cropFraction)
+                    return@synchronized ModelAdapters.decode(tensors,config,transform).map{it.copy(source="model_litert:$modelHash:trained")}
+                }
                 val i=interpreter ?: error("Aucun modèle chargé")
-                require(i.inputTensorCount==1) { "Cet adaptateur prend une seule entrée image; modèle multi-entrée non adapté" }
+                require(i.inputTensorCount==1+config.extraIntInputs.size) { "Nombre d’entrées différent du contrat" }
                 val expected=if(config.inputLayout=="NHWC") intArrayOf(1,config.inputHeight,config.inputWidth,config.inputChannels) else intArrayOf(1,config.inputChannels,config.inputHeight,config.inputWidth)
+                if(!i.getInputTensor(0).shape().contentEquals(expected)) {
+                    require(config.inputWidth in config.dynamicMinSize..config.dynamicMaxSize && config.inputHeight in config.dynamicMinSize..config.dynamicMaxSize)
+                    require(config.inputWidth%config.dynamicStride==0 && config.inputHeight%config.dynamicStride==0)
+                    i.resizeInput(0,expected,true);i.allocateTensors()
+                }
                 val input=i.getInputTensor(0)
                 require(input.shape().contentEquals(expected) && input.dataType().name==config.inputType) { "Forme/type d’entrée différents du contrat. Inspectez les tenseurs." }
-                val t=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config))
+                val t=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config),config.cropFraction)
+                lastTransform=t
                 val fitted=Bitmap.createBitmap(config.inputWidth,config.inputHeight,Bitmap.Config.ARGB_8888)
                 val pixels=IntArray(config.inputWidth*config.inputHeight)
                 try {
@@ -60,19 +102,39 @@ class LiteRtEngine : AutoCloseable {
                     fitted.getPixels(pixels,0,config.inputWidth,0,0,config.inputWidth,config.inputHeight)
                 } finally { fitted.recycle() }
                 val buffer=TensorCodec.encode(pixels,config,input.quantizationParams().scale,input.quantizationParams().zeroPoint)
-                val indices=if(ModelContract.adapter(config)=="ssd") listOf(config.outputIndexBoxes,config.outputIndexClasses,config.outputIndexScores,config.outputIndexCount).filter{it>=0} else listOf(config.outputIndex)
+                val baseIndices=when(ModelContract.adapter(config)) {
+                    "ssd" -> listOf(config.outputIndexBoxes,config.outputIndexClasses,config.outputIndexScores,config.outputIndexCount).filter{it>=0}
+                    "rfdetr" -> listOf(config.outputIndexBoxes,config.outputIndexScores)
+                    else -> listOf(config.outputIndex)
+                }
+                val indices=(baseIndices+listOf(config.embeddingOutputIndex,config.patchOutputIndex).filter{it>=0}).distinct()
                 require(indices.distinct().size==indices.size) { "Indices de sorties dupliqués" }
                 require(indices.all{it<i.outputTensorCount}) { "Sortie demandée absente du modèle" }
                 val bytes=indices.sumOf{i.getOutputTensor(it).numBytes().toLong()}
                 require(bytes<=64L*1024*1024) { "Sorties trop volumineuses pour le budget mémoire de l’adaptateur" }
                 val outputs=indices.associateWith { ByteBuffer.allocateDirect(i.getOutputTensor(it).numBytes()).order(ByteOrder.nativeOrder()) }
                 val outputObjects=outputs.mapValues{it.value as Any}.toMutableMap()
-                i.runForMultipleInputsOutputs(arrayOf(buffer),outputObjects)
+                val inputs=Array<Any>(i.inputTensorCount){index->
+                    if(index==0) buffer else {
+                        val values=config.extraIntInputs[index.toString()] ?: error("Entrée auxiliaire $index absente")
+                        val tensor=i.getInputTensor(index)
+                        require(tensor.dataType().name=="INT32" && tensor.numElements()==values.size)
+                        ByteBuffer.allocateDirect(values.size*4).order(ByteOrder.nativeOrder()).apply { values.forEach(::putInt);rewind() }
+                    }
+                }
+                i.runForMultipleInputsOutputs(inputs,outputObjects)
                 lastNativeDurationNanos=i.lastNativeInferenceDurationNanoseconds
                 val tensors=outputs.mapValues { (idx,buf) ->
                     val out=i.getOutputTensor(idx);val shape=out.shape().toList()
                     TensorValues(shape,TensorCodec.decode(buf,out.dataType().name,shape.fold(1){a,b->a*b},out.quantizationParams().scale,out.quantizationParams().zeroPoint))
                 }
+                val embeddingIndex=if(config.embeddingOutputIndex>=0)config.embeddingOutputIndex else if(ModelContract.adapter(config)=="embedding")config.outputIndex else -1
+                if(embeddingIndex>=0)lastEmbedding=tensors.getValue(embeddingIndex).values.copyOf().also { values->
+                    require(values.size in 1..8192 && values.all(Float::isFinite))
+                    val norm=kotlin.math.sqrt(values.sumOf{it.toDouble()*it}).toFloat()
+                    require(norm>1e-9f);values.indices.forEach{values[it]/=norm}
+                }
+                if(config.patchOutputIndex>=0)lastPatches=tensors.getValue(config.patchOutputIndex)
                 val configHash=java.security.MessageDigest.getInstance("SHA-256").digest(config.toString().toByteArray()).joinToString(""){"%02x".format(it)}.take(16)
                 ModelAdapters.get(ModelContract.adapter(config)).decode(tensors,config,t).map{it.copy(source="model_litert:$modelHash:$configHash")}
             }
@@ -84,6 +146,6 @@ class LiteRtEngine : AutoCloseable {
         return DryRunResult(lastError==null,if(config.runtime=="local_http") "HTTP loopback · serveur utilisateur" else "LiteRT Interpreter CPU · $currentThreads threads",(System.nanoTime()-start)/1_000_000,proposals,lastError)
     }
     override fun close() = synchronized(lock) {
-        interpreter?.close();interpreter=null;currentModelPath=null
+        bundle?.close();bundle=null;trainingSession?.close();trainingSession=null;interpreter?.close();interpreter=null;currentModelPath=null
     }
 }
