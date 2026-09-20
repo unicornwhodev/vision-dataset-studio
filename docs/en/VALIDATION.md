@@ -46,4 +46,4 @@ The trainable test model is synthetic. No production HF training conversion is y
 
 The exact-image ledger is scoped to a project on one installation. It does not guarantee detection of cropped, edited or lossy-recompressed near-duplicates. Old already-purged images retain only the hashes previously available.
 
-Publication of the source repository is authorized after secret checks. Packages and releases have not been published. Passing the checks above does not qualify the complete product for a stable release.
+The source repository is public. Qualification artifacts use the tested pod build; publishing them does not qualify a stable release. The GitHub Actions attempt was blocked before any job started by an account billing issue. The OCI package is a qualification archive; the prepared build image has not been built or validated.

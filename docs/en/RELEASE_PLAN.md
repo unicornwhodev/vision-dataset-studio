@@ -20,7 +20,25 @@ Every published artifact must match its build receipt. Release notes must identi
 
 After a clean committed CI build, `python3 tools/package_qualification.py` verifies the successful receipt and APK hashes, requires the matching `github_sha`, and creates the qualification ZIP under `dist/packages/`. It must not be bypassed using a fabricated CI SHA. No package or release has been published.
 
-The owner has also requested a release and a GHCR package. The manual
+**Actual outcome:** the [first Actions attempt](https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35478811998)
+was refused before execution because of an account billing issue. The build image has
+not been built or published. The prerelease uses the tested pod build.
+`tools/package_pod_qualification.py` checks all 155 source hashes at the tested commit,
+unchanged Android code, APK bytes and the 14+2 Android evidence. It does not invent a CI
+receipt or bypass the separate CI package guard.
+
+`ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2` is an OCI artifact
+containing the qualification ZIP, not a runnable build image. Download it with:
+
+```bash
+oras pull ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2
+```
+
+New GHCR packages are private by default; visibility is separate from the GitHub
+repository. If needed, the owner changes it to public in package settings. The public
+GitHub release also provides the same files and SHA-256 checksums.
+
+For the future build image, the manual
 `publish-qualification.yml` workflow builds `packaging/Dockerfile`, actually compiles
 the app inside it and runs JVM/lint checks. It publishes that same image at
 `ghcr.io/unicornwhodev/vision-dataset-studio-build` and creates a **prerelease** with

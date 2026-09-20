@@ -55,7 +55,26 @@ en échec sur le pod a été vérifié ; aucun ZIP de qualification n’a été 
 
 ## Publication de qualification autorisée
 
-Le propriétaire a également demandé la release et le package GHCR. Le workflow manuel
+**État réel :** le [premier lancement Actions](https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35478811998)
+a été refusé avant exécution pour un problème de facturation du compte. L’image de build
+décrite ci-dessous n’a donc pas été construite ni publiée. La prérelease utilise le build
+du pod déjà testé. `tools/package_pod_qualification.py` vérifie les 155 empreintes au
+commit testé, l’absence de changement du code Android, les deux APK et les preuves 14+2
+tests ; aucun reçu CI n’est inventé et le contrôle du paquet CI reste intact.
+
+Le package `ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2`
+contient le ZIP des APK et de la documentation, au format OCI. Il s’extrait avec ORAS :
+
+```bash
+oras pull ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2
+```
+
+Ce paquet n’est pas une image exécutable avec `docker run`. Un package GHCR nouvellement
+créé est privé par défaut ; sa visibilité est distincte de celle du dépôt GitHub.
+Si nécessaire, le propriétaire la change en public dans les paramètres du package.
+La release GitHub publique fournit aussi les mêmes fichiers et leurs SHA-256.
+
+Pour la future image de build, le workflow manuel
 `publish-qualification.yml` construit l’image `packaging/Dockerfile`, compile réellement
 l’application dans celle-ci et exécute les tests JVM/lint. Il publie cette même image
 sur `ghcr.io/unicornwhodev/vision-dataset-studio-build` et crée une **prérelease** avec

@@ -30,6 +30,6 @@ Les templates/packs configurent tâches, classes, prompts et modèle ; ils ne so
 
 Aucun poids n’est embarqué dans l’APK. Le build contrôle les extensions et signatures de poids et écrit `app-contents.json`. L’APK Debug universelle reste volumineuse à cause des bibliothèques natives de quatre architectures ; des APK par ABI et une release optimisée sont à préparer.
 
-La CI API 28/35, un téléphone ARM, la RAM, la latence et les contraintes thermiques restent à qualifier. Le pod n’a pas KVM : l’émulateur logiciel sert à la vérification fonctionnelle, pas aux performances. Le push des sources est autorisé ; aucun package ni release stable n’est publié.
+La CI API 28/35, un téléphone ARM, la RAM, la latence et les contraintes thermiques restent à qualifier. Le pod n’a pas KVM : l’émulateur logiciel sert à la vérification fonctionnelle, pas aux performances. Les sources sont publiées. La distribution est une prérelease Debug de qualification et un paquet OCI, sans image de build qualifiée. Le lancement GitHub Actions a été refusé pour un problème de facturation du compte ; aucun job CI n’a exécuté de tests.
 
 La licence du code est Apache-2.0. Les licences des modèles/datasets et les notices transitives restent indépendantes. Le changement d’applicationId ne migre pas les données d’une autre application.

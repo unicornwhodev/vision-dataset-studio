@@ -104,20 +104,23 @@
   },
   "ci": {
     "prepared": true,
-    "published": false,
+    "published": true,
     "executed": false,
     "api_levels": [
       28,
       35
     ],
     "publishes_release": false,
-    "requires_hf_secret": false
+    "requires_hf_secret": false,
+    "attempted": true,
+    "blocker": "GitHub Actions account billing lock; job not started",
+    "run_url": "https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35478811998"
   },
   "data_transition": {
     "in_place_update_from_previous_application_id": false,
     "cross_application_data_import_implemented": false
   },
-  "remote_repository_modified": false,
+  "remote_repository_modified": true,
   "workstation": {
     "project_path": "/workspace/projects/vision-dataset-studio",
     "persistent_volume": true,
@@ -245,6 +248,14 @@
     "visibility": "public",
     "tested_source_commit": "680a2b78876b1d670671421fd3ef97b8268e22c0",
     "secret_review": "docs/PUBLICATION_CHECKS.md",
-    "status": "prepared"
+    "status": "published",
+    "repository_commit": "99c4a33b596540f9c92e04e118d6e81dcb896292"
+  },
+  "distribution": {
+    "kind": "pod-tested debug prerelease",
+    "source_proof": "tools/package_pod_qualification.py",
+    "oci_package": "ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2",
+    "oci_kind": "qualification archive, not a runnable build image",
+    "build_image_status": "prepared, not built; GitHub Actions billing lock"
   }
 }
