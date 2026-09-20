@@ -1,62 +1,35 @@
-# V4.2 RC2 — limitations actuelles
+# Limites de qualification — 4.2.0-rc2
 
-## Complétude fonctionnelle
+## Production par lots
 
-L’[audit de complétude](docs/IMPLEMENTATION_AUDIT.md) confirme que le modèle visuel
-n’est pas réentraîné : seul un correcteur géométrique local se déclenche manuellement.
-Il reproduit une perte des coordonnées brutes des boîtes après correction adaptative.
-Les points ont passé un essai Android d’apprentissage/persistance sur données synthétiques.
+Le cycle local 2+1, l’exclusion des copies identiques/renommées, l’export, la purge et la réouverture Room ont passé un essai instrumenté API 28. Les empreintes persistent par projet. Les images modifiées avec pertes, recadrées ou retouchées ne sont pas couvertes par la garantie d’identité exacte ; les anciennes images déjà purgées ne disposent que des empreintes de fichiers conservées. Voir [BATCH_PRODUCTION.md](docs/BATCH_PRODUCTION.md).
 
-Les six presets et les packs sont des configurations, sans moteur de workflows.
-Le prompt est conservé et transmis, mais aucun agent, serveur VLM ou appel d’outils
-n’est intégré. Les embeddings ne sont ni exposés ni stockés pour similarité,
-clustering ou apprentissage actif. Les bundles multi-graphes ne sont pas exécutables.
+Le fournisseur SAF injecté passe ses quatre scénarios de lecture/écriture défaillante. Il ne remplace pas une recette DocumentsUI et fournisseurs cloud avec octroi/révocation réel de permissions persistantes. Les migrations 1/2/3 → 4 ont passé Room sur Android ; les bases v1/v2 restent des fixtures reconstruites. Une base issue d’une ancienne installation réelle reste à tester.
 
-Le validateur Python fourni cherche encore `batches/batch-*` et refuse les archives
-Android actuelles sous `batches/p-<projet>-batch-*`. Le ZIP synthétique contrôlé est
-intact ; le défaut concerne l’intégration export/validation et reste à corriger.
+Les réservations HF, conflits de commits, réponse perdue, publication distante et nettoyage après perte de réseau ne sont pas qualifiés sur un dépôt de test autorisé. Aucun dépôt existant n’a reçu d’écritures de QA.
 
-## Bloquants de qualification
+## Apprentissage facultatif Android
 
-Deux APK Debug réelles sont produites et vérifiées. Compose/Room/Moshi/LiteRT
-compilent ; le schéma Room v3 est généré par KSP. Le build global reste en échec :
-25/26 tests JVM Android réussissent ; la reprise d’un téléchargement interrompu
-échoue dans `HfTransferV4Test.disconnectedDownloadResumesHashedPrefix`. Lint :
-0 erreur, 68 avertissements. Voir `docs/POD_VALIDATION.md` pour les preuves et
-les résultats instrumentés. Sur API 28, les deux migrations et l’identité ont
-réussi avant le blocage de la suite SAF : `SafFaultProvider` ne trouve pas
-`kotlin.jvm.internal.Intrinsics` dans le processus de l’APK de tests.
+L’apprentissage est désactivé par défaut. Il utilise uniquement le lot terminé dont l’export a été vérifié. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; annulation et erreur conservent les images. L’activation des nouveaux poids reste manuelle.
 
-Les schémas Room JSON historiques v1/v2 ne sont pas disponibles ; les fixtures
-SQL sont reconstruites, pas récupérées sur une installation. Une mise à jour
-depuis des bases réellement utilisées reste nécessaire.
+Un petit réseau de contrôle a réellement modifié ses poids internes, diminué sa perte et reproduit ses sorties après sauvegarde/rechargement sur Android. Ce résultat ne qualifie aucune conversion HF de production. Les conversions entraînables annoncées par le propriétaire doivent encore être importées et éprouvées avec leur contrat réel.
 
-Le pod n’a pas KVM. L’émulateur AOSP démarre et affiche l’application, mais le
-premier affichage a pris environ 28 secondes et des blocages System UI ont été
-observés. La refonte corrige les onglets comprimés : « Importer » est maintenant
-lisible et accessible à 320 dp. Les captures et la recette de l’interface sont
-décrites dans `docs/UI_REDESIGN.md`. L’émulation ne remplace pas une recette sur téléphone.
+Le chemin Interpreter/Flex emploie LiteRT 1.4.2 et Select TF Ops 2.16.1. L’intégration LiteRT 2.2 essayée n’expose pas l’API Java Delegate requise ; sa sauvegarde FlexSave a échoué. Les opérateurs des conversions HF récentes doivent être vérifiés sous le runtime retenu. GPU/NPU et apprentissage distribué ne sont pas intégrés.
 
-Pas de test HF de bout en bout, ni injection de panne réelle sur Android, ni mesure RAM/inférence sur téléphone. Les helpers JVM et le stress SQLite hôte n’établissent pas ces succès.
+Le lot doit contenir au moins 32 images d’apprentissage et 8 de contrôle selon le partage déterministe par hash. Les cibles sont limitées à quatre millions de valeurs par lot pour borner la mémoire. Les signatures d’apprentissage à entrées texte ou masques auxiliaires ne sont pas prises en charge. Un contrôle réutilisé n’est pas une mesure sur corpus indépendant.
 
-## Stockage et transferts
+## Modèles et fonctions complémentaires
 
-Le moteur travaille au premier plan ; pas de garantie de continuation après arrêt du processus. La reprise nécessite une relance et la conservation des fichiers/checkpoints/permissions. Pas d’upload LFS reprenable à l’octet. Les URLs signées renouvelées peuvent redémarrer un téléchargement. Pas de garantie matérielle universelle contre une coupure d’alimentation.
+Les adaptateurs multi-graphes TinyCLIP, EfficientViT-SAM et Florence-2, les tokeniseurs et l’index de similarité sont implémentés. La tokenisation et la persistance de l’index passent leurs tests Android. RepViT HF a exécuté son inférence avec succès sous le runtime retenu. Leur présence ne prouve pas l’exécution de tous les modèles HF : DINOv2 a dépassé dix minutes dans l’émulateur logiciel, puis a été arrêté. Les autres conversions et gros bundles restent à qualifier individuellement ; aucune précision ni performance ARM n’est annoncée.
 
-Les fichiers de travail restent dans le stockage privé. SAF sert aux sources et aux copies d’archives. Les fournisseurs sans lecture persistante ne permettent pas une clôture locale sûre. Une écriture SAF échouée peut laisser un document externe incomplet à gérer manuellement, mais n’autorise pas la purge. Aucune suppression des sources distantes n’est automatisée.
+RTMDet reste en inspection de tenseurs sans décodeur de détection intégré. Le masque SAM ne dispose pas encore d’un éditeur/export de masques. Florence utilise un décodage greedy borné ; la fidélité numérique du prétraitement et les tâches réelles restent à mesurer.
 
-Les gros dossiers SAF peuvent être lents malgré une lecture bornée ; aucune promesse de débit sur corpus massif n’est établie. Les modifications de paramètres d’un projet ne doivent pas invalider ses lots verrouillés ; tester les historiques multi-projets avant un usage réel.
+Les templates/packs configurent tâches, classes, prompts et modèle ; ils ne sont pas un moteur général d’agent ou de workflows. L’application n’embarque pas de serveur VLM autonome. Les profils HTTP locaux dépendent d’un serveur fourni séparément.
 
-## Modèles
+## Distribution
 
-Runtime CPU Interpreter conservé. Pas de CompiledModel/GPU/NPU intégré. SSD MobileNet V1, EfficientDet Lite0 et MobileNet V1 classification ont été téléchargés et exécutés sur l’émulateur API 28 ; aucune précision métier ou performance ARM n’est établie. Le catalogue UWD est résolu dynamiquement au SHA du dépôt. À la révision auditée : six familles publiées sur 22 références configurées, trois téléchargeables, poids communautaires non exécutés par cet audit. L’import inspecte les tenseurs et peut refuser un modèle inattendu. La bibliothèque ne garantit ni exactitude métier ni licence universelle de redistribution.
+Aucun poids n’est embarqué dans l’APK. Le build contrôle les extensions et signatures de poids et écrit `app-contents.json`. L’APK Debug universelle reste volumineuse à cause des bibliothèques natives de quatre architectures ; des APK par ABI et une release optimisée sont à préparer.
 
-Pas de VLM intégré ; le client HTTP exige un serveur séparé sur le même appareil et reste loopback-only. Les mesures mémoire du client n’incluent pas ce serveur. Aucun poids privé ni modèle de pointing non vérifié n’est fourni.
+La CI API 28/35, un téléphone ARM, la RAM, la latence et les contraintes thermiques restent à qualifier. Le pod n’a pas KVM : l’émulateur logiciel sert à la vérification fonctionnelle, pas aux performances. Le push des sources est autorisé ; aucun package ni release stable n’est publié.
 
-## Hors périmètre maintenu
-
-Pas de lecteur Parquet natif avec pixels embarqués, import COCO/YOLO universel, vidéo, segmentation/masques, OCR, édition de squelette, audio/3D ni annotation collaborative temps réel. Un contrat ViTPose heatmap peut produire des points, sans qualification de ce modèle ni outil complet de pose. La V4.2 ajoute des réservations coopératives HF (claim/DONE) pour éviter le travail en double, mais pas un serveur collaboratif ou des verrous instantanés. La correction adaptative géométrique reste locale et n’est pas une preuve de généralisation.
-
-## Identité et distribution
-
-L’identité Android UWD est nouvelle. Il n’y a pas de transfert automatique des bases ni des permissions depuis une application avec un autre applicationId. La licence Apache-2.0 a été choisie. Les notices transitives restent à auditer et la qualification doit être terminée avant publication de la version validée.
+La licence du code est Apache-2.0. Les licences des modèles/datasets et les notices transitives restent indépendantes. Le changement d’applicationId ne migre pas les données d’une autre application.

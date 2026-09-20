@@ -1,4 +1,43 @@
-# Tests — qualification 4.2.0-rc2 sur le pod
+# Tests courants — production par lots et apprentissage optionnel
+
+Actualisation du 20 septembre 2026 (Europe/Paris), sur le pod de compilation et son émulateur API 28 x86_64 sans KVM. L’apprentissage des tests s’exécute dans Android, aucun optimiseur sur l’hôte.
+
+## Recette finale du build 20260919T234604Z-8a3382d3e997
+
+- **26/26 tests JVM**, aucun ignoré. Lint : **0 erreur, 71 avertissements**.
+- **14/14 tests Android métier**, 90,509 s, puis **2/2 tests Compose**, 75,55 s.
+- WorkManager : **88 images acceptées du lot exporté**, 8 rejets exclus, lot voisin exclu. Interruption après 12 étapes, reprise jusqu’à 198. Perte de contrôle 0,689740 → 0,003558 sur fixture synthétique.
+- Nettoyage refusé avant la fin, puis réellement exécuté : copies d’images et snapshot supprimés, checkpoint et image du lot voisin conservés.
+- 155 fichiers sources locaux comparés à ceux du pod : **aucune différence**.
+- APK principale : SHA-256 `0fe9e90838183153b32b4a0c712eb814e4e6aa274e09cdb547a38d9e8477d73f`, **403 138 636 octets**, aucun poids détecté. APK Debug universelle, pas une release signée de distribution.
+- RepViT HF a aussi passé son test Android sous le même runtime (build précédent `…2bc826cf21ad`, test 67,051 s). Cette durée de test sur émulateur ne mesure pas la latence d’un téléphone ni la précision du modèle.
+
+Preuves : `test-results/batch-production/` (journaux, métriques, reçu de build, inventaire APK et comparaison des sources). Les essais HF complets, téléphone et CI restent à faire. Le réseau d’apprentissage est une fixture synthétique, pas une conversion HF de production qualifiée.
+
+
+## Exécution intermédiaire avant le dernier build
+
+| Contrôle | Résultat exécuté |
+|---|---|
+| Build `20260919T233636Z-2bc826cf21ad` | APK et APK de tests produites, vérifiées, installées ; contrôles JVM/lint réussis |
+| Suite Android ciblée | **13/13 réussis**, 41,464 s ; journal `test-results/batch-production/android-batch-7.log` |
+| Lots 2+1 | Deux copies exclues du second lot ; export réel, purge, réouverture de la base, curseur obsolète sans écrasement |
+| Concurrence | Une seule identité acceptée pour deux copies concurrentes ; image distincte conservée |
+| Room 1/2/3 → 4 | Trois migrations Android réussies, données et hashes conservés ; schéma v4 généré par KSP |
+| SAF injecté | Quatre tests réussis, dont copie relue, écriture refusée, lecture perdue et contenu altéré |
+| Apprentissage natif | 48 étapes Android, poids visuels internes modifiés, perte 0,685404 → 0,018374 ; checkpoint rechargé avec sorties identiques |
+| Tokeniseurs HF | Encodage/décodage comparés aux références HF épinglées |
+| Index de similarité | Recherche persistante et isolation des contrats de modèle réussies |
+| Contrôle APK sans poids | Inventaire vide ; garde de build et tests du détecteur ajoutés |
+| Reçus de build, garde sans poids | 17 tests hôte réussis ; distincts d’une compilation Android |
+
+
+
+Les problèmes HTTP du serveur de test IPv6, de fournisseur SAF Kotlin et de provenance des boîtes ont été corrigés ; leurs premiers échecs restent documentés dans l’historique suivant. Le validateur accepte désormais les ZIP Android `p-<projet>-batch-*` (7 tests hôte).
+
+---
+
+# Historique initial — qualification 4.2.0-rc2 sur le pod
 
 Exécution réelle du 19 septembre 2026, JDK 21.0.12.1+1, Gradle 9.3.1, SDK 36.
 Les résultats de préparation RC1 sont conservés dans l’archive initiale et le

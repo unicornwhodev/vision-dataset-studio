@@ -3,10 +3,10 @@
   "product": "Vision Dataset Studio",
   "brand": "Unicorn Who Dev",
   "version": "4.2.0-rc2",
-  "date": "2026-09-19",
+  "date": "2026-09-20",
   "namespace": "com.unicornwhodev.visiondatasetstudio",
   "application_id": "com.unicornwhodev.visiondatasetstudio",
-  "room_schema_version": 3,
+  "room_schema_version": 4,
   "source_only": false,
   "public_release_ready": false,
   "license": "Apache-2.0",
@@ -20,37 +20,35 @@
     "real_compose_tests_executed": true,
     "real_saf_tests_executed": true,
     "physical_device_tested": false,
-    "build_outcome": "failed_dependency_tests",
+    "build_outcome": "build_checks_passed",
     "blockers": [
-      "HfTransferV4Test.disconnectedDownloadResumesHashedPrefix: echec de reprise",
-      "SafFaultProvider: dependance Kotlin absente du processus fournisseur",
-      "Recette produit et CI API 28/35 a terminer"
+      "Qualification telephone ARM, CI API 28/35 et HF reel a terminer"
     ],
     "evidence": "docs/POD_VALIDATION.md",
     "test_apk_built": true,
     "unit_tests": {
       "total": 26,
-      "passed": 25,
-      "failed": 1
+      "passed": 26,
+      "failed": 0
     },
     "lint": {
       "errors": 0,
-      "warnings": 68
+      "warnings": 71
     },
     "room_schema_generated": true,
     "real_compose_test_scope": "Robolectric component capture and two on-device navigation/catalogue tests",
     "build_script_invoked": true,
     "instrumented_tests": {
-      "scheduled": 8,
-      "completed_passed": 3,
-      "suite_completed": false,
-      "status": "blocked_and_stopped",
-      "blocker": "SafFaultProvider: NoClassDefFoundError kotlin.jvm.internal.Intrinsics",
+      "scheduled": 16,
+      "completed_passed": 16,
+      "suite_completed": true,
+      "status": "targeted_suite_passed",
+      "blocker": null,
       "compose_separate_run": {
         "tests": 2,
         "passed": 2,
-        "build_run": "20260919T203710Z-e9cd5c4ddbbe",
-        "runtime_seconds": 75.807,
+        "build_run": "20260919T234604Z-8a3382d3e997",
+        "runtime_seconds": 75.55,
         "device_width_dp": 960
       },
       "compose_phone_run": {
@@ -59,9 +57,13 @@
         "build_run": "20260919T200729Z-bec11e4607bc",
         "runtime_seconds": 74.293,
         "device_width_dp": 320
-      }
+      },
+      "build_run": "20260919T234604Z-8a3382d3e997",
+      "scope": "production lots, concurrence, migration 1/2/3 vers 4, identite, SAF, poids internes train/save/restore, tokeniseurs, index, WorkManager export/reprise",
+      "business_tests": 14,
+      "compose_tests": 2
     },
-    "current_build_run": "20260919T203710Z-e9cd5c4ddbbe"
+    "current_build_run": "20260919T234604Z-8a3382d3e997"
   },
   "portable_tests": {
     "policy": 44,
@@ -97,7 +99,8 @@
     "studio_pack_android_roundtrip": true,
     "point_correction_store_android_fixture": true,
     "export_archive_android_produced": true,
-    "shipped_export_validator_accepts_current_android_archive": false
+    "shipped_export_validator_accepts_current_android_archive": true,
+    "community_hf_repvit_android_passed": true
   },
   "ci": {
     "prepared": true,
@@ -188,6 +191,60 @@
       "multi_graph_multimodal_runtime",
       "usable_embedding_storage_and_search"
     ],
-    "production_changed": false
+    "production_changed": false,
+    "historical": true,
+    "current_status": "See batch_production, native_training and KNOWN_LIMITATIONS.md; this audit describes the earlier commit."
+  },
+  "batch_production": {
+    "primary_workflow": "import, preannotation, human correction, verified export, optional training, cleanup, next batch",
+    "exact_deduplication_scope": "project on this installation; file and decoded pixels SHA-256",
+    "identity_survives_purge": true,
+    "android_two_plus_one_passed": true,
+    "renamed_duplicates_skipped": 2,
+    "training_default_enabled": false,
+    "training_source": "only the processed and verified exported batch",
+    "cleanup_waits_for_training_completion": true,
+    "cleanup_execution_after_training": "passed_on_android",
+    "apk_contains_weights": false,
+    "report": "docs/BATCH_PRODUCTION.md"
+  },
+  "native_training": {
+    "execution": "Android only",
+    "runtime": "LiteRT 1.4.2 + Select TF Ops 2.16.1",
+    "fixture_steps": 48,
+    "initial_loss": 0.6854044694986214,
+    "final_loss": 0.01837361347916884,
+    "internal_weights_changed": true,
+    "checkpoint_reload_matches": true,
+    "hf_production_models_qualified": false,
+    "workmanager_export_cancel_resume_passed": true,
+    "workflow_images": 88,
+    "workflow_steps": 198,
+    "workflow_initial_loss": 0.6897399500194918,
+    "workflow_final_loss": 0.003557757622006894,
+    "cleanup_after_training_passed": true
+  },
+  "additional_portable_tests": {
+    "build_evidence_and_weight_guard": 17,
+    "export_validator": 7,
+    "training_targets": 10,
+    "numeric_engine": 67
+  },
+  "documentation": {
+    "languages": [
+      "fr",
+      "en"
+    ],
+    "index": "docs/README.md",
+    "raw_evidence_language": "original",
+    "app_english_localization": false
+  },
+  "source_publication": {
+    "authorized": true,
+    "repository": "https://github.com/unicornwhodev/vision-dataset-studio",
+    "visibility": "public",
+    "tested_source_commit": "680a2b78876b1d670671421fd3ef97b8268e22c0",
+    "secret_review": "docs/PUBLICATION_CHECKS.md",
+    "status": "prepared"
   }
 }

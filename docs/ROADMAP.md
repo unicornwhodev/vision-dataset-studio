@@ -3,11 +3,28 @@
 La version de travail est **4.2.0-rc2**. Une étape ne passe à « validée » qu'avec
 une commande exécutée, son résultat et les artefacts correspondants.
 
+Le pod sert au développement, à la compilation et à la recette. L’apprentissage
+du produit reste sur Android : aucun serveur d’entraînement distant. Le contrat
+attendu des conversions est dans [LITERT_TRAINING_CONTRACT.md](LITERT_TRAINING_CONTRACT.md).
+
+## État courant
+
+| Livraison | État exécuté |
+|---|---|
+| Production locale 2+1, doublons, export et purge | Tests Android réussis |
+| Reprise HTTP, SAF injecté, migrations Room | Tests réussis |
+| Provenance des boîtes et validateur d’export | Régressions corrigées et vérifiées |
+| Apprentissage optionnel du lot exporté, reprise, nettoyage après la fin | Tests Android réussis sur fixture synthétique |
+| Tokeniseurs, similarité, RepViT HF | Tests Android réussis ; pas de mesure de précision ARM |
+| Autres conversions HF, masques, RTMDet, agent/workflows généraux | Qualification ou implémentation restante |
+
+La [version anglaise](en/ROADMAP.md) présente les mêmes priorités. La liste ci-dessous conserve les critères détaillés ; elle ne remplace pas les résultats du [rapport courant](../TEST_REPORT.md).
+
 ## Priorités issues de l’audit de complétude
 
 L’[audit du 19 septembre](IMPLEMENTATION_AUDIT.md) distingue les capacités
 existantes des fonctions demandées encore absentes. Les éléments ci-dessous
-sont **à réaliser**, pas des fonctionnalités déjà disponibles.
+doivent être lus avec le rapport de tests courant : plusieurs implémentations sont maintenant présentes, leur qualification reste distincte. La production par lots et la règle apprentissage facultatif après export/avant nettoyage priment sur les extensions.
 
 | Ordre | Livraison concrète | Critère d’acceptation |
 |---|---|---|
@@ -16,8 +33,8 @@ sont **à réaliser**, pas des fonctionnalités déjà disponibles.
 | 1 | Réparer reprise HTTP et fournisseur SAF de tests | Build complet vert, test de reprise réellement réussi, suite SAF terminée avec pannes injectées. |
 | 2 | Rendre le catalogue conforme à ses capacités | États distincts pour téléchargement, inspection et préannotation ; disponibilité au SHA constaté ; contrat et normalisation vérifiés pour chaque modèle activable. |
 | 2 | Terminer les modèles communautaires utiles | ViTPose et détecteurs testés sur images autorisées ; vecteurs d’embedding accessibles et persistés avant d’annoncer similarité/doublons ; bundles seulement après implémentation et essais de leurs graphes/tokenizers. |
-| 3 | Chaîne d’entraînement à partir des corrections validées | Export supervisé versionné avec origine et hash du modèle, séparation apprentissage/validation/test, absence de propositions non revues ; entraînement sur le pod existant, métriques comparées au modèle précédent, poids versionnés et retour arrière. |
-| 3 | Boucle continue contrôlée | Déclencheur après un seuil de nouvelles corrections, état de tâche/progression/reprise visible, annulation ; conversion LiteRT et compatibilité Android testées avant proposition d’activation. Aucune validation humaine créée par le modèle. |
+| 3 | Chaîne d’entraînement à partir des corrections validées | Export supervisé versionné avec origine et hash du modèle, séparation apprentissage/validation/test, absence de propositions non revues ; entraînement dans l’application Android, y compris les couches internes exposées par les conversions, métriques comparées au modèle précédent, poids versionnés et retour arrière. |
+| 3 | Boucle continue contrôlée | Option désactivée par défaut, déclencheur après export vérifié du lot corrigé ; nettoyage interdit avant la fin de l’apprentissage, état de tâche/progression/reprise visible, annulation ; signatures LiteRT et rechargement des checkpoints testés avant proposition d’activation. Aucune validation humaine créée par le modèle. |
 | 4 | Moteur de workflows et templates exécutables | Schéma de version/étapes/paramètres, import/export et reprise ; template import → préannotation → revue → export exécuté entièrement ; entraînement ajouté comme étape observable. |
 | 4 | Agent avec prompts et consignes versionnés | Backend réel configuré et joignable, consigne système/projet/tâche, sorties structurées validées, outils du studio explicitement branchés ; essai sur serveur réel, journal des actions et erreurs. Le test du répondeur HTTP ne suffit pas. |
 | 5 | Recette produit et publication | Cycle local 2 + 1 avec copie relue/purge/reprise, HF sur destination de test autorisée, appareil ARM, CI API 28/35 ; publication du commit et des seuls artefacts correspondants. |

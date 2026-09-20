@@ -1,5 +1,8 @@
 # Audit de complétude — 19 septembre 2026
 
+> État historique de l’audit initial. Les correctifs de provenance/export, les bundles, l’index de similarité, le cycle anti-doublons et l’apprentissage Android optionnel ont évolué depuis cette matrice. Consulter [le rapport courant](../TEST_REPORT.md), [les limites](../KNOWN_LIMITATIONS.md) et [la production par lots](BATCH_PRODUCTION.md). Le moteur d’agent et les workflows généraux restent incomplets.
+
+
 **Verdict : l’application n’est pas entièrement implémentée par rapport aux fonctions demandées.**
 Le téléchargement, l’inférence CPU et la préannotation ont une implémentation réelle.
 L’entraînement continu des poids, le moteur d’agent et les workflows automatisés
@@ -43,7 +46,7 @@ Les chemins ci-dessous sont relatifs à
 | Outils d’annotation et validation humaine | Présent | Neuf types de tâches, validation explicite, provenance et annuler/rétablir. Dessin de boîte et persistance contrôlés auparavant dans [UI_REDESIGN.md](UI_REDESIGN.md). Tous les outils n’ont pas une recette gestuelle complète. |
 | Apprentissage des corrections de points | Présent, limité | Apprentissage numérique, promotion, AtomicFile, rechargement et reset testés réellement sur Android avec 160 corrections synthétiques. Propositions acceptées sans déplacement exclues ; lot non finalisé refusé. |
 | Apprentissage des corrections de boîtes | Défectueux | La correction écrase la géométrie servant ensuite d’origine du modèle. Reproduction indépendante en échec, détaillée ci-dessous. |
-| Entraînement continu du modèle visuel | Absent | Déclenchement manuel du correcteur uniquement. Aucun entraînement/fine-tuning des poids `.tflite`, tâche automatique à la validation, entraînement sur le pod, versionnement/promotions de nouveaux poids ou retour arrière de ces poids. |
+| Entraînement continu du modèle visuel | Absent | Déclenchement manuel du correcteur uniquement. Aucun entraînement/fine-tuning des poids `.tflite`, tâche automatique à la validation, versionnement/promotions de nouveaux poids ou retour arrière de ces poids. |
 | Templates de tâches | Présent | Six `WorkflowPreset` : point, multi, detect, caption, vl, sort. Ils sélectionnent des tâches, sans programmer une séquence d’actions. |
 | Packs partageables | Présent, périmètre limité | `StudioPack` transporte nom, classes, tâches, taille de lot et contrat de modèle/prompt. Aller-retour Moshi réel et rejet des champs inconnus testés sur Android ; parcours SAF créant un projet non testé ici. |
 | Workflows automatisés | Absent | Pas de graphe d’étapes, dépendances, conditions, ordonnanceur ni pipeline import → prétraitement → correction → entraînement → export configurable. |

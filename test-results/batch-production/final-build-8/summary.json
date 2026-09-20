@@ -1,0 +1,24 @@
+{
+  "build": "20260919T234604Z-8a3382d3e997",
+  "jvm_tests": {
+    "tests": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "Warning": 71
+  },
+  "artifacts": {
+    "app": {
+      "file": "vision-dataset-studio-uwd-debug.apk",
+      "sha256": "0fe9e90838183153b32b4a0c712eb814e4e6aa274e09cdb547a38d9e8477d73f",
+      "bytes": 403138636
+    },
+    "tests": {
+      "file": "vision-dataset-studio-uwd-test.apk",
+      "sha256": "70220342727d07b2ed280263d765e557eaf83621e73dfd29d592c4aca1e3e16f",
+      "bytes": 2684203
+    }
+  }
+}

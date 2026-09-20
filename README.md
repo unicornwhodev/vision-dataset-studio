@@ -1,63 +1,76 @@
 # Vision Dataset Studio — Unicorn Who Dev
 
-**4.2.0-rc2 · Android · applicationId `com.unicornwhodev.visiondatasetstudio`**
+**Français** · [English](README.en.md)
 
-Atelier mobile générique de préparation de datasets image pour la vision par ordinateur et les corpus vision-langage. Le projet configure ses tâches, classes, sources, lots, modèles et exports, sans domaine imposé.
+Atelier Android pour produire des datasets d’images par lots : préannotation, correction humaine et export. Interface sombre compacte, image au centre du travail.
 
-**Version en qualification sur le poste Runpod.** Les résultats courants sont consignés dans [le rapport du pod](docs/POD_VALIDATION.md). Les tests portables ne remplacent pas la recette Android, les essais sur téléphone et les échanges HF réels.
+**4.2.0-rc2 · Apache-2.0 · En qualification**
+Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
 
-La refonte **Studio sombre cyan/violet** est décrite dans [le guide UI](docs/UI_REDESIGN.md). Son affinage compact et la nouvelle file de travail sont illustrés dans [la recette de cette révision](docs/UI_REFINEMENT.md).
+## Parcours principal
 
-**Audit fonctionnel : implémentation incomplète.** Huit essais Android ciblés
-passent, dont l’inférence de trois vrais modèles. L’entraînement continu des poids,
-le moteur d’agent et les workflows automatisés restent absents ; deux défauts de
-correction/export sont reproduits. Voir [la matrice complète](docs/IMPLEMENTATION_AUDIT.md).
+**Importer → préannoter → corriger/valider → exporter et vérifier → apprentissage facultatif → nettoyer → lot suivant.**
 
-Licence du code : **Apache-2.0**, choisie par le propriétaire. Les modèles, datasets et composants tiers conservent leurs propres conditions.
+L’apprentissage est **désactivé par défaut**. S’il est activé, il porte uniquement sur le lot corrigé et exporté ; le nettoyage attend sa fin. Les nouveaux poids sont activés manuellement. Le traitement manuel et les exports fonctionnent sans modèle.
 
-## Périmètre conservé
+Les empreintes de fichiers et de pixels empêchent de réintroduire une copie identique dans les lots suivants du même projet. Elles restent en base après la purge. Les quasi-doublons retouchés ou recompressés avec pertes ne sont pas couverts par cette garantie.
 
-- Projets indépendants, lots configurables de 1 à 1 000 cas ; sources HF Viewer, manifeste HF, dossier ou manifeste local. Réservations HF facultatives pour plusieurs annotateurs afin d’ignorer les cas déjà terminés ou en cours chez un autre collaborateur.
-- Pointing, détection, classification/tags, captions, grounding, questions-réponses, comptage et qualité ; les corrections humaines restent distinctes des propositions.
-- Modèles LiteRT CPU avec contrats explicites, bibliothèque locale et catalogue Hugging Face UWD découvert dynamiquement puis téléchargé volontairement ; client HTTP limité au même appareil.
-- Annotations canoniques et projections d’export, publication HF avec parent conservé, preuves de copie locale/distante, purge explicite et reprenable.
+**L’APK n’embarque aucun poids.** Le runtime et les outils sont intégrés ; les modèles sont téléchargés ou importés après installation. L’apprentissage s’exécute sur Android. Le pod sert au développement et à la recette.
 
-Les contrats décrivent ce qui est interprété ; ils ne promettent pas la compatibilité avec tous les exports portant le même nom de modèle. Aucune sortie IA ne valide automatiquement un échantillon. Les poids, données personnelles, tokens et clés de signature ne sont pas inclus.
+## Fonctions et état
 
-## Identité et données existantes
+| Fonction | État |
+|---|---|
+| Import local / HF, lots configurables, correction et exports | Implémentés ; cycle local 2+1 vérifié sur Android |
+| Identité persistante, reprise et purge protégée | Tests Android réussis, dont copies renommées et concurrence |
+| Apprentissage des poids internes, checkpoints, interruption/reprise | Testé sur réseau synthétique ; conversions HF entraînables à qualifier |
+| Téléchargement HF, contrats et prétraitement LiteRT | Implémentés ; RepViT exécuté sur Android, autres familles à qualifier |
+| Tokeniseurs et similarité persistante | Tests Android réussis |
+| Bundles TinyCLIP / SAM / Florence-2 | Adaptateurs présents ; qualification par conversion incomplète |
+| Éditeur/export de masques, décodeur RTMDet | À compléter |
+| Agent autonome et workflows généraux exécutables | Non livrés ; les packs actuels configurent l’atelier |
 
-Namespace, applicationId, sources, tests et scripts utilisent le même identifiant UWD. Le thème et les noms des tests de démarrage ne sont plus ceux du template.
+Les [résultats exécutés](TEST_REPORT.md) et les [limites](KNOWN_LIMITATIONS.md) font foi. Le dépôt partage les sources en qualification ; le produit n’est pas encore complet ni prêt pour une release stable.
 
-**Le changement d’applicationId crée une autre application Android.** Ce n’est pas une mise à jour sur place d’une installation portant un ancien identifiant. Ses données privées et autorisations SAF ne sont pas transférées automatiquement. Ne pas désinstaller une ancienne application contenant des données avant d’en avoir vérifié la sauvegarde. Les migrations Room 1 → 2 → 3 sont conservées mais ne font pas migrer les données entre deux applicationIds. Aucun import inter-application complet n’est implémenté.
+## Utiliser l’atelier
 
-## Poste de travail préparé
+1. Créer un projet et choisir ses tâches, classes, source et taille de lot.
+2. Importer un dossier/manifeste local ou configurer HF, puis indexer la source.
+3. Télécharger/importer un modèle si la préannotation est souhaitée ; vérifier son contrat et essayer une image.
+4. Préparer le lot, contrôler les propositions, corriger et valider ou rejeter chaque image.
+5. Créer l’archive, choisir son emplacement et vérifier sa relecture, ou publier/vérifier sur une destination HF autorisée.
+6. Si l’apprentissage est activé, attendre sa fin. Confirmer le nettoyage puis préparer le lot suivant.
 
-Le [guide du poste Runpod](docs/WORKSTATION.md) décrit les outils persistants, VS Code, ADB et le contrôle visuel de l’émulateur. La [roadmap](docs/ROADMAP.md) et le [plan de publication](docs/RELEASE_PLAN.md) séparent préparation, qualification et distribution.
+Les annotations canoniques sont conservées. COCO, YOLO, WebDataset et vision-langage sont des sorties complémentaires avec leurs contraintes propres. Une projection ne remplace pas le JSONL canonique.
 
-## Construire et tester
+## Construire
 
-Prérequis Linux/macOS : JDK 17+, Python 3.11+, Android SDK `platforms;android-36` et `build-tools;36.0.0`, accès aux dépôts officiels. Gradle 9.3.1 est vérifié ; le lanceur fourni est un bootstrap Python et non le wrapper JAR officiel.
+Environnement utilisé : JDK 21, Python 3.11+, SDK Android 36, build-tools 36.0.0, Gradle 9.3.1. Le bootstrap Gradle Python vérifie la distribution ; ce n’est pas un wrapper JAR livré dans l’archive initiale.
 
 ```bash
 bash tools/build_android.sh
 ```
 
-Chaque tentative crée `dist/android/runs/<identifiant>/status.json` et actualise `dist/android/latest.json`, même lorsqu’un prérequis manque. Seuls des APK réellement assemblés, vérifiés par `apksigner` et contrôlés avec `aapt` sont copiés dans cette tentative. Les anciennes preuves ne sont pas supprimées ni réétiquetées comme un succès du nouveau build.
+Chaque tentative produit `dist/android/runs/<id>/status.json`. Le reçu contient les signatures, identités et empreintes des deux APK réellement assemblées ; `app-contents.json` vérifie l’absence de poids. Un échec n’est jamais promu en qualification.
 
-Le workflow manuel `.github/workflows/android-qualification.yml` prévoit build, tests JVM avec dépendances, lint, APK instrumentée, puis exécution des tests instrumentés sur des émulateurs dédiés API 28 et 35. Les APK installés sont ceux du build, avec empreintes vérifiées, sans recompilation avec une autre clé. Le workflow accepte explicitement les licences SDK lorsqu’il est lancé par l’opérateur ; il ne publie rien et n’utilise aucun token HF. **Il n’a pas été déclenché pour cette livraison.**
+Pour un appareil de recette dédié :
 
 ```bash
-python3 tools/qa/test_identity.py
-python3 tools/qa/test_build_evidence.py
-bash tools/qa/run_policy_tests.sh
-bash tools/qa/run_engine_tests.sh
-bash tools/qa/run_v4_reliability.sh
-python3 tools/qa/test_v4_sqlite.py
-python3 tools/qa/test_export_validator.py
+export ANDROID_SERIAL=emulator-5554
+export VDS_ALLOW_TEST_INSTALL=1
+bash tools/qa/run_device_qualification.sh
 ```
 
-Ces tests hôte ne remplacent pas Room, Compose, Moshi ou SAF sur Android. Les résultats courants sont dans `TEST_REPORT.md` et `docs/POD_VALIDATION.md` ; les preuves brutes sont conservées hors Git sur le pod.
+Les tests de modèles nécessitent des fixtures injectées séparément et peuvent être ignorés en leur absence. Le téléphone ARM, les performances, la CI API 28/35 et les écritures HF réelles ne sont pas encore qualifiés. Voir [la recette](docs/ANDROID_QUALIFICATION.md).
 
-## Avant publication
+## Documentation et dépôt
 
-Lire `LICENSING_STATUS.md`, `NOTICE`, `KNOWN_LIMITATIONS.md`, `docs/ANDROID_QUALIFICATION.md` et `QUALIFICATION_STATUS.json`. La licence Apache-2.0 a été choisie. Il reste à vérifier les droits des composants et les notices transitives, puis à terminer la recette réelle en s’appuyant sur les résultats du rapport du pod. Changer le branding ne prouve pas à lui seul la titularité des droits sur du code antérieur.
+- [Guide FR/EN](docs/README.md), [production par lots](docs/BATCH_PRODUCTION.md), [contrat d’apprentissage](docs/LITERT_TRAINING_CONTRACT.md).
+- [Roadmap](docs/ROADMAP.md), [plan de publication](docs/RELEASE_PLAN.md), [contribution](CONTRIBUTING.md).
+- [Poste de développement](docs/WORKSTATION.md), [interface](docs/UI_REFINEMENT.md).
+
+Destination autorisée : dépôt public [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). Les APK seront des assets de Releases ; GHCR est prévu pour un éventuel environnement de build qualifié. La publication des sources ne vaut pas qualification complète. Aucun package ni release stable n’est annoncé comme publié.
+
+Le code relève d’[Apache-2.0](LICENSE), selon les droits des contributeurs. Les modèles, données et bibliothèques conservent leurs licences ; voir [NOTICE](NOTICE) et [l’état des droits](LICENSING_STATUS.md).
+
+Le changement d’applicationId ne transfère pas les données d’une autre application. Les migrations Room 1/2/3 → 4 concernent uniquement la même identité Android ; conserver l’ancienne installation jusqu’à sauvegarde vérifiée.

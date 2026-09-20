@@ -1,7 +1,7 @@
 # Préparation de publication
 
 Destination : `unicornwhodev/vision-dataset-studio`, public. Licence : Apache-2.0.
-La publication vient après revue des preuves et des limitations de la version.
+[English](en/RELEASE_PLAN.md). Le propriétaire a autorisé le push des sources et de la documentation le 20 septembre 2026, après contrôle des secrets. Le dépôt doit conserver son statut de qualification : les fonctionnalités et validations manquantes bloquent encore la release stable.
 
 ## Artefacts attendus
 

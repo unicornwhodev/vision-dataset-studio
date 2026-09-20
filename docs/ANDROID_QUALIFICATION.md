@@ -25,8 +25,8 @@ Cette commande installe les deux APK déjà construites, exécute les tests inst
 
 | Scénario | Manipulation sur appareil/service | Acceptation |
 |---|---|---|
-| Migration réelle | Dans une application de test avec identité et signature constantes, ouvrir une copie de base de schéma 1/2 puis migrer vers 3 ; compléter avec une base issue d’une installation réelle | Annotations, projets, curseurs et reçus préservés ; validation Room réelle ; aucune preuve inventée |
-| Cycle local | Fixtures 3 images, lot 2 puis 1, revoir/corriger/exporter/copier/relire/purger | Deux lots terminés, originaux inchangés et annotations conservées |
+| Migration réelle | Dans une application de test avec identité et signature constantes, ouvrir une copie de base de schéma 1/2 puis migrer vers 4 ; compléter avec une base issue d’une installation réelle | Annotations, projets, curseurs et reçus préservés ; validation Room réelle ; aucune preuve inventée |
+| Cycle local | Fixtures 3 images et deux copies renommées, lot 2 puis 1, revoir/corriger/exporter/copier/relire/purger/redémarrer | Deux lots terminés sans réimport des copies, originaux inchangés, annotations et identités conservées |
 | Reprise image | Couper réseau à mi-transfert puis relancer ; ETag inchangé puis changé | Bytes finaux identiques ; jamais concaténation de versions ; erreurs visibles |
 | URL expirée | Renouveler URL source après expiration | Reprise conservatrice ou nouveau téléchargement, jamais mélange de ressources |
 | HF conflit | Deux clients déplacent la branche entre préparation et commit | Conflit affiché ; aucun nouveau parent automatique ; autres chemins inchangés |
