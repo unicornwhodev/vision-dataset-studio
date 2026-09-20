@@ -89,5 +89,49 @@ fun main(){
     test("shared claim policy skips completed and active foreign work but recovers expired leases"){val now=1000L;check(SharedClaimPolicy.unavailable("DONE","other",Long.MAX_VALUE,"me",now));check(SharedClaimPolicy.unavailable("CLAIMED","other",2000L,"me",now));check(!SharedClaimPolicy.unavailable("CLAIMED","other",999L,"me",now));check(!SharedClaimPolicy.unavailable("CLAIMED","me",2000L,"me",now));check(SharedClaimPolicy.reusableByCurrentWorker("CLAIMED","me",2000L,"me",now));check(!SharedClaimPolicy.reusableByCurrentWorker("CLAIMED","me",999L,"me",now))}
     test("embedding and inspect-only contracts permit empty class vocabularies"){ModelContract.validate(ModelConfig(task="embedding",adapter="embedding",labels=emptyList()));ModelContract.validate(ModelConfig(task="inspection",adapter="inspect_only",labels=emptyList()))}
     test("box correction head can adjust centre and size without touching another label"){val src="model_litert:boxmodel:contract";val key=AdaptiveCorrection.groupKey(src,"a","box");val head=CorrectionHead(listOf(listOf(.02,0.0,0.0,0.0,0.0,0.0),listOf(-.01,0.0,0.0,0.0,0.0,0.0),listOf(.04,0.0,0.0,0.0,0.0,0.0),listOf(.02,0.0,0.0,0.0,0.0,0.0)),1,"box");val ledger=CorrectionLedger(groups=listOf(CorrectionGroup(key,head=head)));val a=ModelProposal("box","a",.9f,xmin=.2f,ymin=.2f,xmax=.4f,ymax=.5f,source=src);val b=a.copy(label="b");val out=AdaptiveCorrection.apply(listOf(a,b),ledger);near(out[0].xmin,.20f);near(out[0].xmax,.44f);near(out[0].ymin,.18f);near(out[0].ymax,.50f);check(out[1]==b)}
+    test("mask canonical RLE and COCO column order remain distinct") {
+        val pixels=booleanArrayOf(true,false,false,true,true,false)
+        val m=MaskTarget("m","target",2,3,MaskCodec.encode(pixels))
+        check(MaskCodec.decode(m).contentEquals(pixels))
+        check(MaskCodec.coco(m,2,3)["counts"]==listOf(0,1,1,1,1,1,1))
+        fails { MaskCodec.decode(m.copy(runs=listOf(8))) }
+        fails { MaskCodec.decode(m.copy(runs=listOf(-1,7))) }
+    }
+    test("mask brush, erase and human corrections survive new inference") {
+        val blank=MaskTarget("m","target",64,64,listOf(4096))
+        val painted=MaskCodec.stroke(blank,.2f,.5f,.8f,.5f,.1f,false)
+        check(MaskCodec.decode(painted).count { it }>100 && painted.isHumanVerified && painted.explicitlyAdjusted)
+        val erased=MaskCodec.stroke(painted,.2f,.5f,.8f,.5f,.1f,true)
+        check(MaskCodec.decode(erased).none { it })
+        val merged=ProposalMerger.merge(SampleAnnotations(masks=listOf(painted)),emptyList(),"SEGMENTATION",replaceTypes=setOf("mask"))
+        check(merged.masks==listOf(painted))
+        check(AnnotationReview.problems(SampleAnnotations(masks=listOf(blank)),setOf(StudioTask.SEGMENTATION)).isNotEmpty())
+    }
+    test("wide masks and original camera resolution export without a full-size raster") {
+        val wide=MaskTarget("wide","target",4096,512,listOf(0,4096*512))
+        MaskCodec.validate(wide)
+        val tiny=MaskTarget("tiny","target",2,2,listOf(0,1,3))
+        val projected=MaskCodec.projectCoco(tiny,4000,3000)
+        check(projected.area==3_000_000 && projected.bbox==listOf(0,0,2000,1500))
+        val runs=projected.segmentation["counts"] as List<*>
+        check(runs.sumOf{it as Int}==12_000_000 && runs.take(3)==listOf(0,1500,1500))
+        check(MaskCodec.projectCoco(tiny.copy(runs=listOf(4)),4000,3000).area==0)
+        fails { MaskCodec.projectCoco(tiny,100_001,100_001) }
+    }
+    test("named signature output order differs from default graph") {
+        val c=ModelConfig(adapter="yolo",labels=listOf("a"),outputIndex=2,namedOutputIndices=mapOf("logits" to 0,"boxes" to 1,"detections" to 2),training=TrainingContract(inferOutputs=listOf("detections"),targetShape=listOf(1,100,6),targetEncoding="boxes_xyxy_class_mask"))
+        check(c.signatureConfig().outputIndex==0)
+        val p=decode(c.signatureConfig(),floatArrayOf(.5f,.5f,.2f,.4f,.9f),listOf(1,5,1)).single()
+        near(p.xmin,.4f);near(p.ymax,.7f)
+    }
+    test("RTMDet uses zero-offset grid and stride-scaled distances") {
+        val c=ModelConfig(adapter="rtmdet",labels=listOf("a","b"),inputWidth=16,inputHeight=16,featureStrides=listOf(8),resizeMode="stretch")
+        val values=FloatArray(24){-20f};val base=18
+        values[base]=10f;values[base+1]=-10f
+        for(k in 2..5)values[base+k]=.5f
+        val p=ModelAdapters.decode(mapOf(0 to TensorValues(listOf(1,2,2,6),values)),c,InputTransform.create(16,16,16,16,"stretch")).single()
+        near(p.xmin,.25f);near(p.xmax,.75f);check(p.label=="a")
+        fails { ModelAdapters.decode(mapOf(0 to TensorValues(listOf(1,1,4,6),values)),c,InputTransform.create(16,16,16,16,"stretch")) }
+    }
     println("PASS $count V4.2 engine tests; 1500 transform trials included. Numeric fixtures only: no Android runtime, live HF, actual weights, Room or real correction benchmark executed.")
 }

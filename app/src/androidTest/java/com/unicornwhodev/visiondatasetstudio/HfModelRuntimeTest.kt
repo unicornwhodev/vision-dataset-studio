@@ -37,7 +37,7 @@ class HfModelRuntimeTest {
                 if(id=="dinov2")assertEquals(listOf(1,256,384),engine.lastPatches?.shape)
                 if(id=="tinyclip")assertEquals(2,out.size)
                 if(id=="efficientvit_sam")assertNotNull(engine.lastMask)
-                File(root,"android-result.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf("model" to id,"revision" to revision,"runtime" to "Android LiteRT 2.2 CPU","success" to true,"proposals" to out.size,"embedding_size" to engine.lastEmbedding?.size,"milliseconds" to (System.nanoTime()-start)/1_000_000,"accuracy_evaluated" to false,"note" to engine.lastNote)))
+                File(root,"android-result.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf("model" to id,"revision" to revision,"runtime" to "Android LiteRT 1.4.2 CPU / Select TF Ops 2.16.1","success" to true,"proposals" to out.size,"embedding_size" to engine.lastEmbedding?.size,"milliseconds" to (System.nanoTime()-start)/1_000_000,"accuracy_evaluated" to false,"note" to engine.lastNote)))
             }
         }finally{image.recycle()}
     }

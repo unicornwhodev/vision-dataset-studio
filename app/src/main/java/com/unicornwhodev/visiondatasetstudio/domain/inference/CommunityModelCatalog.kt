@@ -28,7 +28,9 @@ object CommunityModelCatalog {
         val files: List<HfTreeItem>,
         val available: Boolean,
         val installableNow: Boolean,
-        val note: String
+        val note: String,
+        val sourceRepo: String = repoId,
+        val sourcePrefix: String = "models/${entry.id}/"
     )
 
     val entries = listOf(
@@ -41,7 +43,7 @@ object CommunityModelCatalog {
         Entry("grounding_dino_base", "Grounding DINO Base", "Détection open-vocabulary guidée par texte", "Apache-2.0", listOf("model.tflite"), "multi_input", "Open-vocabulary"),
         Entry("owlv2_base_patch16", "OWLv2 Base Patch16", "Détection zero-shot guidée par texte", "Apache-2.0", listOf("model.tflite"), "multi_input", "Open-vocabulary"),
         Entry("depth_anything_v2_small", "Depth Anything V2 Small", "Estimation de profondeur monoculaire", "Apache-2.0", listOf("model.tflite"), "inspect", "Profondeur"),
-        Entry("rtmdet_tiny", "RTMDet Tiny", "Détection d’objets légère", "Apache-2.0", listOf("model.tflite"), "inspect", "Détection"),
+        Entry("rtmdet_tiny", "RTMDet Tiny", "Détection d’objets légère", "Apache-2.0", listOf("model.tflite"), "rtmdet", "Détection"),
         Entry("efficientformer_l1", "EfficientFormer L1", "Classification et embeddings visuels", "Apache-2.0", listOf("model.tflite"), "embedding", "Représentation"),
         Entry("repvit_m1", "RepViT M1", "Classification et embeddings visuels mobiles", "Apache-2.0", listOf("model.tflite"), "embedding", "Représentation"),
         Entry("edgenext_xx_small", "EdgeNeXt XX-Small", "Classification et embeddings visuels compacts", "MIT", listOf("model.tflite"), "embedding", "Représentation"),
@@ -56,37 +58,42 @@ object CommunityModelCatalog {
         Entry("table_transformer_structure", "Table Transformer Structure", "Reconnaissance de structure de tableaux", "MIT", listOf("model.tflite"), "inspect", "Document")
     )
 
-    suspend fun discover(hf: HfApiClient): List<Availability> {
-        val sha = hf.resolveModelRevision(repoId, "main")
-        val tree = hf.listModelTree(repoId, sha, "models")
-        val result = entries.map { spec ->
-            val prefix = "models/${spec.id}/"
+    data class Source(val repository: String = repoId, val revision: String = "main", val folder: String = "models") {
+        fun validate() {
+            require(repository.matches(Regex("[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*"))) { "Dépôt attendu : compte/modèle" }
+            require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.validRevision(revision))
+            require(folder.isEmpty() || com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(folder))
+        }
+    }
+
+    suspend fun discover(hf: HfApiClient, source: Source = Source()): List<Availability> {
+        source.validate()
+        val sha = hf.resolveModelRevision(source.repository, source.revision)
+        return fromTree(source, sha, hf.listModelTree(source.repository, sha, source.folder))
+    }
+
+    /** Metadata advertises a download, never a successful inference or training run. */
+    fun fromTree(source: Source, sha: String, tree: List<HfTreeItem>): List<Availability> {
+        source.validate()
+        val root = if (source.folder.isBlank()) "" else source.folder.trimEnd('/') + "/"
+        val weights = tree.filter { it.type != "directory" && it.path.startsWith(root) && it.path.endsWith(".tflite", true) }
+        return weights.groupBy { it.path.substringBeforeLast('/', "") }.toSortedMap().map { (folder, graphs) ->
+            val prefix = if (folder.isBlank()) "" else "$folder/"
+            val id = folder.removePrefix(root).ifBlank { source.repository.substringAfter('/') }
             val files = tree.filter { it.type != "directory" && it.path.startsWith(prefix) }
             val names = files.map { it.path.removePrefix(prefix) }.toSet()
-            val available = spec.expectedFiles.all(names::contains)
-            val installable = available && (spec.expectedFiles.size == 1 && spec.adapterStatus in setOf("embedding", "heatmap", "inspect", "rfdetr") || spec.id in setOf("tinyclip","efficientvit_sam","florence2"))
-            Availability(spec, sha, files, available, installable, when {
-                !available -> "Conversion non disponible dans le dépôt pour le moment"
-                spec.expectedFiles.size > 1 -> "Pipeline multi-graphes local · RAM et temps à mesurer sur votre appareil"
-                spec.adapterStatus == "inspect" -> "Téléchargeable pour inspection · contrat de sortie à confirmer avant préannotation"
-                spec.adapterStatus == "embedding" -> "Représentations visuelles accessibles · aucun label inventé"
-                else -> "Téléchargeable et contrat initial proposé automatiquement"
-            })
+            val explicit = "android_model_config.json" in names || "model_config.json" in names
+            val known = if (source.repository == repoId) entries.firstOrNull { it.id == id } else null
+            val spec = known ?: Entry(id, id.replace('_', ' '), "Conversion LiteRT", "Voir la model card", graphs.map { it.path.removePrefix(prefix) }, if (explicit) "contract" else "inspect", "Dépôt HF")
+            val installable = "artifact_manifest.json" in names && (graphs.size == 1 || known?.adapterStatus == "bundle")
+            Availability(spec, sha, files, true, installable, when {
+                "artifact_manifest.json" !in names -> "Manifeste SHA-256 manquant"
+                !installable -> "Bundle sans pipeline déclaré"
+                explicit -> "Contrat fourni · compatibilité vérifiée à l’installation, essai sur image requis"
+                graphs.size > 1 -> "Pipeline local · essai sur appareil requis"
+                else -> "Inspection des tenseurs · aucun label déduit du nom"
+            }, source.repository, prefix)
         }
-        // Surface new single-file conversions added to the repository without requiring an app release.
-        val known = entries.map { it.id }.toSet()
-        val folders = tree.mapNotNull { item ->
-            val rest = item.path.removePrefix("models/")
-            rest.substringBefore('/').takeIf { rest.contains('/') && it.isNotBlank() }
-        }.distinct().filterNot(known::contains)
-        val dynamic = folders.map { id ->
-            val prefix = "models/$id/"
-            val files = tree.filter { it.type != "directory" && it.path.startsWith(prefix) }
-            val tflites = files.filter { it.path.endsWith(".tflite", true) }
-            val e = Entry(id, id.replace('_',' ').replaceFirstChar { it.uppercase() }, "Conversion LiteRT publiée dans le catalogue", "Voir model card", tflites.map { it.path.removePrefix(prefix) }, "inspect", "Nouveau")
-            Availability(e, sha, files, tflites.isNotEmpty(), tflites.size == 1, if (tflites.size == 1) "Nouveau modèle · téléchargement pour inspection" else "Bundle ou conversion sans fichier LiteRT unique")
-        }
-        return result + dynamic
     }
 
     /** Build only contracts we can justify from the serialized tensor shapes. Unknown layouts stay inspect-only. */
@@ -101,14 +108,14 @@ object CommunityModelCatalog {
                 else -> error("Bundle non pris en charge")
             }.also(ModelContract::validate)
         }
+        val explicit = listOf("android_model_config.json", "model_config.json").map { File(file.parentFile, it) }.firstOrNull { it.isFile }
+        if (explicit != null) {
+            val c = com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(ModelConfig::class.java).failOnUnknown().fromJson(explicit.readText()) ?: error("Contrat Android invalide")
+            ModelContract.validate(c)
+            if (c.training != null) LiteRtTrainingSession(file, c).use { }
+            return c
+        }
         Interpreter(file, LiteRtOptions.forFile(file,1)).use { i ->
-            val explicit = listOf("android_model_config.json","model_config.json").map{File(file.parentFile,it)}.firstOrNull{it.isFile} ?: File(file.parentFile,"android_model_config.json")
-            if(explicit.isFile()) {
-                val c=com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(ModelConfig::class.java).failOnUnknown().fromJson(explicit.readText()) ?: error("Contrat Android invalide")
-                ModelContract.validate(c)
-                if(c.training!=null)LiteRtTrainingSession(file,c).use{}
-                return c
-            }
             require(i.inputTensorCount == 1 || (item.entry.id == "vitpose" && i.inputTensorCount == 2)) { "Entrées auxiliaires non décrites pour cette conversion" }
             val dynamicContract=File(file.parentFile,"runtime_contract.json").takeIf{it.isFile}?.let{
                 com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(Any::class.java).fromJson(it.readText()) as? Map<*,*>
@@ -117,7 +124,8 @@ object CommunityModelCatalog {
             if(dynamic) {
                 require(dynamicContract!=null){"Dimensions dynamiques : runtime_contract.json requis"}
                 require(dynamicContract["task"] in setOf("classification + visual embeddings","object detection"))
-                i.resizeInput(0,intArrayOf(1,3,224,224),true);i.allocateTensors()
+                val side=if(item.entry.id=="rtmdet_tiny")320 else 224
+                i.resizeInput(0,intArrayOf(1,3,side,side),true);i.allocateTensors()
             }
             val input = i.getInputTensor(0)
             val shape = input.shape().toList()
@@ -157,6 +165,10 @@ object CommunityModelCatalog {
                     }
                     common.copy(task="pointing",adapter="heatmap",labels=labels,outputIndex=0,outputLayout=layout,scoreActivation="clamp",threshold=.05f,resizeMode="stretch",extraIntInputs=if(i.inputTensorCount==2)mapOf("1" to listOf(0)) else emptyMap())
                 }
+                "rtmdet_tiny" -> common.copy(task="object_detection",adapter="rtmdet",inputWidth=320,inputHeight=320,
+                    labels=cocoSlots.filterIndexed { index,label -> index!=0 && !label.startsWith("unused_") },isRgb=false,
+                    channelMean=listOf(103.53f,116.28f,123.675f),channelStd=listOf(57.375f,57.12f,58.395f),
+                    resizeMode="letterbox",outputLayout="NHWC",coordinates="pixels",scoreActivation="sigmoid",dynamicMinSize=32,dynamicMaxSize=640,dynamicStride=32)
                 "rfdetr" -> {
                     require(i.outputTensorCount==2 && i.getOutputTensor(0).shape().toList()==listOf(1,300,4) && i.getOutputTensor(1).shape().toList()==listOf(1,300,91))
                     common.copy(task="object_detection",adapter="rfdetr",resizeMode="stretch",labels=cocoSlots,outputIndexBoxes=0,outputIndexScores=1,threshold=.35f)

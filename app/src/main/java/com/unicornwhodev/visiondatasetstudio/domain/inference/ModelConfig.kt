@@ -59,9 +59,23 @@ data class ModelConfig(
     val bundleKind: String = "",
     val promptPoint: List<Float> = emptyList(),
     val promptBox: List<Float> = emptyList(),
+    val spatialLabel: String = "target",
+    val namedOutputIndices: Map<String, Int> = emptyMap(),
+    val featureStrides: List<Int> = listOf(8, 16, 32),
     val training: TrainingContract? = null,
     val trainingCheckpoint: String = ""
 ) {
+    /** Signature outputs have a different order from the flatbuffer's default graph. */
+    fun signatureConfig(): ModelConfig {
+        val names = training?.inferOutputs ?: return this
+        fun index(original: Int): Int {
+            val name = namedOutputIndices.entries.firstOrNull { it.value == original }?.key ?: return original
+            return names.indexOf(name).also { require(it >= 0) { "Sortie $name absente de infer" } }
+        }
+        return copy(outputIndex = index(outputIndex), outputIndexBoxes = if (ModelContract.adapter(this) in setOf("ssd", "rfdetr")) index(outputIndexBoxes) else outputIndexBoxes,
+            outputIndexScores = if (ModelContract.adapter(this) in setOf("ssd", "rfdetr")) index(outputIndexScores) else outputIndexScores,
+            namedOutputIndices = names.withIndex().associate { it.value to it.index })
+    }
     companion object {
         fun defaultDetectionPreset(labels: List<String> = listOf("person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light")): ModelConfig {
             return ModelConfig(
@@ -111,8 +125,12 @@ data class TrainingContract(
     val weightProbeSignature: String = "",
     val weightProbeOutput: String = "",
     val weightProbeInput: String = "probe",
+    val auxiliaryTargets: Map<String, AuxiliaryTarget> = emptyMap(),
     val scope: String = "converter_declared"
 )
+
+@JsonClass(generateAdapter = true)
+data class AuxiliaryTarget(val shape: List<Int>, val labels: List<String> = emptyList(), val order: List<String> = emptyList(), val meaning: String = "")
 
 data class ModelProposal(
     val type: String, // box, point, tag, caption, vqa, count
@@ -132,6 +150,7 @@ data class ModelProposal(
     val modelY: Float? = null,
     val boxWidth: Float = 0f,
     val boxHeight: Float = 0f,
+    val mask: com.unicornwhodev.visiondatasetstudio.data.model.MaskTarget? = null,
     val correctionGeneration: Int? = null,
     val modelXmin: Float? = null,
     val modelYmin: Float? = null,

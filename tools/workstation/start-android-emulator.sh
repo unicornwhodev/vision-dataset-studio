@@ -3,6 +3,10 @@ set -euo pipefail
 source /workspace/toolchains/android-env.sh
 QA=/workspace/qa/vision-dataset-studio
 mkdir -p "$QA" "$ANDROID_AVD_HOME"
+emulator_memory="${VDS_EMULATOR_MEMORY_MB:-4096}"
+emulator_cores="${VDS_EMULATOR_CORES:-4}"
+[[ "$emulator_memory" =~ ^[0-9]+$ && "$emulator_cores" =~ ^[0-9]+$ ]] || { echo 'Numeric emulator memory/cores required' >&2; exit 2; }
+(( emulator_memory >= 1024 && emulator_memory <= 12288 && emulator_cores >= 1 && emulator_cores <= 16 )) || { echo 'Emulator memory/cores outside supported limits' >&2; exit 2; }
 case "${VDS_EMULATOR_PROFILE:-workstation}" in
   workstation) width=960; height=720; density=160; scale=1.0 ;;
   phone) width=480; height=800; density=240; scale=0.9 ;;
@@ -40,7 +44,7 @@ fi
 accel=off
 if [[ -r /dev/kvm && -w /dev/kvm ]]; then accel=on; fi
 nohup emulator -avd vds-api28-aosp -port 5554 -accel "$accel" -gpu swiftshader \
-  -no-audio -no-snapshot -no-boot-anim -memory 2048 -cores 2 \
+  -no-audio -no-snapshot -no-boot-anim -memory "$emulator_memory" -cores "$emulator_cores" \
   -skin "${width}x${height}" -scale "$scale" -no-metrics > "$QA/emulator-api28.log" 2>&1 </dev/null &
 echo "Emulator starting; log: $QA/emulator-api28.log"
 echo 'Browser access: ssh -N -L 6080:127.0.0.1:6080 runpod-workstation'

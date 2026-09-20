@@ -15,12 +15,15 @@ object AnnotationReview {
         if (StudioTask.POINTING in tasks && a.points.size > 1) add("Le profil Point unique n’autorise qu’une cible. Choisissez Points multiples pour ce cas.")
         if ((a.points.any { !it.isHumanVerified }) || a.boxes.any { !it.isHumanVerified } || a.tags.any { !it.isHumanVerified } || a.captions.any { !it.isHumanVerified && it.sourceProvenance != "human" } || a.vqaList.any { !it.isHumanVerified && it.sourceProvenance != "human" } || a.counts.any { !it.isHumanVerified && it.sourceProvenance != "human" })
             add("Des propositions restent à relire. Acceptez-les explicitement ou supprimez-les.")
-        val located = a.boxes.isNotEmpty() || visiblePoints.isNotEmpty()
+        if(a.masks.any { it.label.isBlank() || runCatching { com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.validate(it) }.isFailure }) add("Un masque est invalide.")
+        if(a.masks.any { !it.isHumanVerified }) add("Des masques restent à relire.")
+        if(StudioTask.SEGMENTATION in tasks && a.masks.none { it.runs.withIndex().any { (i,n) -> i%2==1 && n>0 } } && a.quality.verifiedNegativeQueries.isEmpty()) add("Dessinez un masque ou vérifiez son absence.")
+        val located = a.masks.any { it.runs.withIndex().any { (i,n) -> i%2==1 && n>0 } } || a.boxes.isNotEmpty() || visiblePoints.isNotEmpty()
         val absent = a.quality.verifiedNegativeQueries.isNotEmpty() || a.quality.isHardNegative
         if (absent && located) add("Une absence globale ne peut pas coexister avec une cible localisée. Précisez les annotations de ce cas.")
         if (absent && a.quality.isUnlocalizablePresent) add("Une cible ne peut pas être à la fois absente et présente non localisable.")
         if (a.quality.isUncertain) add("L’incertitude doit être résolue avant validation; utilisez Différer pour conserver ce cas à revoir.")
-        val allIds = a.boxes.map { it.id } + a.points.map { it.id }
+        val allIds = a.boxes.map { it.id } + a.points.map { it.id } + a.masks.map { it.id }
         if (allIds.any { it.isBlank() } || allIds.distinct().size != allIds.size) add("Les identifiants de régions doivent être renseignés et uniques.")
         if (a.captions.any { it.text.isBlank() || it.language.isBlank() }) add("Une légende est vide ou sans langue.")
         if (a.tags.any { it.label.isBlank() }) add("Un tag est vide.")

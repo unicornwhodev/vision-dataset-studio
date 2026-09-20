@@ -77,6 +77,7 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
     }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
         StudioTopBar(project?.name ?: "Atelier", "Atelier  /  Lot ${batch.toString().padStart(2, '0')}", actions = {
+            IconButton(onClick = { viewModel.navigateTo(Screen.Workflow) }, enabled = !busy) { Icon(Icons.Default.AccountTree, "Workflows et agent", Modifier.size(19.dp)) }
             IconButton(onClick = { viewModel.navigateTo(Screen.Controls) }, enabled = !busy, modifier = Modifier.testTag("controls_shortcut")) {
                 Icon(Icons.Default.FolderOpen, "Gérer les projets", Modifier.size(19.dp))
             }

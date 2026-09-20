@@ -49,6 +49,12 @@ class OnDeviceTrainingTest {
                 LiteRtEngine().use { engine ->
                     assertTrue(engine.loadModel(model));val predictions=engine.runInference(red,config.copy(trainingCheckpoint=receipt))
                     assertNull(engine.lastError);assertEquals("rouge",predictions.maxBy{it.score}.label)
+                    val untrained=engine.runInference(red,config)
+                    assertNull(engine.lastError)
+                    assertNotEquals("Changing the selected checkpoint must reset the cached session",predictions.map{it.score},untrained.map{it.score})
+                    val restored=engine.runInference(red,config.copy(trainingCheckpoint=receipt))
+                    assertNull(engine.lastError)
+                    assertEquals(predictions.map{it.score},restored.map{it.score})
                 }
             }
             File(root,"android-training-evidence.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf(

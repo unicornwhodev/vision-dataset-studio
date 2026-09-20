@@ -22,9 +22,14 @@ object ProposalMerger {
         if("caption" in replaceTypes && "CAPTIONING" in enabled) captions=captions.filter{retain(it.isHumanVerified,it.sourceProvenance,it.id)}+proposals.filter{it.type=="caption" && it.text.isNotBlank()}.map{p->CaptionTarget(id(),p.text,language,sourceProvenance=p.source)}
         if("vqa" in replaceTypes && "VQA" in enabled) qa=qa.filter{retain(it.isHumanVerified,it.sourceProvenance,it.id)}+proposals.filter{it.type=="vqa" && it.question.isNotBlank() && it.text.isNotBlank()}.map{p->VqaTarget(id(),p.question,p.text,sourceProvenance=p.source)}
         if("count" in replaceTypes && "COUNTING" in enabled) counts=counts.filter{retain(it.isHumanVerified,it.sourceProvenance,it.id)}+proposals.filter{it.type=="count"}.map{p->CountingTarget(id(),p.label,p.count,isExhaustive=false,sourceProvenance=p.source)}
-        return a.copy(points=points,boxes=boxes,tags=tags,captions=captions,vqaList=qa,counts=counts)
+        val masks=if("mask" in replaceTypes && "SEGMENTATION" in enabled)
+            a.masks.filter { retain(it.isHumanVerified,it.sourceProvenance,it.id) || it.explicitlyAdjusted } + proposals.filter { it.type=="mask" }.map { p ->
+                requireNotNull(p.mask).also(MaskCodec::validate).copy(id=id(),sourceProvenance=p.source,modelScore=p.score,isHumanVerified=false,explicitlyAdjusted=false)
+            } else a.masks
+        return a.copy(masks=masks,points=points,boxes=boxes,tags=tags,captions=captions,vqaList=qa,counts=counts)
     }
     fun draft(a:SampleAnnotations)=a.copy(
+        masks=a.masks.map{it.copy(isHumanVerified=false,sourceProvenance="import",explicitlyAdjusted=false)},
         points=a.points.map{it.copy(isHumanVerified=false,sourceProvenance="import",explicitlyAdjusted=false)},
         boxes=a.boxes.map{it.copy(isHumanVerified=false,sourceProvenance="import",explicitlyAdjusted=false,modelXmin=null,modelYmin=null,modelXmax=null,modelYmax=null,correctionGeneration=null)},
         captions=a.captions.map{it.copy(isHumanVerified=false,sourceProvenance="import")},

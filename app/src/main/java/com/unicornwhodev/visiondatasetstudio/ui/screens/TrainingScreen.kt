@@ -31,7 +31,15 @@ fun TrainingScreen(vm:MainViewModel) {
             Column(Modifier.widthIn(max=760.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(20.dp)) {
                 Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.PhonelinkSetup,null,Modifier.size(24.dp));Spacer(Modifier.width(12.dp));Column{
                     Text(if(config?.training!=null)"Modèle entraînable" else "Conversion d’inférence",style=MaterialTheme.typography.titleMedium)
-                    Text(if(config?.training!=null)"${config.training.scope} · poids persistants" else "Les signatures d’apprentissage ne sont pas encore disponibles.",style=MaterialTheme.typography.bodySmall)
+                    Text(when(config?.training?.scope) {
+                        "classification_head_only","pretrained_classification_head_only" -> "Tête de classification · encodeur figé"
+                        "candidate_classification_and_box_adaptation_only" -> "Adaptation des détections · encodeur figé"
+                        "heatmap_channel_mixing_head_only" -> "Tête de points · encodeur figé"
+                        "four_task_output_adaptation_only" -> "Sorties multitâches · encodeur figé"
+                        "internal_visual_and_output_layers" -> "Couches visuelles et sorties entraînables"
+                        null -> "Les signatures d’apprentissage ne sont pas encore disponibles."
+                        else -> "Périmètre défini par la conversion"
+                    },style=MaterialTheme.typography.bodySmall)
                 }}
                 Text("Lot exporté $number uniquement. Nettoyage après apprentissage.",style=MaterialTheme.typography.bodyMedium)
                 Row(verticalAlignment=Alignment.CenterVertically){Text("Cycles",Modifier.weight(1f));listOf(1,3,10).forEach{n->FilterChip(selected=epochs==n,onClick={epochs=n},enabled=!active,label={Text("$n")});Spacer(Modifier.width(6.dp))}}

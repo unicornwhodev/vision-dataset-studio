@@ -5,6 +5,7 @@ enum class StudioTask(val title: String, val hint: String) {
     POINTING("Point unique", "Une cible localisée, absente ou non localisable"),
     POINTING_MULTI("Points multiples", "Plusieurs instances dans une image"),
     DETECTION("Détection", "Boîtes englobantes et classes d’objets"),
+    SEGMENTATION("Masques", "Segmentation et correction au pinceau"),
     CAPTIONING("Légendes", "Descriptions courtes, détaillées et multilingues"),
     CLASSIFICATION("Tags & classes", "Étiquettes et classification multi-label"),
     GROUNDING("Texte ↔ région", "Relier une expression à des points ou des boîtes"),
@@ -20,6 +21,7 @@ object StudioWorkflow {
         WorkflowPreset("point", "Pointer une cible", "Un point par image", setOf(StudioTask.POINTING)),
         WorkflowPreset("multi", "Pointer plusieurs cibles", "Toutes les instances utiles", setOf(StudioTask.POINTING_MULTI)),
         WorkflowPreset("detect", "Détecter des objets", "Boîtes et classes", setOf(StudioTask.DETECTION)),
+        WorkflowPreset("segment", "Segmenter des régions", "Masques et corrections", setOf(StudioTask.SEGMENTATION)),
         WorkflowPreset("caption", "Décrire des images", "Légendes et tags", setOf(StudioTask.CAPTIONING, StudioTask.CLASSIFICATION)),
         WorkflowPreset("vl", "Préparer un corpus VL", "Régions, questions et descriptions", setOf(StudioTask.DETECTION, StudioTask.GROUNDING, StudioTask.CAPTIONING, StudioTask.VQA)),
         WorkflowPreset("sort", "Trier et qualifier", "Tags et contrôle qualité", setOf(StudioTask.CLASSIFICATION, StudioTask.NEGATIVE))

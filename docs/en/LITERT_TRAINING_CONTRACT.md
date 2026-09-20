@@ -66,14 +66,15 @@ The optional `weights` probe exposes an internal visual-layer tensor. Comparing 
 | `points_xyv` | `[1,C,3]` | Coordinates in model-input space and visibility; one point per class |
 | `heatmap_nchw` | `[1,C,H,W]` | Human point-centred Gaussian targets, sigma one pixel |
 | `boxes_xyxy_class_mask` | `[1,N,6]` | Box coordinates, class index and presence mask, with explicit zero padding |
+| `segmentation_point_valid_mask_nchw` | `[1,3,H,W]` | Segmentation, point map and validity; per-task auxiliary supervision |
 
-Other encodings need a dedicated adapter. Training graphs requiring text or auxiliary mask inputs are not supported by this contract. An inference bundle may work without being trainable.
+Other encodings need a dedicated adapter. The multitask contract accepts `presence`, `abstention` and `supervision` auxiliary inputs. Supervision flags follow segmentation, point, abstention and presence order. An unreviewed task receives zero weight; missing annotations never establish absence. Text training inputs remain unsupported. An inference bundle may work without being trainable.
 
 ## Dataset and lifecycle
 
 Learning is off by default. Only accepted images from the completely reviewed and verified exported batch enter its private snapshot. The batch fingerprint and export proof are recorded. Other batches and unreviewed proposals are excluded. Cleanup waits for learning and evaluation to finish; errors and cancellation retain the images.
 
-A deterministic file-hash split assigns roughly 80% training / 20% control, with at least 32 training and 8 control images. Exact duplicates cannot cross that split; transformed near-duplicates are not automatically grouped. Conflicting targets for an identical file are rejected. Target values are capped at four million per batch to bound memory.
+A deterministic file-hash split assigns roughly 80% training / 20% control, with at least 32 training and 8 control images. Exact duplicates cannot cross that split; transformed near-duplicates are not automatically grouped. Conflicting targets for an identical file are rejected. Targets are capped at one million values per image, stored in separate hashed files and loaded one image at a time. The disk budget covers the entire batch.
 
 WorkManager runs without a network requirement when the battery is not low. Durable checkpoints support cancellation and resume. Candidate acceptance requires more than 1% control-loss improvement and, when a probe is available, changed internal weights. A fresh interpreter must reproduce checkpoint outputs. This reused control set is not an independent generalization benchmark. Activation remains manual; rejected, interrupted or failed runs never replace the active model.
 
@@ -84,3 +85,9 @@ The Interpreter path uses LiteRT 1.4.2, Select TF Ops 2.16.1 and an explicit Fle
 For each real conversion, exercise all four signatures, prove internal-weight updates, restore in a fresh interpreter, test cancellation/resume and target geometry, then measure memory/latency/battery on a phone and evaluate accuracy/forgetting on an authorized independent corpus.
 
 `tools/qa/create_training_fixture.py` only compiles an untrained synthetic visual network. Optimizer steps run in Android tests. Its successful validation does not qualify production HF models. See [executed validation](VALIDATION.md).
+
+## Scope of the supplied conversions
+
+The inspected HF training conversions expose classification heads, detection adaptations, heatmap channel mixing or multitask output adaptations. **Their visual encoders remain frozen.** Android can update the variables exported by `train`, but cannot invent missing backbone gradients. The synthetic QA network also exposes internal layers; that separate test does not qualify backbone training for HF conversions.
+
+Dynamic signature inputs are resized through shaped arrays and output tensors are read after invocation. Changing a selected checkpoint reloads its state even when the source model stays the same. `tools/qa/qualify_converted_models.py` records inference, update, save and resume results per conversion. Refer to the qualification report for executed evidence; these smoke tests do not measure accuracy.

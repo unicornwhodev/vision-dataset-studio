@@ -21,7 +21,16 @@ import java.io.File
 import java.util.UUID
 
 @JsonClass(generateAdapter=true)
-data class TrainingSample(val image:String,val sha256:String,val target:List<Float>,val validation:Boolean)
+data class TrainingSample(val image:String,val sha256:String,val target:List<Float>,val validation:Boolean,
+    val targetFile:String="",val targetSha256:String="",val auxiliary:Map<String,List<Float>> = emptyMap()) {
+    fun readTarget(root:File):FloatArray {
+        if(targetFile.isBlank())return target.toFloatArray()
+        val f=File(root,targetFile)
+        require(f.canonicalPath.startsWith(root.canonicalPath+File.separator) && f.length() in 4..4_000_000 && f.length()%4==0L)
+        require(HashUtils.computeSha256(f)==targetSha256) { "Cible d’apprentissage altérée" }
+        return java.io.DataInputStream(f.inputStream().buffered()).use { input -> FloatArray((f.length()/4).toInt()) { input.readFloat() } }
+    }
+}
 @JsonClass(generateAdapter=true)
 data class DeviceTrainingRun(
     val id:String,val projectId:Long,val modelFile:String,val modelSha256:String,val config:ModelConfig,
@@ -85,7 +94,8 @@ class OnDeviceTraining(private val context:Context) {
             batch to samples.filter{it.annotationStatus=="VALIDATED"}.sortedBy{it.sampleId}
                 .map{row -> row to (db.annotationDao().getAnnotationSync(row.sampleId)?.dataJson ?: error("Annotations absentes"))}
         }
-        require(rows.size.toLong()*config.training.targetShape.fold(1L){a,b->a*b}<=4_000_000L){"Lot trop volumineux pour les cibles de ce modèle sur cet appareil"}
+        val targetBytes=config.training.targetShape.fold(1L){a,b->a*b}*4
+        require(targetBytes in 4..4_000_000L)
         require(rows.isNotEmpty()){"Aucune image acceptée dans cet export"}
         LiteRtTrainingSession(source,config).use{} // Verify signatures before copying the exported corpus.
         val prepared=rows.map { (row,annotationJson) ->
@@ -94,22 +104,32 @@ class OnDeviceTraining(private val context:Context) {
             require(row.sha256==null || row.sha256==sha){"Image modifiée après annotation"}
             val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true};BitmapFactory.decodeFile(image.path,bounds)
             require(bounds.outWidth>0 && bounds.outHeight>0)
-            val a=annotationsAdapter.fromJson(annotationJson) ?: error("Annotations invalides")
-            val targets=TrainingTargets.encode(a,config,bounds.outWidth,bounds.outHeight)
-            Triple(image,sha,targets.toList())
+            // Keep annotation text only while preparing; dense masks are encoded one image at a time.
+            Triple(image,sha,annotationJson)
         }
         val byImage=prepared.groupBy{it.second}
         require(byImage.values.all{group->group.map{it.third}.distinct().size==1}){"Annotations contradictoires pour des fichiers identiques"}
         val unique=byImage.values.map{it.first()}
         val train=unique.count{!holdout(it.second)};val validation=unique.size-train
         require(train>=32 && validation>=8){"Il faut 32 images d’apprentissage et 8 de contrôle ; disponibles : $train / $validation"}
-        val needed=source.length()*3+unique.sumOf{it.first.length()}+16L*1024*1024
+        val needed=source.length()*3+unique.sumOf{it.first.length()}+targetBytes*unique.size+16L*1024*1024
         val policy=ProjectSettings.read(project)
         require(StorageManager(context).hasAvailableBudget(needed,project.diskBudgetMb,policy.reserveFreeMb)){"Budget disque insuffisant pour conserver les checkpoints et images d’apprentissage"}
         val id=UUID.randomUUID().toString();val directory=File(context.filesDir,"models/training-$id").apply{mkdirs()}
         try {
             val model=File(directory,"model.tflite");source.copyTo(model)
-            val samples=unique.map{(image,sha,target)->val copy=File(directory,"images/$sha").apply{parentFile?.mkdirs()};image.copyTo(copy);TrainingSample(copy.path,sha,target,holdout(sha))}
+            // Delegate requirements belong to the conversion and survive each learned generation.
+            File(source.parentFile,"runtime_contract.json").takeIf { it.isFile }?.copyTo(File(directory,"runtime_contract.json"))
+            val samples=unique.map { (image,sha,annotationJson) ->
+                val annotations=annotationsAdapter.fromJson(annotationJson) ?: error("Annotations invalides")
+                val bounds=BitmapFactory.Options().apply { inJustDecodeBounds=true };BitmapFactory.decodeFile(image.path,bounds)
+                val target=TrainingTargets.encode(annotations,config,bounds.outWidth,bounds.outHeight)
+                val auxiliary=TrainingTargets.auxiliary(annotations,config).mapValues { it.value.toList() }
+                val copy=File(directory,"images/$sha").apply { parentFile?.mkdirs() };image.copyTo(copy)
+                val targetFile=File(directory,"targets/$sha.f32").apply { parentFile?.mkdirs() }
+                java.io.DataOutputStream(targetFile.outputStream().buffered()).use { out -> target.forEach(out::writeFloat) }
+                TrainingSample(copy.path,sha,emptyList(),holdout(sha),targetFile.relativeTo(directory).invariantSeparatorsPath,HashUtils.computeSha256(targetFile),auxiliary)
+            }
             // A resumed generation starts from the active checkpoint; the original profile is never modified.
             val inherited=if(config.trainingCheckpoint.isBlank())null else readCheckpoint(source,config.trainingCheckpoint)
             val baseConfig=config.copy(trainingCheckpoint="")
@@ -131,6 +151,8 @@ class OnDeviceTraining(private val context:Context) {
         val models=File(context.filesDir,"models").canonicalFile
         val root=File(run.modelFile).parentFile!!.canonicalFile
         check(root.parentFile==models && root.name=="training-${run.id}")
+        val targets=File(root,"targets")
+        check(!targets.exists() || targets.deleteRecursively()) { "Nettoyage des cibles incomplet" }
         val images=File(root,"images")
         check(!images.exists() || images.deleteRecursively()){"Nettoyage des images d’apprentissage incomplet; relancez le nettoyage"}
     }
@@ -195,7 +217,7 @@ class DeviceTrainingWorker(context:Context,parameters:WorkerParameters):Coroutin
                 run.checkpoint?.let(session::restore)
                 suspend fun evaluate():Double {
                     var sum=0.0
-                    for(sample in validation){alive();val image=bitmap(sample);try{sum+=TrainingTargets.validationLoss(session.infer(image),sample.target.toFloatArray(),run.config)}finally{image.recycle()}}
+                    for(sample in validation){alive();val image=bitmap(sample);try{sum+=TrainingTargets.validationLoss(session.infer(image),sample.readTarget(model.parentFile!!),run.config,sample.auxiliary.mapValues{it.value.toFloatArray()})}finally{image.recycle()}}
                     return sum/validation.size
                 }
                 if(run.initialLoss==null){run=run.copy(initialLoss=evaluate(),initialWeightProbe=session.weightProbe());store.write(run)}
@@ -204,7 +226,7 @@ class DeviceTrainingWorker(context:Context,parameters:WorkerParameters):Coroutin
                 try {
                     for(step in run.completedSteps until run.totalSteps) {
                         alive();val sample=training[step%training.size];val image=bitmap(sample)
-                        try{session.train(image,sample.target.toFloatArray(),run.learningRate)}finally{image.recycle()}
+                        try{session.train(image,sample.readTarget(model.parentFile!!),run.learningRate,sample.auxiliary.mapValues{it.value.toFloatArray()})}finally{image.recycle()}
                         run=run.copy(completedSteps=step+1)
                         if((step+1)%8==0 || step+1==run.totalSteps){
                             val previous=run.checkpoint

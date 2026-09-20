@@ -21,9 +21,10 @@ class LiteRtGraph(file:File,threads:Int=2):AutoCloseable {
         inputs.forEachIndexed { i,input->require(interpreter.getInputTensor(i).numBytes()==input.bytes.capacity());input.bytes.rewind() }
         val size=(0 until interpreter.outputTensorCount).sumOf{interpreter.getOutputTensor(it).numBytes().toLong()}
         require(size<=128L*1024*1024){"Sorties du bundle au-delà du budget mémoire"}
-        val buffers=(0 until interpreter.outputTensorCount).associateWith{ByteBuffer.allocateDirect(interpreter.getOutputTensor(it).numBytes()).order(ByteOrder.nativeOrder())}
-        interpreter.runForMultipleInputsOutputs(inputs.map{it.bytes as Any}.toTypedArray(),buffers.mapValues{it.value as Any}.toMutableMap())
-        return buffers.map{(i,b)->val t=interpreter.getOutputTensor(i);TensorValues(t.shape().toList(),TensorCodec.decode(b,t.dataType().name,t.numElements(),t.quantizationParams().scale,t.quantizationParams().zeroPoint)).also{require(it.values.all(Float::isFinite))}}
+        val outputs=(0 until interpreter.outputTensorCount).associateWith { null as Any? }.toMutableMap()
+        interpreter.runForMultipleInputsOutputs(inputs.map{it.bytes as Any}.toTypedArray(),outputs)
+        require((0 until interpreter.outputTensorCount).sumOf{interpreter.getOutputTensor(it).numBytes().toLong()}<=128L*1024*1024){"Sorties du bundle au-delà du budget mémoire"}
+        return outputs.keys.map{i->val t=interpreter.getOutputTensor(i);TensorValues(t.shape().toList(),TensorCodec.decode(t.asReadOnlyBuffer(),t.dataType().name,t.numElements(),t.quantizationParams().scale,t.quantizationParams().zeroPoint)).also{require(it.values.all(Float::isFinite))}}
     }
     override fun close()=interpreter.close()
     companion object {

@@ -10,11 +10,12 @@ import java.io.File
 
 object CommunityModelInstaller {
     fun artifacts(item:CommunityModelCatalog.Availability)=item.files.filter{f->
-        f.type!="directory" && f.path.substringAfterLast('.').lowercase() in setOf("tflite","json","txt","md")
+        f.type!="directory" && (f.path.substringAfterLast('.').lowercase() in setOf("tflite","json","txt","md") ||
+            f.path.substringAfterLast('/').uppercase() in setOf("LICENSE", "LICENCE", "COPYING", "NOTICE"))
     }
     suspend fun install(item:CommunityModelCatalog.Availability,directory:File,hf:HfApiClient,progress:(Int,Int)->Unit):File = withContext(Dispatchers.IO) {
         require(item.installableNow && !directory.exists());directory.mkdirs()
-        val items=artifacts(item);val prefix="models/${item.entry.id}/"
+        val items=artifacts(item);val prefix=item.sourcePrefix
         require(items.isNotEmpty() && items.size<=128)
         val hashes=linkedMapOf<String,String>()
         items.sortedBy{if(it.path.endsWith("artifact_manifest.json"))0 else 1}.forEachIndexed{index,remote->
@@ -23,7 +24,7 @@ object CommunityModelInstaller {
             require(remote.size in 1..(2L*1024*1024*1024))
             val file=File(directory,relative).apply{parentFile?.mkdirs()}
             require(file.canonicalPath.startsWith(directory.canonicalPath+File.separator))
-            check(hf.downloadModelFile(CommunityModelCatalog.repoId,item.repoSha,remote.path,file,remote.size)){"Téléchargement interrompu : $relative"}
+            check(hf.downloadModelFile(item.sourceRepo,item.repoSha,remote.path,file,remote.size)){"Téléchargement interrompu : $relative"}
             require(file.length()==remote.size){"Taille différente du catalogue épinglé"}
             hashes[relative]=HashUtils.computeSha256(file);progress(index+1,items.size)
         }

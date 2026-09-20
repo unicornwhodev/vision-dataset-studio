@@ -6,6 +6,7 @@ enum class TaskType {
     POINTING,
     POINTING_MULTI,
     DETECTION,
+    SEGMENTATION,
     CAPTIONING,
     CLASSIFICATION,
     GROUNDING,
@@ -151,6 +152,13 @@ data class QualityAuditTarget(
     val auditNotes: String = ""
 )
 
+@JsonClass(generateAdapter = true)
+data class MaskTarget(
+    val id: String, val label: String, val width: Int, val height: Int, val runs: List<Int>,
+    val isHumanVerified: Boolean = false, val sourceProvenance: String = "human",
+    val modelScore: Float? = null, val explicitlyAdjusted: Boolean = false
+)
+
 /**
  * Full state bundle of annotations for a single sample.
  */
@@ -163,6 +171,7 @@ data class SampleAnnotations(
     val groundings: List<GroundingTarget> = emptyList(),
     val vqaList: List<VqaTarget> = emptyList(),
     val counts: List<CountingTarget> = emptyList(),
+    val masks: List<MaskTarget> = emptyList(),
     val quality: QualityAuditTarget = QualityAuditTarget()
 )
 

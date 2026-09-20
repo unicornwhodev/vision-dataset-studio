@@ -37,6 +37,26 @@ object TrainingTargets {
                 }
                 require(c.labels.all{label->a.points.any{it.label==label} || label in a.quality.verifiedNegativeQueries})
             }
+            "segmentation_point_valid_mask_nchw" -> {
+                require(shape.size==4 && shape[1]==3);val h=shape[2];val w=shape[3];val plane=h*w
+                val masks=a.masks.filter { it.label==c.spatialLabel };require(masks.all { it.isHumanVerified })
+                val points=a.points.filter { it.label==c.spatialLabel };require(points.all { it.isHumanVerified })
+                val decoded=masks.map { it to MaskCodec.decode(it) }
+                for(y in 0 until h) for(x in 0 until w) {
+                    val p=transform.point((x+.5f)/w,(y+.5f)/h,true);val idx=y*w+x
+                    if(p.first !in 0f..1f || p.second !in 0f..1f)continue
+                    out[2*plane+idx]=1f
+                    if(decoded.any { (m,values) -> values[(p.second*m.height).toInt().coerceAtMost(m.height-1)*m.width+(p.first*m.width).toInt().coerceAtMost(m.width-1)] })out[idx]=1f
+                }
+                points.filterNot { it.isAbsent || it.isAbstained }.forEach { p ->
+                    val q=xy(p.x,p.y);require(q.first in 0f..1f && q.second in 0f..1f)
+                    val cx=q.first*w-.5f;val cy=q.second*h-.5f
+                    for(y in max(0,cy.toInt()-6)..min(h-1,cy.toInt()+6))for(x in max(0,cx.toInt()-6)..min(w-1,cx.toInt()+6)) {
+                        val idx=plane+y*w+x;out[idx]=max(out[idx],exp(-((x-cx).pow(2)+(y-cy).pow(2))/8f))
+                    }
+                }
+                require(auxiliary(a,c).getValue("supervision").any { it>0 }) { "Aucune tâche du modèle n’a de supervision humaine" }
+            }
             "boxes_xyxy_class_mask" -> {
                 require(shape.size==3 && shape[2]==6 && a.boxes.size<=shape[1]);require(a.boxes.all{it.isHumanVerified})
                 require(a.boxes.isNotEmpty() || c.labels.all{it in a.quality.verifiedNegativeQueries})
@@ -48,7 +68,29 @@ object TrainingTargets {
         }
         return out
     }
-    fun validationLoss(outputs:List<TensorValues>,target:FloatArray,c:ModelConfig):Double {
+    fun auxiliary(a:SampleAnnotations,c:ModelConfig):Map<String,FloatArray> {
+        val spec=requireNotNull(c.training)
+        if(spec.auxiliaryTargets.isEmpty()) return emptyMap()
+        require(spec.targetEncoding=="segmentation_point_valid_mask_nchw" && spec.auxiliaryTargets.keys==setOf("presence","abstention","supervision"))
+        require(spec.auxiliaryTargets.getValue("supervision").order==listOf("segmentation","point","abstention","presence"))
+        val labels=spec.auxiliaryTargets.getValue("presence").labels
+        require(labels.isNotEmpty())
+        val tags=a.tags.filter { it.isHumanVerified }.map { it.label }.toSet()
+        val negatives=a.quality.verifiedNegativeQueries.toSet()
+        val presence=FloatArray(labels.size) { if(labels[it] in tags)1f else 0f }
+        val presenceReviewed=labels.all { it in tags || it in negatives }
+        val points=a.points.filter { it.label==c.spatialLabel && it.isHumanVerified }
+        val abstained=points.any { it.isAbstained } || a.quality.isUnlocalizablePresent
+        val spatialNegative=c.spatialLabel in negatives
+        val supervision=floatArrayOf(
+            if(a.masks.any { it.label==c.spatialLabel && it.isHumanVerified } || spatialNegative)1f else 0f,
+            if(points.any { !it.isAbstained } || spatialNegative)1f else 0f,
+            if(abstained || points.any { !it.isAbsent && !it.isAbstained })1f else 0f,
+            if(presenceReviewed)1f else 0f)
+        return mapOf("presence" to presence,"abstention" to floatArrayOf(if(abstained)1f else 0f),"supervision" to supervision)
+    }
+    fun validationLoss(outputs:List<TensorValues>,target:FloatArray,config:ModelConfig,auxiliary:Map<String,FloatArray> = emptyMap()):Double {
+        val c=config.signatureConfig()
         val spec=requireNotNull(c.training)
         return when(spec.targetEncoding) {
             "one_hot","multi_hot" -> {
@@ -60,6 +102,20 @@ object TrainingTargets {
             "heatmap_nchw","points_xyv" -> {
                 val output=outputs[c.outputIndex].values;require(output.size==target.size && output.all(Float::isFinite))
                 output.indices.sumOf{(output[it]-target[it]).toDouble().pow(2)}/target.size
+            }
+            "segmentation_point_valid_mask_nchw" -> {
+                val n=spec.targetShape[2]*spec.targetShape[3]
+                val weights=auxiliary.getValue("supervision");require(weights.size==4 && weights.any { it>0 })
+                fun logits(name:String)=outputs[c.namedOutputIndices.getValue(name)].values
+                fun bce(z:Float,y:Float)=max(z.toDouble(),0.0)-z*y+ln(1+exp(-abs(z.toDouble())))
+                val valid=target.copyOfRange(n*2,n*3);val total=valid.sum().coerceAtLeast(1f)
+                val seg=logits("segmentation_logits");val point=logits("point_logits");require(seg.size==n && point.size==n)
+                val segmentation=(0 until n).sumOf { bce(seg[it],target[it])*valid[it] }/total
+                val pointing=(0 until n).sumOf { bce(point[it],target[n+it])*valid[it] }/total
+                val presence=logits("presence_logits");val targetPresence=auxiliary.getValue("presence");require(presence.size==targetPresence.size)
+                val p=presence.indices.sumOf { bce(presence[it],targetPresence[it]) }/presence.size
+                val abst=bce(logits("abstention_logits").single(),auxiliary.getValue("abstention").single())
+                segmentation*weights[0]+.5*pointing*weights[1]+.25*abst*weights[2]+.25*p*weights[3]
             }
             "boxes_xyxy_class_mask" -> {
                 val predictions=ModelAdapters.decode(outputs.mapIndexed{i,v->i to v}.toMap(),c.copy(threshold=0f),InputTransform.create(c.inputWidth,c.inputHeight,c.inputWidth,c.inputHeight,"stretch")).filter{it.type=="box"}

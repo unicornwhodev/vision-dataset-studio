@@ -471,27 +471,37 @@ class HfApiClient(
         return "https://huggingface.co/$clean/resolve/".toHttpUrlOrNull()!!.newBuilder().addPathSegment(revision).addPathSegments(path).build().toString()
     }
 
-    /** List a bounded model-repository tree. Used only for the allowlisted community model catalogue. */
+    /** Authenticated, pinned and paginated; a partial tree must never look complete. */
     suspend fun listModelTree(repoId: String, revision: String = "main", path: String = "models"): List<HfTreeItem> = withContext(Dispatchers.IO) {
         val clean = repoId.trim().removePrefix("https://huggingface.co/").removePrefix("models/")
-        require(clean.matches(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"))) { "Dépôt modèle invalide" }
+        require(clean.matches(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")))
         require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.validRevision(revision))
-        require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(path))
-        val url = "https://huggingface.co/api/models/$clean/tree/".toHttpUrlOrNull()!!.newBuilder()
-            .addPathSegment(revision).addPathSegments(path).addQueryParameter("recursive", "true").addQueryParameter("expand", "false").build().toString()
-        client.newCall(newRequestBuilder(url).get().build()).execute().use { r ->
-            check(r.isSuccessful) { "Catalogue modèles inaccessible (HTTP ${r.code})" }
-            val raw = r.body?.let(::boundedJson) ?: "[]"
-            @Suppress("UNCHECKED_CAST")
-            val rows = moshi.adapter(List::class.java).fromJson(raw) as? List<Map<String, Any?>> ?: emptyList()
-            require(rows.size <= 5000) { "Catalogue distant trop volumineux" }
-            rows.mapNotNull { row ->
-                val itemPath = row["path"] as? String ?: return@mapNotNull null
-                val type = row["type"] as? String ?: "file"
-                val size = (row["size"] as? Number)?.toLong() ?: 0L
-                HfTreeItem(itemPath, type, size)
+        require(path.isEmpty() || com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(path))
+        val builder = "https://huggingface.co/api/models/$clean/tree/".toHttpUrlOrNull()!!.newBuilder().addPathSegment(revision)
+        if (path.isNotEmpty()) builder.addPathSegments(path)
+        val initial = builder.addQueryParameter("recursive", "true").addQueryParameter("expand", "false").build()
+        var next: String? = initial.toString()
+        val visited = mutableSetOf<String>()
+        val items = linkedMapOf<String, HfTreeItem>()
+        while (next != null) {
+            val url = next!!.toHttpUrlOrNull() ?: error("Pagination invalide")
+            require(url.scheme == "https" && url.host == initial.host && url.encodedPath == initial.encodedPath && url.username.isEmpty() && url.password.isEmpty())
+            require(visited.add(url.toString()) && visited.size <= 100) { "Pagination cyclique ou trop longue" }
+            client.newCall(newRequestBuilder(url.toString()).get().build()).execute().use { r ->
+                check(r.isSuccessful) { "Catalogue modèles inaccessible (HTTP ${r.code})" }
+                @Suppress("UNCHECKED_CAST")
+                val rows = moshi.adapter(List::class.java).fromJson(r.body?.let(::boundedJson) ?: "[]") as? List<Map<String, Any?>> ?: error("Catalogue invalide")
+                rows.forEach { row ->
+                    val itemPath = row["path"] as? String ?: error("Chemin absent")
+                    require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(itemPath))
+                    items[itemPath] = HfTreeItem(itemPath, row["type"] as? String ?: "file", (row["size"] as? Number)?.toLong() ?: 0L)
+                }
+                require(items.size <= 5000) { "Catalogue distant trop volumineux" }
+                next = r.headers.values("Link").flatMap { it.split(',') }.firstOrNull { it.contains("rel=\"next\"") }
+                    ?.substringAfter('<')?.substringBefore('>')
             }
         }
+        items.values.toList()
     }
 
     suspend fun downloadModelFile(repoId: String, revision: String, path: String, dest: File, maxBytes: Long): Boolean =

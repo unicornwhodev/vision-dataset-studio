@@ -157,6 +157,11 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
             val s = samples[index].first; val c = labels.indexOf(b.label); require(c >= 0) { "Classe COCO inconnue: ${b.label}" }
             val bbox = NormalizedRect(b.xmin, b.ymin, b.xmax, b.ymax).toCocoPx(s.imageWidth, s.imageHeight)
             mapOf("id" to ++next, "image_id" to index + 1, "category_id" to c + 1, "bbox" to bbox.toList(), "area" to bbox[2] * bbox[3], "iscrowd" to 0)
+        } + a.masks.mapNotNull { m ->
+            val sample=samples[index].first;val category=labels.indexOf(m.label);require(category>=0) { "Classe COCO inconnue: ${m.label}" }
+            val projection=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.projectCoco(m,sample.imageWidth,sample.imageHeight)
+            if(projection.area==0) null else mapOf("id" to ++next,"image_id" to index+1,"category_id" to category+1,"bbox" to projection.bbox,"area" to projection.area,"iscrowd" to 0,
+                "segmentation" to projection.segmentation)
         } }
         outputFile.writeText(json(mapOf("images" to samples.mapIndexed { i, (s, _) -> mapOf("id" to i + 1, "file_name" to "images/${imageName(s)}", "width" to s.imageWidth, "height" to s.imageHeight) },
             "categories" to labels.mapIndexed { i, label -> mapOf("id" to i + 1, "name" to label) }, "annotations" to annotations)))
@@ -194,5 +199,5 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
         media = CanonicalMediaInfo(imageName(s), s.imageWidth, s.imageHeight, when (File(s.localImagePath ?: "image.jpg").extension.lowercase()) { "png" -> "image/png"; "webp" -> "image/webp"; else -> "image/jpeg" },
             s.sha256 ?: "", s.phash?.toString(16), null, s.sourceSha256, s.imageTransform), // Never publish a temporary signed/private URL.
         annotations = a, review_status = s.annotationStatus,
-        audit = CanonicalAuditInfo(s.createdAt, s.updatedAt, "local_curator", a.boxes.any { it.sourceProvenance != "human" } || a.points.any { it.sourceProvenance != "human" } || a.tags.any { it.sourceProvenance != "human" }))
+        audit = CanonicalAuditInfo(s.createdAt, s.updatedAt, "local_curator", a.masks.any { it.sourceProvenance != "human" } || a.boxes.any { it.sourceProvenance != "human" } || a.points.any { it.sourceProvenance != "human" } || a.tags.any { it.sourceProvenance != "human" }))
 }

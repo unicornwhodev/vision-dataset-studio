@@ -75,9 +75,11 @@ class LiteRtBundle(private val manifestFile:File) {
             if(value>0){maskPixels[y*bitmap.width+x]=Color.WHITE;x1=min(x1,x);y1=min(y1,y);x2=max(x2,x);y2=max(y2,y)}
         }
         mask=Bitmap.createBitmap(maskPixels,bitmap.width,bitmap.height,Bitmap.Config.ARGB_8888)
-        note="Masque calculé localement ; proposition de boîte englobante à corriger."
+        note="Masque proposé · correction et validation requises."
         val score=result[1].values[0].coerceIn(0f,1f)
-        return if(x2<x1 || y2<y1 || score<c.threshold)emptyList() else listOf(ModelProposal("box",c.labels.firstOrNull() ?: "object",score,x1.toFloat()/bitmap.width,y1.toFloat()/bitmap.height,(x2+1f)/bitmap.width,(y2+1f)/bitmap.height))
+        return if(x2<x1 || y2<y1 || score<c.threshold)emptyList() else listOf(
+            ModelProposal("mask",c.labels.firstOrNull() ?: "object",score,mask=com.unicornwhodev.visiondatasetstudio.data.model.MaskTarget("proposal",c.labels.firstOrNull() ?: "object",bitmap.width,bitmap.height,MaskCodec.encode(BooleanArray(maskPixels.size){maskPixels[it]!=0}))),
+            ModelProposal("box",c.labels.firstOrNull() ?: "object",score,x1.toFloat()/bitmap.width,y1.toFloat()/bitmap.height,(x2+1f)/bitmap.width,(y2+1f)/bitmap.height))
     }
     private suspend fun florence(bitmap:Bitmap,c:ModelConfig):List<ModelProposal> {
         val prompts=mapOf("<CAPTION>" to "What does the image describe?","<DETAILED_CAPTION>" to "Describe in detail what is shown in the image.","<MORE_DETAILED_CAPTION>" to "Describe with a paragraph what is shown in the image.","<OD>" to "Locate the objects with category name in the image.","<OCR>" to "What is the text in the image?")

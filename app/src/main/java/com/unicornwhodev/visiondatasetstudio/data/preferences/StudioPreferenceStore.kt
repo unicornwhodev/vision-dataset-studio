@@ -23,6 +23,14 @@ class StudioPreferenceStore(context: Context) {
             .putString("caption_language", value.captionLanguage).apply()
         mutable.value = value
     }
+    var modelCatalog: com.unicornwhodev.visiondatasetstudio.domain.inference.CommunityModelCatalog.Source
+        get() = com.unicornwhodev.visiondatasetstudio.domain.inference.CommunityModelCatalog.Source(
+            prefs.getString("model_repo", null) ?: com.unicornwhodev.visiondatasetstudio.domain.inference.CommunityModelCatalog.repoId,
+            prefs.getString("model_revision", "main") ?: "main", prefs.getString("model_folder", "models") ?: "models")
+        set(value) {
+            value.validate()
+            prefs.edit().putString("model_repo", value.repository).putString("model_revision", value.revision).putString("model_folder", value.folder).apply()
+        }
     var activeProjectId: Long
         get() = prefs.getLong("active_project", 1L)
         set(value) { prefs.edit().putLong("active_project", value).apply() }

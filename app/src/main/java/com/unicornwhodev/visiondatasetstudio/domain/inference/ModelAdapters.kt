@@ -27,16 +27,16 @@ data class InputTransform(val imageWidth: Int, val imageHeight: Int, val width: 
 }
 
 object ModelContract {
-    val adapters = listOf("ssd", "rfdetr", "tinyclip", "sam_box", "florence2", "yolo", "xyxy_score_class", "classification", "points", "heatmap", "embedding", "inspect_only")
+    val adapters = listOf("ssd", "rfdetr", "rtmdet", "fireviewer_dinov3_multitask", "tinyclip", "sam_box", "florence2", "yolo", "xyxy_score_class", "classification", "points", "heatmap", "embedding", "inspect_only")
     fun adapter(c: ModelConfig) = if (c.adapter == "auto") when(c.task) {
         "object_detection" -> "ssd"; "classification" -> "classification"; "pointing" -> "points"; else -> c.task
     } else c.adapter
     fun resize(c: ModelConfig) = if (c.resizeMode == "auto") if (adapter(c) == "classification") "stretch" else "letterbox" else c.resizeMode
     fun outputTypes(c: ModelConfig): Set<String> {
-        if(c.bundleKind.isNotBlank())return when(c.bundleKind){"tinyclip"->setOf("tag");"efficientvit_sam"->setOf("box");"florence2"->setOf("caption","box");else->emptySet()}
+        if(c.bundleKind.isNotBlank())return when(c.bundleKind){"tinyclip"->setOf("tag");"efficientvit_sam"->setOf("box","mask");"florence2"->setOf("caption","box");else->emptySet()}
         if(c.runtime=="local_http") return when(c.httpOutputMode) { "caption_text"->setOf("caption");else-> when(c.task){
             "classification"->setOf("tag");"captioning"->setOf("caption");"vqa"->setOf("vqa");"pointing"->setOf("point");"counting"->setOf("count");"multitask"->setOf("point","box","tag","caption","vqa","count");else->setOf("box")}}
-        return when(adapter(c)) { "classification"->setOf("tag");"points","heatmap"->setOf("point");"embedding","inspect_only"->emptySet();else->when(c.outputMode){"points"->setOf("point");"both"->setOf("point","box");else->setOf("box")} } + if(c.deriveCounts) setOf("count") else emptySet()
+        return when(adapter(c)) { "fireviewer_dinov3_multitask"->setOf("tag","mask","point"); "classification"->setOf("tag");"points","heatmap"->setOf("point");"embedding","inspect_only"->emptySet();else->when(c.outputMode){"points"->setOf("point");"both"->setOf("point","box");else->setOf("box")} } + if(c.deriveCounts) setOf("count") else emptySet()
     }
     fun validate(c: ModelConfig) {
         require(c.bundleKind in setOf("","tinyclip","efficientvit_sam","florence2"))
@@ -46,9 +46,15 @@ object ModelContract {
         require(c.extraIntInputs.size<=4 && c.extraIntInputs.all{(k,v)->k.toIntOrNull() in 1..4 && v.size in 1..4096})
         c.training?.let { t ->
             require(listOf(t.trainSignature,t.inferSignature,t.saveSignature,t.restoreSignature,t.imageInput,t.targetInput,t.lossOutput,t.checkpointInput).all{it.matches(Regex("[A-Za-z0-9_/.-]{1,100}"))})
-            require(t.targetEncoding in setOf("one_hot","multi_hot","points_xyv","heatmap_nchw","boxes_xyxy_class_mask"))
+            require(t.targetEncoding in setOf("one_hot","multi_hot","points_xyv","heatmap_nchw","boxes_xyxy_class_mask","segmentation_point_valid_mask_nchw"))
             require(t.targetShape.isNotEmpty() && t.targetShape.size<=4 && t.targetShape.all{it in 1..4096} && t.targetShape.fold(1L){a,b->a*b}<=1_000_000)
             require(t.inferOutputs.isNotEmpty() && t.inferOutputs.distinct().size==t.inferOutputs.size)
+        }
+        require(c.namedOutputIndices.size<=128 && c.namedOutputIndices.values.all { it in 0..128 } && c.namedOutputIndices.values.distinct().size==c.namedOutputIndices.size)
+        require(c.featureStrides.isNotEmpty() && c.featureStrides.size<=8 && c.featureStrides.all { it in 1..128 })
+        c.training?.auxiliaryTargets?.forEach { (name, target) ->
+            require(name.matches(Regex("[A-Za-z0-9_]{1,100}")))
+            require(target.shape.isNotEmpty() && target.shape.all { it in 1..4096 } && target.shape.fold(1L){a,b->a*b}<=1_000_000)
         }
         require(c.trainingCheckpoint.isBlank() || (c.training!=null && com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(c.trainingCheckpoint)))
         require(c.schemaVersion == 1) { "Version de contrat modèle non prise en charge" }
@@ -142,6 +148,50 @@ object ModelAdapters {
                     val x=v(i,0);val y=v(i,1);val w=v(i,2);val h=v(i,3)
                     box(c,t,x-w/2,y-h/2,x+w/2,y+h/2,score,c.labels[cls])?.let(all::add)
                 }; nms(all,c)
+            }
+            "fireviewer_dinov3_multitask" -> {
+                fun output(name:String)=outputs.getValue(c.namedOutputIndices.getValue(name))
+                val presence=output("presence_logits");require(presence.shape==listOf(1,c.labels.size))
+                val probs=scores(presence.values,"sigmoid")
+                val tags=probs.mapIndexed { i,p -> ModelProposal("tag",c.labels[i],p) }.filter { it.score>=c.threshold }
+                val abstention=output("abstention_logits");require(abstention.values.size==1)
+                if(scores(abstention.values,"sigmoid")[0]>=.5f) tags else {
+                    val point=output("point_logits");val segmentation=output("segmentation_logits")
+                    require(point.shape.size==4 && point.shape[0]==1 && point.shape[1]==1 && segmentation.shape==point.shape)
+                    require(c.spatialLabel.isNotBlank())
+                    val h=point.shape[2];val w=point.shape[3]
+                    val pointProbs=scores(point.values,"sigmoid");val best=pointProbs.indices.maxByOrNull { pointProbs[it] }!!
+                    val position=t.point((best%w+.5f)/w,(best/w+.5f)/h,true)
+                    val points=if(pointProbs[best]>=c.threshold && position.first in 0f..1f && position.second in 0f..1f)
+                        listOf(ModelProposal("point",c.spatialLabel,pointProbs[best],pointX=position.first,pointY=position.second,modelX=position.first,modelY=position.second)) else emptyList()
+                    // Store a raster in original-image coordinates, excluding padding and undoing crop/resize.
+                    val seg=scores(segmentation.values,"sigmoid")
+                    val mw=minOf(512,t.imageWidth);val mh=maxOf(1,(t.imageHeight.toDouble()*mw/t.imageWidth).roundToInt()).coerceAtMost(2048)
+                    val raster=BooleanArray(mw*mh) { i ->
+                        val nx=((i%mw+.5f)/mw*t.fittedWidth+t.left)/t.width
+                        val ny=((i/mw+.5f)/mh*t.fittedHeight+t.top)/t.height
+                        nx in 0f..1f && ny in 0f..1f && seg[(ny*h).toInt().coerceIn(0,h-1)*w+(nx*w).toInt().coerceIn(0,w-1)]>=.5f
+                    }
+                    val masks=if(raster.any { it }) listOf(ModelProposal("mask",c.spatialLabel,seg.max(),mask=com.unicornwhodev.visiondatasetstudio.data.model.MaskTarget("proposal",c.spatialLabel,mw,mh,MaskCodec.encode(raster)))) else emptyList()
+                    tags+points+masks
+                }
+            }
+            "rtmdet" -> {
+                val all=mutableListOf<ModelProposal>()
+                c.featureStrides.forEachIndexed { index,stride ->
+                    val out=outputs.getValue(index); val sh=out.shape; val channels=c.labels.size+4
+                    require(sh==listOf(1,c.inputHeight/stride,c.inputWidth/stride,channels)) { "Carte RTMDet incompatible avec le pas déclaré" }
+                    val w=sh[2]
+                    for (cell in 0 until sh[1]*w) {
+                        val base=cell*channels
+                        val prob=scores(out.values.copyOfRange(base,base+c.labels.size),"sigmoid")
+                        val cls=prob.indices.maxByOrNull { prob[it] } ?: continue
+                        if(prob[cls]<c.threshold) continue
+                        val x=(cell%w)*stride.toFloat();val y=(cell/w)*stride.toFloat();val d=base+c.labels.size
+                        box(c.copy(coordinates="pixels"),t,x-out.values[d]*stride,y-out.values[d+1]*stride,x+out.values[d+2]*stride,y+out.values[d+3]*stride,prob[cls],c.labels[cls])?.let(all::add)
+                    }
+                }
+                nms(all,c)
             }
             "rfdetr" -> {
                 val boxes=outputs.getValue(c.outputIndexBoxes);val logits=outputs.getValue(c.outputIndexScores)

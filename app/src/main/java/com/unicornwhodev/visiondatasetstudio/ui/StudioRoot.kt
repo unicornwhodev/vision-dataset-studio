@@ -80,6 +80,7 @@ fun StudioRoot(viewModel: MainViewModel) {
                             is Screen.Models -> ModelLibraryScreen(viewModel)
                             is Screen.Training -> TrainingScreen(viewModel)
                             is Screen.Similarity -> SimilarityScreen(viewModel)
+                            is Screen.Workflow -> WorkflowScreen(viewModel)
                             is Screen.Publication -> PublicationScreen(viewModel)
                             is Screen.QualityDashboard -> QualityDashboardScreen(viewModel)
                             is Screen.Preferences -> StudioPreferencesScreen(viewModel)

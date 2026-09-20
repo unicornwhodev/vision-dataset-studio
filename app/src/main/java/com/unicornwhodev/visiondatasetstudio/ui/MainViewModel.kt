@@ -40,6 +40,7 @@ sealed class Screen {
     object Models : Screen()
     object Training : Screen()
     object Similarity : Screen()
+    object Workflow : Screen()
 }
 
 private sealed class EditCommand {
@@ -64,6 +65,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val projectFlow = _activeProjectId.flatMapLatest { db.projectDao().getProject(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
     val batches = _activeProjectId.flatMapLatest { db.batchDao().getBatches(it) }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val modelProfiles = db.modelProfileDao().observe().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    private val _catalogSource = MutableStateFlow(preferenceStore.modelCatalog)
+    val catalogSource = _catalogSource.asStateFlow()
+    private val workflowJournal=com.unicornwhodev.visiondatasetstudio.domain.workflow.WorkflowJournal(application)
+    private val _workflow=MutableStateFlow<com.unicornwhodev.visiondatasetstudio.domain.workflow.WorkflowRun?>(null)
+    val workflow=_workflow.asStateFlow()
+    private val _agentChoice=MutableStateFlow<com.unicornwhodev.visiondatasetstudio.domain.workflow.LocalWorkflowAgent.Choice?>(null)
+    val agentChoice=_agentChoice.asStateFlow()
     private val _communityModels = MutableStateFlow<List<CommunityModelCatalog.Availability>>(emptyList())
     val communityModels = _communityModels.asStateFlow()
     private val _modelDiagnostics = MutableStateFlow("")
@@ -132,7 +140,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         db.withTransaction {
                             val sample = db.sampleDao().getSampleSync(command.sampleId)
                             check(sample != null && db.batchDao().getBatchSync(sample.projectId, sample.batchNumber)?.status !in com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates) { "Lot verrouillé : correction non écrite" }
-                            db.sampleDao().updateSample(sample.copy(annotationStatus = if (command.annotations.boxes.any { !it.isHumanVerified } || command.annotations.points.any { !it.isHumanVerified } || command.annotations.tags.any { !it.isHumanVerified }) "PROPOSALS_AVAILABLE" else "IN_PROGRESS", updatedAt = System.currentTimeMillis()))
+                            db.sampleDao().updateSample(sample.copy(annotationStatus = if (command.annotations.masks.any { !it.isHumanVerified } || command.annotations.boxes.any { !it.isHumanVerified } || command.annotations.points.any { !it.isHumanVerified } || command.annotations.tags.any { !it.isHumanVerified }) "PROPOSALS_AVAILABLE" else "IN_PROGRESS", updatedAt = System.currentTimeMillis()))
                             batchEngine.saveSampleAnnotations(command.sampleId, command.annotations)
                         }
                         failedSaves.remove(command.sampleId)
@@ -164,7 +172,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         checkTokenStatus()
-        viewModelScope.launch { runCatching { _communityModels.value=CommunityModelCatalog.discover(hfApiClient) } }
+        viewModelScope.launch { runCatching { _communityModels.value=CommunityModelCatalog.discover(hfApiClient, _catalogSource.value) } }
     }
 
     fun updatePreferences(value: StudioPreferences) = preferenceStore.update(value)
@@ -528,7 +536,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         var factor=1;while(maxOf(bounds.outWidth,bounds.outHeight)/factor>2048)factor*=2
         BitmapFactory.decodeFile(s.localImagePath,BitmapFactory.Options().apply { inSampleSize=factor }) ?: error("Image non décodable")
     }
-    fun runLiteRtOnCurrentSample() = operation {
+    fun runLiteRtOnCurrentSample(promptPoint: List<Float> = emptyList()) = operation {
         val s=_currentSample.value ?: error("Aucun cas actif")
         val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
         val base=modelConfig(p)
@@ -536,7 +544,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val c=if(base.bundleKind=="efficientvit_sam") {
             val box=annotations.boxes.firstOrNull{it.isHumanVerified}
             val point=annotations.points.firstOrNull{it.isHumanVerified && !it.isAbsent && !it.isAbstained}
-            when{box!=null->base.copy(promptBox=listOf(box.xmin,box.ymin,box.xmax,box.ymax),promptPoint=emptyList());point!=null->base.copy(promptPoint=listOf(point.x,point.y),promptBox=emptyList());else->base}
+            when{promptPoint.size==2->base.copy(promptPoint=promptPoint,promptBox=emptyList());box!=null->base.copy(promptBox=listOf(box.xmin,box.ymin,box.xmax,box.ymax),promptPoint=emptyList());point!=null->base.copy(promptPoint=listOf(point.x,point.y),promptBox=emptyList());else->base}
         }else base
         try {
             loadForInference(p,c);val bitmap=decodeSample(s)
@@ -554,7 +562,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun acceptCurrentProposals() {
         val a=_currentAnnotations.value
-        updateAnnotations(a.copy(points=a.points.map{it.copy(isHumanVerified=true)},boxes=a.boxes.map{it.copy(isHumanVerified=true)},
+        updateAnnotations(a.copy(masks=a.masks.map{it.copy(isHumanVerified=true)},points=a.points.map{it.copy(isHumanVerified=true)},boxes=a.boxes.map{it.copy(isHumanVerified=true)},
             tags=a.tags.map{it.copy(isHumanVerified=true)},captions=a.captions.map{it.copy(isHumanVerified=true)},
             groundings=a.groundings.map{it.copy(isHumanVerified=true)},vqaList=a.vqaList.map{it.copy(isHumanVerified=true)},counts=a.counts.map{it.copy(isHumanVerified=true)}))
     }
@@ -597,13 +605,90 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         _operationProgress.value=OperationProgress("Rapport de mesure enregistré; aucune image ni jeton inclus.",1,1)
     }
+    fun setModelCatalog(repository: String, revision: String, folder: String) = operation {
+        val source = CommunityModelCatalog.Source(repository.trim().removePrefix("https://huggingface.co/"), revision.trim(), folder.trim().trim('/'))
+        source.validate()
+        val found = CommunityModelCatalog.discover(hfApiClient, source)
+        preferenceStore.modelCatalog = source
+        _catalogSource.value = source
+        _communityModels.value = found
+        _operationProgress.value = OperationProgress("${found.size} conversion(s)", 1, 1)
+    }
+    fun loadWorkflow()=operation { _workflow.value=withContext(Dispatchers.IO) { workflowJournal.read(_activeProjectId.value,_activeBatchNumber.value) } }
+    fun startWorkflow(template:String,instructions:String)=operation {
+        com.unicornwhodev.visiondatasetstudio.domain.workflow.WorkflowTools.template(template)
+        require(instructions.length<=8000)
+        val run=com.unicornwhodev.visiondatasetstudio.domain.workflow.WorkflowRun(_activeProjectId.value,_activeBatchNumber.value,template,instructions=instructions)
+        withContext(Dispatchers.IO) { workflowJournal.write(run) };_workflow.value=run
+    }
+    fun askLocalWorkflowAgent(endpoint:String,instructions:String)=operation {
+        val rows=db.sampleDao().getSamplesForBatchSync(_activeProjectId.value,_activeBatchNumber.value)
+        _agentChoice.value=com.unicornwhodev.visiondatasetstudio.domain.workflow.LocalWorkflowAgent.propose(endpoint,instructions,rows.groupingBy { it.annotationStatus }.eachCount())
+    }
+    fun resumeWorkflow()=operation {
+        var run=withContext(Dispatchers.IO) { workflowJournal.read(_activeProjectId.value,_activeBatchNumber.value) } ?: error("Choisissez un workflow")
+        val template=com.unicornwhodev.visiondatasetstudio.domain.workflow.WorkflowTools.template(run.template)
+        suspend fun record(phase:String,message:String) {
+            run=run.copy(phase=phase,message=message);withContext(Dispatchers.IO){workflowJournal.write(run)};_workflow.value=run
+        }
+        try {
+            while(run.cursor<template.steps.size) {
+                val p=db.projectDao().getProjectSync(run.projectId) ?: error("Projet absent")
+                val policy=ProjectSettings.read(p)
+                val step=template.steps[run.cursor]
+                record("running",com.unicornwhodev.visiondatasetstudio.domain.workflow.WorkflowTools.labels.getValue(step))
+                val rows=db.sampleDao().getSamplesForBatchSync(p.id,run.batchNumber)
+                val batch=db.batchDao().getBatchSync(p.id,run.batchNumber)
+                if(batch?.status in setOf("PURGED","EMPTY")) {
+                    run=run.copy(cursor=template.steps.size)
+                    record("completed",if(batch?.status=="EMPTY") "Fin de source · aucun cas à traiter." else "Lot terminé · historique conservé.")
+                    break
+                }
+                var wait:String?=null
+                when(step) {
+                    "import_batch" -> if(rows.isEmpty() || rows.any { it.acquisitionStatus !in setOf("AVAILABLE","DUPLICATE") && it.annotationStatus!="REJECTED" })
+                        prepareBatch(p.copy(settingsJson=ProjectSettings.write(policy.copy(autoPreannotate=false))),run.batchNumber)
+                    "preannotate" -> if(rows.any { it.annotationStatus=="PENDING" && it.acquisitionStatus=="AVAILABLE" }) {
+                        val config=modelConfig(p)
+                        try { loadForInference(p,config);batchEngine.runBatchInference(p.id,run.batchNumber,config,freshOnly=true) { done,total -> _operationProgress.value=OperationProgress("Préannotation",done,total) } }
+                        finally { liteRtEngine.close() }
+                    }
+                    "review" -> if(rows.isEmpty() || rows.any { it.annotationStatus !in setOf("VALIDATED","REJECTED","DUPLICATE") }) wait="Corrigez et validez les images du lot."
+                    "audit" -> {
+                        require(rows.isNotEmpty() && rows.all { it.annotationStatus in setOf("VALIDATED","REJECTED","DUPLICATE") }) { "Relecture incomplète" }
+                        batchEngine.requireUniqueExport(rows.filter { it.annotationStatus=="VALIDATED" })
+                        rows.filter { it.annotationStatus=="VALIDATED" }.forEach { row ->
+                            val issues=com.unicornwhodev.visiondatasetstudio.domain.validation.AnnotationReview.problems(batchEngine.getSampleAnnotations(row.sampleId),com.unicornwhodev.visiondatasetstudio.core.workflow.StudioWorkflow.parseTasks(p.activeTasksCsv))
+                            require(issues.isEmpty()) { issues.joinToString(" · ") }
+                        }
+                    }
+                    "prepare_export" -> if(batch?.status !in setOf("VERIFIED","PURGED")) {
+                        if(rows.none { it.annotationStatus=="VALIDATED" }) batchEngine.closeRejectedBatch(p.id,run.batchNumber)
+                        else prepareActiveArchive()
+                    }
+                    "verify_export" -> if(batch?.status !in setOf("VERIFIED","PURGED")) wait="Enregistrez et vérifiez la copie dans Export."
+                    "optional_train" -> if(policy.continuousTraining && rows.any { it.annotationStatus=="VALIDATED" }) {
+                        val learned=deviceTraining.readBatch(p.id,run.batchNumber)
+                        if(learned==null) { val prepared=deviceTraining.prepare(p,run.batchNumber);_trainingRun.value=prepared;deviceTraining.enqueue(p.id) }
+                        if(learned?.phase !in setOf("completed","rejected")) wait="Attendez la fin de l’apprentissage, ou reprenez-le dans Modèles."
+                    }
+                    "cleanup" -> if(batch?.status!="PURGED") wait="Confirmez le nettoyage dans Export après la fin de l’apprentissage."
+                    else -> error("Outil non autorisé")
+                }
+                if(wait!=null) { record("waiting",wait);break }
+                run=run.copy(cursor=run.cursor+1)
+                record(if(run.cursor==template.steps.size)"completed" else "ready",if(run.cursor==template.steps.size)"Lot terminé · le lot suivant reste une action explicite." else "Étape terminée")
+            }
+        } catch(e:CancellationException) { withContext(NonCancellable){record("paused","Interrompu · reprise disponible")};throw e }
+        catch(e:Exception) { record("failed",e.message ?: "Étape échouée");throw e }
+    }
     fun refreshCommunityModelCatalog()=operation {
         _operationProgress.value=OperationProgress("Lecture du catalogue LiteRT UWD…",0,1)
-        _communityModels.value=CommunityModelCatalog.discover(hfApiClient)
+        _communityModels.value=CommunityModelCatalog.discover(hfApiClient, _catalogSource.value)
         _operationProgress.value=OperationProgress("Catalogue actualisé : ${_communityModels.value.count{it.available}} conversion(s) disponible(s).",1,1)
     }
     fun downloadCommunityModel(id:String)=operation {
-        val item=_communityModels.value.firstOrNull{it.entry.id==id} ?: CommunityModelCatalog.discover(hfApiClient).firstOrNull{it.entry.id==id} ?: error("Modèle absent du catalogue")
+        val item=_communityModels.value.firstOrNull{it.entry.id==id} ?: CommunityModelCatalog.discover(hfApiClient, _catalogSource.value).firstOrNull{it.entry.id==id} ?: error("Modèle absent du catalogue")
         require(item.available && item.installableNow){item.note}
         val project=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
         val settings=ProjectSettings.read(project);batchEngine.checkNetwork(settings)
@@ -617,7 +702,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val hash=withContext(Dispatchers.IO){com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils.computeSha256(file)}
             val report=try {
                 check(withContext(Dispatchers.IO){liteRtEngine.loadModel(file,config.threads)}){liteRtEngine.lastError ?: "Modèle non chargeable"}
-                "Catalogue: ${CommunityModelCatalog.repoId}@${item.repoSha}\nLicence déclarée: ${item.entry.upstreamLicense}\n"+liteRtEngine.tensorReport()
+                "Catalogue: ${item.sourceRepo}@${item.repoSha}\nLicence déclarée: ${item.entry.upstreamLicense}\n"+liteRtEngine.tensorReport()
             }finally{liteRtEngine.close()}
             db.modelProfileDao().save(ModelProfileEntity(UUID.randomUUID().toString(),item.entry.title,file.path,hash,moshi.adapter(ModelConfig::class.java).toJson(config),report))
             saved=true;_modelDiagnostics.value=report
@@ -659,6 +744,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun exportActiveBatchToLocalZip(includeWebDataset: Boolean = true, includeJsonl: Boolean = true, includeCoco: Boolean = true, includeYolo: Boolean = true, includeVl: Boolean = true) = operation {
+        prepareActiveArchive(includeWebDataset,includeJsonl,includeCoco,includeYolo,includeVl)
+    }
+    private suspend fun prepareActiveArchive(includeWebDataset: Boolean = true, includeJsonl: Boolean = true, includeCoco: Boolean = true, includeYolo: Boolean = true, includeVl: Boolean = true) {
         _operationProgress.value = OperationProgress("Préparation de l’archive locale…", 0, 1)
         val p = db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Atelier absent")
         check(db.batchDao().getBatchSync(_activeProjectId.value, _activeBatchNumber.value)?.status !in com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates) { "Le paquet publié doit rester inchangé pour vérification. Récupérez les fichiers depuis le commit HF ou conservez l’archive déjà prête." }

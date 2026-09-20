@@ -86,19 +86,17 @@ Elle ne doit pas retourner une constante, une métrique ou seulement la tête fi
 | `points_xyv` | `[1,C,3]` | x, y normalisés dans l’entrée modèle, présence ; une cible par classe |
 | `heatmap_nchw` | `[1,C,H,W]` | Gaussiennes centrées sur les points humains, sigma 1 pixel |
 | `boxes_xyxy_class_mask` | `[1,N,6]` | xmin, ymin, xmax, ymax, indice classe, masque 0/1 ; zéro-padding explicite |
+| `segmentation_point_valid_mask_nchw` | `[1,3,H,W]` | Masque, carte de point et validité ; supervision auxiliaire par tâche |
 
 Le convertisseur doit utiliser exactement ces encodages, ou l’application doit
-recevoir un adaptateur supplémentaire. Les graphes de training à entrées multiples
-(image, texte, masques auxiliaires) nécessitent un contrat supplémentaire et sont
-refusés par cette première interface. Un bundle d’inférence peut être utilisable
-sans être entraînable par cette interface.
+recevoir un adaptateur supplémentaire. Le contrat multitâche accepte les entrées auxiliaires `presence`, `abstention` et `supervision`. Les quatre indicateurs de supervision suivent l’ordre segmentation, point, abstention, présence. Une tâche non revue reçoit un indicateur nul : une annotation manquante ne devient jamais une absence. Les entrées texte pour l’apprentissage restent non prises en charge. Un bundle d’inférence peut être utilisable sans être entraînable.
 
 ## Cycle local et contrôle
 
 L’option est désactivée par défaut. Un snapshot privé contient exclusivement les images acceptées du lot terminé, exporté et vérifié. Sa preuve d’export et son empreinte sont enregistrées. Aucun déclenchement ne suit une validation individuelle. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; une interruption ou un échec conserve les images. Les fichiers
 identiques restent dans le même groupe : attribution déterministe par SHA-256,
 environ 80 % apprentissage / 20 % contrôle. Les quasi-doublons ou réencodages
-ne sont pas regroupés automatiquement. Minimum : 32 images train et 8 contrôle. Les cibles sont limitées à quatre millions de valeurs par lot pour borner la mémoire.
+ne sont pas regroupés automatiquement. Minimum : 32 images train et 8 contrôle. Les cibles sont limitées à un million de valeurs par image. Elles sont sérialisées séparément, hachées et chargées une image à la fois ; le budget disque couvre le lot entier.
 Les doublons avec des cibles contradictoires sont refusés. Les propositions
 non vérifiées ne peuvent pas servir de cibles.
 
@@ -127,3 +125,9 @@ précision. Les résultats réellement obtenus seront consignés séparément.
 ## Runtime Android
 
 Le chemin `Interpreter` utilise LiteRT 1.4.2 avec Select TF Ops 2.16.1 et un délégué Flex explicite pour les signatures secondaires `save`/`restore`. Les AAR officiels LiteRT 2.1.5 et 2.2.0 inspectés ne fournissent pas l’API Java Delegate nécessaire : le test Android sous 2.2.0 a modifié les poids mais échoué sur FlexSave. Ce choix de compatibilité doit être qualifié avec chaque conversion HF ; il ne garantit pas tous les opérateurs des conversions récentes. L’API moderne CompiledModel n’est pas annoncée comme un backend d’apprentissage.
+
+## Portée des conversions actuellement fournies
+
+Les conversions HF entraînables inspectées exposent des têtes de classification, des adaptations de détection, un mélange de cartes de points ou une adaptation de sorties multitâches. **Leurs encodeurs visuels restent figés.** L’application peut mettre à jour les variables exportées par `train`, mais ne peut pas créer des gradients absents du graphe. Le réseau synthétique de recette expose aussi ses couches internes ; ce test distinct ne transforme pas les conversions HF en entraînement du backbone.
+
+Les entrées de signatures à dimensions dynamiques sont redimensionnées à partir de tableaux multidimensionnels ; les sorties sont lues après l’invocation. Les checkpoints sont rechargés lorsque leur sélection change, même avec un modèle source identique. Le runner `tools/qa/qualify_converted_models.py` conserve les résultats d’inférence, de mise à jour, de sauvegarde et de reprise par conversion. Voir le rapport de qualification pour les résultats exécutés, sans les confondre avec une mesure de précision.

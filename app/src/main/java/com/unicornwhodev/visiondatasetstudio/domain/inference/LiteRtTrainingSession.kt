@@ -14,41 +14,66 @@ class LiteRtTrainingSession(private val file:File,private val config:ModelConfig
     private val interpreter=try { Interpreter(file,LiteRtOptions.forFile(file,config.threads).addDelegate(flex)) }
         catch(e:Throwable){flex.close();throw e}
     init {
+        try {
         val signatures=interpreter.signatureKeys.toSet()
         require(listOf(contract.trainSignature,contract.inferSignature,contract.saveSignature,contract.restoreSignature).all{it in signatures}){
             "Conversion limitée à l’inférence : signatures train/infer/save/restore manquantes"
         }
         require(contract.inferOutputs.isNotEmpty()){"Ordre des sorties d’inférence absent du contrat"}
-        require(interpreter.getSignatureInputs(contract.trainSignature).toSet()==setOf(contract.imageInput,contract.targetInput)+if(contract.learningRateInput.isBlank())emptySet() else setOf(contract.learningRateInput)) { "Entrées train différentes du contrat" }
+        require(interpreter.getSignatureInputs(contract.trainSignature).toSet()==(setOf(contract.imageInput,contract.targetInput)+contract.auxiliaryTargets.keys+(if(contract.learningRateInput.isBlank())emptySet() else setOf(contract.learningRateInput)))) { "Entrées train différentes du contrat" }
         require(interpreter.getSignatureInputs(contract.inferSignature).toSet()==setOf(contract.imageInput)) { "Entrées infer différentes du contrat" }
         require(interpreter.getSignatureInputs(contract.saveSignature).toSet()==setOf(contract.checkpointInput))
         require(interpreter.getSignatureInputs(contract.restoreSignature).toSet()==setOf(contract.checkpointInput))
         val target=interpreter.getInputTensorFromSignature(contract.targetInput,contract.trainSignature)
         require(target.shape().toList()==contract.targetShape && target.dataType().name=="FLOAT32") { "Forme/type des cibles d’apprentissage différents du contrat" }
         require(contract.targetShape.fold(1L){a,b->a*b} in 1..1_000_000)
+        contract.auxiliaryTargets.forEach { (name,spec) ->
+            val tensor=interpreter.getInputTensorFromSignature(name,contract.trainSignature)
+            require(tensor.shape().toList()==spec.shape && tensor.dataType().name=="FLOAT32") { "Cible auxiliaire incompatible : $name" }
+        }
+        } catch(e:Throwable) { try { interpreter.close() } finally { flex.close() }; throw e }
     }
     fun infer(bitmap:Bitmap):List<TensorValues> {
         val image=LiteRtGraph.image(bitmap,config)
-        val expected=interpreter.getInputTensorFromSignature(contract.imageInput,contract.inferSignature)
-        require(expected.shape().toList()==image.shape && expected.dataType().name==image.type)
-        val outputs=contract.inferOutputs.associateWith { name ->
-            val tensor=interpreter.getOutputTensorFromSignature(name,contract.inferSignature)
-            require(tensor.numBytes()<=64*1024*1024)
-            ByteBuffer.allocateDirect(tensor.numBytes()).order(ByteOrder.nativeOrder())
-        }
-        interpreter.runSignature(mapOf(contract.imageInput to image.bytes),outputs.mapValues{it.value as Any}.toMutableMap(),contract.inferSignature)
-        return outputs.map{(name,buffer)->
+        // Java only resizes signature inputs from shaped arrays, never from flat ByteBuffers.
+        // Read dynamic outputs after invocation; their serialized size may still be one element.
+        val input=signatureImage(image,contract.inferSignature)
+        interpreter.runSignature(mapOf(contract.imageInput to input),contract.inferOutputs.associateWith { null as Any? }.toMutableMap(),contract.inferSignature)
+        val bytes=contract.inferOutputs.sumOf { interpreter.getOutputTensorFromSignature(it,contract.inferSignature).numBytes().toLong() }
+        require(bytes in 1..64L*1024*1024) { "Sorties d’inférence au-delà du budget mémoire" }
+        return contract.inferOutputs.map{name->
             val t=interpreter.getOutputTensorFromSignature(name,contract.inferSignature)
-            TensorValues(t.shape().toList(),TensorCodec.decode(buffer,t.dataType().name,t.numElements(),t.quantizationParams().scale,t.quantizationParams().zeroPoint)).also{require(it.values.all(Float::isFinite))}
+            TensorValues(t.shape().toList(),TensorCodec.decode(t.asReadOnlyBuffer(),t.dataType().name,t.numElements(),t.quantizationParams().scale,t.quantizationParams().zeroPoint)).also{require(it.values.all(Float::isFinite))}
         }
     }
-    fun train(bitmap:Bitmap,targets:FloatArray,learningRate:Float):Float {
+    private fun signatureImage(image:LiteRtGraph.Input,signature:String):Any {
+        val tensor=interpreter.getInputTensorFromSignature(contract.imageInput,signature)
+        require(tensor.dataType().name==image.type) { "Type image différent du contrat de signature" }
+        image.bytes.rewind()
+        if(tensor.shape().toList()==image.shape)return image.bytes
+        val dynamic=tensor.shapeSignature()
+        require(image.type=="FLOAT32" && dynamic.size==image.shape.size && dynamic.indices.all { dynamic[it]<0 || dynamic[it]==image.shape[it] }) {
+            "Dimensions image incompatibles avec la signature $signature"
+        }
+        val array=java.lang.reflect.Array.newInstance(java.lang.Float.TYPE,*image.shape.toIntArray())
+        val values=image.bytes.order(ByteOrder.nativeOrder()).asFloatBuffer()
+        fun fill(part:Any) {
+            if(part is FloatArray)values.get(part)
+            else for(i in 0 until java.lang.reflect.Array.getLength(part))fill(java.lang.reflect.Array.get(part,i))
+        }
+        fill(array);require(!values.hasRemaining());return array
+    }
+    fun train(bitmap:Bitmap,targets:FloatArray,learningRate:Float,auxiliary:Map<String,FloatArray> = emptyMap()):Float {
         require(learningRate.isFinite() && learningRate in .000001f..1f)
         require(targets.size.toLong()==contract.targetShape.fold(1L){a,b->a*b} && targets.all(Float::isFinite))
         val image=LiteRtGraph.image(bitmap,config)
-        val expected=interpreter.getInputTensorFromSignature(contract.imageInput,contract.trainSignature)
-        require(expected.shape().toList()==image.shape && expected.dataType().name==image.type)
-        val inputs=mutableMapOf<String,Any>(contract.imageInput to image.bytes,contract.targetInput to LiteRtGraph.floats(contract.targetShape,targets).bytes)
+        val inputs=mutableMapOf<String,Any>(contract.imageInput to signatureImage(image,contract.trainSignature),contract.targetInput to LiteRtGraph.floats(contract.targetShape,targets).bytes)
+        require(auxiliary.keys==contract.auxiliaryTargets.keys) { "Supervision auxiliaire absente" }
+        auxiliary.forEach { (name,values) ->
+            val spec=contract.auxiliaryTargets.getValue(name)
+            require(values.all(Float::isFinite) && values.size.toLong()==spec.shape.fold(1L){a,b->a*b})
+            inputs[name]=LiteRtGraph.floats(spec.shape,values).bytes
+        }
         if(contract.learningRateInput.isNotBlank())inputs[contract.learningRateInput]=LiteRtGraph.floats(emptyList(),floatArrayOf(learningRate)).bytes
         val loss=ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder())
         require(interpreter.getOutputTensorFromSignature(contract.lossOutput,contract.trainSignature).numElements()==1)

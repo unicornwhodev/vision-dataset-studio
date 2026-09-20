@@ -28,9 +28,11 @@ class LiteRtEngine : AutoCloseable {
         private set
     val lastMask:Bitmap? get()=bundle?.mask
     private var trainingSession:LiteRtTrainingSession?=null
+    private var trainingConfig:ModelConfig?=null
     private var interpreter: Interpreter?=null
     private var currentModelPath: String?=null
     private var modelHash=""
+    private var originalModelHash=""
     private var currentThreads=2
     private val lock=Any()
     private val localClient=LocalModelClient()
@@ -41,7 +43,7 @@ class LiteRtEngine : AutoCloseable {
             if(currentModelPath==file.absolutePath && interpreter!=null && currentThreads==threads) return@synchronized true
             close()
             if(file.extension=="json")bundle=LiteRtBundle(file) else interpreter=Interpreter(file,LiteRtOptions.forFile(file,threads).setCancellable(true))
-            currentModelPath=file.absolutePath;currentThreads=threads;modelHash=HashUtils.computeSha256(file)
+            currentModelPath=file.absolutePath;currentThreads=threads;modelHash=HashUtils.computeSha256(file);originalModelHash=modelHash
             true
         } catch(e:Exception) { lastError=e.message ?: "Modèle non chargeable";close();false }
     }
@@ -68,19 +70,24 @@ class LiteRtEngine : AutoCloseable {
             }
             synchronized(lock) {
                 if(config.training!=null) {
-                    if(trainingSession==null) {
+                    if(trainingSession==null || trainingConfig!=config) {
                         val file=File(requireNotNull(currentModelPath))
+                        trainingSession?.close();trainingSession=null;trainingConfig=null
                         interpreter?.close();interpreter=null
-                        trainingSession=LiteRtTrainingSession(file,config)
-                        if(config.trainingCheckpoint.isNotBlank()) {
-                            val receipt=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.readCheckpoint(file,config.trainingCheckpoint)
-                            trainingSession!!.restore(receipt)
-                            modelHash=AdaptiveCorrection.hash(modelHash+receipt.files.toSortedMap().toString())
-                        }
+                        val session=LiteRtTrainingSession(file,config)
+                        try {
+                            modelHash=originalModelHash
+                            if(config.trainingCheckpoint.isNotBlank()) {
+                                val receipt=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.readCheckpoint(file,config.trainingCheckpoint)
+                                session.restore(receipt)
+                                modelHash=AdaptiveCorrection.hash(originalModelHash+receipt.files.toSortedMap().toString())
+                            }
+                            trainingSession=session;trainingConfig=config
+                        } catch(e:Throwable) { session.close();throw e }
                     }
                     val tensors=trainingSession!!.infer(bitmap).mapIndexed{i,v->i to v}.toMap()
                     val transform=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config),config.cropFraction)
-                    return@synchronized ModelAdapters.decode(tensors,config,transform).map{it.copy(source="model_litert:$modelHash:trained")}
+                    return@synchronized ModelAdapters.decode(tensors,config.signatureConfig(),transform).map{it.copy(source="model_litert:$modelHash:trained")}
                 }
                 val i=interpreter ?: error("Aucun modèle chargé")
                 require(i.inputTensorCount==1+config.extraIntInputs.size) { "Nombre d’entrées différent du contrat" }
@@ -105,6 +112,8 @@ class LiteRtEngine : AutoCloseable {
                 val baseIndices=when(ModelContract.adapter(config)) {
                     "ssd" -> listOf(config.outputIndexBoxes,config.outputIndexClasses,config.outputIndexScores,config.outputIndexCount).filter{it>=0}
                     "rfdetr" -> listOf(config.outputIndexBoxes,config.outputIndexScores)
+                    "rtmdet" -> config.featureStrides.indices.toList()
+                    "fireviewer_dinov3_multitask" -> config.namedOutputIndices.values.toList()
                     else -> listOf(config.outputIndex)
                 }
                 val indices=(baseIndices+listOf(config.embeddingOutputIndex,config.patchOutputIndex).filter{it>=0}).distinct()
@@ -112,8 +121,8 @@ class LiteRtEngine : AutoCloseable {
                 require(indices.all{it<i.outputTensorCount}) { "Sortie demandée absente du modèle" }
                 val bytes=indices.sumOf{i.getOutputTensor(it).numBytes().toLong()}
                 require(bytes<=64L*1024*1024) { "Sorties trop volumineuses pour le budget mémoire de l’adaptateur" }
-                val outputs=indices.associateWith { ByteBuffer.allocateDirect(i.getOutputTensor(it).numBytes()).order(ByteOrder.nativeOrder()) }
-                val outputObjects=outputs.mapValues{it.value as Any}.toMutableMap()
+                // Some Flex/dynamic outputs keep a placeholder shape until the first invocation.
+                val outputObjects=indices.associateWith { null as Any? }.toMutableMap()
                 val inputs=Array<Any>(i.inputTensorCount){index->
                     if(index==0) buffer else {
                         val values=config.extraIntInputs[index.toString()] ?: error("Entrée auxiliaire $index absente")
@@ -124,9 +133,12 @@ class LiteRtEngine : AutoCloseable {
                 }
                 i.runForMultipleInputsOutputs(inputs,outputObjects)
                 lastNativeDurationNanos=i.lastNativeInferenceDurationNanoseconds
-                val tensors=outputs.mapValues { (idx,buf) ->
+                require(indices.sumOf { i.getOutputTensor(it).numBytes().toLong() } <= 64L*1024*1024) {
+                    "Sorties trop volumineuses pour le budget mémoire de l’adaptateur"
+                }
+                val tensors=indices.associateWith { idx ->
                     val out=i.getOutputTensor(idx);val shape=out.shape().toList()
-                    TensorValues(shape,TensorCodec.decode(buf,out.dataType().name,shape.fold(1){a,b->a*b},out.quantizationParams().scale,out.quantizationParams().zeroPoint))
+                    TensorValues(shape,TensorCodec.decode(out.asReadOnlyBuffer(),out.dataType().name,out.numElements(),out.quantizationParams().scale,out.quantizationParams().zeroPoint))
                 }
                 val embeddingIndex=if(config.embeddingOutputIndex>=0)config.embeddingOutputIndex else if(ModelContract.adapter(config)=="embedding")config.outputIndex else -1
                 if(embeddingIndex>=0)lastEmbedding=tensors.getValue(embeddingIndex).values.copyOf().also { values->
@@ -146,6 +158,6 @@ class LiteRtEngine : AutoCloseable {
         return DryRunResult(lastError==null,if(config.runtime=="local_http") "HTTP loopback · serveur utilisateur" else "LiteRT Interpreter CPU · $currentThreads threads",(System.nanoTime()-start)/1_000_000,proposals,lastError)
     }
     override fun close() = synchronized(lock) {
-        bundle?.close();bundle=null;trainingSession?.close();trainingSession=null;interpreter?.close();interpreter=null;currentModelPath=null
+        bundle?.close();bundle=null;trainingSession?.close();trainingSession=null;trainingConfig=null;interpreter?.close();interpreter=null;currentModelPath=null
     }
 }

@@ -20,6 +20,8 @@ import com.unicornwhodev.visiondatasetstudio.ui.components.*
 
 @Composable
 fun ModelLibraryScreen(vm: MainViewModel) {
+    val source by vm.catalogSource.collectAsState()
+    var editSource by remember { mutableStateOf(false) }
     val remote by vm.communityModels.collectAsState()
     val local by vm.modelProfiles.collectAsState()
     val project by vm.projectFlow.collectAsState()
@@ -31,6 +33,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
         StudioTopBar("Modèles", "Bibliothèque  /  ${local.size} installé(s)", actions = {
             IconButton(onClick = { vm.navigateTo(Screen.Training) }, enabled = !busy) { Icon(Icons.Default.ModelTraining, "Apprentissage sur cet appareil", Modifier.size(19.dp)) }
+            IconButton(onClick = { editSource = true }, enabled = !busy) { Icon(Icons.Default.Storage, "Dépôt du catalogue", Modifier.size(19.dp)) }
             IconButton(onClick = vm::refreshCommunityModelCatalog, enabled = !busy) { Icon(Icons.Default.Refresh, "Actualiser le catalogue", Modifier.size(19.dp)) }
         })
     }) { inset ->
@@ -53,6 +56,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                             val state = when {
                                 !item.available -> "À venir"
                                 !item.installableNow -> "Bundle non pris en charge"
+                                item.entry.adapterStatus == "contract" -> "Contrat fourni"
                                 item.entry.adapterStatus == "heatmap" -> "Contrat heatmap"
                                 item.entry.adapterStatus == "embedding" -> "Représentations visuelles"
                                 item.entry.adapterStatus == "bundle" -> "Pipeline local"
@@ -124,6 +128,20 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                 }
             }
         }
+    }
+    if (editSource) {
+        var repo by remember { mutableStateOf(source.repository) }
+        var revision by remember { mutableStateOf(source.revision) }
+        var folder by remember { mutableStateOf(source.folder) }
+        AlertDialog(onDismissRequest = { editSource = false }, title = { Text("Catalogue Hugging Face") }, text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(repo, { repo = it }, label = { Text("Compte / dépôt") }, singleLine = true)
+                OutlinedTextField(revision, { revision = it }, label = { Text("Révision") }, singleLine = true)
+                OutlinedTextField(folder, { folder = it }, label = { Text("Dossier · vide pour la racine") }, singleLine = true)
+                Text("L’accès privé utilise la connexion HF de l’application.", style = MaterialTheme.typography.bodySmall)
+            }
+        }, confirmButton = { TextButton(onClick = { vm.setModelCatalog(repo, revision, folder); editSource = false }) { Text("Ouvrir") } },
+            dismissButton = { TextButton(onClick = { editSource = false }) { Text("Annuler") } })
     }
     deleteId?.let { id -> AlertDialog(onDismissRequest = { deleteId = null }, title = { Text("Supprimer ce profil ?") },
         text = { Text("Les annotations et les correcteurs ne sont pas supprimés. Les poids sont effacés uniquement s’ils ne sont plus référencés.") },
