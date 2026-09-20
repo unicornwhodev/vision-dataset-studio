@@ -1,48 +1,32 @@
-# Publication plan
+# Publication — 4.2.0-rc3
 
-[Français](../RELEASE_PLAN.md) · **English**
+[Français](../RELEASE_PLAN.md). Public repository: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). Apache-2.0 licence.
 
-Target: public `unicornwhodev/vision-dataset-studio`, Apache-2.0. On 20 September 2026 the owner authorized publishing the source and documentation after checking for secrets. The repository remains under qualification: missing features and validation still block a stable release.
+rc3 is a **Debug qualification prerelease**. It publishes the current development snapshot requested by the owner, with the partial LiteRT matrix and open defects. It is not a stable release.
 
-| Artifact | Destination | Gate |
-|---|---|---|
-| Source and bilingual documentation | GitHub repository | Identified tested commit, reviewed scope, no secrets or private assets |
-| Debug APK and test APK | Qualification release assets | Successful receipt, correct application ID, signatures and SHA-256 |
-| Test reports and screenshots | Release evidence | Executed results, no private corpus |
-| Signed release APK/AAB | Stable release | Durable signing-key process and distribution qualification |
-| Build environment image | GitHub Packages / GHCR | Dockerfile review, actual image build and validation |
+## Artifacts
 
-Before any push, verify the active GitHub identity. The intended owner is `unicornwhodev`; an earlier terminal session used another account. Use interactive authentication, never copy a token into chat or project files.
+- `vision-dataset-studio.apk`: the single user-facing APK, with no model weights.
+- `vision-dataset-studio-4.2.0-rc3-qualification.zip`: user APK, test-only instrumentation APK, receipts, results, FR/EN documentation and licence.
+- `PACKAGE.json`, `SHA256SUMS` and OCI digest: provenance and integrity.
 
-Exclude model weights, user datasets, credentials, signing keys, build caches and pod-specific settings. Preserve required upstream attribution. A debug signature is not a durable distribution signature.
-
-Every published artifact must match its build receipt. Release notes must identify the tested commit, executed and skipped tests, known limitations and supported model/runtime combinations. Pending HF, CI or phone tests must not be presented as passing.
-
-After a clean committed CI build, `python3 tools/package_qualification.py` verifies the successful receipt and APK hashes, requires the matching `github_sha`, and creates the qualification ZIP under `dist/packages/`. It must not be bypassed using a fabricated CI SHA. No package or release has been published.
-
-**Actual outcome:** the [first Actions attempt](https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35478811998)
-was refused before execution because of an account billing issue. The build image has
-not been built or published. The prerelease uses the tested pod build.
-`tools/package_pod_qualification.py` checks all 155 source hashes at the tested commit,
-unchanged Android code, APK bytes and the 14+2 Android evidence. It does not invent a CI
-receipt or bypass the separate CI package guard.
-
-`ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2` is an OCI artifact
-containing the qualification ZIP, not a runnable build image. Download it with:
+`ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc3` distributes that archive as OCI, **not a runnable image**. It is linked to the GitHub repository; package visibility is currently private and separate from repository visibility. Release assets are public. With authorized GHCR access:
 
 ```bash
-oras pull ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2
+oras pull ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc3
 ```
 
-New GHCR packages are private by default; visibility is separate from the GitHub
-repository. If needed, the owner changes it to public in package settings. The public
-GitHub release also provides the same files and SHA-256 checksums.
+`tools/package_workstation_release.py` requires a clean Git tree, a complete compiled-source manifest matching the commit, APK hashes and Android evidence from the same build. It refuses embedded weights and failed or skipped instrumented suites. Development-build model receipts remain distinct.
 
-For the future build image, the manual
-`publish-qualification.yml` workflow builds `packaging/Dockerfile`, actually compiles
-the app inside it and runs JVM/lint checks. It publishes that same image at
-`ghcr.io/unicornwhodev/vision-dataset-studio-build` and creates a **prerelease** with
-the user APK, SHA-256 checksums, image digest and bilingual qualification ZIP.
-The instrumentation APK remains inside the technical ZIP. The Docker context contains
-no credentials or weights; publication uses the ephemeral GitHub Actions token.
-This workflow does not replace API 28/35 instrumentation or complete phone/model QA.
+```bash
+python3 tools/package_workstation_release.py --build-dir dist/rc3-build \
+  --evidence test-results/litert-rc3 --version 4.2.0-rc3
+```
+
+The historical rc2 packager and CI packager remain separate. No CI receipt is fabricated. The [latest Actions attempt](https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35539418339) was refused before execution because of an account billing issue. The build Dockerfile is not qualified.
+
+## Signing and resumption
+
+The rc3 Debug key is backed up outside Git for future builds. The owner confirmed that nobody downloaded rc2; no rc2 distribution migration is planned. A future stable release requires durable signing, notice review and physical-device QA.
+
+Sources, SDK, emulators, conversions and evidence remain under `/workspace` on the persistent volume. APKs and public evidence are also backed up to the Chromebook before pod shutdown. No credentials, weights or private keys are published.

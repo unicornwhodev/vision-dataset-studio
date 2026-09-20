@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-20T21:57:24.455Z" hostname="cff7261cdec5" time="1.249">
+  <properties/>
+  <testcase name="fullResponseRestartsInsteadOfAppending" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.757"/>
+  <testcase name="commitConflictPreservesPinnedParent" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.106"/>
+  <testcase name="wrongRangeNeverOverwritesFinalFile" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.036"/>
+  <testcase name="overSizeResponseRejected" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.013"/>
+  <testcase name="occupiedPathIsNeverOverwritten" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.163"/>
+  <testcase name="disconnectedDownloadResumesHashedPrefix" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.091"/>
+  <testcase name="remoteReceiptVerifiesWithoutLocalPayload" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.068"/>
+  <testcase name="lostCommitReplyIsNotAutomaticallyReplayed" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.015"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

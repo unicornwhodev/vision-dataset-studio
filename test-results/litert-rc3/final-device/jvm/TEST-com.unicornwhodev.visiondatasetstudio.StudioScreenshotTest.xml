@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.StudioScreenshotTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-20T21:57:45.429Z" hostname="cff7261cdec5" time="12.727">
+  <properties/>
+  <testcase name="sample_thumbnail_screenshot" classname="com.unicornwhodev.visiondatasetstudio.StudioScreenshotTest" time="11.584"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

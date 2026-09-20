@@ -1,0 +1,39 @@
+{
+  "case": "Charlbi-rtmdet_tiny_learning",
+  "revision": "1244117f490e36ce321d70baa672753caeaef028",
+  "build_id": "20260920T204726Z-e97732364106",
+  "passed": true,
+  "timed_out": false,
+  "android": {
+    "case": "Charlbi-rtmdet_tiny_learning",
+    "runtime": "Android LiteRT Interpreter CPU",
+    "accuracy_evaluated": false,
+    "physical_arm_device": false,
+    "optimizer_on_host": false,
+    "phase": "complete",
+    "elapsed_ms": 695452,
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "model_sha256": "4f50d81ccaf2fea576522ee427f6fb9c04cc3dfcfdca4d534dbfb180afc3d458",
+    "threads": 4,
+    "adapter": "yolo",
+    "training_scope": "candidate_classification_and_box_adaptation_only",
+    "output_shapes": [
+      [
+        1,
+        84,
+        2100
+      ]
+    ],
+    "training_loss": 0.120895654,
+    "output_max_change": 0.15809631,
+    "proposals": 0,
+    "checkpoint_files": 1,
+    "restore_max_difference": 0.0,
+    "resumed_loss": 0.120224014,
+    "optimizer_steps_on_android": 2,
+    "application_checkpoint_loaded": true,
+    "training": "passed",
+    "success": true
+  },
+  "collection": "collected after controller paused between builds"
+}

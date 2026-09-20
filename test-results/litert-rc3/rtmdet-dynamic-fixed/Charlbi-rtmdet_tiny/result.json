@@ -1,0 +1,24 @@
+{
+  "case": "Charlbi-rtmdet_tiny",
+  "revision": "1244117f490e36ce321d70baa672753caeaef028",
+  "build_id": "20260920T212400Z-583fa4f10a2d",
+  "serial": "emulator-5554",
+  "passed": false,
+  "timed_out": false,
+  "controller_seconds": 125.528,
+  "android": {
+    "case": "Charlbi-rtmdet_tiny",
+    "runtime": "Android LiteRT Interpreter CPU",
+    "accuracy_evaluated": false,
+    "physical_arm_device": false,
+    "optimizer_on_host": false,
+    "phase": "inference",
+    "elapsed_ms": 114569,
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "model_sha256": "3530d743d01bca79d48e294fbf718ad75baf1b42e18a1f565f4abfc7f266596a",
+    "threads": 4,
+    "adapter": "rtmdet",
+    "success": false,
+    "error": "AssertionError: Carte RTMDet incompatible avec le pas d\u00e9clar\u00e9 expected null, but was:<Carte RTMDet incompatible avec le pas d\u00e9clar\u00e9>"
+  }
+}

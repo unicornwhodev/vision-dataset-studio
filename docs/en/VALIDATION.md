@@ -1,3 +1,30 @@
+# rc3 validation — 20 September 2026 UTC
+
+[Français](../../TEST_REPORT.md) · **English**
+
+Final APK: **4.2.0-rc3**, build `20260920T215432Z-cdd13d7fbf98`, compiled source `2738b13` (132 files matched to the commit).
+
+| Check | Executed result |
+|---|---|
+| Build, identity and signing | Main and test APK built, verified, installed |
+| JVM suite | **26/26 passed**, no skips |
+| Lint | **0 errors, 72 warnings** |
+| Android business/Compose suite | **19/19 passed**, no skips, **99.092 seconds** |
+| Python host suite | **45 passed** |
+| Portable numerical engine / training targets | **72 / 16 checks passed** |
+| Model conversions | **5 passed, 1 failed, 25 pending**; individual development-build receipts retained |
+| APK weight check | No embedded model weights |
+
+The Android suite covers local batch/deduplication, concurrency, Room migrations, injected SAF failures, tokenizers, similarity, synthetic learning/save/restore/resume, exported-batch cleanup ordering, workflow gates, mask gestures and Compose navigation. The initial mask-tap regression is fixed and passes on the final APK; historical failed attempts remain in evidence.
+
+APK: **365,878,582 bytes**, SHA-256 `37af2f8daa53169a44eca215fd4c50ebec6ba0d648759fd31ef8b6c6be083072`. See [selected evidence](../../test-results/litert-rc3/) and the [LiteRT matrix](LITERT_QUALIFICATION.md). Four HF conversions passed native train/save/restore/resume with frozen encoders. Internal visual-layer updates were separately demonstrated by the synthetic fixture, not by those HF conversions.
+
+No credentials, private repository identifiers or weights are included in published evidence. GitHub Actions remains blocked before execution by account billing. Physical ARM performance, task accuracy, a real agent backend and authorized remote HF QA writes remain pending. **Debug prerelease, not a stable release.**
+
+---
+
+# Historical rc2 validation
+
 # Validation and remaining limitations
 
 [Français](../../TEST_REPORT.md) · **English**

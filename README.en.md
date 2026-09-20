@@ -4,7 +4,7 @@
 
 An Android workspace for producing image datasets in batches: model proposals, human correction and export. A compact dark interface keeps the image at the centre of the work.
 
-**4.2.0-rc2 · Apache-2.0 · Under qualification**
+**4.2.0-rc3 · Apache-2.0 · Under qualification**
 Android application ID: `com.unicornwhodev.visiondatasetstudio`
 
 ## Main workflow
@@ -23,12 +23,14 @@ Persistent file and decoded-pixel fingerprints prevent identical copies from ent
 |---|---|
 | Local / HF import, configurable batches, correction and export | Implemented; local 2+1 cycle verified on Android |
 | Persistent identity, resume and protected cleanup | Android tests passed, including renamed copies and concurrent claims |
-| Internal-weight learning, checkpoints, cancel/resume | Tested with a synthetic network; trainable HF conversions still need qualification |
-| HF download, LiteRT contracts and preprocessing | Implemented; RepViT executed on Android, other families pending |
+| Android learning, checkpoints, cancel/resume | Four HF conversions passed train/save/restore/resume; their encoders remain frozen |
+| HF download, LiteRT contracts and preprocessing | Configurable catalogue, pinned revisions and SHA-256 verification; RepViT and four trainable conversions executed |
 | Tokenizers and persistent similarity index | Android tests passed |
-| TinyCLIP / SAM / Florence-2 bundles | Adapters implemented; conversion-specific qualification incomplete |
-| Mask editor/export and RTMDet decoder | Incomplete |
-| Autonomous agent and general executable workflows | Not shipped; existing packs configure the workspace |
+| TinyCLIP / SAM / Florence-2 bundles | Adapters present; conversion tests remain pending |
+| Mask editor/export | Brush, eraser, separate instances, canonical and COCO export; gesture test passed |
+| Inference-only RTMDet | Decoder implemented; runtime shape incompatibility remains open |
+| Executable workflows | Three templates, journal/resume, review/export/cleanup gates; guard tests passed |
+| Agent | Optional local HTTP planner; separate user-provided server, real integration pending |
 
 See [executed validation](docs/en/VALIDATION.md) and [the roadmap](docs/en/ROADMAP.md). This repository shares source code under qualification; the product is not yet complete or ready for a stable release.
 
@@ -66,10 +68,11 @@ Model tests need fixtures staged separately and may be skipped when those are ab
 ## Documentation and repository
 
 - [FR/EN documentation index](docs/README.md), [batch production](docs/en/BATCH_PRODUCTION.md), [training contract](docs/en/LITERT_TRAINING_CONTRACT.md).
+- [Workflows](docs/en/WORKFLOWS.md), [LiteRT qualification](docs/en/LITERT_QUALIFICATION.md).
 - [Roadmap](docs/en/ROADMAP.md), [release plan](docs/en/RELEASE_PLAN.md), [contributing](CONTRIBUTING.md).
 - [Workstation guide](docs/WORKSTATION.md) and [UI evidence](docs/UI_REFINEMENT.md) are currently French technical references.
 
-Authorized public destination: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). The [qualification prerelease](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc2) distributes the user APK and QA package. GHCR stores that package as an OCI artifact; the build Dockerfile remains untested because GitHub Actions is blocked by an account billing issue. See the [publication plan](docs/en/RELEASE_PLAN.md). No stable release is claimed.
+Authorized public destination: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). The [qualification prerelease](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc3) distributes the user APK and QA package. GHCR stores that package as an OCI artifact; the build Dockerfile remains untested because GitHub Actions is blocked by an account billing issue. See the [publication plan](docs/en/RELEASE_PLAN.md). No stable release is claimed.
 
 Project code uses [Apache-2.0](LICENSE), subject to contributor rights. Models, datasets and dependencies keep their own licences; see [NOTICE](NOTICE) and [licensing status](LICENSING_STATUS.md).
 

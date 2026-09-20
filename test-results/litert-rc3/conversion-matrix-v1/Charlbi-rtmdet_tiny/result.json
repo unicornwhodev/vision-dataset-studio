@@ -1,0 +1,23 @@
+{
+  "case": "Charlbi-rtmdet_tiny",
+  "revision": "1244117f490e36ce321d70baa672753caeaef028",
+  "build_id": "20260920T204726Z-e97732364106",
+  "passed": false,
+  "timed_out": false,
+  "controller_seconds": 125.957,
+  "android": {
+    "case": "Charlbi-rtmdet_tiny",
+    "runtime": "Android LiteRT Interpreter CPU",
+    "accuracy_evaluated": false,
+    "physical_arm_device": false,
+    "optimizer_on_host": false,
+    "phase": "inference",
+    "elapsed_ms": 115206,
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "model_sha256": "3530d743d01bca79d48e294fbf718ad75baf1b42e18a1f565f4abfc7f266596a",
+    "threads": 4,
+    "adapter": "rtmdet",
+    "success": false,
+    "error": "AssertionError: Cannot copy from a TensorFlowLite tensor (824) with 537600 bytes to a Java Buffer with 336 bytes. expected null, but was:<Cannot copy from a TensorFlowLite tensor (824) with 537600 bytes to a Java Buffer with 336 bytes.>"
+  }
+}

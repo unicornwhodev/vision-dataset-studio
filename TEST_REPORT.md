@@ -1,3 +1,21 @@
+# État rc3 — build et tests du 20 septembre 2026 UTC
+
+Dernière APK : **4.2.0-rc3**, build `20260920T215432Z-cdd13d7fbf98`, sources compilées `2738b13` (132 fichiers comparés au commit, aucune différence).
+
+- **26/26 tests JVM**, aucun ignoré ; lint **0 erreur, 72 avertissements**.
+- **19/19 tests Android**, aucun ignoré, **99,092 s** : lots/doublons, concurrence, Room, SAF injecté, tokeniseurs, similarité, apprentissage synthétique et reprise, workflows et gestes de masques, navigation Compose.
+- **45 tests Python hôte**, **72 contrôles moteur**, **16 contrôles cibles d’apprentissage** réussis. Ces contrôles portables restent distincts des tests Android.
+- APK utilisateur : **365 878 582 octets**, SHA-256 `37af2f8daa53169a44eca215fd4c50ebec6ba0d648759fd31ef8b6c6be083072`. Aucun poids embarqué.
+- **5 conversions HF réussies** : inférence RepViT et quatre conversions avec apprentissage/sauvegarde/restauration/reprise ; **1 défaut RTMDet ouvert**, **25 conversions à tester**. Les reçus conservent leurs builds de développement respectifs. [Détails FR/EN](docs/LITERT_QUALIFICATION.md).
+
+Le défaut initial de peinture des masques (0 instance après tap) est corrigé ; le test dédié et la suite finale passent. Les anciennes tentatives et leur échec restent conservés. Les conversions HF entraînables figent encore leurs encodeurs ; la preuve de modification de couches visuelles concerne uniquement la fixture synthétique.
+
+Preuves publiques sélectionnées : [`test-results/litert-rc3/`](test-results/litert-rc3/). Aucun poids privé, identifiant de dépôt privé, clé ni token n’y figure. La CI reste bloquée avant exécution par la facturation GitHub. Téléphone ARM, précision métier, serveur d’agent réel et écritures HF sur dépôt de QA restent à qualifier. **Prérelease Debug, pas release stable.**
+
+---
+
+# Historique rc2 (résultats conservés, antérieurs à rc3)
+
 # Tests courants — production par lots et apprentissage optionnel
 
 Actualisation du 20 septembre 2026 (Europe/Paris), sur le pod de compilation et son émulateur API 28 x86_64 sans KVM. L’apprentissage des tests s’exécute dans Android, aucun optimiseur sur l’hôte.

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-20T21:57:25.714Z" hostname="cff7261cdec5" time="2.137">
+  <properties/>
+  <testcase name="annotationsRoundTrip" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.01"/>
+  <testcase name="contractRejectsUnknownKeys" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.018"/>
+  <testcase name="nullForNonNullFieldIsRejected" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.0"/>
+  <testcase name="receiptKeepsLongSizes" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.006"/>
+  <testcase name="historicalDefaultsRemainUnverified" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.004"/>
+  <testcase name="reflectionFallbackForEntitiesKeepsDefaults" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="2.099"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

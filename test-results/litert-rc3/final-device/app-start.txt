@@ -1,0 +1,5 @@
+Starting: Intent { cmp=com.unicornwhodev.visiondatasetstudio/.MainActivity }
+Status: timeout
+Activity: com.unicornwhodev.visiondatasetstudio/.MainActivity
+WaitTime: 10403
+Complete

@@ -1,0 +1,165 @@
+[
+  {
+    "case": "Charlbi-edgenext_xx_small_learning",
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "build_id": "20260920T204726Z-e97732364106",
+    "passed": true,
+    "timed_out": false,
+    "controller_seconds": 120.591,
+    "android": {
+      "case": "Charlbi-edgenext_xx_small_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 110081,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "72d87145acf5caf05095c1e4ab7c056ec0095b645d8a16b61c2dfbf9b0d0515d",
+      "threads": 4,
+      "adapter": "classification",
+      "training_scope": "pretrained_classification_head_only",
+      "output_shapes": [
+        [
+          1,
+          1000
+        ]
+      ],
+      "training_loss": 11.391106,
+      "output_max_change": 0.09351325,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 11.297009,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true
+    }
+  },
+  {
+    "case": "Charlbi-edgenext_x_small_learning",
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "build_id": "20260920T204726Z-e97732364106",
+    "passed": true,
+    "timed_out": false,
+    "controller_seconds": 227.661,
+    "android": {
+      "case": "Charlbi-edgenext_x_small_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 216623,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "e46e661555749e7402b495f45b304cececc368b360341438370b8ad0dd840276",
+      "threads": 4,
+      "adapter": "classification",
+      "training_scope": "pretrained_classification_head_only",
+      "output_shapes": [
+        [
+          1,
+          1000
+        ]
+      ],
+      "training_loss": 11.275679,
+      "output_max_change": 0.09805727,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 11.176739,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true
+    }
+  },
+  {
+    "case": "Charlbi-repvit_m1",
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "build_id": "20260920T204726Z-e97732364106",
+    "passed": true,
+    "timed_out": false,
+    "controller_seconds": 63.485,
+    "android": {
+      "case": "Charlbi-repvit_m1",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 52874,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "4849906123f080d356a02733324fae7059a56531fdd9fee70065bcf7f3ef77bc",
+      "threads": 4,
+      "adapter": "embedding",
+      "proposals": 0,
+      "embedding_values": 384,
+      "training": "not_exposed_by_conversion",
+      "success": true
+    }
+  },
+  {
+    "case": "Charlbi-rtmdet_tiny",
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "build_id": "20260920T204726Z-e97732364106",
+    "passed": false,
+    "timed_out": false,
+    "controller_seconds": 125.957,
+    "android": {
+      "case": "Charlbi-rtmdet_tiny",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "inference",
+      "elapsed_ms": 115206,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "3530d743d01bca79d48e294fbf718ad75baf1b42e18a1f565f4abfc7f266596a",
+      "threads": 4,
+      "adapter": "rtmdet",
+      "success": false,
+      "error": "AssertionError: Cannot copy from a TensorFlowLite tensor (824) with 537600 bytes to a Java Buffer with 336 bytes. expected null, but was:<Cannot copy from a TensorFlowLite tensor (824) with 537600 bytes to a Java Buffer with 336 bytes.>"
+    }
+  },
+  {
+    "case": "Charlbi-rtmdet_tiny_learning",
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "build_id": "20260920T204726Z-e97732364106",
+    "passed": true,
+    "timed_out": false,
+    "android": {
+      "case": "Charlbi-rtmdet_tiny_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 695452,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "4f50d81ccaf2fea576522ee427f6fb9c04cc3dfcfdca4d534dbfb180afc3d458",
+      "threads": 4,
+      "adapter": "yolo",
+      "training_scope": "candidate_classification_and_box_adaptation_only",
+      "output_shapes": [
+        [
+          1,
+          84,
+          2100
+        ]
+      ],
+      "training_loss": 0.120895654,
+      "output_max_change": 0.15809631,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 0.120224014,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true
+    },
+    "collection": "collected after controller paused between builds"
+  }
+]

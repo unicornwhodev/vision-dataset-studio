@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Vision Dataset Studio",
   "brand": "Unicorn Who Dev",
-  "version": "4.2.0-rc2",
+  "version": "4.2.0-rc3",
   "date": "2026-09-20",
   "namespace": "com.unicornwhodev.visiondatasetstudio",
   "application_id": "com.unicornwhodev.visiondatasetstudio",
@@ -12,73 +12,37 @@
   "license": "Apache-2.0",
   "rights_and_transitive_notices_review": "pending",
   "android": {
-    "compilation_started": true,
-    "apk_built": true,
-    "instrumented_tests_executed": true,
-    "real_room_migration_executed": true,
-    "real_moshi_tests_executed": true,
-    "real_compose_tests_executed": true,
-    "real_saf_tests_executed": true,
-    "physical_device_tested": false,
+    "current_build_run": "20260920T215432Z-cdd13d7fbf98",
+    "compiled_source_commit": "2738b13d75952698ba611355220f8038f7f0e998",
     "build_outcome": "build_checks_passed",
-    "blockers": [
-      "Qualification telephone ARM, CI API 28/35 et HF reel a terminer"
-    ],
-    "evidence": "docs/POD_VALIDATION.md",
+    "apk_built": true,
     "test_apk_built": true,
     "unit_tests": {
-      "total": 26,
       "passed": 26,
-      "failed": 0
+      "failed": 0,
+      "skipped": 0
     },
     "lint": {
       "errors": 0,
-      "warnings": 71
+      "warnings": 72
     },
-    "room_schema_generated": true,
-    "real_compose_test_scope": "Robolectric component capture and two on-device navigation/catalogue tests",
-    "build_script_invoked": true,
     "instrumented_tests": {
-      "scheduled": 16,
-      "completed_passed": 16,
-      "suite_completed": true,
-      "status": "targeted_suite_passed",
-      "blocker": null,
-      "compose_separate_run": {
-        "tests": 2,
-        "passed": 2,
-        "build_run": "20260919T234604Z-8a3382d3e997",
-        "runtime_seconds": 75.55,
-        "device_width_dp": 960
-      },
-      "compose_phone_run": {
-        "tests": 2,
-        "passed": 2,
-        "build_run": "20260919T200729Z-bec11e4607bc",
-        "runtime_seconds": 74.293,
-        "device_width_dp": 320
-      },
-      "build_run": "20260919T234604Z-8a3382d3e997",
-      "scope": "production lots, concurrence, migration 1/2/3 vers 4, identite, SAF, poids internes train/save/restore, tokeniseurs, index, WorkManager export/reprise",
-      "business_tests": 14,
-      "compose_tests": 2
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "runtime_seconds": 99.092,
+      "build_run": "20260920T215432Z-cdd13d7fbf98",
+      "evidence": "test-results/litert-rc3/final-device/instrumentation.txt"
     },
-    "current_build_run": "20260919T234604Z-8a3382d3e997"
+    "physical_device_tested": false,
+    "room_schema_generated": true,
+    "weights_embedded": false
   },
   "portable_tests": {
-    "policy": 44,
-    "numeric_engine": 67,
-    "reliability_helpers": 43,
-    "sqlite_host": 9,
-    "export_validator": 6,
-    "identity": 12,
-    "build_evidence": 15,
-    "passed": 196
-  },
-  "syntax": {
-    "kotlin_and_kts_files": 75,
-    "syntax_errors": 0,
-    "type_resolution_performed": true
+    "python_host_suite_passed": 45,
+    "numeric_engine_checks_passed": 72,
+    "training_target_checks_passed": 16,
+    "not_android_execution": true
   },
   "stress": {
     "rows": 200000,
@@ -114,7 +78,7 @@
     "requires_hf_secret": false,
     "attempted": true,
     "blocker": "GitHub Actions account billing lock; job not started",
-    "run_url": "https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35478811998"
+    "run_url": "https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35539418339"
   },
   "data_transition": {
     "in_place_update_from_previous_application_id": false,
@@ -170,7 +134,8 @@
       "build_run": "20260919T203710Z-e9cd5c4ddbbe",
       "validated_width_dp": 960,
       "saved_box_after_apk_update": true
-    }
+    },
+    "historical": true
   },
   "implementation_audit": {
     "date": "2026-09-19",
@@ -225,13 +190,12 @@
     "workflow_steps": 198,
     "workflow_initial_loss": 0.6897399500194918,
     "workflow_final_loss": 0.003557757622006894,
-    "cleanup_after_training_passed": true
-  },
-  "additional_portable_tests": {
-    "build_evidence_and_weight_guard": 17,
-    "export_validator": 7,
-    "training_targets": 10,
-    "numeric_engine": 67
+    "cleanup_after_training_passed": true,
+    "hf_conversions_runtime_passed": 4,
+    "hf_conversions_trainable_total": 20,
+    "hf_backbone_trainable": false,
+    "hf_scope": "heads and output adapters only; encoder frozen",
+    "report": "docs/LITERT_QUALIFICATION.md"
   },
   "documentation": {
     "languages": [
@@ -246,16 +210,35 @@
     "authorized": true,
     "repository": "https://github.com/unicornwhodev/vision-dataset-studio",
     "visibility": "public",
-    "tested_source_commit": "680a2b78876b1d670671421fd3ef97b8268e22c0",
+    "tested_source_commit": "2738b13d75952698ba611355220f8038f7f0e998",
     "secret_review": "docs/PUBLICATION_CHECKS.md",
-    "status": "published",
-    "repository_commit": "99c4a33b596540f9c92e04e118d6e81dcb896292"
+    "status": "rc3 publication authorized"
   },
   "distribution": {
-    "kind": "pod-tested debug prerelease",
-    "source_proof": "tools/package_pod_qualification.py",
-    "oci_package": "ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc2",
+    "kind": "workstation-tested Debug prerelease",
+    "source_proof": "tools/package_workstation_release.py",
+    "oci_package": "ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc3",
     "oci_kind": "qualification archive, not a runnable build image",
-    "build_image_status": "prepared, not built; GitHub Actions billing lock"
+    "build_image_status": "prepared, not built; GitHub Actions billing lock",
+    "oci_visibility": "private",
+    "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc3"
+  },
+  "lite_rt_matrix": {
+    "model_conversions_downloaded_verified": 31,
+    "model_conversions_passed": 5,
+    "model_conversions_failed": 1,
+    "model_conversions_pending": 25,
+    "hf_trainable_conversions_passed": 4,
+    "hf_trainable_conversions_total": 20,
+    "evidence": "test-results/litert-rc3/models-passed.json"
+  },
+  "workflows": {
+    "templates": 3,
+    "journal_resume": true,
+    "human_review_required": true,
+    "verified_export_before_learning": true,
+    "cleanup_after_training": true,
+    "local_agent_planner": "implemented; real backend integration pending",
+    "report": "docs/WORKFLOWS.md"
   }
 }

@@ -121,3 +121,11 @@ Références officielles :
 - https://developer.android.com/studio
 - https://developer.android.com/studio/run/emulator-commandline
 - https://developer.android.com/studio/run/emulator-acceleration
+
+## Reprise après la session rc3
+
+Le poste recréé utilise une RTX 2000 Ada et le volume réseau conservé. À la reprise, relire l’adresse/port SSH du pod avant d’actualiser l’alias local ; ils peuvent changer. Réinstaller les dépendances système temporaires si nécessaire. Le SDK, les AVD et la clé Debug rc3 sont sous `/workspace/toolchains/` ; aucune clé ne doit entrer dans Git.
+
+Les preuves de la session sont dans `/workspace/qa/` et les logs dans `/workspace/setup-logs/`. La file de conversions a été arrêtée avec `STOP_AFTER_CURRENT`. Reprendre uniquement les cas non terminés listés dans la matrice, dans un nouveau dossier de preuves ; ne pas écraser les résultats antérieurs. L’apprentissage de qualification reste exécuté dans l’émulateur Android.
+
+Le volume réseau continue d’être facturé lorsque le calcul est arrêté. Ne pas supprimer ce volume lors de la fermeture quotidienne du poste.

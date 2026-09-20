@@ -1,0 +1,38 @@
+{
+  "case": "Charlbi-edgenext_xx_small_learning",
+  "revision": "1244117f490e36ce321d70baa672753caeaef028",
+  "build_id": "20260920T204726Z-e97732364106",
+  "passed": true,
+  "timed_out": false,
+  "controller_seconds": 120.591,
+  "android": {
+    "case": "Charlbi-edgenext_xx_small_learning",
+    "runtime": "Android LiteRT Interpreter CPU",
+    "accuracy_evaluated": false,
+    "physical_arm_device": false,
+    "optimizer_on_host": false,
+    "phase": "complete",
+    "elapsed_ms": 110081,
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "model_sha256": "72d87145acf5caf05095c1e4ab7c056ec0095b645d8a16b61c2dfbf9b0d0515d",
+    "threads": 4,
+    "adapter": "classification",
+    "training_scope": "pretrained_classification_head_only",
+    "output_shapes": [
+      [
+        1,
+        1000
+      ]
+    ],
+    "training_loss": 11.391106,
+    "output_max_change": 0.09351325,
+    "proposals": 0,
+    "checkpoint_files": 1,
+    "restore_max_difference": 0.0,
+    "resumed_loss": 11.297009,
+    "optimizer_steps_on_android": 2,
+    "application_checkpoint_loaded": true,
+    "training": "passed",
+    "success": true
+  }
+}

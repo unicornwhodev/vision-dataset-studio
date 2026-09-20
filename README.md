@@ -4,7 +4,7 @@
 
 Atelier Android pour produire des datasets d’images par lots : préannotation, correction humaine et export. Interface sombre compacte, image au centre du travail.
 
-**4.2.0-rc2 · Apache-2.0 · En qualification**
+**4.2.0-rc3 · Apache-2.0 · En qualification**
 Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
 
 ## Parcours principal
@@ -23,12 +23,14 @@ Les empreintes de fichiers et de pixels empêchent de réintroduire une copie id
 |---|---|
 | Import local / HF, lots configurables, correction et exports | Implémentés ; cycle local 2+1 vérifié sur Android |
 | Identité persistante, reprise et purge protégée | Tests Android réussis, dont copies renommées et concurrence |
-| Apprentissage des poids internes, checkpoints, interruption/reprise | Testé sur réseau synthétique ; conversions HF entraînables à qualifier |
-| Téléchargement HF, contrats et prétraitement LiteRT | Implémentés ; RepViT exécuté sur Android, autres familles à qualifier |
+| Apprentissage Android, checkpoints, interruption/reprise | Quatre conversions HF ont passé train/save/restore/reprise ; encodeurs figés par ces conversions |
+| Téléchargement HF, contrats et prétraitement LiteRT | Catalogue configurable, révisions et SHA-256 vérifiés ; RepViT et quatre conversions entraînables exécutés |
 | Tokeniseurs et similarité persistante | Tests Android réussis |
-| Bundles TinyCLIP / SAM / Florence-2 | Adaptateurs présents ; qualification par conversion incomplète |
-| Éditeur/export de masques, décodeur RTMDet | À compléter |
-| Agent autonome et workflows généraux exécutables | Non livrés ; les packs actuels configurent l’atelier |
+| Bundles TinyCLIP / SAM / Florence-2 | Adaptateurs présents ; tests des conversions à terminer |
+| Éditeur/export de masques | Pinceau, gomme, instances distinctes, export canonique et COCO ; test de geste réussi |
+| RTMDet sans apprentissage | Décodeur implémenté ; incompatibilité de forme encore ouverte à l’exécution |
+| Workflows exécutables | Trois templates, journal/reprise, pauses de revue/export/nettoyage ; tests de garde réussis |
+| Agent | Planificateur HTTP local optionnel ; serveur fourni séparément, intégration réelle à qualifier |
 
 Les [résultats exécutés](TEST_REPORT.md) et les [limites](KNOWN_LIMITATIONS.md) font foi. Le dépôt partage les sources en qualification ; le produit n’est pas encore complet ni prêt pour une release stable.
 
@@ -66,10 +68,11 @@ Les tests de modèles nécessitent des fixtures injectées séparément et peuve
 ## Documentation et dépôt
 
 - [Guide FR/EN](docs/README.md), [production par lots](docs/BATCH_PRODUCTION.md), [contrat d’apprentissage](docs/LITERT_TRAINING_CONTRACT.md).
+- [Workflows](docs/WORKFLOWS.md), [qualification LiteRT](docs/LITERT_QUALIFICATION.md).
 - [Roadmap](docs/ROADMAP.md), [plan de publication](docs/RELEASE_PLAN.md), [contribution](CONTRIBUTING.md).
 - [Poste de développement](docs/WORKSTATION.md), [interface](docs/UI_REFINEMENT.md).
 
-Destination autorisée : dépôt public [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). La [prérelease de qualification](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc2) distribue l’APK utilisateur et le paquet de recette. GHCR héberge ce paquet au format OCI ; le Dockerfile de build reste à éprouver, GitHub Actions étant bloqué par la facturation du compte. Voir le [plan de publication](docs/RELEASE_PLAN.md). Aucune release stable n’est annoncée.
+Destination autorisée : dépôt public [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). La [prérelease de qualification](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc3) distribue l’APK utilisateur et le paquet de recette. GHCR héberge ce paquet au format OCI ; le Dockerfile de build reste à éprouver, GitHub Actions étant bloqué par la facturation du compte. Voir le [plan de publication](docs/RELEASE_PLAN.md). Aucune release stable n’est annoncée.
 
 Le code relève d’[Apache-2.0](LICENSE), selon les droits des contributeurs. Les modèles, données et bibliothèques conservent leurs licences ; voir [NOTICE](NOTICE) et [l’état des droits](LICENSING_STATUS.md).
 

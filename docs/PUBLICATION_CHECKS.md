@@ -1,19 +1,19 @@
-# Contrôles avant publication · Publication checks
+# Contrôles de publication rc3 · rc3 publication checks
 
-20 septembre / September 2026. Sources Android testées / tested Android source: `680a2b78876b1d670671421fd3ef97b8268e22c0`.
+20 septembre 2026 UTC. Sources Android : `2738b13`. [Preuves de build](../test-results/litert-rc3/final-build/status.json).
 
 ## Français
 
-- Gitleaks 8.30.1 : archive officielle vérifiée par SHA-256, analyse de tout l’historique Git et des fichiers candidats à la publication.
-- Aucun secret confirmé. Quatre alertes génériques du manifeste de sources ont été vérifiées : chacune est le SHA-256 recalculé du fichier Kotlin nommé, pas un identifiant d’accès. Aucune règle générale n’a été désactivée.
-- Les fichiers `.env`, variantes locales, clés, APK, poids, caches et données de recette non sélectionnées sont exclus. Seules les preuves synthétiques relues sous `test-results/batch-production/` sont ajoutées explicitement.
-- Les deux APK du build `20260919T234604Z-8a3382d3e997` ont été sauvegardées localement sous `dist/pod-handoff/final-build/`. Les SHA-256 ont été recalculés et comparés aux reçus. Ces binaires ne sont pas ajoutés à Git.
-- Les scans ne constituent pas une preuve absolue d’absence de secrets. La publication conserve le statut de qualification et les limites documentées.
+- Gitleaks 8.30.1 : fichiers candidats et historique Git analysés, sans désactiver de règle.
+- Douze alertes sur les fichiers candidats : huit SHA-256 de sources (anciens et nouveau manifeste) et quatre empreintes de **clés publiques** imprimées par `apksigner`. Les sources ont été comparées aux commits et les APK vérifiées ; aucune de ces valeurs n’est un jeton ni une clé privée.
+- Les fichiers de configuration locaux, `.env`, tokens, clés privées/keystores, données utilisateur, poids et identifiants des dépôts HF privés sont exclus. Les preuves publiques sont sélectionnées explicitement ; aucun répertoire du pod n’est publié en bloc.
+- Les APK ont été recopiées sur le Chromebook et leurs tailles/SHA-256 recalculés. L’inventaire APK confirme l’absence de poids. La clé Debug rc3 reste hors Git.
+- Les rapports détaillés du scanner sont conservés localement sous `dist/publication-review/`, exclus du dépôt. Un scan ne prouve pas une absence absolue de secrets ; cette publication combine scan et revue des fichiers sélectionnés.
 
 ## English
 
-- Gitleaks 8.30.1: official archive verified against its SHA-256 checksum; full Git history and publication candidate files scanned.
-- No confirmed secret. Four generic findings in the source manifest were checked: each is the recomputed SHA-256 of its named Kotlin file, not an access credential. No general detection rule was disabled.
-- `.env` files and local variants, keys, APKs, weights, caches and unselected QA data are excluded. Only reviewed synthetic evidence under `test-results/batch-production/` is explicitly included.
-- Both APKs from build `20260919T234604Z-8a3382d3e997` were backed up locally under `dist/pod-handoff/final-build/`. Their SHA-256 digests were recomputed and matched to the receipts. The binaries are excluded from Git.
-- Scans cannot prove the absolute absence of secrets. Publication preserves the qualification status and documented limitations.
+- Gitleaks 8.30.1 scans publication candidates and Git history without disabling rules.
+- Twelve candidate-file findings: eight source SHA-256 digests across old/new manifests and four **public-key** fingerprints printed by `apksigner`. Sources were checked against their commits and APK signatures verified; none is an access token or private key.
+- Local configuration, `.env`, credentials, private keys/keystores, user data, weights and private HF repository identifiers are excluded. Public evidence is explicitly selected; no pod directory is published wholesale.
+- APKs were backed up to the Chromebook and their size/SHA-256 recomputed. The APK inventory contains no model weights. The rc3 Debug key remains outside Git.
+- Detailed scanner reports stay under ignored `dist/publication-review/`. Scanning cannot prove an absolute absence of secrets; this publication combines scanning with review of selected files.
