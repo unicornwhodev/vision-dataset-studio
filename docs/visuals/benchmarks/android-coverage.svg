@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="936pt" height="360pt" viewBox="0 0 936 360" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.6.3, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 360
+L 936 360
+L 936 0
+L 0 0
+z
+" style="fill: #101419"/>
+  </g>
+  <g id="axes_1"/>
+  <g id="text_1">
+   <text style="fill: #77dce3; font: 700 70px 'DejaVu Sans'; text-anchor: start" x="74.88" y="187.2" transform="rotate(-0 74.88 187.2)">5</text>
+  </g>
+  <g id="text_2">
+   <text style="fill: #ecf2f8; font: 14px 'DejaVu Sans'; text-anchor: start" x="74.88" y="219.6" transform="rotate(-0 74.88 219.6)">PASS / Réussis</text>
+  </g>
+  <g id="text_3">
+   <text style="fill: #fb997e; font: 700 70px 'DejaVu Sans'; text-anchor: start" x="365.04" y="187.2" transform="rotate(-0 365.04 187.2)">1</text>
+  </g>
+  <g id="text_4">
+   <text style="fill: #ecf2f8; font: 14px 'DejaVu Sans'; text-anchor: start" x="365.04" y="219.6" transform="rotate(-0 365.04 219.6)">FAIL / Échec</text>
+  </g>
+  <g id="text_5">
+   <text style="fill: #9eabb8; font: 700 70px 'DejaVu Sans'; text-anchor: start" x="655.2" y="187.2" transform="rotate(-0 655.2 187.2)">19</text>
+  </g>
+  <g id="text_6">
+   <text style="fill: #ecf2f8; font: 14px 'DejaVu Sans'; text-anchor: start" x="655.2" y="219.6" transform="rotate(-0 655.2 219.6)">PENDING / À tester</text>
+  </g>
+  <g id="text_7">
+   <text style="fill: #ecf2f8; font: 700 21px 'DejaVu Sans'; text-anchor: start" x="56.16" y="26.756719" transform="rotate(-0 56.16 26.756719)">Android app · qualification coverage</text>
+  </g>
+  <g id="text_8">
+   <text style="fill: #9eabb8; font: 11px 'DejaVu Sans'; text-anchor: start" x="56.16" y="40.758281" transform="rotate(-0 56.16 40.758281)">25 conversions • 15 trainable variants • snapshot 20 Sep 2026</text>
+  </g>
+  <g id="text_9">
+   <text style="fill: #9eabb8; font: 9px 'DejaVu Sans'; text-anchor: start" x="56.16" y="349.128281" transform="rotate(-0 56.16 349.128281)">Charlbi • evidence 20 Sep 2026 • source revision 1244117f490e</text>
+  </g>
+ </g>
+</svg>

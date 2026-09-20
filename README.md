@@ -1,3 +1,5 @@
+![Vision Dataset Studio — Unicorn Who Dev](docs/visuals/banner.png)
+
 # Vision Dataset Studio — Unicorn Who Dev
 
 **Français** · [English](README.en.md)
@@ -6,6 +8,14 @@ Atelier Android pour produire des datasets d’images par lots : préannotation,
 
 **4.2.0-rc3 · Apache-2.0 · En qualification**
 Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
+
+## L’application en images
+
+| Atelier rc3 actuel | Éditeur d’annotations |
+|---|---|
+| [![Atelier rc3](test-results/litert-rc3/final-device/app-ready.png)](test-results/litert-rc3/final-device/app-ready.png) | [![Éditeur d’annotations](docs/ui-refined/refined-editor-persisted.png)](docs/ui-refined/refined-editor-persisted.png) |
+
+Captures réelles sur émulateur Android. À gauche : build rc3 final après démarrage. À droite : recette de l’éditeur du 19 septembre, image synthétique et annotation conservée ; capture historique, pas un nouveau test rc3. [Provenance et galerie en pleine taille](docs/VISUALS.md). La bannière est une illustration générée.
 
 ## Parcours principal
 
@@ -16,6 +26,14 @@ L’apprentissage est **désactivé par défaut**. S’il est activé, il porte 
 Les empreintes de fichiers et de pixels empêchent de réintroduire une copie identique dans les lots suivants du même projet. Elles restent en base après la purge. Les quasi-doublons retouchés ou recompressés avec pertes ne sont pas couverts par cette garantie.
 
 **L’APK n’embarque aucun poids.** Le runtime et les outils sont intégrés ; les modèles sont téléchargés ou importés après installation. L’apprentissage s’exécute sur Android. Le pod sert au développement et à la recette.
+
+![Cycle du lot](docs/visuals/batch-flow.fr.svg)
+
+## Architecture du système
+
+![Architecture de l’application](docs/visuals/architecture.fr.svg)
+
+L’état de production, l’inférence et l’apprentissage facultatif restent sur Android. Le planificateur local optionnel propose un workflow ; il ne peut ni valider les annotations, ni publier, nettoyer ou activer des poids. [Architecture, données et sources](docs/ARCHITECTURE.md).
 
 ## Fonctions et état
 
@@ -44,6 +62,12 @@ Les [résultats exécutés](TEST_REPORT.md) et les [limites](KNOWN_LIMITATIONS.m
 6. Si l’apprentissage est activé, attendre sa fin. Confirmer le nettoyage puis préparer le lot suivant.
 
 Les annotations canoniques sont conservées. COCO, YOLO, WebDataset et vision-langage sont des sorties complémentaires avec leurs contraintes propres. Une projection ne remplace pas le JSONL canonique.
+
+## Preuves LiteRT
+
+![Qualification du catalogue public](docs/visuals/benchmarks/android-coverage.png)
+
+Ce graphique couvre les **25 variantes publiques Charlbi**. Quatre ont passé train/save/restore/reprise Android ; RepViT a passé l’inférence. Les six conversions d’une autre source autorisée sont hors de ce graphique public. [Résultats, checkpoints et limites des durées](docs/LITERT_QUALIFICATION.md) · [Documentation complète des modèles](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder). Aucune vitesse téléphone ni précision métier annoncée.
 
 ## Construire
 

@@ -1,3 +1,5 @@
+![Vision Dataset Studio — Unicorn Who Dev](docs/visuals/banner.png)
+
 # Vision Dataset Studio — Unicorn Who Dev
 
 [Français](README.md) · **English**
@@ -6,6 +8,14 @@ An Android workspace for producing image datasets in batches: model proposals, h
 
 **4.2.0-rc3 · Apache-2.0 · Under qualification**
 Android application ID: `com.unicornwhodev.visiondatasetstudio`
+
+## Application screenshots
+
+| Current rc3 workspace | Annotation editor |
+|---|---|
+| [![rc3 workspace](test-results/litert-rc3/final-device/app-ready.png)](test-results/litert-rc3/final-device/app-ready.png) | [![Annotation editor](docs/ui-refined/refined-editor-persisted.png)](docs/ui-refined/refined-editor-persisted.png) |
+
+Real Android emulator captures. Left: final rc3 build after startup. Right: editor QA from 19 September, with a synthetic image and a persisted annotation; historical capture, not a new rc3 test. [Image provenance and full-size gallery](docs/VISUALS.md). The banner is a generated illustration.
 
 ## Main workflow
 
@@ -16,6 +26,14 @@ Learning is **off by default**. When enabled, it uses only the corrected, export
 Persistent file and decoded-pixel fingerprints prevent identical copies from entering later batches of the same project. The ledger survives cache cleanup. Edited near-duplicates and lossy recompressions are outside this exact-identity guarantee.
 
 **The APK contains no model weights.** It includes the runtime and integration tools; models are downloaded or imported after installation. Learning runs on Android. The pod is used for development and QA.
+
+![Batch lifecycle](docs/visuals/batch-flow.en.svg)
+
+## System architecture
+
+![Application architecture](docs/visuals/architecture.en.svg)
+
+All production state, inference and optional learning live on Android. The optional local planner proposes a workflow; it cannot approve annotations, publish, clean up or activate weights. [Architecture, data boundaries and source map](docs/en/ARCHITECTURE.md).
 
 ## Features and status
 
@@ -44,6 +62,12 @@ See [executed validation](docs/en/VALIDATION.md) and [the roadmap](docs/en/ROADM
 6. If learning is enabled, wait until it finishes. Confirm cleanup and prepare the next batch.
 
 Canonical annotations are retained. COCO, YOLO, WebDataset and vision-language outputs are optional projections with their own constraints; they do not replace canonical JSONL.
+
+## LiteRT evidence
+
+![Public catalogue qualification](docs/visuals/benchmarks/android-coverage.png)
+
+This figure covers the **25 public Charlbi variants**. Four passed Android train/save/restore/resume; RepViT passed inference. The six additional authorized-source conversions are outside this public chart. [Executed results, checkpoint figures and timing limitations](docs/en/LITERT_QUALIFICATION.md) · [Full model documentation](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder). No phone speed or accuracy claim.
 
 ## Build and test
 

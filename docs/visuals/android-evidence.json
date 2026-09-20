@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "source_repository": "Charlbi/Lite_rt_prepared_for_android_dataset_builder",
+  "source_revision": "1244117f490e36ce321d70baa672753caeaef028",
+  "evidence_date": "2026-09-20",
+  "visuals_date": "2026-09-21",
+  "footer": "Charlbi • evidence 20 Sep 2026 • source revision 1244117f490e",
+  "coverage": {
+    "total": 25,
+    "trainable": 15,
+    "passed": 5,
+    "failed": 1,
+    "pending": 19
+  },
+  "android": [
+    {
+      "case": "Charlbi-edgenext_xx_small_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 108614,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "72d87145acf5caf05095c1e4ab7c056ec0095b645d8a16b61c2dfbf9b0d0515d",
+      "threads": 4,
+      "adapter": "classification",
+      "training_scope": "pretrained_classification_head_only",
+      "output_shapes": [
+        [
+          1,
+          1000
+        ]
+      ],
+      "training_loss": 11.391106,
+      "output_max_change": 0.09351325,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 11.297009,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true,
+      "id": "edgenext_xx_small_learning",
+      "label": "EdgeNeXt XX-Small",
+      "optimizer_steps": 2,
+      "build_id": "20260920T211135Z-09c558a5b622"
+    },
+    {
+      "case": "Charlbi-edgenext_x_small_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 216623,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "e46e661555749e7402b495f45b304cececc368b360341438370b8ad0dd840276",
+      "threads": 4,
+      "adapter": "classification",
+      "training_scope": "pretrained_classification_head_only",
+      "output_shapes": [
+        [
+          1,
+          1000
+        ]
+      ],
+      "training_loss": 11.275679,
+      "output_max_change": 0.09805727,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 11.176739,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true,
+      "id": "edgenext_x_small_learning",
+      "label": "EdgeNeXt X-Small",
+      "optimizer_steps": 2,
+      "build_id": "20260920T204726Z-e97732364106"
+    },
+    {
+      "case": "Charlbi-repvit_m1",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 51464,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "4849906123f080d356a02733324fae7059a56531fdd9fee70065bcf7f3ef77bc",
+      "threads": 4,
+      "adapter": "embedding",
+      "proposals": 0,
+      "embedding_values": 384,
+      "training": "not_exposed_by_conversion",
+      "success": true,
+      "id": "repvit_m1",
+      "label": "RepViT M1 · inference",
+      "optimizer_steps": null,
+      "build_id": "20260920T211135Z-09c558a5b622"
+    },
+    {
+      "case": "Charlbi-rtmdet_tiny_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 696769,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "4f50d81ccaf2fea576522ee427f6fb9c04cc3dfcfdca4d534dbfb180afc3d458",
+      "threads": 4,
+      "adapter": "yolo",
+      "training_scope": "candidate_classification_and_box_adaptation_only",
+      "output_shapes": [
+        [
+          1,
+          84,
+          2100
+        ]
+      ],
+      "training_loss": 0.120895654,
+      "output_max_change": 0.15809631,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 0.120224014,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true,
+      "id": "rtmdet_tiny_learning",
+      "label": "RTMDet Tiny · learning",
+      "optimizer_steps": 2,
+      "build_id": "20260920T211135Z-09c558a5b622"
+    },
+    {
+      "case": "Charlbi-edgenext_small_usi_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 464544,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "3df246e01c4122909b00fe95db1555c549ce07e77985ec902574d30f1352f0f9",
+      "threads": 4,
+      "adapter": "classification",
+      "training_scope": "pretrained_classification_head_only",
+      "output_shapes": [
+        [
+          1,
+          1000
+        ]
+      ],
+      "training_loss": 10.552082,
+      "output_max_change": 0.07088137,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 10.480469,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true,
+      "id": "edgenext_small_usi_learning",
+      "label": "EdgeNeXt Small USI",
+      "optimizer_steps": 2,
+      "build_id": "20260920T212400Z-583fa4f10a2d"
+    }
+  ],
+  "source_receipts": [
+    "test-results/litert-rc3/models-passed.json",
+    "test-results/litert-rc3/rtmdet-dynamic-fixed/summary.json"
+  ]
+}

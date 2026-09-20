@@ -33,3 +33,13 @@ The other 25 conversions remain pending, including the six private conversions, 
 ## Measurement boundaries
 
 Java CPU runtime: LiteRT 1.4.2 + Select TF Ops 2.16.1; AOSP API 28 x86_64 software emulator without KVM. Synthetic input and corrections follow each contract. These are execution/update/persistence checks, not task accuracy, generalization or ARM phone benchmarks. No optimizer ran on the Linux pod host. The APK embeds no model weights.
+
+## Visual evidence
+
+![Checkpoint round trip](../visuals/benchmarks/android-checkpoints.png)
+
+![Whole-test duration](../visuals/benchmarks/android-test-duration.png)
+
+The duration includes model loading, multiple inference calls and training/checkpoint operations where exposed. It is not inference latency or a phone benchmark. Each row is a single execution; workloads differ. [Reproducible values and image provenance](../VISUALS.md).
+
+[Full model report](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder/blob/main/docs/BENCHMARKS.en.md) separates host conversion checks, the standalone RepViT learning SDK report and this app campaign. The SDK report does not change the app coverage counts.

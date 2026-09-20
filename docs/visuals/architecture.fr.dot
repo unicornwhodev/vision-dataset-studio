@@ -1,0 +1,19 @@
+digraph architecture {
+graph [bgcolor="#101419",pad="0.35",nodesep="0.3",ranksep="0.55",fontname="DejaVu Sans",fontcolor="#edf2f6",fontsize=18];
+node [shape=box,style="rounded,filled",color="#33404c",fillcolor="#192129",fontcolor="#edf2f6",fontname="DejaVu Sans",fontsize=13,margin="0.16,0.16"];
+edge [color="#79d6df",fontcolor="#aab6c2",fontname="DejaVu Sans",fontsize=10,arrowsize=0.7];
+rankdir=TB;
+local [label="Fichiers locaux / SAF"];
+hf [label="Hugging Face\nDépôts autorisés"];
+agent [label="Planificateur local facultatif\nTemplates uniquement",style="rounded,dashed",color="#b59af5"];
+subgraph cluster_android {label="Android · Vision Dataset Studio";color="#48616c";style=rounded;
+ui [label="Interface Compose\nAnnotation humaine"];
+batch [label="Moteur de lots + journal workflow\nGardes de revue / export / nettoyage"];
+infer [label="Moteur LiteRT\nPrétraiter · inférer · décoder"];
+train [label="WorkManager\nApprentissage facultatif"];
+room [label="Room\nAnnotations · hashes · reçus"];
+storage [label="Fichiers privés\nImages · modèles · checkpoints"];
+export [label="Export vérifié\nJSONL + projections"];
+ui -> batch; batch -> infer; batch -> train; batch -> export; batch -> room [dir=both]; infer -> storage [dir=both]; train -> storage [dir=both]; {rank=same;infer;train;export;} {rank=same;room;storage;} }
+local -> ui; hf -> ui [label="HTTPS"]; agent -> ui [style=dashed,label="loopback HTTP"]; {rank=same;local;hf;agent;}
+}

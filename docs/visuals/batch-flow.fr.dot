@@ -1,0 +1,15 @@
+digraph flow {
+graph [bgcolor="#101419",pad="0.35",nodesep="0.3",ranksep="0.55",fontname="DejaVu Sans",fontcolor="#edf2f6",fontsize=18];
+node [shape=box,style="rounded,filled",color="#33404c",fillcolor="#192129",fontcolor="#edf2f6",fontname="DejaVu Sans",fontsize=13,margin="0.16,0.16"];
+edge [color="#79d6df",fontcolor="#aab6c2",fontname="DejaVu Sans",fontsize=10,arrowsize=0.7];
+rankdir=TB;
+imp [label="Importer le lot\nVérifier les identités"];
+review [label="Propositions facultatives\nCorrection humaine",color="#77dce3",fillcolor="#203c40"];
+export [label="Exporter\nVérifier la copie",color="#77dce3",fillcolor="#203c40"];
+clean [label="Confirmer le nettoyage\nGarder historique + hashes"];
+next [label="Lot suivant"];
+train [label="Apprentissage Android facultatif\nLot exporté, images acceptées\nPuis évaluation"];
+hold [label="Erreur / interruption\nConserver les images"];
+imp -> review -> export; clean -> next; {rank=same;imp;review;export;} {rank=same;train;clean;next;}
+export -> clean [label="Désactivé"]; export -> train [label="Activé"]; train -> clean [label="Terminé"]; train -> hold; hold -> train [style=dashed,label="Reprendre",constraint=false];
+}

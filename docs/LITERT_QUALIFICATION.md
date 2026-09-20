@@ -33,3 +33,13 @@ La [PR communautaire #10](https://huggingface.co/spaces/litert-community/README/
 ## Limites de la mesure
 
 Runtime CPU Java : LiteRT 1.4.2 + Select TF Ops 2.16.1 ; émulateur AOSP API 28 x86_64 sans KVM. Entrée synthétique et corrections construites selon chaque contrat. Ces essais vérifient exécution, mise à jour et persistance ; ils ne mesurent ni précision métier, ni gain de généralisation, ni performance sur téléphone ARM. Aucun optimiseur n’a tourné dans Linux sur l’hôte du pod. Aucun poids n’est embarqué dans l’APK.
+
+## Résultats en images
+
+![Checkpoint round trip](visuals/benchmarks/android-checkpoints.png)
+
+![Whole-test duration](visuals/benchmarks/android-test-duration.png)
+
+La durée comprend chargement, plusieurs inférences et, lorsque disponibles, apprentissage et checkpoints. Ce n’est pas une latence d’inférence ni un benchmark téléphone. Chaque ligne est une exécution unique ; les charges diffèrent. [Reproducible values and image provenance](VISUALS.md).
+
+[Le rapport complet des modèles](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder/blob/main/docs/BENCHMARKS.md) distingue conversion sur hôte, rapport SDK autonome de RepViT entraînable et cette campagne applicative. Le rapport SDK ne modifie pas les comptes de couverture de l’application.
