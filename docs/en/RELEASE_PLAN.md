@@ -19,3 +19,12 @@ Exclude model weights, user datasets, credentials, signing keys, build caches an
 Every published artifact must match its build receipt. Release notes must identify the tested commit, executed and skipped tests, known limitations and supported model/runtime combinations. Pending HF, CI or phone tests must not be presented as passing.
 
 After a clean committed CI build, `python3 tools/package_qualification.py` verifies the successful receipt and APK hashes, requires the matching `github_sha`, and creates the qualification ZIP under `dist/packages/`. It must not be bypassed using a fabricated CI SHA. No package or release has been published.
+
+The owner has also requested a release and a GHCR package. The manual
+`publish-qualification.yml` workflow builds `packaging/Dockerfile`, actually compiles
+the app inside it and runs JVM/lint checks. It publishes that same image at
+`ghcr.io/unicornwhodev/vision-dataset-studio-build` and creates a **prerelease** with
+the user APK, SHA-256 checksums, image digest and bilingual qualification ZIP.
+The instrumentation APK remains inside the technical ZIP. The Docker context contains
+no credentials or weights; publication uses the ephemeral GitHub Actions token.
+This workflow does not replace API 28/35 instrumentation or complete phone/model QA.

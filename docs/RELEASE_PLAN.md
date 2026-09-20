@@ -52,3 +52,16 @@ Le script exige un reçu de succès, vérifie les octets des APK et refuse un ar
 Git modifié ou un `github_sha` différent. Il produit un ZIP et son SHA-256 dans
 `dist/packages/`. Ce paquet Debug n’est pas une release stable. Le refus du build
 en échec sur le pod a été vérifié ; aucun ZIP de qualification n’a été promu.
+
+## Publication de qualification autorisée
+
+Le propriétaire a également demandé la release et le package GHCR. Le workflow manuel
+`publish-qualification.yml` construit l’image `packaging/Dockerfile`, compile réellement
+l’application dans celle-ci et exécute les tests JVM/lint. Il publie cette même image
+sur `ghcr.io/unicornwhodev/vision-dataset-studio-build` et crée une **prérelease** avec
+l’APK utilisateur, son SHA-256, le digest de l’image et le ZIP de qualification FR/EN.
+L’APK instrumentée reste dans le ZIP technique. Aucun secret ni poids ne fait partie
+du contexte Docker. Le jeton éphémère de GitHub Actions autorise la publication.
+
+Ce workflow ne remplace pas la recette instrumentée API 28/35 ni la qualification
+complète des modèles et du téléphone ; les notes de release distinguent ces limites.

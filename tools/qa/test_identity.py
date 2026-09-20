@@ -39,7 +39,7 @@ class IdentityTests(unittest.TestCase):
     def test_version_and_database_versions_distinct(self):
         self.assertIn('versionName = "4.2.0-rc2"',(ROOT/'app/build.gradle.kts').read_text())
         db=next((ROOT/'app/src/main').rglob('AppDatabase.kt')).read_text()
-        self.assertIn('version = 3',db)
+        self.assertIn('version = 4',db)
         self.assertNotIn('fallbackToDestructiveMigration',db)
     def test_device_scripts_use_canonical_id(self):
         for name in ['capture_device_metrics.sh','run_device_qualification.sh']:

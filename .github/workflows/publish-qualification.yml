@@ -1,0 +1,94 @@
+name: Publish qualification release and build tools
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'New qualification tag matching the Android version (never overwrite an existing release)'
+        default: v4.2.0-rc2
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-qualification
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      packages: write
+    env:
+      QUALIFICATION_TAG: ${{ inputs.tag }}
+      IMAGE: ghcr.io/unicornwhodev/vision-dataset-studio-build
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Validate destination and new version tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$GITHUB_REPOSITORY" = unicornwhodev/vision-dataset-studio
+          python3 - <<'PY'
+          import os, pathlib, re
+          version = re.search(r'versionName\s*=\s*"([^"]+)"', pathlib.Path('app/build.gradle.kts').read_text())[1]
+          assert os.environ['QUALIFICATION_TAG'] == 'v' + version
+          assert re.fullmatch(r'[0-9A-Za-z.+-]+', version)
+          PY
+          git check-ref-format "refs/tags/$QUALIFICATION_TAG"
+          if gh release view "$QUALIFICATION_TAG" >/dev/null 2>&1; then
+            echo 'Release already exists; refusing to overwrite it.' >&2
+            exit 1
+          fi
+      - name: Build Android toolchain image
+        run: docker build --pull --tag vds-build:qualification packaging
+      - name: Compile and qualify APKs inside the image
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" --volume "$GITHUB_WORKSPACE:/source" \
+            --env HOME=/tmp/vds-build-home --env GRADLE_USER_HOME=/tmp/vds-gradle \
+            --env GITHUB_SHA --env GITHUB_RUN_ID --env QUALIFICATION_TAG vds-build:qualification \
+            bash -c 'set -e; mkdir -p "$HOME"; python3 tools/qa/test_identity.py; python3 tools/qa/test_build_evidence.py; bash tools/build_android.sh; python3 tools/package_qualification.py; python3 tools/prepare_release.py'
+      - name: Keep build and publication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualification-publication-evidence
+          retention-days: 30
+          if-no-files-found: warn
+          path: |
+            dist/android/
+            dist/packages/
+            dist/release/
+            app/build/reports/
+            app/build/test-results/
+      - name: Authenticate to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Publish the image that actually built the APKs
+        run: |
+          docker tag vds-build:qualification "$IMAGE:$QUALIFICATION_TAG"
+          docker tag vds-build:qualification "$IMAGE:sha-$GITHUB_SHA"
+          docker push "$IMAGE:$QUALIFICATION_TAG"
+          docker push "$IMAGE:sha-$GITHUB_SHA"
+          docker inspect "$IMAGE:$QUALIFICATION_TAG" --format '{{json .RepoDigests}}' > dist/release/container-digests.json
+      - name: Publish qualification prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$QUALIFICATION_TAG" \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Vision Dataset Studio $QUALIFICATION_TAG — qualification" \
+            --notes-file dist/release/RELEASE_NOTES.md \
+            dist/release/vision-dataset-studio.apk \
+            dist/release/SHA256SUMS \
+            dist/release/container-digests.json \
+            dist/packages/*-qualification.zip

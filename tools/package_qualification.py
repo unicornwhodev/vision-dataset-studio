@@ -41,8 +41,10 @@ def main() -> None:
         for apk in apks:
             z.write(apk, apk.name)
             z.write(apk.with_suffix('.apk.sha256'), apk.with_suffix('.apk.sha256').name)
-        for name in ['README.md', 'LICENSE', 'NOTICE', 'LICENSING_STATUS.md', 'KNOWN_LIMITATIONS.md',
-                     'docs/ROADMAP.md', 'docs/ANDROID_QUALIFICATION.md']:
+        for name in ['README.md', 'README.en.md', 'LICENSE', 'NOTICE', 'LICENSING_STATUS.md', 'KNOWN_LIMITATIONS.md',
+                     'TEST_REPORT.md', 'QUALIFICATION_STATUS.json', 'docs/README.md', 'docs/ROADMAP.md',
+                     'docs/en/ROADMAP.md', 'docs/en/VALIDATION.md', 'docs/BATCH_PRODUCTION.md',
+                     'docs/en/BATCH_PRODUCTION.md', 'docs/ANDROID_QUALIFICATION.md']:
             z.write(ROOT / name, name)
     digest = hashlib.file_digest(dest.open('rb'), 'sha256').hexdigest()
     dest.with_suffix('.zip.sha256').write_text(f'{digest}  {dest.name}\n')
