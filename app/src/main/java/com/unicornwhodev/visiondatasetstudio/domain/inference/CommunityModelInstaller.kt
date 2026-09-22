@@ -26,9 +26,11 @@ object CommunityModelInstaller {
             require(hashes[relative]==sha && File(directory,relative).length()==bytes) { "SHA-256 ou taille non conforme : $relative" }
         }
         // Documentation is deliberately best-effort. Other downloaded runtime/config files remain integrity protected.
-        hashes.filterKeys { !isDocumentation(it) }.forEach { (relative, actual) ->
-            val info=expected[relative] as? Map<*,*> ?: return@forEach
-            require(actual==info["sha256"] && File(directory,relative).length()==(info["bytes"] as Number).toLong()) { "SHA-256 ou taille non conforme : $relative" }
+        hashes.filterKeys { !isDocumentation(it) && it.substringAfterLast('/')!="artifact_manifest.json" }.forEach { (relative, actual) ->
+            val info=expected[relative] as? Map<*,*> ?: error("Artefact runtime téléchargé absent du manifeste : $relative")
+            val sha=info["sha256"] as? String ?: error("SHA-256 absent du manifeste : $relative")
+            val bytes=(info["bytes"] as? Number)?.toLong() ?: error("Taille absente du manifeste : $relative")
+            require(actual==sha && File(directory,relative).length()==bytes) { "SHA-256 ou taille non conforme : $relative" }
         }
     }
     suspend fun install(item:CommunityModelCatalog.Availability,directory:File,hf:HfApiClient,progress:(Int,Int)->Unit):File = withContext(Dispatchers.IO) {

@@ -4,7 +4,17 @@ import com.unicornwhodev.visiondatasetstudio.data.hf.HfApiClient
 import com.unicornwhodev.visiondatasetstudio.data.hf.HfTreeItem
 import org.tensorflow.lite.Interpreter
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
+private val executedQualifications=mapOf(
+    "repvit_m1" to QualificationStatus.INFERENCE_ONLY,
+    "edgenext_xx_small_learning" to QualificationStatus.TRAINING_QUALIFIED,
+    "edgenext_x_small_learning" to QualificationStatus.TRAINING_QUALIFIED,
+    "rtmdet_tiny_learning" to QualificationStatus.TRAINING_QUALIFIED,
+    "edgenext_small_usi_learning" to QualificationStatus.TRAINING_QUALIFIED,
+    "rtmdet_tiny" to QualificationStatus.FAILED
+)
 private fun declaredCapabilities(id:String,adapter:String):ModelCapabilities {
     val values=when {
         id=="tinyclip"->setOf(ModelCapability.EMBEDDING,ModelCapability.SIMILARITY,ModelCapability.CLASSIFICATION)
@@ -15,7 +25,8 @@ private fun declaredCapabilities(id:String,adapter:String):ModelCapabilities {
         adapter=="embedding"->setOf(ModelCapability.EMBEDDING,ModelCapability.SIMILARITY)
         else->setOf(ModelCapability.INSPECTION_ONLY)
     }
-    val qualification=when(id){"repvit_m1"->QualificationStatus.INFERENCE_ONLY;"rtmdet_tiny"->QualificationStatus.FAILED;else->QualificationStatus.UNTESTED}
+    // Only campaigns recorded in docs/LITERT_QUALIFICATION.md may enter this table.
+    val qualification=executedQualifications[id] ?: QualificationStatus.UNTESTED
     return ModelCapabilities(values,qualification)
 }
 
@@ -81,10 +92,25 @@ object CommunityModelCatalog {
         }
     }
 
-    suspend fun discover(hf: HfApiClient, source: Source = Source()): List<Availability> {
+    suspend fun discover(hf: HfApiClient, source: Source = Source()): List<Availability> = withContext(Dispatchers.IO) {
         source.validate()
         val sha = hf.resolveModelRevision(source.repository, source.revision)
-        return fromTree(source, sha, hf.listModelTree(source.repository, sha, source.folder))
+        val discovered=fromTree(source, sha, hf.listModelTree(source.repository, sha, source.folder))
+        discovered.map { item ->
+            val contract=item.files.firstOrNull{it.path.removePrefix(item.sourcePrefix) in setOf("android_model_config.json","model_config.json")}
+                ?: return@map item
+            val temp=File.createTempFile("vds-model-contract-",".json")
+            try {
+                val result=runCatching {
+                    check(hf.downloadModelFile(item.sourceRepo,item.repoSha,contract.path,temp,1024L*1024)){"Téléchargement du contrat interrompu"}
+                    val config=com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(ModelConfig::class.java).failOnUnknown().fromJson(temp.readText()) ?: error("Contrat vide")
+                    ModelContract.validate(config)
+                    val qualification=executedQualifications[item.entry.id] ?: QualificationStatus.UNTESTED
+                    item.copy(entry=item.entry.copy(capabilities=ModelCapabilities.fromConfig(config,qualification)),note="Contrat validé · essai sur image requis")
+                }
+                result.getOrElse{item.copy(installableNow=false,note="Contrat invalide ou inaccessible : ${it.message ?: "erreur inconnue"}")}
+            } finally { temp.delete() }
+        }
     }
 
     /** Metadata advertises a download, never a successful inference or training run. */

@@ -60,7 +60,11 @@ class TrainingWorkflowTest {
         try{otherFile.outputStream().use{otherBitmap.compress(Bitmap.CompressFormat.PNG,100,it)}}finally{otherBitmap.recycle()}
         val other=accepted.first().copy(sampleId="other-batch-$projectId",batchNumber=2,localImagePath=otherFile.path,sha256=HashUtils.computeSha256(otherFile))
         db.sampleDao().insertNewSamples(listOf(other));db.annotationDao().insertOrReplace(AnnotationRecord(other.sampleId,db.annotationDao().getAnnotationSync(accepted.first().sampleId)!!.dataJson))
+        val preflight=store.inspectPreparation(project,1)
         val run=store.prepare(project,1,epochs=3,learningRate=.05f)
+        assertEquals(preflight.samples.map{it.sha256},run.samples.map{it.sha256})
+        assertEquals(preflight.trainCount,run.samples.count{!it.validation})
+        assertEquals(preflight.validationCount,run.samples.count{it.validation})
         assertEquals(run.id,store.readBatch(projectId,1)!!.id)
         assertEquals(1,run.sourceBatchNumber);assertTrue(run.exportProof.isNotBlank())
         var cleanupRefused=false

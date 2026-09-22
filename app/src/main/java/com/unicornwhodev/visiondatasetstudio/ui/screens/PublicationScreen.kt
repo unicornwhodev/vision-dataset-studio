@@ -109,7 +109,8 @@ fun PublicationScreen(viewModel: MainViewModel) {
             TextButton(onClick = { showPreview = !showPreview }) { Icon(Icons.Default.DataObject, null); Spacer(Modifier.width(8.dp)); Text(if (showPreview) "Masquer l’aperçu" else "Aperçu des données") }
             if (showPreview) StudioSection("Aperçu", "La sortie complète peut contenir davantage d’annotations.") {
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { DatasetExportFormat.entries.forEach { format ->
-                    FilterChip(previewKey == format.key, onClick = { previewKey = format.key }, label = { Text(format.label) })
+                    val label=stringResource(when(format){DatasetExportFormat.CANONICAL_JSONL->R.string.export_format_canonical;DatasetExportFormat.COCO->R.string.export_format_coco;DatasetExportFormat.YOLO->R.string.export_format_yolo;DatasetExportFormat.VISION_LANGUAGE->R.string.export_format_vl})
+                    FilterChip(previewKey == format.key, onClick = { previewKey = format.key }, label = { Text(label) })
                 } }
                 SelectionContainer { Text(preview?.take(16000) ?: "Chargement…", style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace) }
             }

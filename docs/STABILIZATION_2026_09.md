@@ -1,5 +1,51 @@
 # Stabilisation — septembre 2026
 
+## Second stabilization pass — 22 septembre 2026
+
+### Fixed
+
+- La réinitialisation d’un projet efface désormais ses identités d’image dans la même transaction Room que ses échantillons. La réinitialisation d’un lot reste limitée aux identités de ce lot et la suppression complète conserve son comportement.
+- Le moteur de lot vérifie lui-même le contrat modèle/tâches avant de sélectionner ou de modifier une image. Cette garde couvre donc les appels manuels, la préannotation automatique et les workflows. Toutes les tâches actives doivent être couvertes ; `POINTING_MULTI` accepte une sortie `point`, et le grounding exige une sortie textuelle et une sortie de région.
+- Les nouveaux masques du pinceau, du polygone, du lasso et du remplissage utilisent une seule fabrique de raster, bornée à 512 pixels sur le grand côté et respectant le ratio de l’image. La segmentation produite par l’adaptateur multitâche utilise la même taille.
+- Un changement de projet vide maintenant la pile de navigation avant d’ouvrir les contrôles ; Retour ne peut plus rouvrir un écran du projet précédent.
+- Le contrôle d’intégrité refuse maintenant tout artefact runtime/config téléchargé mais absent du manifeste ; seul le manifeste racine et la documentation non exécutable échappent à cette exigence.
+- Le grounding n’est plus annoncé à partir d’une simple juxtaposition caption+région : aucun adaptateur n’est déclaré compatible tant qu’il ne produit pas le lien canonique `GroundingTarget`.
+- Le preflight recalcule désormais les SHA des images, déduplique comme la préparation, exécute les vrais encodeurs de cibles et partage avec `prepare()` l’estimation incluant cibles principales et auxiliaires. Les poids configurés, présents et lisibles sont affichés séparément.
+- Les quatre décisions de pointing sont distinctes dans l’inspecteur et s’appuient sur `PointTarget` et `QualityAuditTarget` existants.
+- Les diagnostics enregistrent la forme/layout/dtype d’entrée, les formes/dtypes/indices de sorties réellement utilisés, la durée native et l’empreinte du contrat.
+- Un collecteur borné aux répertoires `models/training-<UUID>` supprime les candidats non référencés tout en conservant modèles actifs, profils partagés et runs encore indexés.
+- Les capacités des profils installés sont dérivées du contrat validé (`adapter`, sorties, bundle et signatures d’apprentissage), tandis que la qualification reste un statut indépendant. La table de qualification ne contient que les cinq succès et l’échec consignés dans `LITERT_QUALIFICATION.md`.
+- Les actions principales des écrans Modèles et Apprentissage utilisent maintenant les ressources FR/EN ; un test Compose force un contexte anglais et vérifie les libellés principaux.
+- Le catalogue distant lit maintenant le contrat Android épinglé (maximum 1 Mio), le valide, puis associe ses capacités théoriques avant affichage ; un contrat invalide ou inaccessible rend l’entrée non installable sans modifier son statut de qualification.
+- Le preflight et `prepare()` utilisent désormais la même inspection en lecture seule : snapshot, états terminaux, SHA persisté/réel, doublons, targets principales/auxiliaires, signatures LiteRT, checkpoint et hash de profil sont contrôlés par une seule implémentation.
+- La projection de masque COCO dispose d’un test indépendant de l’ordre colonne, de l’aire et de la boîte après remise à l’échelle.
+- L’export COCO valide maintenant avant écriture les identifiants et références, dimensions, catégories, boîtes, aires, `iscrowd` et sommes RLE ; le fichier est remplacé atomiquement et l’aperçu inclut les masques.
+- Un contrôle hôte compare toutes les clés FR/EN et vérifie les libellés anglais critiques Modèles, Apprentissage, qualification et COCO.
+
+### Executed tests
+
+- `python -m unittest discover -s tools/qa -p 'test_*.py'` : **47 tests réussis**, aucun échec. Ce sont des contrôles hôte, pas une compilation Android.
+- `git diff --check` : réussi.
+
+### Failed tests
+
+- `./gradlew test --no-daemon` : arrêt avant exécution, SDK Android introuvable (`ANDROID_HOME` absent).
+- `./gradlew lint --no-daemon` : arrêt avant lint, même cause.
+- `./gradlew assembleDebug --no-daemon` : arrêt avant compilation, même cause.
+- `./gradlew assembleDebugAndroidTest --no-daemon` : arrêt avant compilation, même cause.
+
+### Not executed
+
+- Tests instrumentés, dont `ProjectMaintenanceTest`, LiteRT, éditeur, Room et navigation : aucun SDK, APK ou émulateur disponible.
+- Téléphone ARM, mesures RAM/latence/thermique, SAF réel, corpus autorisé représentatif, précision complète des modèles et intégration d’écriture HF. `adb` n’est pas installé dans ce conteneur.
+
+### Remaining blockers
+
+- Cette passe n’est **pas qualifiée Android** : les deux APK et les schémas KSP n’ont pas été produits dans cet environnement.
+- La validation des signatures LiteRT est maintenant partagée par le preflight et `prepare()` ; l’exécution Android doit encore confirmer ce chemin sur le commit courant et ne doit pas être confondue avec une qualification de précision.
+- Les écrans Modèles et Apprentissage n’ont plus que deux occurrences candidates du motif statique ciblé, mais 246 occurrences (dont valeurs dynamiques et identifiants techniques) restent à classifier dans l’ensemble de l’UI. Setup, éditeur, publication et contrôles conservent encore des phrases françaises inline : l’anglais complet n’est donc pas encore revendiqué.
+- Le test de réimport après reset et les nouveaux tests de compatibilité/raster sont écrits, mais ne doivent pas être annoncés comme réussis avant une exécution Android/JVM réelle.
+
 ## Corrigé
 
 - L’intégrité d’installation distingue désormais les artefacts runtime requis de la documentation. Un changement de README, licence, notice ou changelog ne bloque plus un poids intact ; poids et contrats couverts restent vérifiés par taille et SHA-256.

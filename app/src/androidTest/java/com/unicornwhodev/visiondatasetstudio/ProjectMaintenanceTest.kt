@@ -6,6 +6,8 @@ import com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager
 import com.unicornwhodev.visiondatasetstudio.data.db.AppDatabase
 import com.unicornwhodev.visiondatasetstudio.data.model.*
 import com.unicornwhodev.visiondatasetstudio.domain.batch.ProjectMaintenance
+import com.unicornwhodev.visiondatasetstudio.domain.batch.ImageIdentity
+import com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining
 import com.unicornwhodev.visiondatasetstudio.domain.inference.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
@@ -41,5 +43,41 @@ class ProjectMaintenanceTest {
             ProjectMaintenance(context,db,storage).resumePending()
             assertFalse(java.io.File(context.filesDir,"maintenance/pending.json").exists())
         } finally { db.close() }
+    }
+
+    @Test fun resetProjectForgetsIdentityAndAllowsTheSameCorpusAgain()=runBlocking {
+        val db=Room.inMemoryDatabaseBuilder(context,AppDatabase::class.java).build();val storage=StorageManager(context);val id=88773L
+        try {
+            db.projectDao().saveProject(ProjectEntity(id=id,activeTasksCsv="DETECTION"))
+            db.batchDao().insertOrReplace(BatchEntity(id,1,"READY"))
+            val first=SampleEntity("old-sample",id,1,"same-image",0,sourceFileUrl=null,localImagePath=null,sha256="same-file-sha",acquisitionStatus="AVAILABLE",annotationStatus="PENDING",syncStatus="NOT_EXPORTED")
+            db.sampleDao().insertSamples(listOf(first))
+            assertNull(ImageIdentity.accept(db,first,"same-pixel-sha"))
+            assertEquals("old-sample",db.imageIdentityDao().owner(id,"file_sha256","same-file-sha")!!.firstSampleId)
+
+            ProjectMaintenance(context,db,storage).resetProject(id)
+            assertNull(db.imageIdentityDao().owner(id,"file_sha256","same-file-sha"))
+            db.batchDao().insertOrReplace(BatchEntity(id,1,"READY"))
+            val importedAgain=first.copy(sampleId="new-sample")
+            db.sampleDao().insertSamples(listOf(importedAgain))
+            assertNull(ImageIdentity.accept(db,importedAgain,"same-pixel-sha"))
+            assertEquals("new-sample",db.imageIdentityDao().owner(id,"file_sha256","same-file-sha")!!.firstSampleId)
+            assertEquals("AVAILABLE",db.sampleDao().getSampleSync("new-sample")!!.acquisitionStatus)
+        } finally { db.close() }
+    }
+
+    @Test fun orphanTrainingCleanupPreservesActiveAndSharedModels()=runBlocking {
+        val db=Room.inMemoryDatabaseBuilder(context,AppDatabase::class.java).build()
+        val models=java.io.File(context.filesDir,"models").apply{mkdirs()}
+        fun candidate(id:String)=java.io.File(models,"training-$id").apply{mkdirs()}.let{java.io.File(it,"model.tflite").apply{writeText("model")}}
+        val active=candidate("11111111-1111-1111-1111-111111111111")
+        val shared=candidate("22222222-2222-2222-2222-222222222222")
+        val orphan=candidate("33333333-3333-3333-3333-333333333333")
+        try {
+            db.projectDao().saveProject(ProjectEntity(id=88774,modelPath=active.path))
+            db.modelProfileDao().save(ModelProfileEntity("shared-cleanup","shared",shared.path,"sha","{}",""))
+            assertEquals(1,OnDeviceTraining(context).cleanupOrphanedCandidates(db))
+            assertTrue(active.isFile);assertTrue(shared.isFile);assertFalse(orphan.parentFile!!.exists())
+        } finally { active.parentFile?.deleteRecursively();shared.parentFile?.deleteRecursively();orphan.parentFile?.deleteRecursively();db.close() }
     }
 }

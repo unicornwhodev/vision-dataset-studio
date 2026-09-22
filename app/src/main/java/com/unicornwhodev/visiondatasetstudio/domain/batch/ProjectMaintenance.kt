@@ -52,12 +52,13 @@ class ProjectMaintenance(private val context:Context,private val db:AppDatabase,
             val project=db.projectDao().getProjectSync(projectId) ?: error("Projet absent")
             db.annotationDao().deleteProjectAnnotations(projectId);db.auditDao().deleteProjectLogs(projectId)
             db.sampleDao().deleteProjectSamples(projectId);db.batchDao().deleteProjectBatches(projectId)
-            db.sourceEntryDao().clear(projectId)
+            db.sourceEntryDao().clear(projectId);db.imageIdentityDao().deleteProject(projectId)
             val settings=ProjectSettings.read(project).copy(sourceIndexReady=false)
             db.projectDao().saveProject(project.copy(lastRowCursor=0,settingsJson=ProjectSettings.write(settings),updatedAt=System.currentTimeMillis()))
         }
         receipt(MaintenanceReceipt("project",projectId,sampleIds=samples.map{it.sampleId},stage="database_committed"));interruptionPoint("after_database")
         storage.purgeVerifiedBatchMedia(samples.map{it.sampleId});deleteProjectFiles(projectId,false)
+        com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining(context).cleanupOrphanedCandidates(db)
         receiptFile.delete()
     }
 
@@ -72,6 +73,7 @@ class ProjectMaintenance(private val context:Context,private val db:AppDatabase,
         }
         receipt(MaintenanceReceipt("delete",projectId,sampleIds=samples.map{it.sampleId},stage="database_committed"));interruptionPoint("after_database")
         storage.purgeVerifiedBatchMedia(samples.map{it.sampleId});deleteProjectFiles(projectId,true)
+        com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining(context).cleanupOrphanedCandidates(db)
         // Shared model profiles and their referenced weights are intentionally untouched.
         receiptFile.delete()
     }
