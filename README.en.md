@@ -37,6 +37,8 @@ All production state, inference and optional learning live on Android. The optio
 
 ## Features and status
 
+The September 2026 stabilization now separates runtime-artifact integrity from model documentation, exposes capabilities/qualification, and distinguishes an empty inference from a failure. See the [stabilization report](docs/STABILIZATION_2026_09.md). These fixes do not qualify a model that has not been executed.
+
 | Feature | Status |
 |---|---|
 | Local / HF import, configurable batches, correction and export | Implemented; local 2+1 cycle verified on Android |

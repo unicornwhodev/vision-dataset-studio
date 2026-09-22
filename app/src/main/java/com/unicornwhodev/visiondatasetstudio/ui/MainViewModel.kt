@@ -57,6 +57,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val liteRtEngine = LiteRtEngine()
     val exporters = DatasetExporters(storageManager, hfApiClient)
     val batchEngine = BatchEngine(db, storageManager, hfApiClient, liteRtEngine, exporters)
+    private val projectMaintenance = com.unicornwhodev.visiondatasetstudio.domain.batch.ProjectMaintenance(application,db,storageManager)
     val preferenceStore = StudioPreferenceStore(application)
     val preferences = preferenceStore.state
     private val _activeProjectId = MutableStateFlow(preferenceStore.activeProjectId)
@@ -76,10 +77,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val communityModels = _communityModels.asStateFlow()
     private val _modelDiagnostics = MutableStateFlow("")
     val modelDiagnostics = _modelDiagnostics.asStateFlow()
+    private val _inferenceReceipts=MutableStateFlow("")
+    val inferenceReceipts=_inferenceReceipts.asStateFlow()
     private var operationJob: Job? = null
     val deviceTraining=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining(application)
     private val _trainingRun=MutableStateFlow<com.unicornwhodev.visiondatasetstudio.domain.training.DeviceTrainingRun?>(null)
     val trainingRun=_trainingRun.asStateFlow()
+    private val _trainingPreflight=MutableStateFlow<com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPreflight?>(null)
+    val trainingPreflight=_trainingPreflight.asStateFlow()
     private val _similarImages=MutableStateFlow<List<Pair<SampleEntity,Float>>>(emptyList())
     val similarImages=_similarImages.asStateFlow()
     private val correctionStore=AdaptiveCorrectionStore(application)
@@ -87,6 +92,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val correctionReport=_correctionReport.asStateFlow()
 
     private val _currentScreen = MutableStateFlow<Screen>(Screen.Home)
+    private val navigation = NavigationHistory<Screen>(Screen.Home)
     val currentScreen = _currentScreen.asStateFlow()
     private val _activeBatchNumber = MutableStateFlow(1)
     val activeBatchNumber = _activeBatchNumber.asStateFlow()
@@ -131,6 +137,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val moshi = com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi
 
     init {
+        viewModelScope.launch(Dispatchers.IO) { runCatching { projectMaintenance.resumePending() }.onFailure { reportError("Reprise du nettoyage local requise : ${it.message}") } }
         // A single writer prevents an older keystroke from overwriting a newer edit.
         viewModelScope.launch {
             for (command in edits) when (command) {
@@ -179,6 +186,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun reportError(message: String) { _operationProgress.value = OperationProgress(message, 0, 1, true) }
     fun clearOperationProgress() { if (!_isBusy.value) _operationProgress.value = null }
     fun clearEditorIssues() { _editorIssues.value = emptyList() }
+    fun refreshInferenceReceipts()=viewModelScope.launch(Dispatchers.IO) {
+        val rows=InferenceReceiptStore(getApplication<Application>().filesDir).list(_activeProjectId.value).takeLast(20).reversed()
+        _inferenceReceipts.value=rows.joinToString("\n\n"){r->"${r.outcome.uppercase()} · ${r.sampleId ?: "benchmark"} · ${r.diagnostics.adapter}/${r.diagnostics.task}\nSHA ${r.diagnostics.modelSha256} · entrée ${r.diagnostics.inputShape} · seuil ${r.diagnostics.threshold} · ${r.diagnostics.proposalCount} proposition(s)"+(r.diagnostics.emptyReason?.let{"\n$it"}?:"")+(r.diagnostics.error?.let{"\nErreur : $it"}?:"")}
+    }
 
     private fun operation(block: suspend () -> Unit) {
         if (_isBusy.value || _editorBusy.value) return
@@ -206,12 +217,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             finally { _editorBusy.value = false }
         }
     }
+    private fun setScreen(screen:Screen) {
+        if(screen is Screen.AnnotationEditor && navigation.current is Screen.AnnotationEditor)navigation.replace(screen) else navigation.navigate(screen)
+        _currentScreen.value=navigation.current
+    }
     fun navigateTo(screen: Screen) {
         if (_isBusy.value || _editorBusy.value) return
-        if (_currentScreen.value is Screen.AnnotationEditor) editorAction { _currentScreen.value = screen }
-        else _currentScreen.value = screen
+        if (_currentScreen.value is Screen.AnnotationEditor) editorAction { navigation.navigate(screen);_currentScreen.value = navigation.current }
+        else { navigation.navigate(screen);_currentScreen.value = navigation.current }
     }
-    fun back() = navigateTo(if (_currentScreen.value is Screen.AnnotationEditor) Screen.BatchGrid else Screen.Home)
+    fun back() {
+        if (_isBusy.value || _editorBusy.value) return
+        val action={_currentScreen.value=navigation.back()}
+        if(_currentScreen.value is Screen.AnnotationEditor)editorAction{action()} else action()
+    }
 
     fun checkTokenStatus() {
         viewModelScope.launch {
@@ -245,7 +264,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             diskBudgetMb = diskBudgetMb.coerceIn(128L, 65536L), activeTasksCsv = StudioWorkflow.tasksCsv(tasks), updatedAt = System.currentTimeMillis())
         db.projectDao().saveProject(updated)
         _operationProgress.value = null
-        if (startBatch) prepareBatch(updated, _activeBatchNumber.value) else _currentScreen.value = Screen.Home
+        if (startBatch) prepareBatch(updated, _activeBatchNumber.value) else setScreen(Screen.Home)
     }
 
     fun updateProjectSettings(sourceRepo: String, destRepo: String, sourceConfig: String, sourceSplit: String, imageColumn: String, classesCsv: String, diskBudgetMb: Long) {
@@ -341,7 +360,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             else -> "${unique.size} image(s) à contrôler · $duplicates doublon(s) écarté(s)" + if(exhausted) " · Fin de source" else ""
         }
         _operationProgress.value=OperationProgress(message,1,1,failed>0 || inferenceError!=null)
-        _currentScreen.value = Screen.BatchGrid
+        setScreen(Screen.BatchGrid)
     }
 
     fun resumeWork() {
@@ -361,7 +380,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         undoStack.clear(); redoStack.clear(); refreshUndo()
         _editorIssues.value = emptyList()
         preferenceStore.lastSampleId = sampleId
-        _currentScreen.value = Screen.AnnotationEditor(sampleId)
+        setScreen(Screen.AnnotationEditor(sampleId))
     }
     fun openSampleInEditor(sampleId: String) = editorAction { openSample(sampleId) }
     fun moveSample(delta: Int) = editorAction {
@@ -421,19 +440,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val list = db.sampleDao().getSamplesForBatchSync(s.projectId, s.batchNumber)
             val eligible = list.filter { it.sampleId != s.sampleId && StudioWorkflow.isPending(it.annotationStatus) && StudioWorkflow.canEdit(it.acquisitionStatus, it.syncStatus, it.localImagePath != null) }
             val next = eligible.firstOrNull { (it.sourceOrdinal ?: it.sourceRowIndex) > (s.sourceOrdinal ?: s.sourceRowIndex) } ?: eligible.firstOrNull()
-            if (next != null) openSample(next.sampleId) else _currentScreen.value = Screen.BatchGrid
-        } else { _currentScreen.value = Screen.BatchGrid }
+            if (next != null) openSample(next.sampleId) else setScreen(Screen.BatchGrid)
+        } else { setScreen(Screen.BatchGrid) }
     }
     fun rejectCurrent(reason: String) = editorAction {
         require(reason.isNotBlank()) { "Un motif est requis." }
         val s = _currentSample.value ?: return@editorAction
         batchEngine.rejectSample(s.sampleId, s.batchNumber, reason.trim())
-        _currentScreen.value = Screen.BatchGrid
+        setScreen(Screen.BatchGrid)
     }
     fun deferCurrent() = editorAction {
         val s = _currentSample.value ?: return@editorAction
         batchEngine.deferSample(s.sampleId, s.batchNumber)
-        _currentScreen.value = Screen.BatchGrid
+        setScreen(Screen.BatchGrid)
     }
     fun bulkAction(ids: Set<String>, action: String, value: String = "") = operation {
         for (id in ids) {
@@ -523,6 +542,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun preannotateActiveBatch() = operation {
         val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
         val c=modelConfig(p)
+        check(ModelContract.supportsTasks(c,p.activeTasksCsv)) { if(ModelContract.adapter(c) in setOf("embedding","inspect_only")) "Ce modèle produit des représentations visuelles, pas des annotations pour cette tâche." else "Ce modèle ne produit pas d’annotations compatibles avec les tâches actives." }
         try {
             loadForInference(p,c)
             val processed=batchEngine.runBatchInference(p.id,_activeBatchNumber.value,c) { done,total ->
@@ -548,9 +568,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }else base
         try {
             loadForInference(p,c);val bitmap=decodeSample(s)
-            val raw=try { liteRtEngine.runInference(bitmap,c) } finally { bitmap.recycle() }
+            val inference=try { liteRtEngine.runInference(bitmap,c) } finally { bitmap.recycle() }
+            withContext(Dispatchers.IO){InferenceReceiptStore(getApplication<Application>().filesDir).write(p.id,s.sampleId,s.batchNumber,inference)}
+            val raw=inference.orThrow()
             val proposals=AdaptiveCorrection.apply(raw,if(ProjectSettings.read(p).adaptiveCorrection)withContext(Dispatchers.IO){correctionStore.read(p.id)} else CorrectionLedger())
-            liteRtEngine.lastError?.let { error("Inférence échouée : $it") }
             liteRtEngine.lastEmbedding?.let{vector->withContext(Dispatchers.IO){EmbeddingIndex(getApplication(),p.id).put(s.sampleId,s.sha256 ?: com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils.computeSha256(File(s.localImagePath!!)),liteRtEngine.embeddingSpaceHash,vector)}}
 
             val a=_currentAnnotations.value
@@ -575,6 +596,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         try {
             loadForInference(p,c);val bitmap=decodeSample(s)
             _dryRunResult.value=try{liteRtEngine.dryRun(bitmap,c)}finally{bitmap.recycle()}
+            liteRtEngine.lastResult?.let{withContext(Dispatchers.IO){InferenceReceiptStore(getApplication<Application>().filesDir).write(p.id,s.sampleId,s.batchNumber,it)}}
         } finally { liteRtEngine.close() }
     }
     private val _benchmarkReport=MutableStateFlow<String?>(null)
@@ -594,6 +616,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _operationProgress.value=OperationProgress("Mesure $done/$total (aucune annotation modifiée)",done,total)
             } } } finally { bitmap.recycle() }
             _benchmarkReport.value=moshi.adapter(Map::class.java).indent("  ").toJson(result)
+            liteRtEngine.lastResult?.let{withContext(Dispatchers.IO){InferenceReceiptStore(getApplication<Application>().filesDir).write(p.id,sample.sampleId,sample.batchNumber,it)}}
             _operationProgress.value=OperationProgress("Mesure terminée sur cet appareil. La mémoire maximale est échantillonnée, pas un pic continu.",1,1)
         } finally { liteRtEngine.close() }
     }
@@ -804,7 +827,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _lastExportedZip.value=null;_previewSnippet.value=null;_editorIssues.value=emptyList()
         preferenceStore.activeProjectId=id;_activeProjectId.value=id
         loadBatch(db.batchDao().getBatchSync(id,preferenceStore.lastBatch)?.batchNumber ?: db.batchDao().getLatestBatchSync(id)?.batchNumber ?: 1)
-        _operationProgress.value=null;_currentScreen.value=Screen.Controls
+        _operationProgress.value=null;setScreen(Screen.Controls)
     }
     fun selectProject(id:Long)=operation { switchProject(id) }
     fun createProject(name:String)=operation {
@@ -812,6 +835,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         var id=System.currentTimeMillis();while(db.projectDao().getProjectSync(id)!=null)id++
         db.projectDao().saveProject(ProjectEntity(id=id,name=name.trim(),classesCsv="object",activeTasksCsv="DETECTION"))
         switchProject(id)
+    }
+    fun resetCurrentBatch()=operation {
+        projectMaintenance.resetBatch(_activeProjectId.value,_activeBatchNumber.value)
+        loadBatch(_activeBatchNumber.value);_operationProgress.value=OperationProgress("Lot courant réinitialisé localement. Aucune publication distante n’a été modifiée.",1,1)
+    }
+    fun resetCurrentProject()=operation {
+        projectMaintenance.resetProject(_activeProjectId.value);loadBatch(1)
+        _operationProgress.value=OperationProgress("État opérationnel local réinitialisé. Configuration et profils partagés conservés.",1,1)
+    }
+    fun deleteCurrentProject()=operation {
+        val deleting=_activeProjectId.value
+        val remaining=db.projectDao().getProjects().first().filterNot{it.id==deleting}
+        val next=remaining.firstOrNull()?.id ?: System.currentTimeMillis().also { id -> db.projectDao().saveProject(ProjectEntity(id=id,name="Mon atelier",classesCsv="object",activeTasksCsv="DETECTION")) }
+        projectMaintenance.deleteProject(deleting);switchProject(next)
+        _operationProgress.value=OperationProgress("Projet supprimé de cet appareil. Modèles partagés et données distantes conservés.",1,1)
     }
     fun saveProcessingSettings(policy:ProcessingSettings,budgetMb:Long,idColumn:String,targetSplit:String)=operation {
         policy.validate();require(budgetMb in 128..65536);require(idColumn.isNotBlank())
@@ -937,7 +975,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val index=EmbeddingIndex(getApplication(),sample.projectId)
         val nearest=withContext(Dispatchers.IO){index.nearest(index.get(sample.sampleId) ?: error("Calculez d’abord la représentation de cette image"))}
         _similarImages.value=nearest.mapNotNull{match->db.sampleDao().getSampleSync(match.sampleId)?.let{it to match.cosine}}
-        _currentScreen.value=Screen.Similarity
+        setScreen(Screen.Similarity)
     }
     private suspend fun prepareOptionalExportTraining(projectId:Long,batchNumber:Int):String {
         val p=db.projectDao().getProjectSync(projectId) ?: return ""
@@ -952,6 +990,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
         val run=deviceTraining.prepare(p,_activeBatchNumber.value,epochs,learningRate);_trainingRun.value=run;deviceTraining.enqueue(p.id)
         _operationProgress.value=OperationProgress("Apprentissage planifié sur cet appareil. Aucun envoi au pod.",1,1)
+    }
+    fun refreshTrainingPreflight()=viewModelScope.launch(Dispatchers.IO) {
+        val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: return@launch
+        val batch=db.batchDao().getBatchSync(p.id,_activeBatchNumber.value)
+        val config=runCatching{modelConfig(p)}.getOrNull()
+        val accepted=db.sampleDao().getSamplesForBatchSync(p.id,_activeBatchNumber.value).filter{it.annotationStatus=="VALIDATED"}.distinctBy{it.sha256 ?: it.sampleId}
+        val validation=accepted.count{row->row.sha256?.let{com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.holdout(it)}==true}
+        val train=accepted.size-validation
+        val source=p.modelPath?.let(::File);val needed=(source?.length() ?: 0L)*3+accepted.sumOf{it.localImagePath?.let(::File)?.length() ?: 0L}+16L*1024*1024
+        val prior=deviceTraining.readBatch(p.id,_activeBatchNumber.value)
+        val already=prior?.let{it.exportSnapshot==batch?.archiveSnapshot && it.phase in setOf("completed","rejected")}==true
+        val available=minOf(storageManager.getFreeSpaceBytes(),(p.diskBudgetMb*1024*1024-storageManager.getUsedSpaceBytes()).coerceAtLeast(0))
+        _trainingPreflight.value=com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPreflight.evaluate(
+            com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPreflightInput(config,batch?.status=="VERIFIED" && batch.verificationKind in setOf("local","hf","both"),train,validation,needed,available,
+                config?.training!=null && accepted.all{db.annotationDao().getAnnotationSync(it.sampleId)!=null},
+                config?.trainingCheckpoint.isNullOrBlank() || (source?.parentFile?.let{File(it,config!!.trainingCheckpoint).isFile}==true),already))
     }
     fun cancelDeviceTraining()=operation {deviceTraining.cancel(_activeProjectId.value)}
     fun resumeDeviceTraining()=operation {

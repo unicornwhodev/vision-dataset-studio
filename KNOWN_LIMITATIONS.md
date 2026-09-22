@@ -1,5 +1,9 @@
 # Limites de qualification — 4.2.0-rc3
 
+La passe de stabilisation du 22 septembre introduit des contrats typés pour les capacités et les résultats d'inférence, mais n'a pas pu être recompilée dans l'environnement courant dépourvu de SDK Android. Elle reste donc à qualifier par le build Android complet ; voir [STABILIZATION_2026_09.md](docs/STABILIZATION_2026_09.md).
+
+La seconde passe ajoute les reçus d’inférence durables, la reprise des maintenances interrompues et les outils avancés de masque. Le test d’interruption injecte une mort après commit de manière déterministe ; une coupure réelle du processus et la compilation Android de cette passe restent à exécuter sur le poste de qualification.
+
 ## Production par lots
 
 Le cycle local 2+1, l’exclusion des copies identiques/renommées, l’export, la purge et la réouverture Room ont passé un essai instrumenté API 28. Les empreintes persistent par projet. Les images modifiées avec pertes, recadrées ou retouchées ne sont pas couvertes par la garantie d’identité exacte ; les anciennes images déjà purgées ne disposent que des empreintes de fichiers conservées. Voir [BATCH_PRODUCTION.md](docs/BATCH_PRODUCTION.md).

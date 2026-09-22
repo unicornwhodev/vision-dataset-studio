@@ -92,7 +92,7 @@ class TrainingWorkflowTest {
         store.requireCleanupAllowed(project,1,true)
         val config=done.config.copy(trainingCheckpoint=OnDeviceTraining.saveCheckpointReceipt(File(done.modelFile),done.checkpoint!!))
         val image=Bitmap.createBitmap(32,32,Bitmap.Config.ARGB_8888).apply{eraseColor(Color.RED)}
-        try{LiteRtEngine().use{engine->assertTrue(engine.loadModel(File(done.modelFile)));assertEquals("rouge",engine.runInference(image,config).maxBy{it.score}.label)}}finally{image.recycle()}
+        try{LiteRtEngine().use{engine->assertTrue(engine.loadModel(File(done.modelFile)));assertEquals("rouge",engine.runInference(image,config).orThrow().maxBy{it.score}.label)}}finally{image.recycle()}
         withTimeout(10000){while(work.getWorkInfosForUniqueWork("vds-training-$projectId").get().any{!it.state.isFinished})delay(100)}
         assertEquals(96,engine.purgeReviewedBatch(projectId,1,true))
         assertTrue("Training images are cleaned only after the run completes",done.samples.all{!File(it.image).exists()})

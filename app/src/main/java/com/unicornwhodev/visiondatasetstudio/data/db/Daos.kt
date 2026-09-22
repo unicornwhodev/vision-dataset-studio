@@ -27,6 +27,9 @@ interface ProjectDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveProject(project: ProjectEntity)
+
+    @Query("DELETE FROM projects WHERE id = :id")
+    suspend fun deleteProject(id:Long)
 }
 
 @Dao
@@ -48,6 +51,11 @@ interface BatchDao {
 
     @Query("UPDATE batches SET status = :status, updatedAt = :updatedAt WHERE projectId = :projectId AND batchNumber = :batchNumber")
     suspend fun updateStatus(projectId: Long, batchNumber: Int, status: String, updatedAt: Long = System.currentTimeMillis())
+
+    @Query("DELETE FROM batches WHERE projectId=:projectId AND batchNumber=:batchNumber")
+    suspend fun deleteBatch(projectId:Long,batchNumber:Int)
+    @Query("DELETE FROM batches WHERE projectId=:projectId")
+    suspend fun deleteProjectBatches(projectId:Long)
 }
 
 @Dao
@@ -84,6 +92,11 @@ interface SampleDao {
 
     @Query("SELECT * FROM samples WHERE projectId = :projectId")
     suspend fun getAllSamples(projectId: Long = 1L): List<SampleEntity>
+
+    @Query("DELETE FROM samples WHERE projectId=:projectId AND batchNumber=:batchNumber")
+    suspend fun deleteBatchSamples(projectId:Long,batchNumber:Int)
+    @Query("DELETE FROM samples WHERE projectId=:projectId")
+    suspend fun deleteProjectSamples(projectId:Long)
 }
 
 @Dao
@@ -99,6 +112,11 @@ interface AnnotationDao {
 
     @Query("DELETE FROM annotations WHERE sampleId = :sampleId")
     suspend fun delete(sampleId: String)
+
+    @Query("DELETE FROM annotations WHERE sampleId IN (SELECT sampleId FROM samples WHERE projectId=:projectId AND batchNumber=:batchNumber)")
+    suspend fun deleteBatchAnnotations(projectId:Long,batchNumber:Int)
+    @Query("DELETE FROM annotations WHERE sampleId IN (SELECT sampleId FROM samples WHERE projectId=:projectId)")
+    suspend fun deleteProjectAnnotations(projectId:Long)
 }
 
 @Dao
@@ -111,6 +129,11 @@ interface AuditDao {
 
     @Query("SELECT * FROM audit_logs WHERE projectId = :projectId ORDER BY timestamp DESC LIMIT 100")
     fun getRecentLogs(projectId: Long = 1L): Flow<List<AuditLogEntity>>
+
+    @Query("DELETE FROM audit_logs WHERE projectId=:projectId AND batchNumber=:batchNumber")
+    suspend fun deleteBatchLogs(projectId:Long,batchNumber:Int)
+    @Query("DELETE FROM audit_logs WHERE projectId=:projectId")
+    suspend fun deleteProjectLogs(projectId:Long)
 }
 
 @Dao
@@ -142,4 +165,8 @@ interface ImageIdentityDao {
     suspend fun owner(projectId:Long, kind:String, digest:String): com.unicornwhodev.visiondatasetstudio.data.model.ImageIdentityEntity?
     @Insert(onConflict=OnConflictStrategy.ABORT)
     suspend fun insert(identity:com.unicornwhodev.visiondatasetstudio.data.model.ImageIdentityEntity)
+    @Query("DELETE FROM image_identities WHERE projectId=:projectId")
+    suspend fun deleteProject(projectId:Long)
+    @Query("DELETE FROM image_identities WHERE projectId=:projectId AND firstBatchNumber=:batchNumber")
+    suspend fun deleteBatch(projectId:Long,batchNumber:Int)
 }

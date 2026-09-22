@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,7 +27,7 @@ fun WorkflowScreen(vm:MainViewModel) {
     var instructions by rememberSaveable { mutableStateOf("") }
     var endpoint by rememberSaveable { mutableStateOf("http://127.0.0.1:8080/plan") }
     LaunchedEffect(project,batch) { vm.loadWorkflow() }
-    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar("Workflow","Lot $batch",onBack={vm.back()})}) { inset ->
+    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_workflow),"Lot $batch",onBack={vm.back()})}) { inset ->
         Box(Modifier.fillMaxSize().padding(inset),contentAlignment=Alignment.TopCenter) {
             Column(Modifier.widthIn(max=760.dp).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 WorkflowTools.templates.forEach { template ->

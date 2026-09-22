@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -58,7 +61,7 @@ fun SetupScreen(viewModel: MainViewModel) {
     val sourceOk = (com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(p).sourceMode == "LOCAL_INDEX" && source.isBlank()) || StudioWorkflow.normalizeRepo(source) != null
     val destOk = destination.isBlank() || StudioWorkflow.normalizeRepo(destination, true) != null
     Scaffold(contentWindowInsets = WindowInsets(0), modifier = Modifier.imePadding(), topBar = {
-        StudioTopBar("Mon projet", "Configuration", onBack = viewModel::back)
+        StudioTopBar(stringResource(R.string.screen_setup), stringResource(R.string.subtitle_configuration), onBack = viewModel::back)
     }, bottomBar = {
         Surface(shadowElevation = 3.dp) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {

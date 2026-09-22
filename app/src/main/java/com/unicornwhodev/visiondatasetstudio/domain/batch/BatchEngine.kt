@@ -278,8 +278,12 @@ class BatchEngine(
             while (maxOf(bounds.outWidth, bounds.outHeight) / factor > 2048) factor *= 2
             val bitmap = BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = factor })
                 ?: error("Image non décodable : ${sample.assetId}")
-            val proposals = AdaptiveCorrection.apply(try { liteRtEngine.runInference(bitmap, config) } finally { bitmap.recycle() },ledger)
-            liteRtEngine.lastError?.let { error("Inférence interrompue à ${sample.assetId} : $it. Les résultats précédents sont conservés.") }
+            val inference = try { liteRtEngine.runInference(bitmap, config) } finally { bitmap.recycle() }
+            InferenceReceiptStore(storageManager.context.filesDir).write(projectId,sample.sampleId,batchNumber,inference)
+            val proposals = AdaptiveCorrection.apply(when(inference) {
+                is InferenceResult.Failure -> error("Inférence interrompue à ${sample.assetId} : ${inference.error}. Les résultats précédents sont conservés.")
+                else -> inference.orThrow()
+            },ledger)
             liteRtEngine.lastEmbedding?.let { vector ->
                 com.unicornwhodev.visiondatasetstudio.domain.inference.EmbeddingIndex(storageManager.context,projectId).put(sample.sampleId,sample.sha256 ?: com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils.computeSha256(File(path)),liteRtEngine.embeddingSpaceHash,vector)
             }

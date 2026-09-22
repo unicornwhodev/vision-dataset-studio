@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +20,7 @@ import java.io.File
 
 @Composable fun SimilarityScreen(vm:MainViewModel) {
     val rows by vm.similarImages.collectAsState()
-    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar("Images similaires","Même projet et mêmes poids",onBack=vm::back)}){inset->
+    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_similarity),stringResource(R.string.subtitle_same_model),onBack=vm::back)}){inset->
         LazyColumn(Modifier.fillMaxSize().padding(inset),contentPadding=PaddingValues(16.dp)) {
             if(rows.isEmpty())item{Text("Aucune autre représentation disponible. Prétraitez le lot avec le même encodeur.",style=MaterialTheme.typography.bodyMedium)}
             items(rows,key={it.first.sampleId}){(sample,score)->

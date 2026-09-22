@@ -19,11 +19,11 @@ object DeviceBenchmark {
                     repetitions:Int=10,progress:(Int,Int)->Unit = {_,_->}):Map<String,Any> {
         require(repetitions in 5..50)
         val before=memory()
-        repeat(3) { coroutineContext.ensureActive();engine.runInference(bitmap,config);check(engine.lastError==null){engine.lastError ?: "Échec"} }
+        repeat(3) { coroutineContext.ensureActive();engine.runInference(bitmap,config).orThrow() }
         val times=mutableListOf<Double>();val native=mutableListOf<Double>();val samples=mutableListOf<Map<String,Long>>()
         repeat(repetitions) { index ->
             coroutineContext.ensureActive()
-            val start=System.nanoTime();engine.runInference(bitmap,config)
+            val start=System.nanoTime();engine.runInference(bitmap,config).orThrow()
             check(engine.lastError==null){engine.lastError ?: "Échec"}
             times+=(System.nanoTime()-start)/1e6
             engine.lastNativeDurationNanos?.let{native+=it/1e6}

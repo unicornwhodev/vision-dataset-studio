@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings
 
 import androidx.compose.foundation.background
@@ -32,6 +35,9 @@ import com.unicornwhodev.visiondatasetstudio.data.model.SampleEntity
 import com.unicornwhodev.visiondatasetstudio.ui.*
 import com.unicornwhodev.visiondatasetstudio.ui.components.*
 import java.io.File
+import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
+import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelConfig
+import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelContract
 
 private enum class BatchFilter(val title: String) { ALL("Tous"), PENDING("À traiter"), PROPOSALS("Suggestions"), VALIDATED("Validés"), DEFERRED("À revoir"), REJECTED("Rejetés"), ERRORS("Erreurs") }
 private fun matches(sample: SampleEntity, filter: BatchFilter) = when (filter) {
@@ -55,6 +61,9 @@ fun BatchGridScreen(viewModel: MainViewModel) {
     val project by viewModel.projectFlow.collectAsState()
     val policy = project?.let(ProjectSettings::read)
     val sourceReady = !project?.hfSourceRepo.isNullOrBlank() || policy?.sourceIndexReady == true
+    val annotationModelCompatible=remember(project?.modelConfigJson,project?.activeTasksCsv) {
+        runCatching { project?.modelConfigJson?.let { StudioJson.moshi.adapter(ModelConfig::class.java).fromJson(it) }?.let { ModelContract.supportsTasks(it,project?.activeTasksCsv.orEmpty()) }==true }.getOrDefault(false)
+    }
     var filter by rememberSaveable { mutableStateOf(BatchFilter.PENDING) }
     var search by rememberSaveable { mutableStateOf("") }
     var priority by rememberSaveable { mutableStateOf(false) }
@@ -74,7 +83,7 @@ fun BatchGridScreen(viewModel: MainViewModel) {
         if(preferences.gridDensity == GridDensity.COMPACT) 188.dp else 240.dp
     } else preferences.gridDensity.minCellDp.dp
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
-        StudioTopBar("Lot ${batchNumber.toString().padStart(2, '0')}", "${samples.size} images  /  $validated validées", actions = {
+        StudioTopBar(stringResource(R.string.batch_title,batchNumber), stringResource(R.string.batch_summary,samples.size,validated), actions = {
             if (samples.isNotEmpty()) IconButton(onClick = viewModel::resumeWork,
                 enabled = !busy && samples.any { StudioWorkflow.isPending(it.annotationStatus) && it.localImagePath != null },
                 modifier = Modifier.testTag("start_annotating_button")) {
@@ -91,7 +100,7 @@ fun BatchGridScreen(viewModel: MainViewModel) {
                 IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "Actions du lot") }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                     DropdownMenuItem(text = { Text("Réessayer les téléchargements") }, enabled = !busy, onClick = { menu = false; viewModel.fetchAndPrepareBatch(batchNumber) })
-                    DropdownMenuItem(text = { Text("Préannoter le lot…") }, enabled = !busy && (project?.modelPath != null || project?.modelConfigJson?.contains("local_http") == true) && samples.any { StudioWorkflow.isPending(it.annotationStatus) }, onClick = { menu = false; confirmInference = true })
+                    DropdownMenuItem(text = { Text(if(annotationModelCompatible) "Préannoter le lot…" else "Modèle incompatible avec les tâches") }, enabled = !busy && annotationModelCompatible && (project?.modelPath != null || project?.modelConfigJson?.contains("local_http") == true) && samples.any { StudioWorkflow.isPending(it.annotationStatus) }, onClick = { menu = false; confirmInference = true })
                     DropdownMenuItem(text = { Text("Exclure les acquisitions en échec…") }, enabled = !busy && samples.any { it.acquisitionStatus.startsWith("ERROR") }, onClick = { menu = false; rejectErrors = true })
                     DropdownMenuItem(text = { Text("Préparer le lot suivant") }, enabled = !busy, onClick = { menu = false; viewModel.nextBatch() })
                     DropdownMenuItem(text = { Text("Sélectionner les cas modifiables affichés") }, onClick = {

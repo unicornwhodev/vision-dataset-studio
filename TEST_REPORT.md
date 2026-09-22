@@ -1,5 +1,13 @@
 # État rc3 — build et tests du 20 septembre 2026 UTC
 
+## Passe de stabilisation du 22 septembre 2026
+
+Les tests unitaires de l'intégrité runtime/documentation, des capacités, de la navigation et du préflight ont été ajoutés. La commande `./gradlew test --no-daemon` a été exécutée mais s'est arrêtée avant les tests faute de SDK Android configuré (`ANDROID_HOME` absent). Aucun nouveau succès Android/JVM n'est revendiqué. Le détail et les limites sont consignés dans [docs/STABILIZATION_2026_09.md](docs/STABILIZATION_2026_09.md).
+
+La seconde passe ajoute les chemins d’exécution du préflight, de maintenance locale et des outils d’annotation. Le téléchargement direct du SDK Android a été tenté mais refusé par le serveur (`HTTP 403`) ; la compilation et les nouveaux tests Kotlin restent donc non exécutés dans ce conteneur.
+
+La passe complémentaire ajoute un test instrumenté de reprise après interruption post-transaction, des tests purs de polygone/remplissage/fusion/séparation et un test de relecture des reçus d’inférence. Ils sont présents mais ne sont pas annoncés comme réussis tant que le SDK Android manque.
+
 Dernière APK : **4.2.0-rc3**, build `20260920T215432Z-cdd13d7fbf98`, sources compilées `2738b13` (132 fichiers comparés au commit, aucune différence).
 
 - **26/26 tests JVM**, aucun ignoré ; lint **0 erreur, 72 avertissements**.

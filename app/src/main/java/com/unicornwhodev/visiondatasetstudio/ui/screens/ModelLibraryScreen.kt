@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -17,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import com.unicornwhodev.visiondatasetstudio.ui.MainViewModel
 import com.unicornwhodev.visiondatasetstudio.ui.Screen
 import com.unicornwhodev.visiondatasetstudio.ui.components.*
+import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelCapability
+import com.unicornwhodev.visiondatasetstudio.domain.inference.QualificationStatus
 
 @Composable
 fun ModelLibraryScreen(vm: MainViewModel) {
@@ -31,7 +36,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
     var deleteId by remember { mutableStateOf<String?>(null) }
     val weights = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { it?.let(vm::importModel) }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
-        StudioTopBar("Modèles", "Bibliothèque  /  ${local.size} installé(s)", actions = {
+        StudioTopBar(stringResource(R.string.screen_models), stringResource(R.string.models_summary,local.size), actions = {
             IconButton(onClick = { vm.navigateTo(Screen.Training) }, enabled = !busy) { Icon(Icons.Default.ModelTraining, "Apprentissage sur cet appareil", Modifier.size(19.dp)) }
             IconButton(onClick = { editSource = true }, enabled = !busy) { Icon(Icons.Default.Storage, "Dépôt du catalogue", Modifier.size(19.dp)) }
             IconButton(onClick = vm::refreshCommunityModelCatalog, enabled = !busy) { Icon(Icons.Default.Refresh, "Actualiser le catalogue", Modifier.size(19.dp)) }
@@ -63,6 +68,15 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                 item.entry.adapterStatus == "rfdetr" -> "Détection"
                                 else -> "Inspection"
                             }
+                            val capabilityText=item.entry.capabilities.values.joinToString(" · ") { when(it) {
+                                ModelCapability.DETECTION->"Détection";ModelCapability.POINTING->"Pointing";ModelCapability.SEGMENTATION->"Masques"
+                                ModelCapability.CLASSIFICATION->"Classification";ModelCapability.EMBEDDING->"Embeddings";ModelCapability.TRAINING->"Entraînable"
+                                ModelCapability.INSPECTION_ONLY->"Inspection uniquement";else->it.name.lowercase().replace('_',' ')
+                            } + " · " + when(item.entry.capabilities.qualification) {
+                                QualificationStatus.QUALIFIED->"Qualifié";QualificationStatus.PARTIALLY_QUALIFIED->"Partiellement qualifié"
+                                QualificationStatus.INFERENCE_ONLY->"Inférence qualifiée";QualificationStatus.TRAINING_QUALIFIED->"Apprentissage qualifié"
+                                QualificationStatus.FAILED->"Échec connu";QualificationStatus.UNTESTED->"Non qualifié"
+                            }
                             Column {
                                 Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Default.Memory, null, Modifier.size(18.dp), tint = if(item.installableNow) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
@@ -70,6 +84,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                         Text(item.entry.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text(item.entry.purpose, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text("$state  ·  ${item.entry.upstreamLicense}", style = MaterialTheme.typography.labelSmall, color = if(item.installableNow) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(capabilityText,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=2)
                                     }
                                     IconButton(onClick = { showInfo = true }) { Icon(Icons.Default.Info, "Détails : ${item.entry.title}", Modifier.size(17.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) }
                                     if(item.installableNow) IconButton(onClick = { vm.downloadCommunityModel(item.entry.id) }, enabled = !busy) {
@@ -79,7 +94,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
                             }
                             if(showInfo) AlertDialog(onDismissRequest = { showInfo = false }, title = { Text(item.entry.title) },
-                                text = { Text("${item.entry.purpose}\n\n${item.entry.accent} · ${item.entry.expectedFiles.size} fichier(s)\n\n${item.note}") },
+                                text = { Text("${item.entry.purpose}\n\n$capabilityText\n${item.entry.accent} · ${item.entry.expectedFiles.size} fichier(s)\n\n${item.note}") },
                                 confirmButton = { TextButton(onClick = { showInfo = false }) { Text("Fermer") } })
                         }
                     } else if(tab == 1) {

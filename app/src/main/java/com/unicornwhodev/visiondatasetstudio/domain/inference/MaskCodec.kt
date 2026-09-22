@@ -33,6 +33,45 @@ object MaskCodec {
             }
         return m.copy(runs=encode(pixels),isHumanVerified=true,explicitlyAdjusted=true)
     }
+    fun polygon(m:MaskTarget,vertices:List<Pair<Float,Float>>,erase:Boolean=false):MaskTarget {
+        require(vertices.size in 3..10_000 && vertices.all{it.first.isFinite()&&it.second.isFinite()&&it.first in 0f..1f&&it.second in 0f..1f})
+        val pixels=decode(m)
+        for(y in 0 until m.height)for(x in 0 until m.width) {
+            val px=(x+.5f)/m.width;val py=(y+.5f)/m.height;var inside=false;var j=vertices.lastIndex
+            for(i in vertices.indices){val a=vertices[i];val b=vertices[j]
+                if((a.second>py)!=(b.second>py) && px<(b.first-a.first)*(py-a.second)/(b.second-a.second)+a.first)inside=!inside
+                j=i
+            }
+            if(inside)pixels[y*m.width+x]=!erase
+        }
+        return m.copy(runs=encode(pixels),isHumanVerified=true,explicitlyAdjusted=true)
+    }
+    fun fill(m:MaskTarget,x:Float,y:Float,erase:Boolean=false):MaskTarget {
+        require(x in 0f..1f&&y in 0f..1f);val pixels=decode(m);val sx=(x*m.width).toInt().coerceAtMost(m.width-1);val sy=(y*m.height).toInt().coerceAtMost(m.height-1)
+        val from=pixels[sy*m.width+sx];val to=!erase
+        if(from==to)return m
+        val queue=ArrayDeque<Int>();queue.add(sy*m.width+sx);pixels[sy*m.width+sx]=to
+        while(queue.isNotEmpty()){val p=queue.removeFirst();val px=p%m.width;val py=p/m.width
+            for(n in intArrayOf(if(px>0)p-1 else -1,if(px<m.width-1)p+1 else -1,if(py>0)p-m.width else -1,if(py<m.height-1)p+m.width else -1))
+                if(n>=0&&pixels[n]==from){pixels[n]=to;queue.add(n)}
+        }
+        return m.copy(runs=encode(pixels),isHumanVerified=true,explicitlyAdjusted=true)
+    }
+    fun merge(masks:List<MaskTarget>,id:String,label:String):MaskTarget {
+        require(masks.size>=2&&masks.all{it.width==masks[0].width&&it.height==masks[0].height})
+        val pixels=BooleanArray(masks[0].width*masks[0].height);masks.forEach{m->decode(m).forEachIndexed{i,v->pixels[i]=pixels[i]||v}}
+        return MaskTarget(id,label,masks[0].width,masks[0].height,encode(pixels),true,explicitlyAdjusted=true)
+    }
+    fun split(m:MaskTarget,id:(Int)->String):List<MaskTarget> {
+        val source=decode(m);val visited=BooleanArray(source.size);val result=mutableListOf<MaskTarget>()
+        for(seed in source.indices)if(source[seed]&&!visited[seed]){val component=BooleanArray(source.size);val q=ArrayDeque<Int>();q.add(seed);visited[seed]=true
+            while(q.isNotEmpty()){val p=q.removeFirst();component[p]=true;val x=p%m.width;val y=p/m.width
+                for(n in intArrayOf(if(x>0)p-1 else -1,if(x<m.width-1)p+1 else -1,if(y>0)p-m.width else -1,if(y<m.height-1)p+m.width else -1))if(n>=0&&source[n]&&!visited[n]){visited[n]=true;q.add(n)}
+            }
+            result+=m.copy(id=id(result.size),runs=encode(component),isHumanVerified=true,explicitlyAdjusted=true)
+        }
+        return result
+    }
     fun resize(m: MaskTarget, width: Int, height: Int): BooleanArray {
         require(width>0 && height>0 && width.toLong()*height<=MAX_PIXELS)
         val source=decode(m)

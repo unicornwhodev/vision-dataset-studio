@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.selection.toggleable
@@ -58,7 +61,7 @@ fun PublicationScreen(viewModel: MainViewModel) {
     }
     LaunchedEffect(showPreview, previewKey, number, samples) { if (showPreview) viewModel.loadPreviewSnippet(previewKey) }
     Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0), topBar = {
-        StudioTopBar("Exporter", "LOT $number")
+        StudioTopBar(stringResource(R.string.screen_export), "LOT $number")
     }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
         Column(Modifier.widthIn(max = 800.dp).fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -9,9 +9,27 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 object CommunityModelInstaller {
+    private val documentationNames = setOf("LICENSE", "LICENCE", "COPYING", "NOTICE", "CHANGELOG")
+    fun isDocumentation(path:String):Boolean = path.substringAfterLast('/').let { name ->
+        name.endsWith(".md", true) || name.substringBeforeLast('.', name).uppercase() in documentationNames
+    }
     fun artifacts(item:CommunityModelCatalog.Availability)=item.files.filter{f->
-        f.type!="directory" && (f.path.substringAfterLast('.').lowercase() in setOf("tflite","json","txt","md") ||
-            f.path.substringAfterLast('/').uppercase() in setOf("LICENSE", "LICENCE", "COPYING", "NOTICE"))
+        f.type!="directory" && (f.path.substringAfterLast('.').lowercase() in setOf("tflite","json","txt","model","vocab","md") || isDocumentation(f.path))
+    }
+    internal fun verifyManifest(directory:File, hashes:Map<String,String>, expected:Map<*,*>, required:Set<String>) {
+        required.forEach { relative ->
+            require(!isDocumentation(relative)) { "Un fichier documentaire ne peut pas être un artefact runtime requis : $relative" }
+            val info=expected[relative] as? Map<*,*> ?: error("Artefact runtime absent du manifeste : $relative")
+            val bytes=(info["bytes"] as? Number)?.toLong() ?: error("Taille absente du manifeste : $relative")
+            val sha=info["sha256"] as? String ?: error("SHA-256 absent du manifeste : $relative")
+            require(relative in hashes && File(directory,relative).isFile) { "Artefact runtime nécessaire absent : $relative" }
+            require(hashes[relative]==sha && File(directory,relative).length()==bytes) { "SHA-256 ou taille non conforme : $relative" }
+        }
+        // Documentation is deliberately best-effort. Other downloaded runtime/config files remain integrity protected.
+        hashes.filterKeys { !isDocumentation(it) }.forEach { (relative, actual) ->
+            val info=expected[relative] as? Map<*,*> ?: return@forEach
+            require(actual==info["sha256"] && File(directory,relative).length()==(info["bytes"] as Number).toLong()) { "SHA-256 ou taille non conforme : $relative" }
+        }
     }
     suspend fun install(item:CommunityModelCatalog.Availability,directory:File,hf:HfApiClient,progress:(Int,Int)->Unit):File = withContext(Dispatchers.IO) {
         require(item.installableNow && !directory.exists());directory.mkdirs()
@@ -31,14 +49,7 @@ object CommunityModelInstaller {
         val manifest=File(directory,"artifact_manifest.json")
         require(manifest.isFile()){"Manifeste SHA-256 requis pour les modèles du catalogue"}
         val expected=StudioJson.moshi.adapter(Any::class.java).fromJson(manifest.readText()) as? Map<*,*> ?: error("Manifeste invalide")
-        expected.forEach{(name,value)->
-            val info=value as? Map<*,*> ?: error("Entrée de manifeste invalide")
-            val relative=name.toString()
-            if(relative in hashes) {
-                require(hashes[relative]==info["sha256"] && File(directory,relative).length()==(info["bytes"] as Number).toLong()){"SHA-256 ou taille non conforme : $relative"}
-            }
-        }
-        item.entry.expectedFiles.forEach{require(it in hashes && it in expected){"Poids non couverts par le manifeste"}}
+        verifyManifest(directory,hashes,expected,item.entry.expectedFiles.toSet())
         if(item.entry.expectedFiles.size==1)return@withContext File(directory,item.entry.expectedFiles.single())
         val bundle=File(directory,"bundle.json")
         bundle.writeText(StudioJson.moshi.adapter(BundleManifest::class.java).toJson(BundleManifest(kind=item.entry.id,revision=item.repoSha,files=hashes)))

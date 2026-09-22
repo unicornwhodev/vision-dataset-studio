@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Vision Dataset Studio</string>
+    <string name="nav_studio">Atelier</string>
+    <string name="nav_batch">Lot</string>
+    <string name="nav_models">Modèles</string>
+    <string name="nav_export">Export</string>
+    <string name="nav_quality">Qualité</string>
+    <string name="nav_settings">Réglages</string>
+    <string name="model_unqualified">Non qualifié</string>
+    <string name="model_failed">Échec connu</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_confirm">Confirmer</string>
+    <string name="screen_controls">Mon espace</string><string name="screen_export">Exporter</string><string name="screen_training">Apprentissage</string>
+    <string name="screen_preferences">Réglages</string><string name="screen_workflow">Workflow</string><string name="screen_setup">Mon projet</string>
+    <string name="screen_quality">Qualité</string><string name="screen_similarity">Images similaires</string><string name="screen_models">Modèles</string>
+    <string name="subtitle_on_device">Sur cet appareil</string><string name="subtitle_configuration">Configuration</string><string name="subtitle_same_model">Même projet et mêmes poids</string>
+    <string name="batch_title">Lot %1$02d</string><string name="batch_summary">%1$d images / %2$d validées</string><string name="models_summary">Bibliothèque / %1$d installé(s)</string>
 </resources>
