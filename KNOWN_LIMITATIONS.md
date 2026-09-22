@@ -1,4 +1,6 @@
-# Limites de qualification — 4.2.0-rc3
+# Limites de qualification — 4.2.0-rc4
+
+La [recette rc4](test-results/stabilization-rc4/README.md) passe 24 tests Android de base et 2 régressions LiteRT sélectionnées, sans test ignoré. Les modèles non exécutés restent non qualifiés ; les preuves précédentes restent historiques.
 
 ## Validation de la stabilisation — 22 septembre 2026
 

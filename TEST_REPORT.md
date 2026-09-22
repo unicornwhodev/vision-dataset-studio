@@ -1,3 +1,11 @@
+# Validation de la release 4.2.0-rc4 — 22 septembre 2026
+
+Build `20260922T183415Z-818e4cf57d14` (versionCode 9) : **54 tests JVM, 24 tests Android de base et 2 régressions HF réussis**, sans échec ni test ignoré dans ces sélections. **52 tests Python**, lint **0 erreur / 89 avertissements**. APK sans poids, 143 fichiers de compilation comparés au commit `d9b2239`. [Rapport bilingue et preuves rc4](test-results/stabilization-rc4/README.md).
+
+Les classes de modèles nécessitant des fixtures/options sont exécutées séparément. Les 2 régressions HF concernent des modèles déjà qualifiés ; elles n’augmentent pas la couverture. Prérelease Debug sur émulateur API 28, sans qualification ARM ni nouvelle exécution CI.
+
+---
+
 # Validation du 22 septembre 2026
 
 Build corrigé **`20260922T175957Z-8ef3e5cc2b0d`**, base `351dd3f` : **54 tests JVM**, **48 tests Python**, **24 tests Android réussis et 10 ignorés**, aucun échec. Lint : **0 erreur, 89 avertissements**. APK construite, signée, installée et contrôlée sans poids embarqués ; 181 fichiers sources comparés, aucune différence.

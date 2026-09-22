@@ -1,0 +1,43 @@
+{
+  "run": "runs/20260922T183415Z-818e4cf57d14",
+  "schema": 1,
+  "run_id": "20260922T183415Z-818e4cf57d14",
+  "application_id": "com.unicornwhodev.visiondatasetstudio",
+  "started_at": "2026-09-22T18:34:15.021688+00:00",
+  "phase": "complete",
+  "outcome": "build_checks_passed",
+  "apk_built": true,
+  "test_apk_built": true,
+  "artifacts": {
+    "app": {
+      "file": "vision-dataset-studio-uwd-debug.apk",
+      "sha256": "7621ccd2737f2542156e66dc24cb0526b72a18219778a8b10512917e73cd7104",
+      "bytes": 366404830
+    },
+    "tests": {
+      "file": "vision-dataset-studio-uwd-test.apk",
+      "sha256": "73638287bc84f476568c77d348a24a4c8401c1ad4787f3ba2a08dc0680dd7bb1",
+      "bytes": 2945311
+    }
+  },
+  "all_build_checks_passed": true,
+  "installed": false,
+  "instrumented_tests_executed": false,
+  "production_qualified": false,
+  "debug_only": true,
+  "github_sha": "d9b22399f5121d05d31ab4aaa67fdc7e9742c3e2",
+  "github_run_id": null,
+  "commands": {
+    "java-version": 0,
+    "gradle-version": 0,
+    "assemble": 0,
+    "app-signature": 0,
+    "app-identity": 0,
+    "checks": 0,
+    "assemble-test": 0,
+    "tests-signature": 0,
+    "tests-identity": 0
+  },
+  "exit_code": 0,
+  "finished_at": "2026-09-22T18:39:24.738494+00:00"
+}

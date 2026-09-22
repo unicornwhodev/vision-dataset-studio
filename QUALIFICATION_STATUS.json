@@ -2,8 +2,8 @@
   "schema": 1,
   "product": "Vision Dataset Studio",
   "brand": "Unicorn Who Dev",
-  "version": "4.2.0-rc3",
-  "date": "2026-09-20",
+  "version": "4.2.0-rc4",
+  "date": "2026-09-22",
   "namespace": "com.unicornwhodev.visiondatasetstudio",
   "application_id": "com.unicornwhodev.visiondatasetstudio",
   "room_schema_version": 4,
@@ -12,34 +12,41 @@
   "license": "Apache-2.0",
   "rights_and_transitive_notices_review": "pending",
   "android": {
-    "current_build_run": "20260920T215432Z-cdd13d7fbf98",
-    "compiled_source_commit": "2738b13d75952698ba611355220f8038f7f0e998",
+    "current_build_run": "20260922T183415Z-818e4cf57d14",
+    "compiled_source_commit": "d9b22399f5121d05d31ab4aaa67fdc7e9742c3e2",
     "build_outcome": "build_checks_passed",
     "apk_built": true,
     "test_apk_built": true,
     "unit_tests": {
-      "passed": 26,
+      "passed": 54,
       "failed": 0,
       "skipped": 0
     },
     "lint": {
       "errors": 0,
-      "warnings": 72
+      "warnings": 89
     },
     "instrumented_tests": {
-      "passed": 19,
+      "passed": 24,
       "failed": 0,
       "skipped": 0,
-      "runtime_seconds": 99.092,
-      "build_run": "20260920T215432Z-cdd13d7fbf98",
-      "evidence": "test-results/litert-rc3/final-device/instrumentation.txt"
+      "runtime_seconds": 219.285,
+      "build_run": "20260922T183415Z-818e4cf57d14",
+      "evidence": "test-results/stabilization-rc4/final-device/instrumentation.txt",
+      "selection": "Core suite excludes opt-in model classes"
     },
     "physical_device_tested": false,
     "room_schema_generated": true,
-    "weights_embedded": false
+    "weights_embedded": false,
+    "converted_model_regressions": {
+      "passed": 2,
+      "failed": 0,
+      "evidence": "test-results/stabilization-rc4/conversions.json",
+      "new_qualifications": 0
+    }
   },
   "portable_tests": {
-    "python_host_suite_passed": 45,
+    "python_host_suite_passed": 52,
     "numeric_engine_checks_passed": 72,
     "training_target_checks_passed": 16,
     "not_android_execution": true
@@ -78,7 +85,9 @@
     "requires_hf_secret": false,
     "attempted": true,
     "blocker": "GitHub Actions account billing lock; job not started",
-    "run_url": "https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35539418339"
+    "run_url": "https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35539418339",
+    "current_release_executed": false,
+    "attempt_scope": "Historical attempt, not rc4"
   },
   "data_transition": {
     "in_place_update_from_previous_application_id": false,
@@ -210,18 +219,18 @@
     "authorized": true,
     "repository": "https://github.com/unicornwhodev/vision-dataset-studio",
     "visibility": "public",
-    "tested_source_commit": "2738b13d75952698ba611355220f8038f7f0e998",
+    "tested_source_commit": "d9b22399f5121d05d31ab4aaa67fdc7e9742c3e2",
     "secret_review": "docs/PUBLICATION_CHECKS.md",
-    "status": "rc3 publication authorized"
+    "status": "rc4 publication authorized"
   },
   "distribution": {
     "kind": "workstation-tested Debug prerelease",
     "source_proof": "tools/package_workstation_release.py",
-    "oci_package": "ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc3",
+    "oci_package": "ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc4",
     "oci_kind": "qualification archive, not a runnable build image",
-    "build_image_status": "prepared, not built; GitHub Actions billing lock",
+    "build_image_status": "Prepared, not built; no rc4 CI run; historical Actions billing failure",
     "oci_visibility": "private",
-    "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc3"
+    "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc4"
   },
   "lite_rt_matrix": {
     "model_conversions_downloaded_verified": 31,

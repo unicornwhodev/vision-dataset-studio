@@ -15,6 +15,17 @@ def sha(path):
  with path.open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 def compiled(name):
  return name.startswith(('app/','gradle/')) and name!='app/.gitignore' or name in ('build.gradle.kts','settings.gradle.kts','gradle.properties','tools/build_android.py','tools/gradle_bootstrap.py')
+def source_hashes(value):
+ """Accept explicit path/hash records and historical manifests without losing duplicates."""
+ if isinstance(value,dict):return value
+ if not isinstance(value,list):raise ValueError('Invalid source manifest')
+ result={}
+ for row in value:
+  name=row['path'];digest=row['sha256']
+  if name in result:raise ValueError('Duplicate source path: '+name)
+  if not isinstance(digest,str) or not re.fullmatch(r'[0-9a-f]{64}',digest):raise ValueError('Invalid source digest')
+  result[name]=digest
+ return result
 def main():
  p=argparse.ArgumentParser(description=__doc__)
  p.add_argument('--build-dir',type=Path,required=True)
@@ -26,6 +37,7 @@ def main():
  evidence=a.evidence.resolve();folder=a.build_dir.resolve()
  evidence.relative_to(ROOT)
  source=json.loads((evidence/'source-manifest.json').read_text());head=git('rev-parse','HEAD').decode().strip()
+ source['files']=source_hashes(source['files'])
  names=[n for n in git('ls-files','-z').decode().split('\0') if n]
  if set(source['files'])!={n for n in names if compiled(n)}:raise RuntimeError('Incomplete compiled-source manifest')
  for n,h in source['files'].items():

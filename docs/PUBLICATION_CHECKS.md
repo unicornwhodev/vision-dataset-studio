@@ -1,3 +1,16 @@
+# Contrôles de publication rc4 · rc4 publication checks
+
+22 septembre 2026 UTC. Sources Android `d9b2239`, build `20260922T183415Z-818e4cf57d14`.
+
+- Les commits ajoutés et les preuves rc4 sélectionnées sont contrôlés avec Gitleaks 8.30.1, règles actives et sorties expurgées. Les empreintes des nouveaux manifestes utilisent des champs `path`/`sha256` explicites pour ne pas confondre un hash de source avec une clé API.
+- Les 143 sources de compilation sont comparées au commit. Les deux APK rapatriées sont vérifiées en taille et SHA-256 ; la clé Debug reste hors du dépôt et l’APK ne contient aucun poids.
+- Seuls les reçus, résultats et documents sélectionnés sont ajoutés. Aucun fichier d’authentification, identifiant de dépôt privé, donnée utilisateur ou clé de signature n’est inclus. L’authentification GitHub/GHCR est transmise en mémoire aux clients, sans jeton dans les commandes, les notes ou les artefacts.
+- Les preuves rc4 sont distinctes des résultats rc3 et du build de stabilisation précédent. Une seule APK utilisateur est proposée ; l’APK instrumentée reste dans l’archive de qualification.
+
+The added commits and selected rc4 evidence are checked using Gitleaks 8.30.1 with active rules and redacted output. Explicit `path`/`sha256` manifest records prevent source digests from resembling API credentials. All 143 compiled files match their commit; transferred APK sizes and hashes are verified. Signing keys and credentials stay outside Git and artifacts, with registry authentication passed in memory. The APK contains no model weights. rc4 receipts remain separate from historical results, and only one user-facing APK is offered.
+
+---
+
 # Contrôles de publication rc3 · rc3 publication checks
 
 20 septembre 2026 UTC. Sources Android : `2738b13`. [Preuves de build](../test-results/litert-rc3/final-build/status.json).

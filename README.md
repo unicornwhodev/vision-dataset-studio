@@ -6,10 +6,10 @@
 
 Atelier Android pour produire des datasets d’images par lots : préannotation, correction humaine et export. Interface sombre compacte, image au centre du travail.
 
-**4.2.0-rc3 · Apache-2.0 · En qualification**
+**4.2.0-rc4 · Apache-2.0 · En qualification**
 Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
 
-Dernière validation du code : **22 septembre 2026**, 54 JVM et 24 Android réussis (10 tests de modèles ignorés). [Corrections, build et limites](docs/validation-20260922/README.md).
+Dernière validation **rc4 · 22 septembre 2026** : **54 JVM, 24 Android de base, 2 régressions LiteRT et 52 Python réussis**. [Build, preuves et limites](test-results/stabilization-rc4/README.md).
 
 ## L’application en images
 
@@ -100,7 +100,7 @@ Les tests de modèles nécessitent des fixtures injectées séparément et peuve
 - [Roadmap](docs/ROADMAP.md), [plan de publication](docs/RELEASE_PLAN.md), [contribution](CONTRIBUTING.md).
 - [Poste de développement](docs/WORKSTATION.md), [interface](docs/UI_REFINEMENT.md).
 
-Destination autorisée : dépôt public [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). La [prérelease de qualification](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc3) distribue l’APK utilisateur et le paquet de recette. GHCR héberge ce paquet au format OCI ; le Dockerfile de build reste à éprouver, GitHub Actions étant bloqué par la facturation du compte. Voir le [plan de publication](docs/RELEASE_PLAN.md). Aucune release stable n’est annoncée.
+Destination autorisée : dépôt public [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). La [prérelease de qualification](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc4) distribue l’APK utilisateur et le paquet de recette. GHCR héberge ce paquet au format OCI ; le Dockerfile de build reste à éprouver, GitHub Actions étant bloqué par la facturation du compte. Voir le [plan de publication](docs/RELEASE_PLAN.md). Aucune release stable n’est annoncée.
 
 Le code relève d’[Apache-2.0](LICENSE), selon les droits des contributeurs. Les modèles, données et bibliothèques conservent leurs licences ; voir [NOTICE](NOTICE) et [l’état des droits](LICENSING_STATUS.md).
 

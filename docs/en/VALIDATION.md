@@ -1,3 +1,11 @@
+# Release 4.2.0-rc4 validation — 22 September 2026
+
+Build `20260922T183415Z-818e4cf57d14` (versionCode 9): **54 JVM, 24 core Android and 2 HF regression tests passed**, with no failures or skips in these selections. **52 Python tests**, lint **0 errors / 89 warnings**. Weight-free APK, 143 compiled files matched to `d9b2239`. [Bilingual rc4 report and evidence](../../test-results/stabilization-rc4/README.md).
+
+Model classes requiring explicit fixtures/options run separately. The 2 HF regressions cover previously qualified models and do not increase coverage. Debug prerelease on API 28 software emulator; no physical ARM qualification or new CI execution.
+
+---
+
 # Validation — 22 September 2026 UTC
 
 Corrected build **`20260922T175957Z-8ef3e5cc2b0d`**, based on `351dd3f`: **54 JVM tests**, **48 Python tests**, **24 Android tests passed / 10 skipped**, zero failures. Lint: **0 errors, 89 warnings**. Both APKs were built, signed, installed and verified; no bundled weights, 181 source files matched.

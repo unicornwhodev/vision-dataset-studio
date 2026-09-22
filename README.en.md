@@ -6,10 +6,10 @@
 
 An Android workspace for producing image datasets in batches: model proposals, human correction and export. A compact dark interface keeps the image at the centre of the work.
 
-**4.2.0-rc3 · Apache-2.0 · Under qualification**
+**4.2.0-rc4 · Apache-2.0 · Under qualification**
 Android application ID: `com.unicornwhodev.visiondatasetstudio`
 
-Latest source validation: **22 September 2026**, 54 JVM and 24 Android tests passed (10 model tests skipped). [Fixes, build and limitations](docs/validation-20260922/README.md).
+Latest validation **rc4 · 22 September 2026**: **54 JVM, 24 core Android, 2 LiteRT regressions and 52 Python tests passed**. [Build, evidence and limits](test-results/stabilization-rc4/README.md).
 
 ## Application screenshots
 
@@ -100,7 +100,7 @@ Model tests need fixtures staged separately and may be skipped when those are ab
 - [Roadmap](docs/en/ROADMAP.md), [release plan](docs/en/RELEASE_PLAN.md), [contributing](CONTRIBUTING.md).
 - [Workstation guide](docs/WORKSTATION.md) and [UI evidence](docs/UI_REFINEMENT.md) are currently French technical references.
 
-Authorized public destination: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). The [qualification prerelease](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc3) distributes the user APK and QA package. GHCR stores that package as an OCI artifact; the build Dockerfile remains untested because GitHub Actions is blocked by an account billing issue. See the [publication plan](docs/en/RELEASE_PLAN.md). No stable release is claimed.
+Authorized public destination: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). The [qualification prerelease](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc4) distributes the user APK and QA package. GHCR stores that package as an OCI artifact; the build Dockerfile remains untested because GitHub Actions is blocked by an account billing issue. See the [publication plan](docs/en/RELEASE_PLAN.md). No stable release is claimed.
 
 Project code uses [Apache-2.0](LICENSE), subject to contributor rights. Models, datasets and dependencies keep their own licences; see [NOTICE](NOTICE) and [licensing status](LICENSING_STATUS.md).
 
