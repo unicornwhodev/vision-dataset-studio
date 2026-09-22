@@ -68,12 +68,15 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                 item.entry.adapterStatus == "bundle" -> R.string.model_state_bundle
                                 item.entry.adapterStatus == "rfdetr" -> R.string.model_state_detection
                                 else -> R.string.model_state_inspection
-                            }
+                            })
                             val capabilityNames=mutableListOf<String>();for(capability in item.entry.capabilities.values)capabilityNames+=when(capability) {
                                 ModelCapability.DETECTION->stringResource(R.string.cap_detection);ModelCapability.POINTING->stringResource(R.string.cap_pointing);ModelCapability.SEGMENTATION->stringResource(R.string.cap_segmentation)
                                 ModelCapability.CLASSIFICATION->stringResource(R.string.cap_classification);ModelCapability.CAPTIONING->stringResource(R.string.cap_captioning);ModelCapability.EMBEDDING->stringResource(R.string.cap_embedding)
                                 ModelCapability.SIMILARITY->stringResource(R.string.cap_similarity);ModelCapability.INTERACTIVE_SEGMENTATION->stringResource(R.string.cap_interactive_segmentation);ModelCapability.TRAINING->stringResource(R.string.cap_training)
                                 ModelCapability.INSPECTION_ONLY->stringResource(R.string.cap_inspection)
+                                ModelCapability.VQA->stringResource(R.string.cap_vqa)
+                                ModelCapability.COUNTING->stringResource(R.string.cap_counting)
+                                ModelCapability.GROUNDING->stringResource(R.string.cap_grounding)
                             };val capabilityText=capabilityNames.joinToString(" · ") + " · " + when(item.entry.capabilities.qualification) {
                                 QualificationStatus.QUALIFIED->stringResource(R.string.qualification_qualified);QualificationStatus.PARTIALLY_QUALIFIED->stringResource(R.string.qualification_partial)
                                 QualificationStatus.INFERENCE_ONLY->stringResource(R.string.qualification_inference);QualificationStatus.TRAINING_QUALIFIED->stringResource(R.string.qualification_training)

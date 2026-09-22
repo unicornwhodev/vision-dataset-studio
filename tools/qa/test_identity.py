@@ -20,7 +20,7 @@ class IdentityTests(unittest.TestCase):
             self.assertEqual(path.parent.relative_to(Path(*path.parts[:path.parts.index('java')+1])).as_posix(),package[1].replace('.','/'),path)
     def test_no_template_namespaces_in_sources(self):
         for path in ROOT.rglob('*'):
-            if not path.is_file() or any(part in {'test-results','dist','.git','__pycache__'} for part in path.parts):continue
+            if not path.is_file() or any(part in {'test-results','dist','.git','.gradle','.kotlin','build','__pycache__'} for part in path.relative_to(ROOT).parts):continue
             try:text=path.read_text()
             except UnicodeError:continue
             self.assertIsNone(re.search(r'com[./]example(?:[./";\s]|$)',text),path)

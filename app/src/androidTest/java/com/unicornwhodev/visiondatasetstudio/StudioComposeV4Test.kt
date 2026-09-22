@@ -13,21 +13,21 @@ class StudioComposeV4Test {
         rule.waitUntil(10000) { rule.onAllNodesWithTag("home_primary").fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithTag("controls_shortcut").assertIsDisplayed()
         rule.onNodeWithTag("controls_shortcut").performClick()
-        rule.onNodeWithText("Mon espace").assertIsDisplayed()
+        rule.onNodeWithText(rule.activity.getString(R.string.screen_controls)).assertIsDisplayed()
         rule.onNodeWithText("Modèles").performClick()
-        rule.onNodeWithText("Catalogue public téléchargeable").assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.controls_public_catalog)).assertExists()
         rule.onNodeWithText("SSD MobileNet V1").assertExists()
     }
     @Test fun compactNavigationKeepsImportAndExportAccessible() {
         rule.waitUntil(10000) { rule.onAllNodesWithTag("nav_Models").fetchSemanticsNodes().isNotEmpty() }
         rule.onNodeWithTag("nav_Models").performClick()
-        rule.onNodeWithText("Importer", useUnmergedTree = true).assertIsDisplayed().performClick()
-        rule.onNodeWithText("Choisir un .tflite").assertIsDisplayed()
+        rule.onNodeWithText(rule.activity.getString(R.string.models_tab_import), useUnmergedTree = true).assertIsDisplayed().performClick()
+        rule.onNodeWithText(rule.activity.getString(R.string.models_choose_file)).assertIsDisplayed()
         rule.onNodeWithTag("nav_Publication").performClick()
-        rule.onNodeWithText("Archive locale").assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.publication_local_archive)).assertExists()
         rule.onNodeWithTag("nav_QualityDashboard").performClick()
         rule.onNodeWithTag("nav_QualityDashboard").assertIsSelected()
-        rule.onNodeWithText("Stockage").assertExists()
+        rule.onNodeWithText(rule.activity.getString(R.string.quality_storage)).assertExists()
         rule.onNodeWithTag("nav_Home").performClick()
         // The workspace command must now be immediately available on both layouts.
         rule.onNodeWithTag("home_primary").assertIsDisplayed().assertHasClickAction()

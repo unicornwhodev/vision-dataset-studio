@@ -102,7 +102,7 @@ class OnDeviceTraining(private val context:Context) {
         val groups=prepared.groupBy{it.sha256};require(groups.values.all{g->g.map{it.annotationJson}.distinct().size==1}){"Annotations contradictoires pour des fichiers identiques"}
         val unique=groups.values.map{it.first()};val train=unique.count{!holdout(it.sha256)};val validation=unique.size-train
         if(requireReady)require(train>=32&&validation>=8){"Il faut 32 images d’apprentissage et 8 de contrôle ; disponibles : $train / $validation"}
-        val previous=readBatch(project.id,batchNumber);val completed=previous?.exportSnapshot==batch.archiveSnapshot&&previous.phase in setOf("completed","rejected")
+        val previous=readBatch(project.id,batchNumber);val completed=previous!=null&&previous.exportSnapshot==batch.archiveSnapshot&&previous.phase in setOf("completed","rejected")
         if(requireReady)check(!completed){"L’apprentissage de cet export est déjà terminé"}
         val inherited=if(config.trainingCheckpoint.isBlank())null else readCheckpoint(source,config.trainingCheckpoint)
         LiteRtTrainingSession(source,config.copy(trainingCheckpoint="")).use{session->inherited?.let(session::restore)}

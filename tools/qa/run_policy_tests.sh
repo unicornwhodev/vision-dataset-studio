@@ -10,6 +10,7 @@ kotlinc tools/qa/MetadataAnnotation.kt tools/qa/PolicyRegression.kt \
  app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/geometry/ImageViewport.kt \
  app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/workflow/StudioWorkflow.kt \
  app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/model/DatasetModels.kt \
+ app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/MaskCodec.kt \
  app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/validation/AnnotationReview.kt \
  app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/export/WebDatasetTarWriter.kt \
  -include-runtime -d "$OUT/policy-tests.jar"

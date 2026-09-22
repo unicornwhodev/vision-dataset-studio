@@ -174,6 +174,6 @@ fun SetupScreen(viewModel: MainViewModel) {
             }
         }
     }
-    if (createRepo) AlertDialog(onDismissRequest = { createRepo = false }, title = { Text(stringResource(R.string.setup_create_private_title)) }, text = { Text(stringResource(R.string.setup_create_private_body,StudioWorkflow.normalizeRepo(destination,true))) },
+    if (createRepo) AlertDialog(onDismissRequest = { createRepo = false }, title = { Text(stringResource(R.string.setup_create_private_title)) }, text = { Text(stringResource(R.string.setup_create_private_body,StudioWorkflow.normalizeRepo(destination,true).orEmpty())) },
         confirmButton = { Button(onClick = { createRepo = false; viewModel.createDestinationRepo(destination) }) { Text(stringResource(R.string.setup_create_repo)) } }, dismissButton = { TextButton(onClick = { createRepo = false }) { Text(stringResource(R.string.common_cancel)) } })
 }

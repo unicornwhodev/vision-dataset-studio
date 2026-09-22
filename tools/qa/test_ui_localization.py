@@ -1,4 +1,5 @@
 import pathlib
+import re
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -16,6 +17,15 @@ class UiLocalizationTest(unittest.TestCase):
         english = self.strings("values-en")
         self.assertEqual(set(default), set(english))
         self.assertTrue(all(value.strip() for value in english.values()))
+
+    def test_every_app_string_reference_exists(self):
+        available = set(self.strings("values"))
+        missing = {}
+        for source in (ROOT / "app" / "src").rglob("*.kt"):
+            references = set(re.findall(r"(?<!android\.)R\.string\.(\w+)", source.read_text()))
+            if references - available:
+                missing[str(source.relative_to(ROOT))] = sorted(references - available)
+        self.assertEqual({}, missing, "Kotlin references strings that Android cannot generate")
 
     def test_critical_english_workflows_are_not_french_fallbacks(self):
         english = self.strings("values-en")

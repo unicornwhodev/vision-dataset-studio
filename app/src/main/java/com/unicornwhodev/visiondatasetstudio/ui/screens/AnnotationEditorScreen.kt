@@ -55,6 +55,7 @@ import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
 import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelAction
 import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelCapabilities
 import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelConfig
+import com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec
 import com.unicornwhodev.visiondatasetstudio.ui.*
 import java.io.File
 import java.util.UUID
@@ -573,6 +574,7 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun InstanceLinkEditor(a:SampleAnnotations,targetId:String,onUpdate:(SampleAnnotations)->Unit,locked:Boolean) {
     val current=InstanceLinks.instanceId(a,targetId)
     val candidates=InstanceLinks.compatibleTargets(a,targetId)
