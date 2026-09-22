@@ -1,6 +1,7 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
 import kotlin.math.*
+import com.unicornwhodev.visiondatasetstudio.core.workflow.StudioTask
 
 /** Pure numerical part of the model contract; testable without Android or model weights. */
 data class TensorValues(val shape: List<Int>, val values: FloatArray) {
@@ -27,6 +28,12 @@ data class InputTransform(val imageWidth: Int, val imageHeight: Int, val width: 
 }
 
 object ModelContract {
+    val humanOnlyTasks = setOf(StudioTask.NEGATIVE)
+    private val taskOutputs = mapOf(
+        StudioTask.DETECTION to "box", StudioTask.POINTING to "point", StudioTask.POINTING_MULTI to "point",
+        StudioTask.SEGMENTATION to "mask", StudioTask.CLASSIFICATION to "tag", StudioTask.CAPTIONING to "caption",
+        StudioTask.VQA to "vqa", StudioTask.COUNTING to "count", StudioTask.GROUNDING to "grounding"
+    )
     val adapters = listOf("ssd", "rfdetr", "rtmdet", "fireviewer_dinov3_multitask", "tinyclip", "sam_box", "florence2", "yolo", "xyxy_score_class", "classification", "points", "heatmap", "embedding", "inspect_only")
     fun adapter(c: ModelConfig) = if (c.adapter == "auto") when(c.task) {
         "object_detection" -> "ssd"; "classification" -> "classification"; "pointing" -> "points"; else -> c.task
@@ -34,31 +41,32 @@ object ModelContract {
     fun resize(c: ModelConfig) = if (c.resizeMode == "auto") if (adapter(c) == "classification") "stretch" else "letterbox" else c.resizeMode
     fun outputTypes(c: ModelConfig): Set<String> {
         if(c.bundleKind.isNotBlank())return when(c.bundleKind){"tinyclip"->setOf("tag");"efficientvit_sam"->setOf("box","mask");"florence2"->setOf("caption","box");else->emptySet()}
-        if(c.runtime=="local_http") return when(c.httpOutputMode) { "caption_text"->setOf("caption");else-> when(c.task){
-            "classification"->setOf("tag");"captioning"->setOf("caption");"vqa"->setOf("vqa");"pointing"->setOf("point");"counting"->setOf("count");"multitask"->setOf("point","box","tag","caption","vqa","count");else->setOf("box")}}
+        if(c.runtime=="local_http") return when(c.httpOutputMode) {
+            "caption_text"->setOf("caption")
+            "grounding_proposals"->setOf("box","point","grounding")
+            else-> when(c.task){
+                "classification"->setOf("tag");"captioning"->setOf("caption");"vqa"->setOf("vqa");"pointing"->setOf("point");"counting"->setOf("count");"multitask"->setOf("point","box","tag","caption","vqa","count");else->setOf("box")}
+        }
         return when(adapter(c)) { "fireviewer_dinov3_multitask"->setOf("tag","mask","point"); "classification"->setOf("tag");"points","heatmap"->setOf("point");"embedding","inspect_only"->emptySet();else->when(c.outputMode){"points"->setOf("point");"both"->setOf("point","box");else->setOf("box")} } + if(c.deriveCounts) setOf("count") else emptySet()
     }
-    fun supportsTasks(c:ModelConfig,tasksCsv:String):Boolean {
-        val tasks=tasksCsv.split(',').map(String::trim).filter(String::isNotEmpty).map(String::uppercase).toSet()
+    fun compatibility(c:ModelConfig,tasksCsv:String):TaskCompatibility {
+        val tasks=tasksCsv.split(',').mapNotNull { raw -> StudioTask.entries.firstOrNull { it.name==raw.trim().uppercase() } }.toSet()
+        val human=tasks intersect humanOnlyTasks
+        val annotatable=tasks-human
         val outputs=outputTypes(c)
-        if(tasks.isEmpty())return false
-        return tasks.all { task -> when(task) {
-            "DETECTION" -> "box" in outputs
-            "POINTING", "POINTING_MULTI" -> "point" in outputs
-            "SEGMENTATION" -> "mask" in outputs
-            "CLASSIFICATION" -> "tag" in outputs
-            "CAPTIONING" -> "caption" in outputs
-            "VQA" -> "vqa" in outputs
-            "COUNTING" -> "count" in outputs
-            // Grounding needs both the phrase and the region it denotes. Merely loading a
-            // detector (or a captioner) is not sufficient to fulfil the task contract.
-            // A caption and a region are not grounding unless the adapter also emits their link.
-            "GROUNDING" -> "grounding" in outputs
-            else -> false
-        } }
+        val covered=annotatable.filterTo(linkedSetOf()) { taskOutputs[it] in outputs }
+        val uncovered=annotatable-covered
+        val usable=covered.mapNotNullTo(linkedSetOf()) { taskOutputs[it] }.apply {
+            // A grounding output is unusable without the explicitly referenced regions
+            // from the same inference response.
+            if(StudioTask.GROUNDING in covered)addAll(outputs intersect setOf("box","point"))
+        }
+        return TaskCompatibility(usable,covered,uncovered,human,usable.isNotEmpty(),annotatable.isNotEmpty() && uncovered.isEmpty())
     }
+    /** Backward-compatible predicate: runnable partial assistance, never a human-only claim. */
+    fun supportsTasks(c:ModelConfig,tasksCsv:String)=compatibility(c,tasksCsv).canRun
     fun requireTaskCompatibility(c:ModelConfig,tasksCsv:String) {
-        check(supportsTasks(c,tasksCsv)) {
+        check(compatibility(c,tasksCsv).canRun) {
             if(adapter(c) in setOf("embedding","inspect_only"))
                 "Ce modèle produit des représentations visuelles, pas des annotations pour les tâches actives."
             else "Sorties modèle incompatibles avec les tâches actives : ${tasksCsv.ifBlank { "aucune tâche" }}."
@@ -113,6 +121,11 @@ object ModelContract {
         if (adapter(c) == "ssd") require(c.boxFormat in setOf("ymin_xmin_ymax_xmax", "xmin_ymin_xmax_ymax", "xywh"))
     }
 }
+
+data class TaskCompatibility(
+    val usableOutputs:Set<String>, val coveredTasks:Set<StudioTask>, val uncoveredTasks:Set<StudioTask>,
+    val humanOnlyTasks:Set<StudioTask>, val canRun:Boolean, val fullyCovered:Boolean
+)
 
 interface ModelAdapter {
     val id: String
@@ -321,8 +334,11 @@ object LocalCallContract {
             "Le runtime local HTTP est limité au loopback de cet appareil. Aucun envoi Internet implicite."
         }
         require(c.httpTimeoutSeconds in 5..300 && c.requestTemplate.length<=32_000 && c.prompt.length<=16_000)
-        require(c.httpOutputMode in setOf("proposals","caption_text"))
-        require(c.task in setOf("object_detection","pointing","classification","captioning","vqa","counting","multitask")) { "Tâche locale non implémentée" }
+        require(c.httpOutputMode in setOf("proposals","caption_text","grounding_proposals"))
+        require(c.task in setOf("object_detection","pointing","classification","captioning","vqa","counting","grounding","multitask")) { "Tâche locale non implémentée" }
+        require((c.task=="grounding") == (c.httpOutputMode=="grounding_proposals")) {
+            "Le grounding exige explicitement httpOutputMode=grounding_proposals"
+        }
         require(c.responsePath.length<=500)
     }
     /** Field/index traversal only, not an executable expression or full JSONPath engine. */

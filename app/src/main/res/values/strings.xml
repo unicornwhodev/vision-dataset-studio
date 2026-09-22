@@ -34,8 +34,93 @@
     <string name="training_progress">%1$d / %2$d étapes · %3$d apprentissage / %4$d contrôle</string><string name="training_loss">Perte de contrôle : %1$.5f → %2$.5f</string><string name="training_weights_changed">Poids internes modifiés</string><string name="training_weights_unchanged">Poids internes inchangés</string>
     <string name="training_details_dataset">32 images d’apprentissage et 8 de contrôle au minimum. Le partage dépend du hash des fichiers ; les fichiers identiques ne traversent pas les deux groupes. Toutes les images acceptées du lot exporté sont utilisées, avec une copie privée conservée jusqu’à la fin de l’apprentissage et au nettoyage.</string>
     <string name="training_details_runtime">L’exécution utilise les signatures train / infer / save / restore du modèle LiteRT. Aucun corpus ni gradient n’est envoyé au pod. Le contrôle réutilisé ne mesure pas la généralisation à un corpus indépendant.</string>
-    <string name="cap_detection">Détection</string><string name="cap_pointing">Pointing</string><string name="cap_segmentation">Masques</string><string name="cap_classification">Classification</string><string name="cap_captioning">Légendes</string><string name="cap_embedding">Embeddings</string><string name="cap_similarity">Similarité</string><string name="cap_interactive_segmentation">Segmentation interactive</string><string name="cap_training">Entraînable</string><string name="cap_inspection">Inspection uniquement</string>
+    <string name="cap_detection">Détection</string><string name="cap_pointing">Pointing</string><string name="cap_segmentation">Masques</string><string name="cap_classification">Classification</string><string name="cap_captioning">Légendes</string><string name="cap_vqa">Questions/réponses</string><string name="cap_counting">Comptage</string><string name="cap_grounding">Texte ↔ région</string><string name="cap_embedding">Embeddings</string><string name="cap_similarity">Similarité</string><string name="cap_interactive_segmentation">Segmentation interactive</string><string name="cap_training">Entraînable</string><string name="cap_inspection">Inspection uniquement</string>
     <string name="qualification_qualified">Qualifié</string><string name="qualification_partial">Partiellement qualifié</string><string name="qualification_inference">Inférence qualifiée</string><string name="qualification_training">Apprentissage qualifié</string><string name="qualification_failed">Échec connu</string><string name="qualification_untested">Non qualifié</string>
     <string name="model_state_upcoming">À venir</string><string name="model_state_unsupported">Bundle non pris en charge</string><string name="model_state_contract">Contrat fourni</string><string name="model_state_heatmap">Contrat heatmap</string><string name="model_state_embedding">Représentations visuelles</string><string name="model_state_bundle">Pipeline local</string><string name="model_state_detection">Détection</string><string name="model_state_inspection">Inspection</string><string name="model_files">%1$d fichier(s)</string><string name="model_test_required">Installation et essai sur appareil requis.</string>
     <string name="export_format_canonical">JSONL complet</string><string name="export_format_coco">COCO — boîtes + masques</string><string name="export_format_yolo">YOLO — boîtes</string><string name="export_format_vl">Questions / réponses</string>
+    <string name="editor_action_preannotate">Préannoter</string><string name="editor_action_preannotate_partial">Préannoter partiellement</string><string name="editor_action_embedding">Calculer la représentation</string><string name="editor_action_interactive_segmentation">Segmenter avec un prompt</string><string name="editor_action_inspect">Inspecter le modèle</string><string name="editor_action_model">Modèle</string>
+    <string name="instance_unlinked">Instance non liée</string><string name="instance_linked">Instance · %1$s</string><string name="instance_new">Nouvelle instance</string><string name="instance_unlink">Dissocier</string><string name="instance_link_box">Lier la boîte · %1$s</string><string name="instance_link_mask">Lier le masque · %1$s</string><string name="instance_link_point">Lier le point · %1$s</string>
+    <!-- Remaining primary-screen labels -->
+    <string name="batch_none">Aucun lot acquis</string>
+    <string name="batch_retry_downloads">Réessayer les téléchargements</string>
+    <string name="batch_exclude_failures">Exclure les acquisitions en échec…</string>
+    <string name="batch_select_editable">Sélectionner les cas modifiables affichés</string>
+    <string name="batch_defer">Différer</string>
+    <string name="batch_add_tag">Ajouter tag</string>
+    <string name="batch_preannotate_title">Préannoter ?</string>
+    <string name="batch_run">Lancer</string>
+    <string name="batch_reject_failures">Rejeter les échecs ?</string>
+    <string name="batch_exclude_cases">Exclure ces cas</string>
+    <string name="batch_tag_to_add">Tag à ajouter</string>
+    <string name="common_apply">Appliquer</string>
+    <string name="editor_reject_explanation">L’image est exclue de l’export, sans suppression immédiate du fichier.</string>
+    <string name="editor_accept_explanation">Les propositions de points, boîtes et tags de cette image seront marquées comme relues par un humain. N’acceptez que ce que vous avez effectivement vérifié.</string>
+    <string name="publication_hf">Hugging Face</string>
+    <string name="publication_isolate_title">Isoler une nouvelle tentative ?</string>
+    <string name="publication_close_all_title">Clôturer tous ces rejets ?</string>
+    <string name="setup_dataset_url_help">URL de dataset ou identifiant, pas une URL de fichier.</string>
+    <string name="setup_classes_help">Identifiants stables de votre taxonomie. Les classes existantes ne sont pas renommées automatiquement.</string>
+    <string name="setup_optional_contract">model-config.json · optionnel</string>
+    <string name="setup_budget_help">Entre 128 et 65 536 Mio. Lots de 1 à 1 000 cas, configurables.</string>
+    <string name="prefs_appearance">Apparence</string>
+    <string name="prefs_gestures">Gestes &amp; rythme</string>
+    <string name="prefs_tools">Outils</string>
+    <string name="controls_projects">Mes projets</string>
+    <string name="controls_presets">Presets</string>
+    <string name="controls_source_selection">Source et sélection</string>
+    <string name="controls_collaboration">Collaboration</string>
+    <string name="controls_batches_network">Lots et réseau</string>
+    <string name="controls_bounded_storage">Stockage borné</string>
+    <string name="controls_hf_publication">Publication Hugging Face</string>
+    <string name="controls_model_library">Bibliothèque de modèles</string>
+    <string name="controls_public_catalog">Catalogue public téléchargeable</string>
+    <string name="controls_download_inspect">Télécharger et inspecter…</string>
+    <string name="controls_import_tflite">Importer un fichier .tflite</string>
+    <string name="controls_download_weights">Télécharger ces poids</string>
+    <string name="controls_detach_model">Détacher le modèle de ce projet</string>
+    <string name="controls_keep_profile">Conserver poids + contrat dans la bibliothèque</string>
+    <string name="controls_contract_preprocessing">Contrat et prétraitement</string>
+    <string name="controls_versioned_contract">Contrat JSON versionné</string>
+    <string name="controls_validate_contract">Vérifier et enregistrer le contrat</string>
+    <string name="controls_dry_run">Essai sans modifier les annotations</string>
+    <string name="controls_test_image">Tester le modèle enregistré sur une image</string>
+    <string name="controls_preannotate_pending">Préannoter les cas en attente du lot</string>
+    <string name="controls_measure_device">Mesurer sur cet appareil</string>
+    <string name="controls_adaptive_points">Correction adaptative des points</string>
+    <string name="common_download">Télécharger</string>
+    <string name="controls_delete_profile_title">Supprimer ce profil ?</string>
+    <string name="common_delete">Supprimer</string>
+    <string name="controls_clear_corrector_title">Effacer le correcteur local ?</string>
+    <string name="common_reset">Réinitialiser</string>
+    <string name="batch_preannotate_body">Le modèle traitera une image à la fois parmi les cas à traiter. Les corrections et décisions existantes seront conservées. Aucune proposition ne sera validée automatiquement. Gardez l’application ouverte.</string>
+    <string name="batch_reject_failures_body">Les images non récupérées seront exclues du corpus avec leur motif d’échec. Cette action ne corrige aucun fichier et ne valide aucune image.</string>
+    <string name="batch_bulk_body">L’action ne touche que les cas sélectionnés et modifiables. Aucune image ne sera validée automatiquement.</string>
+    <string name="publication_isolate_body">Le commit et les chemins de l’ancien envoi resteront inchangés. Une nouvelle publication utilisera un chemin unique ; cela peut créer un doublon distant si la première réponse a été perdue. Aucune suppression distante automatique.</string>
+    <string name="publication_close_all_body">Aucun cas de ce lot n’a été accepté. Les rejets et leurs motifs restent dans l’historique. La purge des copies cache restera séparée ; aucun original source ne sera supprimé.</string>
+    <string name="controls_download_title">Télécharger %1$s ?</string><string name="controls_download_body">Téléchargement depuis le stockage public TensorFlow, sans token HF. Réserve maximale : 64 Mo. Les labels et métadonnées sont lus dans les poids. Une incompatibilité bloque l’import. Vérifiez les conditions du modèle avant redistribution. L’ajout ne remplace pas le modèle actif.</string>
+    <string name="controls_delete_profile_body">Ses poids seront supprimés seulement lorsqu’aucun autre profil ni projet ne les utilise. Les annotations et correcteurs ne seront pas supprimés.</string>
+    <string name="controls_clear_corrector_body">Les exemples numériques et têtes de correction de ce projet seront effacés. Les annotations, images et poids du modèle restent intacts.</string>
+    <!-- Remaining setup and workflow copy -->
+    <string name="setup_access_unconfirmed">Accès non confirmé</string>
+    <string name="setup_adapters_help">Adaptateurs présents : détection SSD / TF Object Detection et classification. Un modèle YOLO, de pointing ou un VLM arbitraire nécessite son propre adaptateur.</string>
+    <string name="setup_no_model">Aucun modèle importé</string>
+    <string name="setup_folder_indexed">Dossier indexé</string>
+    <string name="setup_start">Démarrer</string>
+    <string name="setup_repo_accessible">Dépôt accessible. Cela ne garantit pas le droit d’écriture.</string>
+    <string name="setup_provenance_locked">La provenance est verrouillée après l’acquisition du premier lot : modifier la source sera refusé, sans toucher aux données.</string>
+    <string name="setup_network_safety">Les erreurs réseau ne doivent pas effacer les corrections. La purge automatique exige une vérification distante des fichiers publiés.</string>
+    <string name="setup_export_later">Les formats et le contenu de l’archive seront choisis dans Export. Aucun téléversement ne démarre à cette étape.</string>
+    <string name="setup_proposals_help">Les propositions restent à vérifier. Sans modèle, tous les outils manuels restent disponibles.</string>
+    <string name="setup_local_export_help">L’export local reste possible sans dépôt de destination.</string>
+    <string name="setup_index_help">L’index référence les images. Seul le lot actif est copié dans le cache.</string>
+    <string name="setup_advanced">Options avancées</string>
+    <string name="setup_weights_imported">Poids importés · compatibilité à vérifier</string>
+    <string name="setup_prepare_next">Préparer le lot ensuite</string>
+    <string name="setup_collapse">Réduire</string>
+    <string name="setup_token_security">Stockage chiffré avec Android Keystore. Le jeton n’est pas inclus dans les exports.</string>
+    <string name="setup_tasks_help">Vous pourrez combiner ou changer les tâches ensuite.</string>
+    <string name="workflow_privacy">Envoie uniquement les consignes et les nombres de cas. Le serveur est fourni séparément.</string>
+    <string name="workflow_prepare">Préparer</string>
+    <string name="similarity_empty">Aucune autre représentation disponible. Prétraitez le lot avec le même encodeur.</string>
+    <string name="setup_rows_verified">%1$d lignes vérifiées</string><string name="setup_verify_image_column">Vérifiez que « %1$s » est bien la colonne contenant les images.</string><string name="setup_connected">Connecté : %1$s</string><string name="setup_public_read">Lecture publique disponible</string><string name="setup_create_private_body">Le dépôt %1$s sera créé sur votre compte Hugging Face. Aucun fichier ne sera publié maintenant.</string>
 </resources>

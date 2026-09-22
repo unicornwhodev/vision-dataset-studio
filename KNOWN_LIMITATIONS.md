@@ -1,5 +1,13 @@
 # Limites de qualification — 4.2.0-rc3
 
+## Third stabilization pass
+
+La compatibilité partielle, les états de pointing par cible, la liaison d’instance COCO et les diagnostics multi-runtime sont implémentés mais restent non compilés sur Android dans cet environnement sans SDK. Les champs `localizationState` et `instanceId` sont optionnels afin de relire les JSON historiques ; une exécution Moshi/Room/export sur le pod reste obligatoire. Les actions et libellés statiques principaux des parcours ont des ressources FR/EN, mais le parcours anglais complet reste à exécuter sur Android. Aucune mesure appareil, écriture HF ou qualification APK n’a été effectuée.
+
+La liaison d’instance est maintenant accessible dans l’éditeur et les ambiguïtés sont refusées. Les imports et sorties de modèles ne reçoivent toutefois aucun lien inventé : seuls des identifiants explicitement présents et contractuels pourront être préservés. Ce parcours reste à compiler et à tester sur Android.
+
+Le grounding modèle est pris en charge uniquement par le contrat HTTP explicite `task=grounding` + `httpOutputMode=grounding_proposals`, avec identifiants uniques des régions et liens phrase-région contrôlés avant fusion. Une région filtrée par le seuil invalide la relation au lieu de créer une expression orpheline, et chaque proposition reste soumise à revue humaine. Les bundles Florence-2 et les couples caption+box restent volontairement non déclarés grounding. Aucun serveur HTTP grounding réel n’a encore été qualifié.
+
 La passe de stabilisation du 22 septembre introduit des contrats typés pour les capacités et les résultats d'inférence, mais n'a pas pu être recompilée dans l'environnement courant dépourvu de SDK Android. Elle reste donc à qualifier par le build Android complet ; voir [STABILIZATION_2026_09.md](docs/STABILIZATION_2026_09.md).
 
 La seconde passe ajoute les reçus d’inférence durables, la reprise des maintenances interrompues et les outils avancés de masque. Le test d’interruption injecte une mort après commit de manière déterministe ; une coupure réelle du processus et la compilation Android de cette passe restent à exécuter sur le poste de qualification.

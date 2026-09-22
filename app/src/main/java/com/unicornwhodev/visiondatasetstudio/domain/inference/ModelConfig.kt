@@ -132,8 +132,9 @@ data class TrainingContract(
 @JsonClass(generateAdapter = true)
 data class AuxiliaryTarget(val shape: List<Int>, val labels: List<String> = emptyList(), val order: List<String> = emptyList(), val meaning: String = "")
 
+@JsonClass(generateAdapter = true)
 data class ModelProposal(
-    val type: String, // box, point, tag, caption, vqa, count
+    val type: String, // box, point, tag, caption, vqa, count, grounding
     val label: String,
     val score: Float,
     val xmin: Float = 0f,
@@ -155,7 +156,10 @@ data class ModelProposal(
     val modelXmin: Float? = null,
     val modelYmin: Float? = null,
     val modelXmax: Float? = null,
-    val modelYmax: Float? = null
+    val modelYmax: Float? = null,
+    /** Stable only inside one inference response; used to resolve grounding links. */
+    val proposalId: String = "",
+    val linkedProposalIds: List<String> = emptyList()
 )
 
 data class DryRunResult(
@@ -181,7 +185,12 @@ data class InferenceDiagnostics(
     val outputIndices: List<Int> = emptyList(),
     val outputDtypes: List<String> = emptyList(),
     val nativeDurationNanos: Long? = null,
-    val configSha256: String = ""
+    val configSha256: String = "",
+    val runtime: String = "litert_interpreter",
+    val outputTypes: List<String> = emptyList(),
+    val bundleType: String? = null,
+    val executedComponents: List<String> = emptyList(),
+    val endpoint: String? = null
 )
 
 sealed interface InferenceResult {

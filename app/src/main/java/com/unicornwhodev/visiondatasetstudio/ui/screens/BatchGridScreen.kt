@@ -93,17 +93,17 @@ fun BatchGridScreen(viewModel: MainViewModel) {
                 IconButton(onClick = { batchMenu = true }, enabled = !busy) { Icon(Icons.Default.History, "Choisir un lot") }
                 DropdownMenu(expanded = batchMenu, onDismissRequest = { batchMenu = false }) {
                     batches.forEach { b -> DropdownMenuItem(text = { Text("Lot ${b.batchNumber} · ${b.totalCases} cas · ${b.status}") }, enabled = !busy, onClick = { viewModel.loadBatch(b.batchNumber); batchMenu = false }) }
-                    if (batches.isEmpty()) DropdownMenuItem(text = { Text("Aucun lot acquis") }, onClick = { batchMenu = false })
+                    if (batches.isEmpty()) DropdownMenuItem(text = { Text(stringResource(R.string.batch_none)) }, onClick = { batchMenu = false })
                 }
             }
             Box {
                 IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "Actions du lot") }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                    DropdownMenuItem(text = { Text("Réessayer les téléchargements") }, enabled = !busy, onClick = { menu = false; viewModel.fetchAndPrepareBatch(batchNumber) })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.batch_retry_downloads)) }, enabled = !busy, onClick = { menu = false; viewModel.fetchAndPrepareBatch(batchNumber) })
                     DropdownMenuItem(text = { Text(if(annotationModelCompatible) "Préannoter le lot…" else "Modèle incompatible avec les tâches") }, enabled = !busy && annotationModelCompatible && (project?.modelPath != null || project?.modelConfigJson?.contains("local_http") == true) && samples.any { StudioWorkflow.isPending(it.annotationStatus) }, onClick = { menu = false; confirmInference = true })
-                    DropdownMenuItem(text = { Text("Exclure les acquisitions en échec…") }, enabled = !busy && samples.any { it.acquisitionStatus.startsWith("ERROR") }, onClick = { menu = false; rejectErrors = true })
-                    DropdownMenuItem(text = { Text("Préparer le lot suivant") }, enabled = !busy, onClick = { menu = false; viewModel.nextBatch() })
-                    DropdownMenuItem(text = { Text("Sélectionner les cas modifiables affichés") }, onClick = {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.batch_exclude_failures)) }, enabled = !busy && samples.any { it.acquisitionStatus.startsWith("ERROR") }, onClick = { menu = false; rejectErrors = true })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.publication_next_batch)) }, enabled = !busy, onClick = { menu = false; viewModel.nextBatch() })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.batch_select_editable)) }, onClick = {
                         selected = filtered.filter { StudioWorkflow.canEdit(it.acquisitionStatus, it.syncStatus, it.localImagePath != null) }.map { it.sampleId }.toSet(); menu = false
                     })
                     DropdownMenuItem(text = { Text(if(priority) "Trier par ordre source" else "Prioriser erreurs et révisions") }, onClick = { priority = !priority; menu = false })
@@ -115,8 +115,8 @@ fun BatchGridScreen(viewModel: MainViewModel) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 IconButton(onClick = { selected = emptySet() }) { Icon(Icons.Default.Close, "Annuler la sélection") }
                 Text("${selected.size}", style = MaterialTheme.typography.titleMedium)
-                OutlinedButton(onClick = { actionDialog = "defer" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text("Différer") }
-                Button(onClick = { actionDialog = "tag" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text("Ajouter tag") }
+                OutlinedButton(onClick = { actionDialog = "defer" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.batch_defer)) }
+                Button(onClick = { actionDialog = "tag" }, enabled = !busy, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.batch_add_tag)) }
             }
         }
     }) { inset ->
@@ -158,20 +158,20 @@ fun BatchGridScreen(viewModel: MainViewModel) {
             }
         }
     }
-    if (confirmInference) AlertDialog(onDismissRequest = { confirmInference = false }, title = { Text("Préannoter ?") },
-        text = { Text("Le modèle traitera une image à la fois, parmi les cas à traiter. Vos corrections et les cas validés, différés ou rejetés seront conservés. Aucune proposition ne sera validée automatiquement. Gardez l’application ouverte.") },
-        confirmButton = { Button(onClick = { confirmInference = false; viewModel.preannotateActiveBatch() }) { Text("Lancer") } }, dismissButton = { TextButton(onClick = { confirmInference = false }) { Text("Annuler") } })
-    if (rejectErrors) AlertDialog(onDismissRequest = { rejectErrors = false }, title = { Text("Rejeter les échecs ?") },
-        text = { Text("Les images non récupérées seront exclues du corpus, avec leur motif d’échec conservé. Cette action ne corrige pas les fichiers et ne valide aucune image.") },
-        confirmButton = { Button(onClick = { rejectErrors = false; viewModel.rejectFailedAcquisitions() }) { Text("Exclure ces cas") } }, dismissButton = { TextButton(onClick = { rejectErrors = false }) { Text("Annuler") } })
+    if (confirmInference) AlertDialog(onDismissRequest = { confirmInference = false }, title = { Text(stringResource(R.string.batch_preannotate_title)) },
+        text = { Text(stringResource(R.string.batch_preannotate_body)) },
+        confirmButton = { Button(onClick = { confirmInference = false; viewModel.preannotateActiveBatch() }) { Text(stringResource(R.string.batch_run)) } }, dismissButton = { TextButton(onClick = { confirmInference = false }) { Text(stringResource(R.string.common_cancel)) } })
+    if (rejectErrors) AlertDialog(onDismissRequest = { rejectErrors = false }, title = { Text(stringResource(R.string.batch_reject_failures)) },
+        text = { Text(stringResource(R.string.batch_reject_failures_body)) },
+        confirmButton = { Button(onClick = { rejectErrors = false; viewModel.rejectFailedAcquisitions() }) { Text(stringResource(R.string.batch_exclude_cases)) } }, dismissButton = { TextButton(onClick = { rejectErrors = false }) { Text(stringResource(R.string.common_cancel)) } })
     if (actionDialog != null) AlertDialog(onDismissRequest = { actionDialog = null }, title = { Text(if (actionDialog == "tag") "Ajouter un tag à ${selected.size} cas" else "Différer ${selected.size} cas") }, text = {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("L’action ne touche que les cas sélectionnés et modifiables. Aucune image ne sera validée automatiquement.")
-            if (actionDialog == "tag") OutlinedTextField(tag, { tag = it }, label = { Text("Tag à ajouter") }, singleLine = true)
+            Text(stringResource(R.string.batch_bulk_body))
+            if (actionDialog == "tag") OutlinedTextField(tag, { tag = it }, label = { Text(stringResource(R.string.batch_tag_to_add)) }, singleLine = true)
         }
     }, confirmButton = { Button(enabled = actionDialog != "tag" || tag.isNotBlank(), onClick = {
         viewModel.bulkAction(selected, actionDialog ?: "defer", tag); actionDialog = null; selected = emptySet(); tag = ""
-    }) { Text("Appliquer") } }, dismissButton = { TextButton(onClick = { actionDialog = null }) { Text("Annuler") } })
+    }) { Text(stringResource(R.string.common_apply)) } }, dismissButton = { TextButton(onClick = { actionDialog = null }) { Text(stringResource(R.string.common_cancel)) } })
 }
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -45,17 +45,8 @@ class LocalModelClient {
                 val target=if(selected is String) any.fromJson(selected) else selected
                 val adapter=moshi.adapter<List<ModelProposal>>(Types.newParameterizedType(List::class.java,ModelProposal::class.java)).failOnUnknown()
                 val proposals=adapter.fromJsonValue(target) ?: error("Tableau de propositions attendu")
-                require(proposals.size<=1000)
-                proposals.forEach { p ->
-                    require(p.type in ModelContract.outputTypes(c)) { "Type de proposition non déclaré dans la tâche du contrat" }
-                    if(p.type in setOf("point","box","tag","count"))require(p.label.isNotBlank())
-                    if(p.type in setOf("caption","vqa"))require(p.text.isNotBlank())
-                    if(p.type=="vqa")require(p.question.isNotBlank())
-                    require(p.score.isFinite() && p.score in 0f..1f && p.text.length<=32_000 && p.question.length<=8000 && p.count>=0)
-                    if(p.type=="point") require(p.pointX.isFinite() && p.pointY.isFinite() && p.pointX in 0f..1f && p.pointY in 0f..1f)
-                    if(p.type=="box") require(listOf(p.xmin,p.ymin,p.xmax,p.ymax).all{it.isFinite() && it in 0f..1f} && p.xmax>p.xmin && p.ymax>p.ymin)
-                }
-                proposals.filter{it.score>=c.threshold}.map{it.copy(source=provenance)}
+                GroundingProposalContract.validateAndFilter(proposals,ModelContract.outputTypes(c),c.threshold)
+                    .map{it.copy(source=provenance)}
             }
         }
     }

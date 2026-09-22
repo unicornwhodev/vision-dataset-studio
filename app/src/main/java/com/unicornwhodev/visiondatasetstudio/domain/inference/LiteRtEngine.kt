@@ -72,7 +72,10 @@ class LiteRtEngine : AutoCloseable {
             outputShapes=lastOutputShapes,threshold=config.threshold,proposalCount=proposals.size,
             emptyReason=if(proposals.isEmpty() && lastError==null) (lastNote.ifBlank { "Aucune proposition au-dessus du seuil" }) else null,error=lastError,
             inputLayout=config.inputLayout,inputDtype=lastInputDtype.ifBlank{config.inputType},outputIndices=lastOutputIndices,
-            outputDtypes=lastOutputDtypes,nativeDurationNanos=lastNativeDurationNanos,configSha256=configHash)
+            outputDtypes=lastOutputDtypes,nativeDurationNanos=lastNativeDurationNanos,configSha256=configHash,
+            runtime=config.runtime,outputTypes=proposals.map{it.type}.distinct(),bundleType=config.bundleKind.takeIf(String::isNotBlank),
+            executedComponents=when(config.bundleKind){"tinyclip"->listOf("image_encoder");"efficientvit_sam"->listOf("image_encoder","prompt_encoder","mask_decoder");"florence2"->listOf("image_encoder","text_decoder");else->emptyList()},
+            endpoint=config.endpoint.takeIf{config.runtime=="local_http"}?.let{java.net.URI(it).let{uri->"${uri.scheme}://${uri.host}:${uri.port}${uri.path}"}})
         return when {
             lastError!=null -> InferenceResult.Failure(requireNotNull(lastError),diagnostics)
             proposals.isEmpty() -> InferenceResult.Empty(diagnostics.emptyReason!!,diagnostics)
@@ -82,13 +85,16 @@ class LiteRtEngine : AutoCloseable {
     private suspend fun runInferenceProposals(bitmap:Bitmap,config:ModelConfig):List<ModelProposal> = withContext(Dispatchers.Default) {
         lastError=null;lastNativeDurationNanos=null;lastNote="";lastEmbedding=null;lastPatches=null;lastTransform=null
         lastInputShape=emptyList();lastInputDtype="";lastOutputShapes=emptyList();lastOutputIndices=emptyList();lastOutputDtypes=emptyList()
+        val started=System.nanoTime()
         try {
             ModelContract.validate(config)
             embeddingSpaceHash=AdaptiveCorrection.hash(modelHash+config.toString())
-            if(config.runtime=="local_http") return@withContext localClient.run(bitmap,config)
+            if(config.runtime=="local_http") return@withContext localClient.run(bitmap,config).also{lastNativeDurationNanos=System.nanoTime()-started;lastInputShape=listOf(bitmap.height,bitmap.width,3);lastInputDtype="image"}
             if(config.bundleKind.isNotBlank()) {
                 val runtime=requireNotNull(bundle){"Bundle non chargé"};require(runtime.manifest.kind==config.bundleKind)
                 val result=runtime.run(bitmap,config);lastEmbedding=runtime.embedding;lastNote=runtime.note
+                lastNativeDurationNanos=System.nanoTime()-started;lastInputShape=listOf(1,config.inputHeight,config.inputWidth,config.inputChannels);lastInputDtype=config.inputType
+                lastOutputDtypes=result.map{"proposal:${it.type}"}.distinct()
                 return@withContext result.map{it.copy(source="model_litert:$modelHash:${config.bundleKind}")}
             }
             synchronized(lock) {
@@ -109,6 +115,8 @@ class LiteRtEngine : AutoCloseable {
                         } catch(e:Throwable) { session.close();throw e }
                     }
                     val tensors=trainingSession!!.infer(bitmap).mapIndexed{i,v->i to v}.toMap()
+                    lastInputShape=if(config.inputLayout=="NHWC")listOf(1,config.inputHeight,config.inputWidth,config.inputChannels)else listOf(1,config.inputChannels,config.inputHeight,config.inputWidth)
+                    lastInputDtype=config.inputType;lastOutputIndices=tensors.keys.sorted();lastOutputShapes=lastOutputIndices.map{tensors.getValue(it).shape};lastOutputDtypes=lastOutputIndices.map{"FLOAT32"};lastNativeDurationNanos=System.nanoTime()-started
                     val transform=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config),config.cropFraction)
                     return@synchronized ModelAdapters.decode(tensors,config.signatureConfig(),transform).map{it.copy(source="model_litert:$modelHash:trained")}
                 }

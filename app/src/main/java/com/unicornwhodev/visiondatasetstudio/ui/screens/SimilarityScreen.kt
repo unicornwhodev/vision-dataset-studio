@@ -22,7 +22,7 @@ import java.io.File
     val rows by vm.similarImages.collectAsState()
     Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_similarity),stringResource(R.string.subtitle_same_model),onBack=vm::back)}){inset->
         LazyColumn(Modifier.fillMaxSize().padding(inset),contentPadding=PaddingValues(16.dp)) {
-            if(rows.isEmpty())item{Text("Aucune autre représentation disponible. Prétraitez le lot avec le même encodeur.",style=MaterialTheme.typography.bodyMedium)}
+            if(rows.isEmpty())item{Text(stringResource(R.string.similarity_empty),style=MaterialTheme.typography.bodyMedium)}
             items(rows,key={it.first.sampleId}){(sample,score)->
                 Row(Modifier.fillMaxWidth().clickable{vm.openSampleInEditor(sample.sampleId)}.padding(vertical=8.dp),verticalAlignment=Alignment.CenterVertically){
                     AsyncImage(sample.localImagePath?.let(::File),null,Modifier.size(96.dp,72.dp),contentScale=ContentScale.Fit)

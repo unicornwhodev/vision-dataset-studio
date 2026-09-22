@@ -19,6 +19,25 @@ class MoshiV4Test {
         val a=StudioJson.moshi.adapter(SampleAnnotations::class.java).fromJson("{\"points\":[{\"id\":\"p\",\"x\":0.1,\"y\":0.2,\"label\":\"object\"}]}")!!
         assertFalse(a.points.single().isHumanVerified);assertFalse(a.points.single().explicitlyAdjusted)
     }
+    @Test fun pointingMultiKeepsFourPerTargetStatesAndLegacyBooleans() {
+        val points=PointLocalizationState.entries.mapIndexed{i,state->PointTarget("p$i",.1f*i,.2f,"object",localizationState=state,isAbsent=state==PointLocalizationState.ABSENT,isAbstained=state in setOf(PointLocalizationState.UNLOCALIZABLE,PointLocalizationState.UNCERTAIN))}
+        val adapter=StudioJson.moshi.adapter(SampleAnnotations::class.java)
+        val restored=adapter.fromJson(adapter.toJson(SampleAnnotations(points=points)))!!
+        assertEquals(PointLocalizationState.entries,restored.points.map{it.effectiveLocalizationState})
+        val legacy=adapter.fromJson("{\"points\":[{\"id\":\"a\",\"x\":0.0,\"y\":0.0,\"label\":\"x\",\"isAbsent\":true},{\"id\":\"u\",\"x\":0.0,\"y\":0.0,\"label\":\"x\",\"isAbstained\":true}]}")!!
+        assertEquals(listOf(PointLocalizationState.ABSENT,PointLocalizationState.UNLOCALIZABLE),legacy.points.map{it.effectiveLocalizationState})
+    }
+    @Test fun canonicalSampleKeepsFourPointStatesThroughExportJson() {
+        val states=PointLocalizationState.entries
+        val annotations=SampleAnnotations(points=states.mapIndexed{i,state->PointTarget("p$i",.1f*i,.2f,"object").withLocalizationState(state)})
+        val sample=CanonicalDatasetSample("sample","asset","local","revision","","train",0,null,"train",CanonicalMediaInfo("image.jpg",10,10,"image/jpeg","sha",null,null),annotations,"VALIDATED",CanonicalAuditInfo(1,2,"human",false))
+        val adapter=StudioJson.moshi.adapter(CanonicalDatasetSample::class.java)
+        val exported=createTempFile(suffix=".jsonl")
+        exported.writeText(adapter.toJson(sample)+"\n")
+        val restored=adapter.fromJson(exported.useLines{it.single()})!!
+        exported.delete()
+        assertEquals(states,restored.annotations.points.map{it.effectiveLocalizationState})
+    }
     @Test fun contractRejectsUnknownKeys() {
         assertThrows(com.squareup.moshi.JsonDataException::class.java) { StudioJson.moshi.adapter(ModelConfig::class.java).failOnUnknown().fromJson("{\"unimplemented_runtime_switch\":true}") }
     }

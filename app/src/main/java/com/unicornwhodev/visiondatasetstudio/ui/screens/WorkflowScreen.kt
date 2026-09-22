@@ -36,8 +36,8 @@ fun WorkflowScreen(vm:MainViewModel) {
                         Text(template.title,style=MaterialTheme.typography.titleSmall)
                     }
                 }
-                OutlinedTextField(instructions,{instructions=it.take(8000)},label={Text("Consignes de l’agent · facultatif")},modifier=Modifier.fillMaxWidth(),minLines=2,maxLines=4)
-                StudioAction(if(run==null)"Préparer" else "Repartir du template",{vm.startWorkflow(selected,instructions)},enabled=!busy,icon=Icons.Default.AccountTree)
+                OutlinedTextField(instructions,{instructions=it.take(8000)},label={Text(stringResource(R.string.workflow_optional_instructions))},modifier=Modifier.fillMaxWidth(),minLines=2,maxLines=4)
+                StudioAction(if(run==null)stringResource(R.string.workflow_prepare) else "Repartir du template",{vm.startWorkflow(selected,instructions)},enabled=!busy,icon=Icons.Default.AccountTree)
                 run?.takeIf { it.projectId==project && it.batchNumber==batch }?.let { state ->
                     HorizontalDivider()
                     val template=WorkflowTools.template(state.template)
@@ -48,17 +48,17 @@ fun WorkflowScreen(vm:MainViewModel) {
                         }
                     }
                     if(state.message.isNotBlank())Text(state.message,style=MaterialTheme.typography.bodySmall,color=if(state.phase=="failed")MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
-                    if(state.phase!="completed")StudioAction("Continuer",vm::resumeWorkflow,primary=true,enabled=!busy,icon=Icons.Default.PlayArrow)
+                    if(state.phase!="completed")StudioAction(stringResource(R.string.common_continue),vm::resumeWorkflow,primary=true,enabled=!busy,icon=Icons.Default.PlayArrow)
                     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                        TextButton(onClick={vm.navigateTo(Screen.BatchGrid)},enabled=!busy) { Text("Corriger") }
-                        TextButton(onClick={vm.navigateTo(Screen.Publication)},enabled=!busy) { Text("Export") }
-                        TextButton(onClick={vm.navigateTo(Screen.Training)},enabled=!busy) { Text("Apprentissage") }
+                        TextButton(onClick={vm.navigateTo(Screen.BatchGrid)},enabled=!busy) { Text(stringResource(R.string.workflow_review)) }
+                        TextButton(onClick={vm.navigateTo(Screen.Publication)},enabled=!busy) { Text(stringResource(R.string.common_export)) }
+                        TextButton(onClick={vm.navigateTo(Screen.Training)},enabled=!busy) { Text(stringResource(R.string.common_training)) }
                     }
                 }
-                StudioDisclosure("Agent local facultatif",Icons.Default.SmartToy) {
-                    OutlinedTextField(endpoint,{endpoint=it},label={Text("Serveur sur cet appareil")},modifier=Modifier.fillMaxWidth(),singleLine=true)
-                    Text("Envoie uniquement les consignes et les nombres de cas. Le serveur est fourni séparément.",style=MaterialTheme.typography.bodySmall)
-                    StudioAction("Proposer un workflow",{vm.askLocalWorkflowAgent(endpoint,instructions)},enabled=!busy)
+                StudioDisclosure(stringResource(R.string.workflow_local_agent),Icons.Default.SmartToy) {
+                    OutlinedTextField(endpoint,{endpoint=it},label={Text(stringResource(R.string.workflow_server))},modifier=Modifier.fillMaxWidth(),singleLine=true)
+                    Text(stringResource(R.string.workflow_privacy),style=MaterialTheme.typography.bodySmall)
+                    StudioAction(stringResource(R.string.workflow_propose),{vm.askLocalWorkflowAgent(endpoint,instructions)},enabled=!busy)
                     choice?.let { plan ->
                         Text(plan.reason,style=MaterialTheme.typography.bodySmall)
                         TextButton(onClick={selected=plan.template;vm.startWorkflow(plan.template,instructions)},enabled=!busy) { Text("Utiliser ${WorkflowTools.template(plan.template).title}") }

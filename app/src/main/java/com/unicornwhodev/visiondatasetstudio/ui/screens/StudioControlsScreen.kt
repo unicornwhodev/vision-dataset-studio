@@ -77,36 +77,36 @@ fun StudioControlsScreen(vm:MainViewModel) {
             Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(20.dp)) {
                 when(tab) {
                     0 -> {
-                        StudioSection("Mes projets","Chaque projet conserve sa source, son curseur, ses lots, annotations et preuves de copie. Le token HF et la bibliothèque de modèles restent communs à l’appareil.",Icons.Default.FolderOpen) {
+                        StudioSection(stringResource(R.string.controls_projects),"Chaque projet conserve sa source, son curseur, ses lots, annotations et preuves de copie. Le token HF et la bibliothèque de modèles restent communs à l’appareil.",Icons.Default.FolderOpen) {
                             allProjects.forEach { item ->
                                 OutlinedButton(onClick={vm.selectProject(item.id)},enabled=!busy && item.id!=p.id,modifier=Modifier.fillMaxWidth()) {
                                     Icon(if(item.id==p.id)Icons.Default.CheckCircle else Icons.Default.Folder,null);Spacer(Modifier.width(8.dp));Text(item.name,Modifier.weight(1f))
                                 }
                             }
-                            OutlinedTextField(newName,{newName=it},label={Text("Nom du nouveau projet")},singleLine=true,modifier=Modifier.fillMaxWidth())
-                            Button(onClick={vm.createProject(newName);newName=""},enabled=!busy && newName.isNotBlank()){Text("Créer un projet")}
-                            OutlinedButton(onClick={vm.navigateTo(Screen.Setup)},enabled=!busy){Text("Configurer")}
+                            OutlinedTextField(newName,{newName=it},label={Text(stringResource(R.string.controls_new_project_name))},singleLine=true,modifier=Modifier.fillMaxWidth())
+                            Button(onClick={vm.createProject(newName);newName=""},enabled=!busy && newName.isNotBlank()){Text(stringResource(R.string.controls_create_project))}
+                            OutlinedButton(onClick={vm.navigateTo(Screen.Setup)},enabled=!busy){Text(stringResource(R.string.common_configure))}
                             HorizontalDivider()
                             Text("Données locales",style=MaterialTheme.typography.titleSmall)
-                            OutlinedButton(onClick={destructiveAction="batch"},enabled=!busy){Text("Réinitialiser le lot courant…")}
-                            OutlinedButton(onClick={destructiveAction="project"},enabled=!busy){Text("Réinitialiser le projet…")}
-                            TextButton(onClick={destructiveAction="delete"},enabled=!busy,colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)){Text("Supprimer le projet…")}
+                            OutlinedButton(onClick={destructiveAction="batch"},enabled=!busy){Text(stringResource(R.string.controls_reset_batch))}
+                            OutlinedButton(onClick={destructiveAction="project"},enabled=!busy){Text(stringResource(R.string.controls_reset_project))}
+                            TextButton(onClick={destructiveAction="delete"},enabled=!busy,colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)){Text(stringResource(R.string.controls_delete_project))}
                         }
-                        StudioSection("Presets","Un pack configure les tâches, classes, taille de lot et contrat modèle. Il exclut les poids, le jeton HF du coffre, le corpus et ses emplacements. Le contrat, le prompt et le corps JSON personnalisé sont inclus : retirez tout secret avant partage.",Icons.Default.Inventory2) {
-                            Button(onClick={packIn.launch(arrayOf("application/json","text/*","application/octet-stream"))},enabled=!busy){Text("Importer un preset")}
-                            OutlinedButton(onClick={packOut.launch("studio-preset.json")},enabled=!busy){Text("Exporter le preset")}
+                        StudioSection(stringResource(R.string.controls_presets),"Un pack configure les tâches, classes, taille de lot et contrat modèle. Il exclut les poids, le jeton HF du coffre, le corpus et ses emplacements. Le contrat, le prompt et le corps JSON personnalisé sont inclus : retirez tout secret avant partage.",Icons.Default.Inventory2) {
+                            Button(onClick={packIn.launch(arrayOf("application/json","text/*","application/octet-stream"))},enabled=!busy){Text(stringResource(R.string.controls_import_preset))}
+                            OutlinedButton(onClick={packOut.launch("studio-preset.json")},enabled=!busy){Text(stringResource(R.string.controls_export_preset))}
                             StudioDetails("Chaque projet peut utiliser son propre pack de tâches et de classes. Sélectionnez séparément les modèles que vous êtes autorisé à utiliser.", style =MaterialTheme.typography.bodyMedium)
                         }
                     }
                     1 -> {
-                        StudioSection("Source et sélection","Enregistrez les réglages avant d’indexer. Après le premier lot, changer de source ou de filtre exige un nouveau projet.",Icons.Default.CloudDownload) {
+                        StudioSection(stringResource(R.string.controls_source_selection),"Enregistrez les réglages avant d’indexer. Après le premier lot, changer de source ou de filtre exige un nouveau projet.",Icons.Default.CloudDownload) {
                             FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                                 listOf("HF_VIEWER" to "HF Viewer","HF_MANIFEST" to "JSONL sur HF","LOCAL_INDEX" to "Local").forEach{(value,label)->
                                     FilterChip(selected=policy.sourceMode==value,onClick={policy=policy.copy(sourceMode=value)},enabled=!busy,label={Text(label)})
                                 }
                             }
                             Text("Source HF : ${p.hfSourceRepo.ifBlank { "non configurée" }}",style=MaterialTheme.typography.bodyMedium)
-                            TextButton(onClick={vm.navigateTo(Screen.Setup)},enabled=!busy){Text("Configurer la source")}
+                            TextButton(onClick={vm.navigateTo(Screen.Setup)},enabled=!busy){Text(stringResource(R.string.controls_configure_source))}
                             if(policy.sourceMode=="HF_VIEWER") {
                                 ControlField("Filtre HF (where), facultatif",policy.filterExpression){policy=policy.copy(filterExpression=it)}
                                 ControlField("Ordre HF (orderby), facultatif",policy.orderBy){policy=policy.copy(orderBy=it)}
@@ -114,32 +114,32 @@ fun StudioControlsScreen(vm:MainViewModel) {
                             } else if(policy.sourceMode=="HF_MANIFEST") {
                                 ControlField("Révision source : branche ou SHA",policy.sourceRevision){policy=policy.copy(sourceRevision=it)}
                                 ControlField("Chemin du JSONL dans le dépôt",policy.manifestPath){policy=policy.copy(manifestPath=it)}
-                                Button(onClick=vm::fetchHfManifest,enabled=!busy && stored.sourceMode=="HF_MANIFEST"){Text("Indexer le manifeste")}
+                                Button(onClick=vm::fetchHfManifest,enabled=!busy && stored.sourceMode=="HF_MANIFEST"){Text(stringResource(R.string.controls_index_manifest))}
                                 if(stored.resolvedSourceRevision!=null) SelectionContainer { Text("Révision résolue : ${stored.resolvedSourceRevision}",style=MaterialTheme.typography.bodySmall) }
                             } else {
-                                OutlinedButton(onClick={folder.launch(null)},enabled=!busy && stored.sourceMode=="LOCAL_INDEX"){Text("Choisir un dossier")}
-                                OutlinedButton(onClick={manifestFolder.launch(null)},enabled=!busy && stored.sourceMode=="LOCAL_INDEX"){Text("Dossier du manifeste")}
-                                Button(onClick={manifest.launch(arrayOf("application/json","application/x-ndjson","text/*","application/octet-stream"))},enabled=!busy && stored.sourceMode=="LOCAL_INDEX"){Text("Importer le JSONL")}
+                                OutlinedButton(onClick={folder.launch(null)},enabled=!busy && stored.sourceMode=="LOCAL_INDEX"){Text(stringResource(R.string.setup_choose_folder))}
+                                OutlinedButton(onClick={manifestFolder.launch(null)},enabled=!busy && stored.sourceMode=="LOCAL_INDEX"){Text(stringResource(R.string.controls_manifest_folder))}
+                                Button(onClick={manifest.launch(arrayOf("application/json","application/x-ndjson","text/*","application/octet-stream"))},enabled=!busy && stored.sourceMode=="LOCAL_INDEX"){Text(stringResource(R.string.controls_import_jsonl))}
                                 StudioDetails("Le dossier source n’est jamais modifié. Les chemins relatifs du JSONL sont résolus à partir du dossier choisi; les URL HTTPS sont également acceptées.", style =MaterialTheme.typography.bodySmall)
                             }
                             ControlField("Colonne identifiant",idColumn){idColumn=it}
                             ControlSwitch("Importer les brouillons",policy.importAnnotations){policy=policy.copy(importAnnotations=it)}
                             Text(if(stored.sourceIndexReady)"Index prêt · ${stored.localSourceLabel}" else "Index local non préparé (inutile en mode Viewer)",style=MaterialTheme.typography.labelMedium)
                         }
-                        StudioSection("Collaboration","Évite que plusieurs personnes téléchargent et traitent les mêmes cas. Les réservations sont stockées dans le dépôt HF de destination et expirent si un appareil est abandonné.",Icons.Default.Groups) {
+                        StudioSection(stringResource(R.string.controls_collaboration),"Évite que plusieurs personnes téléchargent et traitent les mêmes cas. Les réservations sont stockées dans le dépôt HF de destination et expirent si un appareil est abandonné.",Icons.Default.Groups) {
                             ControlSwitch("Activer les réservations partagées",policy.collaborationEnabled){ enabled ->
                                 if(enabled && (policy.sourceMode=="LOCAL_INDEX" || p.hfDestRepo.isBlank())) vm.reportError("Le travail partagé exige une source HF et un dépôt HF de destination")
                                 else policy=policy.copy(collaborationEnabled=enabled)
                             }
                             if(policy.collaborationEnabled) {
                                 ControlField("Identifiant local",workerId){workerId=it;policy=policy.copy(collaborationWorkerId=it.trim())}
-                                TextButton(onClick={ val id="worker-"+java.util.UUID.randomUUID().toString().take(8);workerId=id;policy=policy.copy(collaborationWorkerId=id) }){Text("Générer")}
+                                TextButton(onClick={ val id="worker-"+java.util.UUID.randomUUID().toString().take(8);workerId=id;policy=policy.copy(collaborationWorkerId=id) }){Text(stringResource(R.string.controls_generate))}
                                 ControlField("Bail (minutes)",leaseText,true){leaseText=it;policy=policy.copy(claimLeaseMinutes=it.toIntOrNull() ?: -1)}
                                 StudioDetails("Au prochain lot, l’app ignore les cas marqués DONE ou CLAIMED par un autre collaborateur avant de télécharger leurs images. Les réservations utilisent un commit parent HF : un conflit force une relecture avant nouvelle tentative.", style =MaterialTheme.typography.bodySmall)
                                 Text("Coordination : ${p.hfDestRepo.ifBlank { "destination HF à configurer" }} · branche ${policy.destBranch}",style=MaterialTheme.typography.labelMedium)
                             }
                         }
-                        StudioSection("Lots et réseau","La taille du lot d’annotation est indépendante de la pagination HTTP et du nombre d’images inférées simultanément.",Icons.Default.Layers) {
+                        StudioSection(stringResource(R.string.controls_batches_network),"La taille du lot d’annotation est indépendante de la pagination HTTP et du nombre d’images inférées simultanément.",Icons.Default.Layers) {
                             FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)){listOf(25,50,100,250,500,1000).forEach{n->FilterChip(selected=batchText==n.toString(),onClick={batchText=n.toString()},label={Text("$n")})}}
                             ControlField("Cas par lot · 1 à 1 000",batchText,true){batchText=it}
                             ControlInt("Téléchargements simultanés · 1 à 4",policy.downloadConcurrency){policy=policy.copy(downloadConcurrency=it)}
@@ -154,7 +154,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
                         }
                     }
                     2 -> {
-                        StudioSection("Stockage borné","Les budgets s’appliquent à l’espace utilisé par cette application, modèles et exports compris. Les sources sélectionnées restent en lecture seule.",Icons.Default.Storage) {
+                        StudioSection(stringResource(R.string.controls_bounded_storage),"Les budgets s’appliquent à l’espace utilisé par cette application, modèles et exports compris. Les sources sélectionnées restent en lecture seule.",Icons.Default.Storage) {
                             ControlField("Budget de l’application, Mio · 128 à 65 536",budget,true){budget=it}
                             ControlInt("Espace libre à conserver, Mio · 32 à 4 096",policy.reserveFreeMb){policy=policy.copy(reserveFreeMb=it)}
                             ControlInt("Taille maximale d’une image, Mio · 1 à 256",policy.maxImageMb){policy=policy.copy(maxImageMb=it)}
@@ -164,7 +164,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
                             StudioDetails("La normalisation ne redimensionne pas l’image, mais la réencode; les deux hashes et la transformation sont conservés. Une rotation avec annotations importées ambiguës ou plus de 8 mégapixels est refusée. La copie source reste intacte.", style =MaterialTheme.typography.bodySmall)
                             StudioDetails("Une archive externe est relue et comparée avant de clôturer un lot local. La purge reste explicite. Conserver les lots peut finir par épuiser le budget.", style =MaterialTheme.typography.bodyMedium)
                         }
-                        StudioSection("Publication Hugging Face","Destination : ${p.hfDestRepo.ifBlank{"non configurée — export local disponible"}}",Icons.Default.CloudUpload) {
+                        StudioSection(stringResource(R.string.controls_hf_publication),"Destination : ${p.hfDestRepo.ifBlank{"non configurée — export local disponible"}}",Icons.Default.CloudUpload) {
                             ControlField("Branche de destination existante",policy.destBranch){policy=policy.copy(destBranch=it)}
                             ControlField("Préfixe de publication",policy.destPrefix){policy=policy.copy(destPrefix=it)}
                             ControlField("Split de sortie",split){split=it}
@@ -173,7 +173,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
                             ControlSwitch("Ajouter la projection YOLO",policy.hfYolo){policy=policy.copy(hfYolo=it)}
                             ControlSwitch("Ajouter les instructions vision-language",policy.hfVl){policy=policy.copy(hfVl=it)}
                             StudioDetails("Images et JSONL canonique restent obligatoires. Les fichiers sont isolés par projet et lot sous le préfixe. Aucun fichier du dépôt source n’est supprimé; pas de miroir destructif ni de suppression distante.", style =MaterialTheme.typography.bodyMedium)
-                            TextButton(onClick={vm.navigateTo(Screen.Publication)},enabled=!busy){Text("Ouvrir les exports et preuves de copie")}
+                            TextButton(onClick={vm.navigateTo(Screen.Publication)},enabled=!busy){Text(stringResource(R.string.controls_open_exports))}
                         }
                         SaveControlsButton(busy) {
                             val batch=batchText.toIntOrNull();val mb=budget.toLongOrNull()
@@ -181,72 +181,72 @@ fun StudioControlsScreen(vm:MainViewModel) {
                         }
                     }
                     3 -> {
-                        StudioSection("Bibliothèque de modèles","Le sélecteur principal est maintenant séparé des réglages avancés : catalogue UWD réellement disponible, modèles installés et import manuel.",Icons.Default.Memory) {
-                            Button(onClick={vm.navigateTo(Screen.Models)},enabled=!busy){Text("Ouvrir la bibliothèque de modèles")}
+                        StudioSection(stringResource(R.string.controls_model_library),"Le sélecteur principal est maintenant séparé des réglages avancés : catalogue UWD réellement disponible, modèles installés et import manuel.",Icons.Default.Memory) {
+                            Button(onClick={vm.navigateTo(Screen.Models)},enabled=!busy){Text(stringResource(R.string.controls_open_models))}
                             Text("Cette page conserve les outils avancés de contrat, diagnostic et correction adaptative.",style=MaterialTheme.typography.bodySmall)
                         }
-                        StudioSection("Catalogue public téléchargeable","Profils TensorFlow avec métadonnées. Les tenseurs, labels et normalisations sont vérifiés à l’import; un essai sur image reste nécessaire. Aucun poids n’est inclus dans l’APK.",Icons.Default.Download) {
+                        StudioSection(stringResource(R.string.controls_public_catalog),"Profils TensorFlow avec métadonnées. Les tenseurs, labels et normalisations sont vérifiés à l’import; un essai sur image reste nécessaire. Aucun poids n’est inclus dans l’APK.",Icons.Default.Download) {
                             PublicModelCatalog.entries.forEach { item ->
                                 Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
                                     Text(item.title,style=MaterialTheme.typography.titleSmall)
                                     Text(item.purpose,style=MaterialTheme.typography.bodySmall)
-                                    OutlinedButton(onClick={catalogChoice=item},enabled=!busy) { Text("Télécharger et inspecter…") }
+                                    OutlinedButton(onClick={catalogChoice=item},enabled=!busy) { Text(stringResource(R.string.controls_download_inspect)) }
                                 }
                             }
                         }
-                        StudioSection("Bibliothèque de modèles","Poids locaux et profils d’appel sont sélectionnés explicitement. Importer des poids ne lance ni inférence ni validation.",Icons.Default.Memory) {
+                        StudioSection(stringResource(R.string.controls_model_library),"Poids locaux et profils d’appel sont sélectionnés explicitement. Importer des poids ne lance ni inférence ni validation.",Icons.Default.Memory) {
                             Text("Poids actifs : ${p.modelPath?.substringAfterLast('/') ?: "aucun"}",style=MaterialTheme.typography.labelLarge)
-                            Button(onClick={weights.launch(arrayOf("application/octet-stream","*/*"))},enabled=!busy){Text("Importer un fichier .tflite")}
+                            Button(onClick={weights.launch(arrayOf("application/octet-stream","*/*"))},enabled=!busy){Text(stringResource(R.string.controls_import_tflite))}
                             ControlField("URL HTTPS directe des poids",modelUrl){modelUrl=it}
-                            OutlinedButton(onClick={vm.importModelUrl(modelUrl)},enabled=!busy && modelUrl.startsWith("https://")){Text("Télécharger ces poids")}
-                            OutlinedButton(onClick=vm::detachModel,enabled=!busy){Text("Détacher le modèle de ce projet")}
+                            OutlinedButton(onClick={vm.importModelUrl(modelUrl)},enabled=!busy && modelUrl.startsWith("https://")){Text(stringResource(R.string.controls_download_weights))}
+                            OutlinedButton(onClick=vm::detachModel,enabled=!busy){Text(stringResource(R.string.controls_detach_model))}
                             models.forEach { profile->Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)){
                                 OutlinedButton(onClick={vm.selectModelProfile(profile.id)},enabled=!busy,modifier=Modifier.weight(1f)){Text(profile.name)}
                                 IconButton(onClick={removeProfile=profile.id},enabled=!busy){Icon(Icons.Default.DeleteOutline,"Supprimer le profil ${profile.name}")}
                             } }
                             ControlField("Nom pour sauvegarder ce profil",modelName){modelName=it}
-                            OutlinedButton(onClick={vm.saveActiveModelProfile(modelName)},enabled=!busy && modelName.isNotBlank()){Text("Conserver poids + contrat dans la bibliothèque")}
+                            OutlinedButton(onClick={vm.saveActiveModelProfile(modelName)},enabled=!busy && modelName.isNotBlank()){Text(stringResource(R.string.controls_keep_profile))}
                         }
-                        StudioSection("Contrat et prétraitement","Choisissez un gabarit, puis adaptez-le aux véritables tenseurs du modèle. Un nom de famille de modèles ne garantit pas la compatibilité.",Icons.Default.Tune) {
+                        StudioSection(stringResource(R.string.controls_contract_preprocessing),"Choisissez un gabarit, puis adaptez-le aux véritables tenseurs du modèle. Un nom de famille de modèles ne garantit pas la compatibilité.",Icons.Default.Tune) {
                             FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)){ModelPresets.names.forEach{(id,title)->AssistChip(onClick={contract=configAdapter.toJson(ModelPresets.create(id,p.classesCsv.split(',').map(String::trim)));contractError=null},label={Text(title)},enabled=!busy)}}
                             StudioDetails("Entrées : NHWC/NCHW, RGB/BGR/gris, FLOAT32/UINT8/INT8, normalisation par canal, stretch/letterbox/crop. Sorties : index, layout, coordonnées, activation, seuil, NMS, points issus de boîtes et comptage proposé.", style =MaterialTheme.typography.bodySmall)
-                            OutlinedTextField(contract,{contract=it;contractError=null},label={Text("Contrat JSON versionné")},modifier=Modifier.fillMaxWidth().heightIn(min=240.dp,max=500.dp),textStyle=MaterialTheme.typography.bodySmall.copy(fontFamily=FontFamily.Monospace),isError=contractError!=null)
+                            OutlinedTextField(contract,{contract=it;contractError=null},label={Text(stringResource(R.string.controls_versioned_contract))},modifier=Modifier.fillMaxWidth().heightIn(min=240.dp,max=500.dp),textStyle=MaterialTheme.typography.bodySmall.copy(fontFamily=FontFamily.Monospace),isError=contractError!=null)
                             contractError?.let{Text(it,color=MaterialTheme.colorScheme.error,style=MaterialTheme.typography.bodySmall)}
                             Button(onClick={
                                 try { val c=configAdapter.failOnUnknown().fromJson(contract) ?: error("JSON vide");ModelContract.validate(c);vm.saveModelConfig(contract) }
                                 catch(e:Exception){contractError=e.message ?: "Contrat invalide"}
-                            },enabled=!busy){Text("Vérifier et enregistrer le contrat")}
+                            },enabled=!busy){Text(stringResource(R.string.controls_validate_contract))}
                             StudioDetails("Le runtime embarqué utilise Interpreter CPU. Le mode local_http contacte uniquement localhost / 127.0.0.1; son serveur et son modèle doivent déjà fonctionner sur l’appareil. Pas de VLM embarqué ni de GPU/NPU simulé.", style =MaterialTheme.typography.bodySmall)
                         }
-                        StudioSection("Essai sans modifier les annotations","Utilise la première image disponible du lot, ou l’image active. La durée affichée est celle de cet essai, pas un benchmark garanti.",Icons.Default.Science) {
-                            Button(onClick=vm::dryRunActiveModel,enabled=!busy){Text("Tester le modèle enregistré sur une image")}
+                        StudioSection(stringResource(R.string.controls_dry_run),"Utilise la première image disponible du lot, ou l’image active. La durée affichée est celle de cet essai, pas un benchmark garanti.",Icons.Default.Science) {
+                            Button(onClick=vm::dryRunActiveModel,enabled=!busy){Text(stringResource(R.string.controls_test_image))}
                             if(diagnostics.isNotBlank()) SelectionContainer { Text(diagnostics,style=MaterialTheme.typography.bodySmall.copy(fontFamily=FontFamily.Monospace)) }
                             dryRun?.let{result->
                                 Text(if(result.success)"${result.backend} · ${result.latencyMs} ms · ${result.proposals.size} sorties" else "Échec : ${result.error}",color=if(result.success)MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error)
                                 result.proposals.take(8).forEach{Text("${it.type} · ${it.label} · score ${it.score}",style=MaterialTheme.typography.bodySmall)}
                             }
-                            OutlinedButton(onClick={vm.preannotateActiveBatch()},enabled=!busy){Text("Préannoter les cas en attente du lot")}
-                            OutlinedButton(onClick=vm::refreshInferenceReceipts,enabled=!busy){Text("Afficher les reçus d’inférence")}
+                            OutlinedButton(onClick={vm.preannotateActiveBatch()},enabled=!busy){Text(stringResource(R.string.controls_preannotate_pending))}
+                            OutlinedButton(onClick=vm::refreshInferenceReceipts,enabled=!busy){Text(stringResource(R.string.controls_show_receipts))}
                             if(receipts.isNotBlank())SelectionContainer{Text(receipts,style=MaterialTheme.typography.bodySmall.copy(fontFamily=FontFamily.Monospace))}
                         }
-                        StudioSection("Mesurer sur cet appareil","Trois passages de chauffe, puis plusieurs essais sur la même image. Les annotations restent intactes. La mesure de mémoire concerne ce processus, pas un serveur HTTP distinct.",Icons.Default.Speed) {
+                        StudioSection(stringResource(R.string.controls_measure_device),"Trois passages de chauffe, puis plusieurs essais sur la même image. Les annotations restent intactes. La mesure de mémoire concerne ce processus, pas un serveur HTTP distinct.",Icons.Default.Speed) {
                             FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) { listOf(5,10,30).forEach{n ->
                                 FilterChip(selected=benchmarkRuns==n,onClick={benchmarkRuns=n},label={Text("$n essais")},enabled=!busy)
                             } }
-                            Button(onClick={vm.benchmarkActiveModel(benchmarkRuns)},enabled=!busy){Text("Mesurer temps et RAM")}
+                            Button(onClick={vm.benchmarkActiveModel(benchmarkRuns)},enabled=!busy){Text(stringResource(R.string.controls_measure))}
                             benchmark?.let { report ->
-                                OutlinedButton(onClick={benchmarkOut.launch("studio-device-benchmark.json")},enabled=!busy){Text("Exporter les mesures JSON")}
+                                OutlinedButton(onClick={benchmarkOut.launch("studio-device-benchmark.json")},enabled=!busy){Text(stringResource(R.string.controls_export_metrics))}
                                 SelectionContainer { Text(report.take(14000),style=MaterialTheme.typography.bodySmall.copy(fontFamily=FontFamily.Monospace)) }
                             }
                         }
-                        StudioSection("Correction adaptative des points","Option locale, indépendante du modèle visuel. Seuls les déplacements humains explicites et validés sont éligibles.",Icons.Default.Adjust) {
+                        StudioSection(stringResource(R.string.controls_adaptive_points),"Option locale, indépendante du modèle visuel. Seuls les déplacements humains explicites et validés sont éligibles.",Icons.Default.Adjust) {
                             ControlSwitch("Appliquer le correcteur lors des prochaines préannotations",policy.adaptiveCorrection){policy=policy.copy(adaptiveCorrection=it)}
-                            Button(onClick={vm.saveProcessingSettings(policy.copy(batchSize=batchText.toIntOrNull() ?: -1),budget.toLongOrNull() ?: -1,idColumn,split)},enabled=!busy){Text("Enregistrer l’activation du correcteur")}
-                            OutlinedButton(onClick=vm::trainCorrectionsFromBatch,enabled=!busy){Text("Apprendre les corrections du lot terminé")}
-                            TextButton(onClick=vm::inspectCorrections,enabled=!busy){Text("Lire l’état des correcteurs du projet")}
+                            Button(onClick={vm.saveProcessingSettings(policy.copy(batchSize=batchText.toIntOrNull() ?: -1),budget.toLongOrNull() ?: -1,idColumn,split)},enabled=!busy){Text(stringResource(R.string.controls_save_corrector))}
+                            OutlinedButton(onClick=vm::trainCorrectionsFromBatch,enabled=!busy){Text(stringResource(R.string.controls_train_corrections))}
+                            TextButton(onClick=vm::inspectCorrections,enabled=!busy){Text(stringResource(R.string.controls_inspect_corrections))}
                             Text(correctionReport,style=MaterialTheme.typography.bodySmall)
                             StudioDetails("Séparation par hash d’image, 32 images d’apprentissage et 8 de contrôle au minimum par contexte modèle/classe. Une nouvelle tête doit améliorer le contrôle d’au moins 5 %; déplacement limité à ±8 %. Ce contrôle réutilisé ne prouve pas une généralisation sur un nouveau corpus.", style =MaterialTheme.typography.bodySmall)
-                            TextButton(onClick={confirmReset=true},enabled=!busy){Text("Réinitialiser les corrections apprises…")}
+                            TextButton(onClick={confirmReset=true},enabled=!busy){Text(stringResource(R.string.controls_reset_corrections))}
                         }
                     }
                 }
@@ -254,9 +254,9 @@ fun StudioControlsScreen(vm:MainViewModel) {
             }
         }
     }
-    catalogChoice?.let { entry -> AlertDialog(onDismissRequest={catalogChoice=null},title={Text("Télécharger ${entry.title} ?")},text={Text("Téléchargement depuis le stockage public TensorFlow, sans token HF. Réserve maximale : 64 Mo. Les labels et métadonnées sont lus dans les poids. Une incompatibilité bloque l’import au lieu de deviner le contrat. Vérifiez les conditions du modèle avant redistribution. L’ajout ne remplace pas le modèle actif.")},confirmButton={TextButton(onClick={catalogChoice=null;vm.downloadCatalogModel(entry.id)}){Text("Télécharger")}},dismissButton={TextButton(onClick={catalogChoice=null}){Text("Annuler")}}) }
-    removeProfile?.let{id->AlertDialog(onDismissRequest={removeProfile=null},title={Text("Supprimer ce profil ?")},text={Text("Ses poids seront supprimés seulement lorsqu’aucun autre profil ni projet ne les utilise. Les annotations et correcteurs ne seront pas supprimés.")},confirmButton={TextButton(onClick={removeProfile=null;vm.removeModelProfile(id)}){Text("Supprimer")}},dismissButton={TextButton(onClick={removeProfile=null}){Text("Conserver")}})}
-    if(confirmReset)AlertDialog(onDismissRequest={confirmReset=false},title={Text("Effacer le correcteur local ?")},text={Text("Les exemples numériques et têtes de correction de ce projet seront effacés. Les annotations, images et poids du modèle restent intacts.")},confirmButton={TextButton(onClick={confirmReset=false;vm.resetCorrections()}){Text("Réinitialiser")}},dismissButton={TextButton(onClick={confirmReset=false}){Text("Conserver")}})
+    catalogChoice?.let { entry -> AlertDialog(onDismissRequest={catalogChoice=null},title={Text(stringResource(R.string.controls_download_title,entry.title))},text={Text(stringResource(R.string.controls_download_body))},confirmButton={TextButton(onClick={catalogChoice=null;vm.downloadCatalogModel(entry.id)}){Text(stringResource(R.string.common_download))}},dismissButton={TextButton(onClick={catalogChoice=null}){Text(stringResource(R.string.common_cancel))}}) }
+    removeProfile?.let{id->AlertDialog(onDismissRequest={removeProfile=null},title={Text(stringResource(R.string.controls_delete_profile_title))},text={Text(stringResource(R.string.controls_delete_profile_body))},confirmButton={TextButton(onClick={removeProfile=null;vm.removeModelProfile(id)}){Text(stringResource(R.string.common_delete))}},dismissButton={TextButton(onClick={removeProfile=null}){Text(stringResource(R.string.common_keep))}})}
+    if(confirmReset)AlertDialog(onDismissRequest={confirmReset=false},title={Text(stringResource(R.string.controls_clear_corrector_title))},text={Text(stringResource(R.string.controls_clear_corrector_body))},confirmButton={TextButton(onClick={confirmReset=false;vm.resetCorrections()}){Text(stringResource(R.string.common_reset))}},dismissButton={TextButton(onClick={confirmReset=false}){Text(stringResource(R.string.common_keep))}})
     destructiveAction?.let { action ->
         val deleting=action=="delete"
         AlertDialog(onDismissRequest={destructiveAction=null},title={Text(when(action){"batch"->"Réinitialiser ce lot ?";"project"->"Réinitialiser ce projet ?";else->"Supprimer définitivement ce projet local ?"})},
@@ -266,7 +266,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
                 else->"Toutes les données locales de ce projet seront effacées. Les profils et poids partagés restent disponibles. Les dépôts Hugging Face ne seront jamais supprimés."
             })},confirmButton={Button(colors=if(deleting)ButtonDefaults.buttonColors(containerColor=MaterialTheme.colorScheme.error) else ButtonDefaults.buttonColors(),onClick={
                 destructiveAction=null;when(action){"batch"->vm.resetCurrentBatch();"project"->vm.resetCurrentProject();else->vm.deleteCurrentProject()}
-            }){Text(if(deleting)"Supprimer localement" else "Confirmer")}},dismissButton={TextButton(onClick={destructiveAction=null}){Text("Annuler")}})
+            }){Text(if(deleting)"Supprimer localement" else "Confirmer")}},dismissButton={TextButton(onClick={destructiveAction=null}){Text(stringResource(R.string.common_cancel))}})
     }
 }
 
@@ -284,4 +284,4 @@ private fun ControlSwitch(label:String,value:Boolean,onChange:(Boolean)->Unit) {
     Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) { Text(label,Modifier.weight(1f),style=MaterialTheme.typography.bodyMedium);Switch(checked=value,onCheckedChange=onChange) }
 }
 @Composable
-private fun SaveControlsButton(busy:Boolean,onClick:()->Unit) { Button(onClick=onClick,enabled=!busy,modifier=Modifier.fillMaxWidth().heightIn(min=52.dp)){Text("Enregistrer ces réglages")} }
+private fun SaveControlsButton(busy:Boolean,onClick:()->Unit) { Button(onClick=onClick,enabled=!busy,modifier=Modifier.fillMaxWidth().heightIn(min=52.dp)){Text(stringResource(R.string.controls_save_settings))} }

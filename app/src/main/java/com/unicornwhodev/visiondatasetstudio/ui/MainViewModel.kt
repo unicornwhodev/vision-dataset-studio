@@ -563,7 +563,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val annotations=_currentAnnotations.value
         val c=if(base.bundleKind=="efficientvit_sam") {
             val box=annotations.boxes.firstOrNull{it.isHumanVerified}
-            val point=annotations.points.firstOrNull{it.isHumanVerified && !it.isAbsent && !it.isAbstained}
+            val point=annotations.points.firstOrNull{it.isHumanVerified && it.canProvideCoordinates}
             when{promptPoint.size==2->base.copy(promptPoint=promptPoint,promptBox=emptyList());box!=null->base.copy(promptBox=listOf(box.xmin,box.ymin,box.xmax,box.ymax),promptPoint=emptyList());point!=null->base.copy(promptPoint=listOf(point.x,point.y),promptBox=emptyList());else->base}
         }else base
         try {
@@ -576,7 +576,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             val a=_currentAnnotations.value
             undoStack.add(a);redoStack.clear();refreshUndo()
-            _currentAnnotations.value=ProposalMerger.merge(a,proposals,p.activeTasksCsv,c.captionLanguage,ModelContract.outputTypes(c))
+            _currentAnnotations.value=ProposalMerger.merge(a,proposals,p.activeTasksCsv,c.captionLanguage,ModelContract.compatibility(c,p.activeTasksCsv).usableOutputs)
             enqueueSave(_currentAnnotations.value)
             _operationProgress.value=OperationProgress(if(liteRtEngine.lastEmbedding!=null) "Représentation visuelle enregistrée. Ouvrez Images similaires." else "${proposals.size} proposition(s). ${liteRtEngine.lastNote}",1,1)
         } finally { liteRtEngine.close() }

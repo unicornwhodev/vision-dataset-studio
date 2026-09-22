@@ -50,7 +50,7 @@ fun QualityDashboardScreen(viewModel: MainViewModel) {
                         Text("Aucun lot à analyser", style = MaterialTheme.typography.titleLarge)
                         Text("Les résultats apparaîtront après l’import des images.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         OutlinedButton(onClick = { viewModel.navigateTo(com.unicornwhodev.visiondatasetstudio.ui.Screen.BatchGrid) }) {
-                            Text("Ouvrir les lots"); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ArrowForward, null, Modifier.size(18.dp))
+                            Text(stringResource(R.string.quality_open_batches)); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ArrowForward, null, Modifier.size(18.dp))
                         }
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
@@ -75,7 +75,7 @@ fun QualityDashboardScreen(viewModel: MainViewModel) {
                     }
                 }
                 item {
-                    StudioSection("Stockage", icon = Icons.Default.Storage) {
+                    StudioSection(stringResource(R.string.quality_storage), icon = Icons.Default.Storage) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text("${metrics.second} Mo", style = MaterialTheme.typography.titleLarge)
                             Text("/ ${project?.diskBudgetMb ?: 500} Mo", color = MaterialTheme.colorScheme.onSurfaceVariant)
