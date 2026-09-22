@@ -38,6 +38,13 @@ object ModelContract {
             "classification"->setOf("tag");"captioning"->setOf("caption");"vqa"->setOf("vqa");"pointing"->setOf("point");"counting"->setOf("count");"multitask"->setOf("point","box","tag","caption","vqa","count");else->setOf("box")}}
         return when(adapter(c)) { "fireviewer_dinov3_multitask"->setOf("tag","mask","point"); "classification"->setOf("tag");"points","heatmap"->setOf("point");"embedding","inspect_only"->emptySet();else->when(c.outputMode){"points"->setOf("point");"both"->setOf("point","box");else->setOf("box")} } + if(c.deriveCounts) setOf("count") else emptySet()
     }
+    fun supportsTasks(c:ModelConfig,tasksCsv:String):Boolean {
+        val tasks=tasksCsv.split(',').map(String::trim).map(String::uppercase).toSet()
+        val outputs=outputTypes(c)
+        return ("DETECTION" in tasks && "box" in outputs) || ("POINTING" in tasks && "point" in outputs) ||
+            ("SEGMENTATION" in tasks && "mask" in outputs) || ("CLASSIFICATION" in tasks && "tag" in outputs) ||
+            ("CAPTIONING" in tasks && "caption" in outputs) || ("VQA" in tasks && "vqa" in outputs) || ("COUNTING" in tasks && "count" in outputs)
+    }
     fun validate(c: ModelConfig) {
         require(c.bundleKind in setOf("","tinyclip","efficientvit_sam","florence2"))
         require(c.cropFraction.isFinite() && c.cropFraction in .5f..1f)

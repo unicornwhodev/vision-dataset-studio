@@ -31,7 +31,7 @@ class HfModelRuntimeTest {
         val start=System.nanoTime()
         try {
             LiteRtEngine().use{engine->
-                assertTrue(engine.lastError,engine.loadModel(file));val out=engine.runInference(image,config)
+                assertTrue(engine.lastError,engine.loadModel(file));val out=engine.runInference(image,config).orThrow()
                 assertNull(engine.lastError,engine.lastError)
                 if(id in setOf("dinov2","repvit_m1","hgnetv2_b0","convformer_s18","tinyclip"))assertTrue(requireNotNull(engine.lastEmbedding).all(Float::isFinite))
                 if(id=="dinov2")assertEquals(listOf(1,256,384),engine.lastPatches?.shape)

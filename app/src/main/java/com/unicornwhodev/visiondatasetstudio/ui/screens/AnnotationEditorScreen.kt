@@ -68,7 +68,7 @@ private fun EditorCommand(icon: ImageVector, description: String, onClick: () ->
 }
 
 /** Selection and creation are separate tools: moving an existing target never creates another. */
-enum class EditorTool { SELECT, BOX, POINT, MASK, ERASE, SAM_POINT, PAN_ZOOM }
+enum class EditorTool { SELECT, BOX, POINT, MASK, ERASE, POLYGON, LASSO, FILL, SAM_POINT, PAN_ZOOM }
 private enum class EditorTab(val title: String) { REGIONS("Régions"), CAPTION("Légendes"), TAGS("Tags"), GROUNDING("Texte ↔ région"), VQA("VQA"), COUNTING("Comptage"), QUALITY("Qualité") }
 private fun enabledTabs(tasks: Set<StudioTask>): List<EditorTab> = buildList {
     if (tasks.any { it in setOf(StudioTask.POINTING, StudioTask.POINTING_MULTI, StudioTask.DETECTION, StudioTask.SEGMENTATION, StudioTask.GROUNDING) }) add(EditorTab.REGIONS)
@@ -109,6 +109,10 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
     var label by rememberSaveable { mutableStateOf(classes.first()) }
     LaunchedEffect(classes) { if (label !in classes) label = classes.first() }
     var selected by remember(sampleId) { mutableStateOf<String?>(null) }
+    var copiedBox by remember { mutableStateOf<BoxTarget?>(null) }
+    var copiedPoint by remember { mutableStateOf<PointTarget?>(null) }
+    var brushSize by rememberSaveable { mutableFloatStateOf(.025f) }
+    var eraserSize by rememberSaveable { mutableFloatStateOf(.025f) }
     var samPoint by remember(sampleId) { mutableStateOf<ViewPoint?>(null) }
     val samModel = project?.modelConfigJson?.contains("efficientvit_sam") == true
     var zoom by remember(sampleId) { mutableFloatStateOf(1f) }
@@ -152,6 +156,10 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                 inspectorState.SaveableStateProvider("$sampleId:${tab.name}") {
                     when(tab) {
                         EditorTab.REGIONS -> RegionInspector(a, classes, selected, { selected = it; tool = EditorTool.SELECT }, update,
+                            onDuplicate={id->a.boxes.firstOrNull{it.id==id}?.let{b->val n=b.copy(id=newId(),xmin=(b.xmin+.02f).coerceAtMost(.98f),xmax=(b.xmax+.02f).coerceAtMost(1f));update(a.copy(boxes=a.boxes+n));selected=n.id}
+                                ?:a.points.firstOrNull{it.id==id}?.let{p->val n=p.copy(id=newId(),x=(p.x+.02f).coerceAtMost(1f),y=(p.y+.02f).coerceAtMost(1f));update(a.copy(points=a.points+n));selected=n.id}},
+                            onCopy={id->copiedBox=a.boxes.firstOrNull{it.id==id};copiedPoint=a.points.firstOrNull{it.id==id}},
+                            onPaste={val b=copiedBox;val pnt=copiedPoint;if(b!=null){val n=b.copy(id=newId(),xmin=(b.xmin+.02f).coerceAtMost(.98f),xmax=(b.xmax+.02f).coerceAtMost(1f));update(a.copy(boxes=a.boxes+n));selected=n.id}else if(pnt!=null){val n=pnt.copy(id=newId(),x=(pnt.x+.02f).coerceAtMost(1f),y=(pnt.y+.02f).coerceAtMost(1f));update(a.copy(points=a.points+n));selected=n.id}},canPaste=copiedBox!=null||copiedPoint!=null,
                             onInfer = { if (!hasModel) viewModel.navigateTo(Screen.Models) else viewModel.runLiteRtOnCurrentSample(samPoint?.let { listOf(it.x,it.y) }.orEmpty()) }, modelPresent = hasModel, locked = locked)
                         EditorTab.CAPTION -> CaptionEditorTab(a, prefs.captionLanguage, update)
                         EditorTab.TAGS -> TagsEditorTab(a, classes, update)
@@ -220,11 +228,11 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                         }
                         if (prefs.leftHanded) validate()
                         Row(Modifier.weight(1f).horizontalScroll(rememberScrollState())) {
-                        listOf(EditorTool.SELECT, EditorTool.BOX, EditorTool.POINT, EditorTool.MASK, EditorTool.ERASE, EditorTool.PAN_ZOOM)
-                            .filter { (it != EditorTool.BOX || boxAllowed) && (it != EditorTool.POINT || pointAllowed) && (it !in setOf(EditorTool.MASK,EditorTool.ERASE) || maskAllowed) && (it != EditorTool.SELECT || boxAllowed || pointAllowed || maskAllowed) }
+                        listOf(EditorTool.SELECT, EditorTool.BOX, EditorTool.POINT, EditorTool.MASK, EditorTool.ERASE,EditorTool.POLYGON,EditorTool.LASSO,EditorTool.FILL, EditorTool.PAN_ZOOM)
+                            .filter { (it != EditorTool.BOX || boxAllowed) && (it != EditorTool.POINT || pointAllowed) && (it !in setOf(EditorTool.MASK,EditorTool.ERASE,EditorTool.POLYGON,EditorTool.LASSO,EditorTool.FILL) || maskAllowed) && (it != EditorTool.SELECT || boxAllowed || pointAllowed || maskAllowed) }
                             .forEach { t ->
-                                val icon = when(t) { EditorTool.SELECT -> Icons.Default.NearMe; EditorTool.BOX -> Icons.Default.CropSquare; EditorTool.POINT, EditorTool.SAM_POINT -> Icons.Default.MyLocation; EditorTool.MASK -> Icons.Default.Brush; EditorTool.ERASE -> Icons.Default.AutoFixOff; EditorTool.PAN_ZOOM -> Icons.Default.PanTool }
-                                val description = when(t) { EditorTool.SELECT -> "Sélectionner et déplacer"; EditorTool.BOX -> "Dessiner une boîte"; EditorTool.POINT -> "Placer un point"; EditorTool.SAM_POINT -> "Pointer pour SAM"; EditorTool.MASK -> "Peindre le masque"; EditorTool.ERASE -> "Effacer le masque"; EditorTool.PAN_ZOOM -> "Déplacer et zoomer l’image" }
+                                val icon = when(t) { EditorTool.SELECT -> Icons.Default.NearMe; EditorTool.BOX -> Icons.Default.CropSquare; EditorTool.POINT, EditorTool.SAM_POINT -> Icons.Default.MyLocation; EditorTool.MASK -> Icons.Default.Brush; EditorTool.ERASE -> Icons.Default.AutoFixOff;EditorTool.POLYGON->Icons.Default.ChangeHistory;EditorTool.LASSO->Icons.Default.Gesture;EditorTool.FILL->Icons.Default.FormatColorFill; EditorTool.PAN_ZOOM -> Icons.Default.PanTool }
+                                val description = when(t) { EditorTool.SELECT -> "Sélectionner et déplacer"; EditorTool.BOX -> "Dessiner une boîte"; EditorTool.POINT -> "Placer un point"; EditorTool.SAM_POINT -> "Pointer pour SAM"; EditorTool.MASK -> "Peindre le masque"; EditorTool.ERASE -> "Effacer le masque";EditorTool.POLYGON->"Polygone · double-tap pour fermer";EditorTool.LASSO->"Lasso";EditorTool.FILL->"Remplir une zone"; EditorTool.PAN_ZOOM -> "Déplacer et zoomer l’image" }
                                 EditorCommand(icon, description, selected = tool == t, enabled = !locked, onClick = {
                                     tool = t
                                     if (t != EditorTool.PAN_ZOOM && EditorTab.REGIONS in tabs) tab = EditorTab.REGIONS
@@ -241,6 +249,11 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                         if (!prefs.leftHanded) validate()
                     }
                 }
+                if(tool in setOf(EditorTool.MASK,EditorTool.ERASE)) Row(Modifier.fillMaxWidth().padding(horizontal=12.dp),verticalAlignment=Alignment.CenterVertically) {
+                    Text(if(tool==EditorTool.MASK)"Pinceau" else "Gomme",style=MaterialTheme.typography.labelMedium)
+                    Slider(value=if(tool==EditorTool.MASK)brushSize else eraserSize,onValueChange={if(tool==EditorTool.MASK)brushSize=it else eraserSize=it},valueRange=0.005f..0.1f,modifier=Modifier.weight(1f))
+                    Text("${(((if(tool==EditorTool.MASK)brushSize else eraserSize)*100)).toInt()} %",style=MaterialTheme.typography.labelMedium)
+                }
             }
         }
     }) { inset ->
@@ -252,7 +265,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                         InteractiveAnnotationCanvas(sample, a, if (locked || (propertiesOpen && !regionTab)) EditorTool.PAN_ZOOM else tool,
                             label, selected, zoom, pan, { z, o -> zoom = z; pan = o }, { selected = it }, { next ->
                                 if (StudioTask.POINTING in tasks && next.points.size > 1 && next.points.size > a.points.size) viewModel.reportError("Mode Point unique : déplacez le point existant ou activez Points multiples.") else update(next)
-                            }, showLabels = prefs.showCanvasLabels, promptPoint = samPoint, onPromptSelected = { samPoint = it })
+                            }, brushFraction=if(tool==EditorTool.ERASE)eraserSize else brushSize,showLabels = prefs.showCanvasLabels, promptPoint = samPoint, onPromptSelected = { samPoint = it })
                     }
                     Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 12.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(if(tool==EditorTool.SAM_POINT) "SAM · pointez l’objet" else "$label · ${a.masks.size + a.boxes.size + a.points.size} régions", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis,
@@ -290,7 +303,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
 @Composable
 fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnotations, activeTool: EditorTool, selectedClass: String,
     selectedTargetId: String?, scale: Float, offset: Offset, onTransformChanged: (Float, Offset) -> Unit,
-    onTargetSelected: (String?) -> Unit, onAnnotationsUpdated: (SampleAnnotations) -> Unit, showLabels: Boolean = true,
+    onTargetSelected: (String?) -> Unit, onAnnotationsUpdated: (SampleAnnotations) -> Unit, brushFraction:Float=.025f,showLabels: Boolean = true,
     promptPoint: ViewPoint? = null, onPromptSelected: (ViewPoint) -> Unit = {}) {
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     val density = LocalDensity.current
@@ -313,6 +326,8 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
     var corner by remember { mutableIntStateOf(-1) }
     var creatingId by remember { mutableStateOf<String?>(null) }
     var paintingId by remember(sample?.sampleId) { mutableStateOf<String?>(null) }
+    var polygonPoints by remember(sample?.sampleId) { mutableStateOf<List<Pair<Float,Float>>>(emptyList()) }
+    var lassoPoints by remember(sample?.sampleId) { mutableStateOf<List<Pair<Float,Float>>>(emptyList()) }
     val transformState = rememberTransformableState { z, move, _ ->
         val newScale = (latestScale * z).coerceIn(1f, 12f)
         val maxPanX = canvasSize.width * newScale
@@ -328,7 +343,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
         val iw=(sample?.imageWidth ?: 512).coerceAtLeast(1);val ih=(sample?.imageHeight ?: 512).coerceAtLeast(1)
         val factor=minOf(1f,512f/maxOf(iw,ih));val w=maxOf(1,(iw*factor).toInt());val h=maxOf(1,(ih*factor).toInt())
         val mask=old ?: MaskTarget(newId(),selectedClass,w,h,listOf(w*h),isHumanVerified=true)
-        val updated=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.stroke(mask,previous.x,previous.y,at.x,at.y,.025f,activeTool==EditorTool.ERASE)
+        val updated=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.stroke(mask,previous.x,previous.y,at.x,at.y,brushFraction,activeTool==EditorTool.ERASE)
         paintingId=updated.id
         select(updated.id)
         return origin.copy(masks=origin.masks.filterNot { it.id==updated.id }+updated)
@@ -343,7 +358,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
         .semantics { contentDescription = "Image à annoter. ${annotations.boxes.size} boîtes et ${annotations.points.size} points. Les régions sont aussi accessibles dans le panneau de correction." }
         .then(if(activeTool == EditorTool.PAN_ZOOM) Modifier.transformable(transformState) else Modifier)
         .pointerInput(sample?.sampleId, activeTool, selectedClass, viewport) {
-            detectTapGestures(onDoubleTap = if(activeTool == EditorTool.PAN_ZOOM) {{ _:Offset -> transform(1f, Offset.Zero) }} else null, onTap = { at ->
+            detectTapGestures(onDoubleTap = when(activeTool){EditorTool.PAN_ZOOM->{{_:Offset->transform(1f,Offset.Zero)}};EditorTool.POLYGON->{{_:Offset->if(polygonPoints.size>=3){val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskTarget(newId(),selectedClass,(sample?.imageWidth?:512).coerceAtMost(512),(sample?.imageHeight?:512).coerceAtMost(512),listOf((sample?.imageWidth?:512).coerceAtMost(512)*(sample?.imageHeight?:512).coerceAtMost(512)),true);val next=MaskCodec.polygon(mask,polygonPoints);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id);polygonPoints=emptyList()}}};else->null}, onTap = { at ->
                 val n = viewport.toImage(at.x, at.y) ?: return@detectTapGestures
                 when(activeTool) {
                     EditorTool.SAM_POINT -> selectPrompt(n)
@@ -359,6 +374,9 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
                         pixels[(n.y*m.height).toInt().coerceIn(0,m.height-1)*m.width+(n.x*m.width).toInt().coerceIn(0,m.width-1)]
                     }?.id)
                     EditorTool.MASK, EditorTool.ERASE -> { paintingId=selectedId; emit(maskStroke(n)); paintingId=null }
+                    EditorTool.POLYGON -> polygonPoints=polygonPoints+(n.x to n.y)
+                    EditorTool.FILL -> {val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val w=(sample?.imageWidth?:512).coerceAtMost(512);val h=(sample?.imageHeight?:512).coerceAtMost(512);val mask=old?:MaskTarget(newId(),selectedClass,w,h,listOf(w*h),true);val next=MaskCodec.fill(mask,n.x,n.y);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id)}
+                    EditorTool.LASSO -> Unit
                     EditorTool.PAN_ZOOM -> Unit
                 }
             })
@@ -370,7 +388,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
                 val at=viewport.toImage(change.position.x,change.position.y,clamp=true)
                 if(at!=null) { change.consume();draft=maskStroke(at,dragStart ?: at);dragStart=at }
             },onDragEnd={draft?.let(emit);draft=null;dragStart=null;paintingId=null},onDragCancel={draft=null;dragStart=null;paintingId=null})
-        } else Modifier)
+        } else Modifier).then(if(activeTool==EditorTool.LASSO)Modifier.pointerInput(sample?.sampleId,selectedClass,viewport){detectDragGestures(onDragStart={at->lassoPoints=viewport.toImage(at.x,at.y)?.let{listOf(it.x to it.y)}.orEmpty()},onDrag={change,_->viewport.toImage(change.position.x,change.position.y,true)?.let{lassoPoints=lassoPoints+(it.x to it.y)};change.consume()},onDragEnd={if(lassoPoints.size>=3){val origin=latest;val w=(sample?.imageWidth?:512).coerceAtMost(512);val h=(sample?.imageHeight?:512).coerceAtMost(512);val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskTarget(newId(),selectedClass,w,h,listOf(w*h),true);val next=MaskCodec.polygon(mask,lassoPoints);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id)};lassoPoints=emptyList()},onDragCancel={lassoPoints=emptyList()})}else Modifier)
         .then(if (activeTool == EditorTool.BOX || activeTool == EditorTool.SELECT) Modifier.pointerInput(sample?.sampleId, activeTool, selectedClass, viewport) {
             detectDragGestures(onDragStart = { at ->
                 dragStart = viewport.toImage(at.x, at.y)
@@ -464,7 +482,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selected: String?, onSelect: (String?) -> Unit,
-    onUpdate: (SampleAnnotations) -> Unit, onInfer: () -> Unit, modelPresent: Boolean, locked: Boolean) {
+    onUpdate: (SampleAnnotations) -> Unit,onDuplicate:(String)->Unit,onCopy:(String)->Unit,onPaste:()->Unit,canPaste:Boolean,onInfer: () -> Unit, modelPresent: Boolean, locked: Boolean) {
     val box=a.boxes.firstOrNull { it.id==selected }; val point=a.points.firstOrNull { it.id==selected }; val mask=a.masks.firstOrNull { it.id==selected }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if(mask!=null) {
@@ -476,6 +494,10 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
                 FilterChip(selected=mask.label==cls,onClick={onUpdate(a.copy(masks=a.masks.map { if(it.id==mask.id) it.copy(label=cls,isHumanVerified=true) else it }))},label={Text(cls)})
             } }
             Text("Pinceau pour ajouter, gomme pour retirer. Annuler reste disponible.",style=MaterialTheme.typography.bodySmall)
+            Row(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                OutlinedButton(enabled=a.masks.count{it.label==mask.label&&it.width==mask.width&&it.height==mask.height}>=2,onClick={val chosen=a.masks.filter{it.label==mask.label&&it.width==mask.width&&it.height==mask.height};val merged=MaskCodec.merge(chosen,newId(),mask.label);onUpdate(a.copy(masks=a.masks-chosen.toSet()+merged));onSelect(merged.id)}){Text("Fusionner")}
+                OutlinedButton(onClick={val pieces=MaskCodec.split(mask){newId()};if(pieces.size>1){onUpdate(a.copy(masks=a.masks.filterNot{it.id==mask.id}+pieces));onSelect(pieces.first().id)}}){Text("Séparer les îlots")}
+            }
             if(!mask.isHumanVerified) TextButton(onClick={onUpdate(a.copy(masks=a.masks.map { if(it.id==mask.id) it.copy(isHumanVerified=true) else it }))}) { Text("Masque relu") }
             TextButton(onClick={onSelect(null)}) { Text("Désélectionner") }
         }
@@ -483,12 +505,15 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
             Row(verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                 Text("${a.masks.size+a.boxes.size+a.points.size} régions", Modifier.weight(1f), style=MaterialTheme.typography.titleSmall)
                 StudioAction(if(modelPresent) "Préannoter" else "Modèle", onInfer, icon=Icons.Default.Memory, enabled=!locked)
+                IconButton(onClick=onPaste,enabled=canPaste&&!locked){Icon(Icons.Default.ContentPaste,"Coller une boîte ou un point")}
             }
             if (a.masks.isEmpty() && a.boxes.isEmpty() && a.points.isEmpty()) Text("Choisissez un outil de dessin.", style=MaterialTheme.typography.bodySmall)
         } else if(mask==null) {
             Row(verticalAlignment=Alignment.CenterVertically) {
                 Text(if(box!=null) "Boîte sélectionnée" else "Point sélectionné",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium)
                 IconButton(onClick={ onUpdate(withoutTarget(a, selected!!)); onSelect(null) }) { Icon(Icons.Default.DeleteOutline,"Supprimer la région sélectionnée") }
+                IconButton(onClick={onDuplicate(selected!!)},enabled=!locked){Icon(Icons.Default.CopyAll,"Dupliquer")}
+                IconButton(onClick={onCopy(selected!!)},enabled=!locked){Icon(Icons.Default.ContentCopy,"Copier")}
                 IconButton(onClick={onSelect(null)}) { Icon(Icons.Default.Close,"Désélectionner") }
             }
             Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
@@ -497,6 +522,11 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
                 },label={Text(label)}) }
             }
             Text(if(box!=null) "Glissez les coins pour redimensionner." else "Glissez ou utilisez les flèches.",style=MaterialTheme.typography.bodySmall)
+            if(point!=null) FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                FilterChip(selected=!point.isAbsent&&!point.isAbstained,onClick={onUpdate(a.copy(points=a.points.map{if(it.id==point.id)it.copy(isAbsent=false,isAbstained=false,isHumanVerified=true)else it}))},label={Text("Cible localisée")})
+                FilterChip(selected=point.isAbsent,onClick={onUpdate(a.copy(points=a.points.map{if(it.id==point.id)it.copy(isAbsent=true,isAbstained=false,isHumanVerified=true)else it}))},label={Text("Cible absente")})
+                FilterChip(selected=point.isAbstained,onClick={onUpdate(a.copy(points=a.points.map{if(it.id==point.id)it.copy(isAbsent=false,isAbstained=true,isHumanVerified=true)else it}))},label={Text("Présente mais non localisable / incertain")})
+            }
             Row(horizontalArrangement=Arrangement.spacedBy(4.dp),verticalAlignment=Alignment.CenterVertically) {
                 listOf(Icons.Default.KeyboardArrowLeft to (-.002f to 0f),Icons.Default.KeyboardArrowUp to (0f to -.002f),Icons.Default.KeyboardArrowDown to (0f to .002f),Icons.Default.KeyboardArrowRight to (.002f to 0f)).forEachIndexed { i,(icon,d) ->
                     OutlinedIconButton(onClick={

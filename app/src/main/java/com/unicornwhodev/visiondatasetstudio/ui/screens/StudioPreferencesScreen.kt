@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.semantics.Role
@@ -32,7 +35,7 @@ fun StudioPreferencesScreen(viewModel: MainViewModel) {
     val project by viewModel.projectFlow.collectAsState()
     val busy by viewModel.isBusy.collectAsState()
     var chosenTasks by remember(project?.activeTasksCsv) { mutableStateOf(StudioWorkflow.parseTasks(project?.activeTasksCsv ?: "DETECTION")) }
-    Scaffold(contentWindowInsets = WindowInsets(0), topBar = { StudioTopBar("Réglages", onBack = viewModel::back) }) { inset ->
+    Scaffold(contentWindowInsets = WindowInsets(0), topBar = { StudioTopBar(stringResource(R.string.screen_preferences), onBack = viewModel::back) }) { inset ->
         Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = 800.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 StudioSection("Apparence", "Réglages enregistrés automatiquement sur cet appareil.", Icons.Default.Palette) {

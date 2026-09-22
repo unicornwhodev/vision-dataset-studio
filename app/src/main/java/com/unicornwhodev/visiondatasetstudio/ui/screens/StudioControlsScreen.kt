@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
@@ -35,6 +38,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
     val models by vm.modelProfiles.collectAsState()
     val busy by vm.isBusy.collectAsState()
     val diagnostics by vm.modelDiagnostics.collectAsState()
+    val receipts by vm.inferenceReceipts.collectAsState()
     val dryRun by vm.dryRunResult.collectAsState()
     val benchmark by vm.benchmarkReport.collectAsState()
     var benchmarkRuns by rememberSaveable { mutableStateOf(10) }
@@ -42,6 +46,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
     val correctionReport by vm.correctionReport.collectAsState()
     var removeProfile by remember{mutableStateOf<String?>(null)}
     var confirmReset by remember{mutableStateOf(false)}
+    var destructiveAction by remember{mutableStateOf<String?>(null)}
     val p=project ?: return
     val stored=remember(p.settingsJson){ProjectSettings.read(p)}
     var tab by rememberSaveable{mutableStateOf(0)}
@@ -66,7 +71,7 @@ fun StudioControlsScreen(vm:MainViewModel) {
     val packIn=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){it?.let(vm::importPack)}
     val benchmarkOut=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")){it?.let(vm::saveBenchmark)}
     val packOut=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")){it?.let(vm::exportPack)}
-    Scaffold(contentWindowInsets=WindowInsets(0),modifier=Modifier.imePadding(),topBar={StudioTopBar("Mon espace", p.name, onBack={ if (!busy) vm.back() })}) { inset ->
+    Scaffold(contentWindowInsets=WindowInsets(0),modifier=Modifier.imePadding(),topBar={StudioTopBar(stringResource(R.string.screen_controls), p.name, onBack={ if (!busy) vm.back() })}) { inset ->
         Column(Modifier.fillMaxSize().padding(inset)) {
             StudioTabs(listOf("Projets", "Sources", "Transferts", "Modèles"), tab, { tab=it }, Modifier.padding(horizontal=16.dp))
             Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(20.dp)) {
@@ -81,6 +86,11 @@ fun StudioControlsScreen(vm:MainViewModel) {
                             OutlinedTextField(newName,{newName=it},label={Text("Nom du nouveau projet")},singleLine=true,modifier=Modifier.fillMaxWidth())
                             Button(onClick={vm.createProject(newName);newName=""},enabled=!busy && newName.isNotBlank()){Text("Créer un projet")}
                             OutlinedButton(onClick={vm.navigateTo(Screen.Setup)},enabled=!busy){Text("Configurer")}
+                            HorizontalDivider()
+                            Text("Données locales",style=MaterialTheme.typography.titleSmall)
+                            OutlinedButton(onClick={destructiveAction="batch"},enabled=!busy){Text("Réinitialiser le lot courant…")}
+                            OutlinedButton(onClick={destructiveAction="project"},enabled=!busy){Text("Réinitialiser le projet…")}
+                            TextButton(onClick={destructiveAction="delete"},enabled=!busy,colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)){Text("Supprimer le projet…")}
                         }
                         StudioSection("Presets","Un pack configure les tâches, classes, taille de lot et contrat modèle. Il exclut les poids, le jeton HF du coffre, le corpus et ses emplacements. Le contrat, le prompt et le corps JSON personnalisé sont inclus : retirez tout secret avant partage.",Icons.Default.Inventory2) {
                             Button(onClick={packIn.launch(arrayOf("application/json","text/*","application/octet-stream"))},enabled=!busy){Text("Importer un preset")}
@@ -216,6 +226,8 @@ fun StudioControlsScreen(vm:MainViewModel) {
                                 result.proposals.take(8).forEach{Text("${it.type} · ${it.label} · score ${it.score}",style=MaterialTheme.typography.bodySmall)}
                             }
                             OutlinedButton(onClick={vm.preannotateActiveBatch()},enabled=!busy){Text("Préannoter les cas en attente du lot")}
+                            OutlinedButton(onClick=vm::refreshInferenceReceipts,enabled=!busy){Text("Afficher les reçus d’inférence")}
+                            if(receipts.isNotBlank())SelectionContainer{Text(receipts,style=MaterialTheme.typography.bodySmall.copy(fontFamily=FontFamily.Monospace))}
                         }
                         StudioSection("Mesurer sur cet appareil","Trois passages de chauffe, puis plusieurs essais sur la même image. Les annotations restent intactes. La mesure de mémoire concerne ce processus, pas un serveur HTTP distinct.",Icons.Default.Speed) {
                             FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) { listOf(5,10,30).forEach{n ->
@@ -245,6 +257,17 @@ fun StudioControlsScreen(vm:MainViewModel) {
     catalogChoice?.let { entry -> AlertDialog(onDismissRequest={catalogChoice=null},title={Text("Télécharger ${entry.title} ?")},text={Text("Téléchargement depuis le stockage public TensorFlow, sans token HF. Réserve maximale : 64 Mo. Les labels et métadonnées sont lus dans les poids. Une incompatibilité bloque l’import au lieu de deviner le contrat. Vérifiez les conditions du modèle avant redistribution. L’ajout ne remplace pas le modèle actif.")},confirmButton={TextButton(onClick={catalogChoice=null;vm.downloadCatalogModel(entry.id)}){Text("Télécharger")}},dismissButton={TextButton(onClick={catalogChoice=null}){Text("Annuler")}}) }
     removeProfile?.let{id->AlertDialog(onDismissRequest={removeProfile=null},title={Text("Supprimer ce profil ?")},text={Text("Ses poids seront supprimés seulement lorsqu’aucun autre profil ni projet ne les utilise. Les annotations et correcteurs ne seront pas supprimés.")},confirmButton={TextButton(onClick={removeProfile=null;vm.removeModelProfile(id)}){Text("Supprimer")}},dismissButton={TextButton(onClick={removeProfile=null}){Text("Conserver")}})}
     if(confirmReset)AlertDialog(onDismissRequest={confirmReset=false},title={Text("Effacer le correcteur local ?")},text={Text("Les exemples numériques et têtes de correction de ce projet seront effacés. Les annotations, images et poids du modèle restent intacts.")},confirmButton={TextButton(onClick={confirmReset=false;vm.resetCorrections()}){Text("Réinitialiser")}},dismissButton={TextButton(onClick={confirmReset=false}){Text("Conserver")}})
+    destructiveAction?.let { action ->
+        val deleting=action=="delete"
+        AlertDialog(onDismissRequest={destructiveAction=null},title={Text(when(action){"batch"->"Réinitialiser ce lot ?";"project"->"Réinitialiser ce projet ?";else->"Supprimer définitivement ce projet local ?"})},
+            text={Text(when(action){
+                "batch"->"Annotations et fichiers locaux du lot courant seront effacés. Le projet, sa source, ses classes et son modèle restent configurés. Aucune publication distante ne sera touchée."
+                "project"->"Lots, annotations, curseurs, index, exports locaux, embeddings et apprentissages propres au projet seront effacés. La configuration et les modèles partagés seront conservés. Aucune donnée distante ne sera supprimée."
+                else->"Toutes les données locales de ce projet seront effacées. Les profils et poids partagés restent disponibles. Les dépôts Hugging Face ne seront jamais supprimés."
+            })},confirmButton={Button(colors=if(deleting)ButtonDefaults.buttonColors(containerColor=MaterialTheme.colorScheme.error) else ButtonDefaults.buttonColors(),onClick={
+                destructiveAction=null;when(action){"batch"->vm.resetCurrentBatch();"project"->vm.resetCurrentProject();else->vm.deleteCurrentProject()}
+            }){Text(if(deleting)"Supprimer localement" else "Confirmer")}},dismissButton={TextButton(onClick={destructiveAction=null}){Text("Annuler")}})
+    }
 }
 
 @Composable

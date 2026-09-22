@@ -47,12 +47,12 @@ class OnDeviceTrainingTest {
             val receipt=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.saveCheckpointReceipt(model,requireNotNull(checkpoint))
             kotlinx.coroutines.runBlocking {
                 LiteRtEngine().use { engine ->
-                    assertTrue(engine.loadModel(model));val predictions=engine.runInference(red,config.copy(trainingCheckpoint=receipt))
+                    assertTrue(engine.loadModel(model));val predictions=engine.runInference(red,config.copy(trainingCheckpoint=receipt)).orThrow()
                     assertNull(engine.lastError);assertEquals("rouge",predictions.maxBy{it.score}.label)
-                    val untrained=engine.runInference(red,config)
+                    val untrained=engine.runInference(red,config).orThrow()
                     assertNull(engine.lastError)
                     assertNotEquals("Changing the selected checkpoint must reset the cached session",predictions.map{it.score},untrained.map{it.score})
-                    val restored=engine.runInference(red,config.copy(trainingCheckpoint=receipt))
+                    val restored=engine.runInference(red,config.copy(trainingCheckpoint=receipt)).orThrow()
                     assertNull(engine.lastError)
                     assertEquals(predictions.map{it.score},restored.map{it.score})
                 }

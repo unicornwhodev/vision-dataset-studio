@@ -165,3 +165,28 @@ data class DryRunResult(
     val proposals: List<ModelProposal>,
     val error: String? = null
 )
+
+data class InferenceDiagnostics(
+    val modelSha256: String,
+    val adapter: String,
+    val task: String,
+    val inputShape: List<Int>,
+    val outputShapes: List<List<Int>> = emptyList(),
+    val threshold: Float,
+    val proposalCount: Int,
+    val emptyReason: String? = null,
+    val error: String? = null
+)
+
+sealed interface InferenceResult {
+    val diagnostics: InferenceDiagnostics
+    data class Success(val proposals: List<ModelProposal>, override val diagnostics: InferenceDiagnostics) : InferenceResult
+    data class Empty(val reason: String, override val diagnostics: InferenceDiagnostics) : InferenceResult
+    data class Failure(val error: String, override val diagnostics: InferenceDiagnostics) : InferenceResult
+
+    fun orThrow(): List<ModelProposal> = when(this) {
+        is Success -> proposals
+        is Empty -> emptyList()
+        is Failure -> throw IllegalStateException(error)
+    }
+}

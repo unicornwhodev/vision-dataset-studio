@@ -5,6 +5,20 @@ import com.unicornwhodev.visiondatasetstudio.data.hf.HfTreeItem
 import org.tensorflow.lite.Interpreter
 import java.io.File
 
+private fun declaredCapabilities(id:String,adapter:String):ModelCapabilities {
+    val values=when {
+        id=="tinyclip"->setOf(ModelCapability.EMBEDDING,ModelCapability.SIMILARITY,ModelCapability.CLASSIFICATION)
+        id=="efficientvit_sam"->setOf(ModelCapability.SEGMENTATION,ModelCapability.INTERACTIVE_SEGMENTATION)
+        id=="florence2"->setOf(ModelCapability.CAPTIONING,ModelCapability.DETECTION)
+        adapter in setOf("rfdetr","rtmdet")->setOf(ModelCapability.DETECTION)
+        adapter=="heatmap"->setOf(ModelCapability.POINTING)
+        adapter=="embedding"->setOf(ModelCapability.EMBEDDING,ModelCapability.SIMILARITY)
+        else->setOf(ModelCapability.INSPECTION_ONLY)
+    }
+    val qualification=when(id){"repvit_m1"->QualificationStatus.INFERENCE_ONLY;"rtmdet_tiny"->QualificationStatus.FAILED;else->QualificationStatus.UNTESTED}
+    return ModelCapabilities(values,qualification)
+}
+
 /**
  * Catalogue hosted by the project, but weights stay opt-in downloads from Hugging Face.
  * Availability is discovered from the remote tree; this file does not pretend unpublished conversions exist.
@@ -20,7 +34,8 @@ object CommunityModelCatalog {
         val upstreamLicense: String,
         val expectedFiles: List<String>,
         val adapterStatus: String,
-        val accent: String
+        val accent: String,
+        val capabilities: ModelCapabilities = declaredCapabilities(id,adapterStatus)
     )
     data class Availability(
         val entry: Entry,
@@ -34,16 +49,16 @@ object CommunityModelCatalog {
     )
 
     val entries = listOf(
-        Entry("tinyclip", "TinyCLIP ViT-8M/16", "Embeddings image-texte, tags zero-shot et similarité", "MIT", listOf("image_encoder.tflite", "text_encoder.tflite"), "bundle", "Vision-language"),
-        Entry("dinov2", "DINOv2 Small", "Embeddings visuels, clustering, doublons et active learning", "Apache-2.0", listOf("model.tflite"), "embedding", "Représentation"),
-        Entry("vitpose", "ViTPose+ Small", "Heatmaps de points-clés humains", "Apache-2.0", listOf("model.tflite"), "heatmap", "Keypoints"),
+        Entry("tinyclip", "TinyCLIP ViT-8M/16", "Embeddings image-texte, tags zero-shot et similarité", "MIT", listOf("image_encoder.tflite", "text_encoder.tflite"), "bundle", "Vision-language", ModelCapabilities(setOf(ModelCapability.EMBEDDING, ModelCapability.SIMILARITY, ModelCapability.CLASSIFICATION), QualificationStatus.UNTESTED)),
+        Entry("dinov2", "DINOv2 Small", "Embeddings visuels, clustering, doublons et active learning", "Apache-2.0", listOf("model.tflite"), "embedding", "Représentation", ModelCapabilities(setOf(ModelCapability.EMBEDDING, ModelCapability.SIMILARITY), QualificationStatus.UNTESTED)),
+        Entry("vitpose", "ViTPose+ Small", "Heatmaps de points-clés humains", "Apache-2.0", listOf("model.tflite"), "heatmap", "Keypoints", ModelCapabilities(setOf(ModelCapability.POINTING), QualificationStatus.UNTESTED)),
         Entry("efficientvit_sam", "EfficientViT-SAM L0", "Segmentation interactive guidée par point ou boîte", "Apache-2.0", listOf("image_encoder.tflite", "decoder_point.tflite", "decoder_box.tflite"), "bundle", "Segmentation"),
-        Entry("rfdetr", "RF-DETR Base", "Détection d’objets", "Apache-2.0", listOf("model.tflite"), "rfdetr", "Détection"),
+        Entry("rfdetr", "RF-DETR Base", "Détection d’objets", "Apache-2.0", listOf("model.tflite"), "rfdetr", "Détection", ModelCapabilities(setOf(ModelCapability.DETECTION), QualificationStatus.UNTESTED)),
         Entry("florence2", "Florence-2 Base", "Captioning, OCR, grounding et tâches VL", "MIT", listOf("image_encoder.tflite", "multimodal_encoder.tflite", "decoder.tflite"), "bundle", "Vision-language"),
         Entry("grounding_dino_base", "Grounding DINO Base", "Détection open-vocabulary guidée par texte", "Apache-2.0", listOf("model.tflite"), "multi_input", "Open-vocabulary"),
         Entry("owlv2_base_patch16", "OWLv2 Base Patch16", "Détection zero-shot guidée par texte", "Apache-2.0", listOf("model.tflite"), "multi_input", "Open-vocabulary"),
         Entry("depth_anything_v2_small", "Depth Anything V2 Small", "Estimation de profondeur monoculaire", "Apache-2.0", listOf("model.tflite"), "inspect", "Profondeur"),
-        Entry("rtmdet_tiny", "RTMDet Tiny", "Détection d’objets légère", "Apache-2.0", listOf("model.tflite"), "rtmdet", "Détection"),
+        Entry("rtmdet_tiny", "RTMDet Tiny", "Détection d’objets légère", "Apache-2.0", listOf("model.tflite"), "rtmdet", "Détection", ModelCapabilities(setOf(ModelCapability.DETECTION), QualificationStatus.FAILED)),
         Entry("efficientformer_l1", "EfficientFormer L1", "Classification et embeddings visuels", "Apache-2.0", listOf("model.tflite"), "embedding", "Représentation"),
         Entry("repvit_m1", "RepViT M1", "Classification et embeddings visuels mobiles", "Apache-2.0", listOf("model.tflite"), "embedding", "Représentation"),
         Entry("edgenext_xx_small", "EdgeNeXt XX-Small", "Classification et embeddings visuels compacts", "MIT", listOf("model.tflite"), "embedding", "Représentation"),

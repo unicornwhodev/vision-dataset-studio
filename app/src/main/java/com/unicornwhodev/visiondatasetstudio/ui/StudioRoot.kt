@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
 import androidx.compose.ui.semantics.*
 import com.unicornwhodev.visiondatasetstudio.ui.screens.*
 
@@ -35,13 +37,13 @@ fun StudioRoot(viewModel: MainViewModel) {
     val activeProject by viewModel.projectFlow.collectAsState()
     val editorBusy by viewModel.editorBusy.collectAsState()
     val holder = rememberSaveableStateHolder()
-    val destinations = remember { listOf(
-        StudioDestination(Screen.Home, "Atelier", Icons.Default.SpaceDashboard),
-        StudioDestination(Screen.BatchGrid, "Lot", Icons.Default.GridView),
-        StudioDestination(Screen.Models, "Modèles", Icons.Default.Memory),
-        StudioDestination(Screen.Publication, "Export", Icons.Default.IosShare),
-        StudioDestination(Screen.QualityDashboard, "Qualité", Icons.Default.Insights)
-    ) }
+    val destinations = listOf(
+        StudioDestination(Screen.Home, stringResource(R.string.nav_studio), Icons.Default.SpaceDashboard),
+        StudioDestination(Screen.BatchGrid, stringResource(R.string.nav_batch), Icons.Default.GridView),
+        StudioDestination(Screen.Models, stringResource(R.string.nav_models), Icons.Default.Memory),
+        StudioDestination(Screen.Publication, stringResource(R.string.nav_export), Icons.Default.IosShare),
+        StudioDestination(Screen.QualityDashboard, stringResource(R.string.nav_quality), Icons.Default.Insights)
+    )
     BackHandler(enabled = screen !is Screen.Home) { viewModel.back() }
     BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout))) {
         val editor = screen is Screen.AnnotationEditor
@@ -60,7 +62,7 @@ fun StudioRoot(viewModel: MainViewModel) {
                             Modifier.testTag("nav_${item.screen.javaClass.simpleName}")) { viewModel.navigateTo(item.screen) }
                     }
                     Spacer(Modifier.weight(1f))
-                    StudioRailItem("Réglages", Icons.Default.Tune, false, !editorBusy && !busy) { viewModel.navigateTo(Screen.Preferences) }
+                    StudioRailItem(stringResource(R.string.nav_settings), Icons.Default.Tune, false, !editorBusy && !busy) { viewModel.navigateTo(Screen.Preferences) }
                     Spacer(Modifier.height(8.dp))
                 }
                 VerticalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))

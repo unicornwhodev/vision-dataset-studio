@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -39,7 +42,7 @@ fun QualityDashboardScreen(viewModel: MainViewModel) {
     val metrics by produceState(0L to 0L, samples) {
         value = withContext(Dispatchers.IO) { viewModel.storageManager.getFreeSpaceBytes() / (1024 * 1024) to viewModel.storageManager.getUsedSpaceBytes() / (1024 * 1024) }
     }
-    Scaffold(contentWindowInsets = WindowInsets(0), topBar = { StudioTopBar("Qualité", project?.name) }) { inset ->
+    Scaffold(contentWindowInsets = WindowInsets(0), topBar = { StudioTopBar(stringResource(R.string.screen_quality), project?.name) }) { inset ->
         Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
             LazyColumn(Modifier.widthIn(max = 900.dp).fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 if (samples.isEmpty()) item {

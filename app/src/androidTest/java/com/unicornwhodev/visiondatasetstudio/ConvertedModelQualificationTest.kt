@@ -71,7 +71,7 @@ class ConvertedModelQualificationTest {
                 phase("inference")
                 LiteRtEngine().use { engine ->
                     assertTrue(engine.lastError,engine.loadModel(model,config.threads))
-                    val proposals=engine.runInference(image,config)
+                    val proposals=engine.runInference(image,config).orThrow()
                     assertNull(engine.lastError,engine.lastError)
                     assertTrue(proposals.all { it.score.isFinite() })
                     if(ModelContract.adapter(config)=="embedding")assertTrue(requireNotNull(engine.lastEmbedding).isNotEmpty())
@@ -128,7 +128,7 @@ class ConvertedModelQualificationTest {
                 phase("application_inference_from_checkpoint")
                 LiteRtEngine().use { engine ->
                     assertTrue(engine.lastError,engine.loadModel(model,config.threads))
-                    val restoredProposals=engine.runInference(image,config.copy(trainingCheckpoint=receipt))
+                    val restoredProposals=engine.runInference(image,config.copy(trainingCheckpoint=receipt)).orThrow()
                     assertNull(engine.lastError,engine.lastError)
                     assertTrue(restoredProposals.all { it.score.isFinite() })
                     assertEquals((result["proposals"] as Int),restoredProposals.size)

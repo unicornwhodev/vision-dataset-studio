@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,14 +22,15 @@ import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
 
 @Composable
 fun TrainingScreen(vm:MainViewModel) {
-    val project by vm.projectFlow.collectAsState();val run by vm.trainingRun.collectAsState();val busy by vm.isBusy.collectAsState()
+    val project by vm.projectFlow.collectAsState();val run by vm.trainingRun.collectAsState();val busy by vm.isBusy.collectAsState();val preflight by vm.trainingPreflight.collectAsState()
     val number by vm.activeBatchNumber.collectAsState();val batches by vm.batches.collectAsState()
     val eligible=batches.any{it.batchNumber==number && it.status=="VERIFIED" && it.verificationKind in setOf("local","hf","both")}
     val p=project ?: return
     val config=remember(p.modelConfigJson){runCatching{p.modelConfigJson?.let{StudioJson.moshi.adapter(ModelConfig::class.java).fromJson(it)}}.getOrNull()}
     var epochs by rememberSaveable{mutableStateOf(3)}
     val active=run?.phase in setOf("queued","training","evaluating")
-    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar("Apprentissage","Sur cet appareil",onBack={vm.navigateTo(Screen.Models)})}) { inset ->
+    LaunchedEffect(p.id,number,run?.phase){vm.refreshTrainingPreflight()}
+    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_training),stringResource(R.string.subtitle_on_device),onBack={vm.navigateTo(Screen.Models)})}) { inset ->
         Box(Modifier.fillMaxSize().padding(inset),contentAlignment=Alignment.TopCenter) {
             Column(Modifier.widthIn(max=760.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(20.dp)) {
                 Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.PhonelinkSetup,null,Modifier.size(24.dp));Spacer(Modifier.width(12.dp));Column{
@@ -43,7 +47,14 @@ fun TrainingScreen(vm:MainViewModel) {
                 }}
                 Text("Lot exporté $number uniquement. Nettoyage après apprentissage.",style=MaterialTheme.typography.bodyMedium)
                 Row(verticalAlignment=Alignment.CenterVertically){Text("Cycles",Modifier.weight(1f));listOf(1,3,10).forEach{n->FilterChip(selected=epochs==n,onClick={epochs=n},enabled=!active,label={Text("$n")});Spacer(Modifier.width(6.dp))}}
-                StudioAction("Entraîner le lot exporté",{vm.startDeviceTraining(epochs)},icon=Icons.Default.ModelTraining,primary=true,enabled=!busy && !active && eligible && config?.training!=null)
+                StudioAction("Entraîner le lot exporté",{vm.startDeviceTraining(epochs)},icon=Icons.Default.ModelTraining,primary=true,enabled=!busy && !active && preflight?.canStart==true)
+                preflight?.let { state ->
+                    Text(if(state.canStart)"Prêt à démarrer" else "Impossible de démarrer",style=MaterialTheme.typography.titleSmall,color=if(state.canStart)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                    state.checks.forEach { check -> Row(horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.Top) {
+                        Icon(if(check.passed)Icons.Default.CheckCircle else Icons.Default.Cancel,null,Modifier.size(17.dp),tint=if(check.passed)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                        Column { Text(check.label,style=MaterialTheme.typography.labelMedium);Text(check.detail,style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) }
+                    } }
+                }
                 Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text("Apprendre après chaque export",style=MaterialTheme.typography.titleSmall);Text("Option désactivée par défaut. Nouveaux poids activés manuellement.",style=MaterialTheme.typography.bodySmall)};Switch(checked=ProjectSettings.read(p).continuousTraining,onCheckedChange=vm::setContinuousTraining,enabled=!busy && config?.training!=null)}
                 run?.let { state ->
                     HorizontalDivider()

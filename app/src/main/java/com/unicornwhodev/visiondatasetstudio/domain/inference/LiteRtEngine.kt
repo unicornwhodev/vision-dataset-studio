@@ -11,6 +11,8 @@ import java.nio.ByteOrder
 
 /** Interpreter CPU backend. CompiledModel/GPU/NPU are not advertised as tested integrations. */
 class LiteRtEngine : AutoCloseable {
+    var lastResult:InferenceResult?=null
+        private set
     var lastError: String? = null
         private set
     var lastNativeDurationNanos:Long?=null
@@ -57,7 +59,18 @@ class LiteRtEngine : AutoCloseable {
             for(n in 0 until i.outputTensorCount) { val t=i.getOutputTensor(n);appendLine("output[$n] ${t.name()} ${t.shape().toList()} ${t.dataType()} q=${t.quantizationParams().scale}/${t.quantizationParams().zeroPoint}") }
         }
     }
-    suspend fun runInference(bitmap:Bitmap,config:ModelConfig):List<ModelProposal> = withContext(Dispatchers.Default) {
+    suspend fun runInference(bitmap:Bitmap,config:ModelConfig):InferenceResult {
+        val proposals = runInferenceProposals(bitmap, config)
+        val diagnostics=InferenceDiagnostics(modelHash,ModelContract.adapter(config),config.task,
+            listOf(1,config.inputChannels,config.inputHeight,config.inputWidth),threshold=config.threshold,
+            proposalCount=proposals.size,emptyReason=if(proposals.isEmpty() && lastError==null) (lastNote.ifBlank { "Aucune proposition au-dessus du seuil" }) else null,error=lastError)
+        return when {
+            lastError!=null -> InferenceResult.Failure(requireNotNull(lastError),diagnostics)
+            proposals.isEmpty() -> InferenceResult.Empty(diagnostics.emptyReason!!,diagnostics)
+            else -> InferenceResult.Success(proposals,diagnostics)
+        }.also{lastResult=it}
+    }
+    private suspend fun runInferenceProposals(bitmap:Bitmap,config:ModelConfig):List<ModelProposal> = withContext(Dispatchers.Default) {
         lastError=null;lastNativeDurationNanos=null;lastNote="";lastEmbedding=null;lastPatches=null;lastTransform=null
         try {
             ModelContract.validate(config)
@@ -154,8 +167,8 @@ class LiteRtEngine : AutoCloseable {
         catch(e:Exception) { lastError=e.message ?: "Inférence échouée";emptyList() }
     }
     suspend fun dryRun(bitmap:Bitmap,config:ModelConfig):DryRunResult {
-        val start=System.nanoTime();val proposals=runInference(bitmap,config)
-        return DryRunResult(lastError==null,if(config.runtime=="local_http") "HTTP loopback · serveur utilisateur" else "LiteRT Interpreter CPU · $currentThreads threads",(System.nanoTime()-start)/1_000_000,proposals,lastError)
+        val start=System.nanoTime();val result=runInference(bitmap,config)
+        return DryRunResult(result !is InferenceResult.Failure,if(config.runtime=="local_http") "HTTP loopback · serveur utilisateur" else "LiteRT Interpreter CPU · $currentThreads threads",(System.nanoTime()-start)/1_000_000,runCatching{result.orThrow()}.getOrDefault(emptyList()),(result as? InferenceResult.Failure)?.error)
     }
     override fun close() = synchronized(lock) {
         bundle?.close();bundle=null;trainingSession?.close();trainingSession=null;trainingConfig=null;interpreter?.close();interpreter=null;currentModelPath=null

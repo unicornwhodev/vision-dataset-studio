@@ -37,6 +37,8 @@ L’état de production, l’inférence et l’apprentissage facultatif restent 
 
 ## Fonctions et état
 
+La stabilisation de septembre 2026 sépare maintenant l'intégrité des artefacts runtime de la documentation des modèles, expose les capacités/qualifications et distingue une inférence vide d'un échec. Voir [le rapport de stabilisation](docs/STABILIZATION_2026_09.md). Ces corrections ne valent pas qualification d'un modèle non exécuté.
+
 | Fonction | État |
 |---|---|
 | Import local / HF, lots configurables, correction et exports | Implémentés ; cycle local 2+1 vérifié sur Android |
