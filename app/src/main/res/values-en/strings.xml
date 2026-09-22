@@ -34,8 +34,93 @@
     <string name="training_progress">%1$d / %2$d steps · %3$d training / %4$d validation</string><string name="training_loss">Validation loss: %1$.5f → %2$.5f</string><string name="training_weights_changed">Internal weights changed</string><string name="training_weights_unchanged">Internal weights unchanged</string>
     <string name="training_details_dataset">At least 32 training images and 8 validation images are required. The split depends on file hashes; identical files cannot cross groups. All accepted images from the exported batch are used, with a private copy retained until training and cleanup finish.</string>
     <string name="training_details_runtime">Execution uses the model’s LiteRT train / infer / save / restore signatures. No corpus or gradient is sent to the pod. Reused validation does not measure generalization to an independent corpus.</string>
-    <string name="cap_detection">Detection</string><string name="cap_pointing">Pointing</string><string name="cap_segmentation">Masks</string><string name="cap_classification">Classification</string><string name="cap_captioning">Captions</string><string name="cap_embedding">Embeddings</string><string name="cap_similarity">Similarity</string><string name="cap_interactive_segmentation">Interactive segmentation</string><string name="cap_training">Trainable</string><string name="cap_inspection">Inspection only</string>
+    <string name="cap_detection">Detection</string><string name="cap_pointing">Pointing</string><string name="cap_segmentation">Masks</string><string name="cap_classification">Classification</string><string name="cap_captioning">Captions</string><string name="cap_vqa">Questions/answers</string><string name="cap_counting">Counting</string><string name="cap_grounding">Text ↔ region</string><string name="cap_embedding">Embeddings</string><string name="cap_similarity">Similarity</string><string name="cap_interactive_segmentation">Interactive segmentation</string><string name="cap_training">Trainable</string><string name="cap_inspection">Inspection only</string>
     <string name="qualification_qualified">Qualified</string><string name="qualification_partial">Partially qualified</string><string name="qualification_inference">Inference qualified</string><string name="qualification_training">Training qualified</string><string name="qualification_failed">Known failure</string><string name="qualification_untested">Unqualified</string>
     <string name="model_state_upcoming">Upcoming</string><string name="model_state_unsupported">Unsupported bundle</string><string name="model_state_contract">Contract provided</string><string name="model_state_heatmap">Heatmap contract</string><string name="model_state_embedding">Visual representations</string><string name="model_state_bundle">Local pipeline</string><string name="model_state_detection">Detection</string><string name="model_state_inspection">Inspection</string><string name="model_files">%1$d file(s)</string><string name="model_test_required">Installation and on-device testing required.</string>
     <string name="export_format_canonical">Complete JSONL</string><string name="export_format_coco">COCO — boxes + masks</string><string name="export_format_yolo">YOLO — boxes</string><string name="export_format_vl">Questions / answers</string>
+    <string name="editor_action_preannotate">Pre-annotate</string><string name="editor_action_preannotate_partial">Partially pre-annotate</string><string name="editor_action_embedding">Compute representation</string><string name="editor_action_interactive_segmentation">Prompt segmentation</string><string name="editor_action_inspect">Inspect model</string><string name="editor_action_model">Model</string>
+    <string name="instance_unlinked">Unlinked instance</string><string name="instance_linked">Instance · %1$s</string><string name="instance_new">New instance</string><string name="instance_unlink">Unlink</string><string name="instance_link_box">Link box · %1$s</string><string name="instance_link_mask">Link mask · %1$s</string><string name="instance_link_point">Link point · %1$s</string>
+    <!-- Remaining primary-screen labels -->
+    <string name="batch_none">No acquired batch</string>
+    <string name="batch_retry_downloads">Retry downloads</string>
+    <string name="batch_exclude_failures">Exclude failed acquisitions…</string>
+    <string name="batch_select_editable">Select displayed editable cases</string>
+    <string name="batch_defer">Defer</string>
+    <string name="batch_add_tag">Add tag</string>
+    <string name="batch_preannotate_title">Pre-annotate?</string>
+    <string name="batch_run">Run</string>
+    <string name="batch_reject_failures">Reject failures?</string>
+    <string name="batch_exclude_cases">Exclude these cases</string>
+    <string name="batch_tag_to_add">Tag to add</string>
+    <string name="common_apply">Apply</string>
+    <string name="editor_reject_explanation">The image is excluded from export without immediately deleting the file.</string>
+    <string name="editor_accept_explanation">Point, box, and tag proposals for this image will be marked as human-reviewed. Accept only what you actually verified.</string>
+    <string name="publication_hf">Hugging Face</string>
+    <string name="publication_isolate_title">Isolate a new attempt?</string>
+    <string name="publication_close_all_title">Close all these rejections?</string>
+    <string name="setup_dataset_url_help">Dataset URL or identifier, not a file URL.</string>
+    <string name="setup_classes_help">Stable identifiers for your taxonomy. Existing classes are not renamed automatically.</string>
+    <string name="setup_optional_contract">model-config.json · optional</string>
+    <string name="setup_budget_help">From 128 to 65,536 MiB. Configurable batches of 1 to 1,000 cases.</string>
+    <string name="prefs_appearance">Appearance</string>
+    <string name="prefs_gestures">Gestures and pace</string>
+    <string name="prefs_tools">Tools</string>
+    <string name="controls_projects">My projects</string>
+    <string name="controls_presets">Presets</string>
+    <string name="controls_source_selection">Source and selection</string>
+    <string name="controls_collaboration">Collaboration</string>
+    <string name="controls_batches_network">Batches and network</string>
+    <string name="controls_bounded_storage">Bounded storage</string>
+    <string name="controls_hf_publication">Hugging Face publication</string>
+    <string name="controls_model_library">Model library</string>
+    <string name="controls_public_catalog">Downloadable public catalog</string>
+    <string name="controls_download_inspect">Download and inspect…</string>
+    <string name="controls_import_tflite">Import a .tflite file</string>
+    <string name="controls_download_weights">Download these weights</string>
+    <string name="controls_detach_model">Detach model from this project</string>
+    <string name="controls_keep_profile">Keep weights and contract in library</string>
+    <string name="controls_contract_preprocessing">Contract and preprocessing</string>
+    <string name="controls_versioned_contract">Versioned JSON contract</string>
+    <string name="controls_validate_contract">Validate and save contract</string>
+    <string name="controls_dry_run">Test without changing annotations</string>
+    <string name="controls_test_image">Test saved model on an image</string>
+    <string name="controls_preannotate_pending">Pre-annotate pending batch cases</string>
+    <string name="controls_measure_device">Measure on this device</string>
+    <string name="controls_adaptive_points">Adaptive point correction</string>
+    <string name="common_download">Download</string>
+    <string name="controls_delete_profile_title">Delete this profile?</string>
+    <string name="common_delete">Delete</string>
+    <string name="controls_clear_corrector_title">Clear local corrector?</string>
+    <string name="common_reset">Reset</string>
+    <string name="batch_preannotate_body">The model will process one pending image at a time. Existing corrections and decisions will be preserved. No proposal will be validated automatically. Keep the app open.</string>
+    <string name="batch_reject_failures_body">Images that could not be retrieved will be excluded from the dataset with their failure reason. This action fixes no file and validates no image.</string>
+    <string name="batch_bulk_body">The action only affects selected editable cases. No image will be validated automatically.</string>
+    <string name="publication_isolate_body">The previous commit and paths will remain unchanged. A new publication will use a unique path; this can create a remote duplicate if the first response was lost. Nothing is deleted remotely.</string>
+    <string name="publication_close_all_body">No case in this batch was accepted. Rejections and reasons remain in history. Cached-copy cleanup remains separate; no source original will be deleted.</string>
+    <string name="controls_download_title">Download %1$s?</string><string name="controls_download_body">Download from public TensorFlow storage without an HF token. Maximum allowance: 64 MB. Labels and metadata are read from the weights. Incompatible imports are blocked. Check the model terms before redistribution. The active model is not replaced.</string>
+    <string name="controls_delete_profile_body">Its weights will be deleted only when no other profile or project uses them. Annotations and correctors will not be deleted.</string>
+    <string name="controls_clear_corrector_body">Numeric examples and correction heads for this project will be erased. Annotations, images, and model weights remain intact.</string>
+    <!-- Remaining setup and workflow copy -->
+    <string name="setup_access_unconfirmed">Access not confirmed</string>
+    <string name="setup_adapters_help">Available adapters: SSD / TF Object Detection and classification. YOLO, pointing, or arbitrary VLM models require a dedicated adapter.</string>
+    <string name="setup_no_model">No imported model</string>
+    <string name="setup_folder_indexed">Folder indexed</string>
+    <string name="setup_start">Start</string>
+    <string name="setup_repo_accessible">Repository accessible. This does not guarantee write permission.</string>
+    <string name="setup_provenance_locked">Provenance is locked after the first batch is acquired: changing the source will be refused without affecting data.</string>
+    <string name="setup_network_safety">Network errors must not erase corrections. Automatic cleanup requires remote verification of published files.</string>
+    <string name="setup_export_later">Archive formats and contents are selected in Export. No upload starts at this step.</string>
+    <string name="setup_proposals_help">Proposals still require review. All manual tools remain available without a model.</string>
+    <string name="setup_local_export_help">Local export remains available without a destination repository.</string>
+    <string name="setup_index_help">The index references images. Only the active batch is copied to cache.</string>
+    <string name="setup_advanced">Advanced options</string>
+    <string name="setup_weights_imported">Weights imported · compatibility must be checked</string>
+    <string name="setup_prepare_next">Prepare the batch next</string>
+    <string name="setup_collapse">Collapse</string>
+    <string name="setup_token_security">Encrypted storage with Android Keystore. The token is not included in exports.</string>
+    <string name="setup_tasks_help">You can combine or change tasks later.</string>
+    <string name="workflow_privacy">Only instructions and case counts are sent. The server is provided separately.</string>
+    <string name="workflow_prepare">Prepare</string>
+    <string name="similarity_empty">No other representation is available. Process the batch with the same encoder.</string>
+    <string name="setup_rows_verified">%1$d verified rows</string><string name="setup_verify_image_column">Check that “%1$s” is the column containing the images.</string><string name="setup_connected">Connected: %1$s</string><string name="setup_public_read">Public read access available</string><string name="setup_create_private_body">Repository %1$s will be created in your Hugging Face account. No file will be published now.</string>
 </resources>

@@ -17,7 +17,7 @@ import org.junit.Test
 class EnglishLocaleComposeTest {
     @get:Rule val rule=createComposeRule()
 
-    @Test fun modelAndTrainingPrimaryActionsUseEnglishResources() {
+    @Test fun primaryWorkflowsUseEnglishResources() {
         val base=InstrumentationRegistry.getInstrumentation().targetContext
         val configuration=Configuration(base.resources.configuration).apply{setLocale(Locale.ENGLISH)}
         val english=base.createConfigurationContext(configuration)
@@ -30,10 +30,16 @@ class EnglishLocaleComposeTest {
                     stringResource(R.string.training_activate),
                     stringResource(R.string.training_scope_classification),
                     stringResource(R.string.qualification_training),
-                    stringResource(R.string.export_format_coco)
+                    stringResource(R.string.export_format_coco),
+                    stringResource(R.string.setup_project_name),
+                    stringResource(R.string.editor_review_before_validate),
+                    stringResource(R.string.publication_publish),
+                    stringResource(R.string.controls_save_settings),
+                    stringResource(R.string.workflow_propose),
+                    stringResource(R.string.quality_open_batches)
                 ).joinToString(" · "))
             }
         }
-        rule.onNodeWithText("Explore · Choose a .tflite file · Train exported batch · Activate trained weights · Classification head · frozen encoder · Training qualified · COCO — boxes + masks").assertIsDisplayed()
+        rule.onNodeWithText("Explore · Choose a .tflite file · Train exported batch · Activate trained weights · Classification head · frozen encoder · Training qualified · COCO — boxes + masks · Project name · Check before validating · Publish · Save these settings · Propose a workflow · Open batches").assertIsDisplayed()
     }
 }

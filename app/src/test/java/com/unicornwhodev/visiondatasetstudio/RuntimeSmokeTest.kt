@@ -87,6 +87,18 @@ class RuntimeSmokeTest {
     val broken=coco.toMutableMap();val brokenRows=rows.map{(it as Map<*,*>).toMutableMap()}.toMutableList()
     val last=brokenRows.last();val segmentation=(last["segmentation"] as Map<*,*>).toMutableMap();segmentation["counts"]=listOf(1,1);last["segmentation"]=segmentation;broken["annotations"]=brokenRows
     assertThrows(IllegalArgumentException::class.java){exporters.validateCocoDocument(broken)}
+
+    val linked=annot.copy(
+      boxes=listOf(annot.boxes.single().copy(instanceId="dog-1")),
+      masks=listOf(annot.masks.single().copy(instanceId="dog-1")))
+    exporters.exportCocoDetection(project,listOf(sample to linked),cocoFile)
+    val linkedRows=(StudioJson.moshi.adapter(Map::class.java).fromJson(cocoFile.readText()) as Map<*,*>)["annotations"] as List<*>
+    assertEquals(1,linkedRows.size);assertTrue((linkedRows.single() as Map<*,*>).containsKey("segmentation"))
+    val distinct=linked.copy(masks=listOf(linked.masks.single().copy(instanceId="dog-2")))
+    exporters.exportCocoDetection(project,listOf(sample to distinct),cocoFile)
+    assertEquals(2,((StudioJson.moshi.adapter(Map::class.java).fromJson(cocoFile.readText()) as Map<*,*>)["annotations"] as List<*>).size)
+    val ambiguous=linked.copy(masks=linked.masks+linked.masks.single().copy(id="m2"))
+    assertThrows(IllegalArgumentException::class.java){exporters.exportCocoDetection(project,listOf(sample to ambiguous),cocoFile)}
     cocoFile.delete()
 
     // 3. YOLO Format

@@ -38,7 +38,7 @@ fun StudioPreferencesScreen(viewModel: MainViewModel) {
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = { StudioTopBar(stringResource(R.string.screen_preferences), onBack = viewModel::back) }) { inset ->
         Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = 800.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                StudioSection("Apparence", "Réglages enregistrés automatiquement sur cet appareil.", Icons.Default.Palette) {
+                StudioSection(stringResource(R.string.prefs_appearance), "Réglages enregistrés automatiquement sur cet appareil.", Icons.Default.Palette) {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         ThemeMode.entries.forEach { theme -> FilterChip(selected = prefs.theme == theme, onClick = { viewModel.updatePreferences(prefs.copy(theme = theme)) }, label = { Text(when(theme) { ThemeMode.SYSTEM -> "Système"; ThemeMode.LIGHT -> "Clair"; ThemeMode.DARK -> "Sombre" }) }) }
                     }
@@ -48,7 +48,7 @@ fun StudioPreferencesScreen(viewModel: MainViewModel) {
                     }
                     PreferenceToggle("Repères sur l’image", "Classes visibles.", prefs.showCanvasLabels) { viewModel.updatePreferences(prefs.copy(showCanvasLabels = it)) }
                 }
-                StudioSection("Gestes & rythme", icon = Icons.Default.TouchApp) {
+                StudioSection(stringResource(R.string.prefs_gestures), icon = Icons.Default.TouchApp) {
                     PreferenceToggle("Passer à l’image suivante", "Après validation.", prefs.autoAdvance) { viewModel.updatePreferences(prefs.copy(autoAdvance = it)) }
                     PreferenceToggle("Mode gaucher", "Valider à gauche.", prefs.leftHanded) { viewModel.updatePreferences(prefs.copy(leftHanded = it)) }
                     PreferenceToggle("Afficher les conseils", "Repères dans l’atelier.", prefs.showGuidance) { viewModel.updatePreferences(prefs.copy(showGuidance = it)) }
@@ -57,11 +57,11 @@ fun StudioPreferencesScreen(viewModel: MainViewModel) {
                         listOf("fr" to "Français", "en" to "Anglais").forEach { (code, label) -> FilterChip(selected = prefs.captionLanguage == code, onClick = { viewModel.updatePreferences(prefs.copy(captionLanguage = code)) }, label = { Text(label) }) }
                     }
                 }
-                StudioSection("Outils", "Qualité reste toujours accessible. Masquer un outil n’efface rien.", Icons.Default.Widgets) {
+                StudioSection(stringResource(R.string.prefs_tools), "Qualité reste toujours accessible. Masquer un outil n’efface rien.", Icons.Default.Widgets) {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StudioTask.entries.forEach { task -> FilterChip(selected = task in chosenTasks, onClick = { chosenTasks = StudioWorkflow.toggleTask(chosenTasks, task) }, label = { Text(task.title) }) }
                     }
-                    Button(onClick = { viewModel.updateTasks(chosenTasks) }, enabled = !busy && chosenTasks != StudioWorkflow.parseTasks(project?.activeTasksCsv ?: "DETECTION")) { Text("Appliquer") }
+                    Button(onClick = { viewModel.updateTasks(chosenTasks) }, enabled = !busy && chosenTasks != StudioWorkflow.parseTasks(project?.activeTasksCsv ?: "DETECTION")) { Text(stringResource(R.string.common_apply)) }
                 }
                 StudioDetails("L’adaptation est explicite : aucun apprentissage caché de vos décisions, aucune modification automatique des classes ou des annotations.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

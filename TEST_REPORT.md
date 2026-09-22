@@ -1,5 +1,19 @@
 # État rc3 — build et tests du 20 septembre 2026 UTC
 
+## Third stabilization pass — 22 septembre 2026
+
+La troisième passe ajoute la compatibilité partielle, traite `NEGATIVE` comme décision exclusivement humaine, porte les quatre états de localisation sur chaque point, lie explicitement les instances box/masque pour COCO, adapte l’action de l’éditeur et homogénéise les diagnostics runtime. Des tests Kotlin ont été ajoutés pour ces chemins mais n’ont pas été exécutés ici.
+
+Complément instance : les relations peuvent désormais être créées et retirées depuis l’éditeur, sont validées avant revue/export et suivent des règles conservatrices lors des duplications, fusions et séparations. Les tests Kotlin correspondants sont écrits ; leur statut d’exécution est celui consigné ci-dessous et ne doit pas être déduit de leur présence.
+
+Complément i18n : les libellés et confirmations statiques principaux des parcours Setup, éditeur, publication, contrôles, qualité, workflow et lots disposent maintenant de ressources FR/EN. Le test Compose anglais a été étendu à leurs actions critiques, mais n’a pas été exécuté ici faute de SDK Android.
+
+Une passe supplémentaire externalise les descriptions restantes de Setup et Workflow ainsi que leurs valeurs dynamiques principales (compte connecté, lignes inspectées, colonne image et création de dépôt). Les contrôles hôte restent à 47 réussites ; cette vérification ne remplace toujours pas Compose sur Android.
+
+Le complément pointing/grounding ajoute un aller-retour JSONL canonique des quatre états et des tests purs de résolution phrase-région. Le contrat grounding HTTP dispose désormais d’un mode de sortie explicite, d’un validateur de références/seuil et d’un garde de revue humaine ; les tests Kotlin couvrant ces règles sont écrits mais ne sont pas comptés comme exécutés tant que Gradle reste bloqué par l’absence de SDK Android.
+
+Exécuté : `python -m unittest discover -s tools/qa -p 'test_*.py'` (**47/47 réussis**) et `git diff --check` (réussi). Les quatre commandes Gradle demandées ont été tentées ; chacune s’est arrêtée avant compilation/test/lint parce que le SDK Android est introuvable et `ANDROID_HOME` absent. Aucun APK ni schéma KSP n’a été produit, aucun test Android/JVM nouveau n’est revendiqué, et le projet n’est pas déclaré stable ou qualifié.
+
 ## Passe de stabilisation du 22 septembre 2026
 
 La passe de finalisation du catalogue dérive maintenant les capacités des contrats installés sans transformer cette capacité théorique en qualification. Les actions principales Modèles/Apprentissage ont été externalisées et un test Compose anglais a été ajouté. Il n’a pas été exécuté ici : le conteneur ne contient ni SDK Android, ni `adb`, ni appareil. Les mesures téléphone ARM, RAM, latence, thermique, SAF réel et corpus représentatif restent **non exécutées**. Aucun nombre de qualification existant n’a été augmenté.

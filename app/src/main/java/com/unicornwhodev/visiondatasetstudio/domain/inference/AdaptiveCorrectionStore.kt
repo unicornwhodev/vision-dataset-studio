@@ -25,7 +25,7 @@ class AdaptiveCorrectionStore(private val context:Context) {
         val additions=mutableMapOf<String,MutableList<CorrectionExample>>()
         pairs.filter{it.first.annotationStatus=="VALIDATED"}.forEach{(s,a)->
             val image=s.sha256 ?: return@forEach
-            a.points.filter{it.explicitlyAdjusted && it.isHumanVerified && !it.isAbsent && !it.isAbstained && it.modelX!=null && it.modelY!=null && it.modelLabel==it.label && it.sourceProvenance.startsWith("model_litert:")}.forEach{p->
+            a.points.filter{it.explicitlyAdjusted && it.isHumanVerified && it.canProvideCoordinates && it.modelX!=null && it.modelY!=null && it.modelLabel==it.label && it.sourceProvenance.startsWith("model_litert:")}.forEach{p->
                 val key=AdaptiveCorrection.groupKey(p.sourceProvenance,p.label)
                 additions.getOrPut(key){mutableListOf()}.add(CorrectionExample(AdaptiveCorrection.hash("$image:${p.id}"),image,p.modelX!!.toDouble(),p.modelY!!.toDouble(),p.boxWidth.toDouble(),p.boxHeight.toDouble(),(p.modelScore ?: .5f).toDouble(),p.x.toDouble(),p.y.toDouble(),true,true))
             }

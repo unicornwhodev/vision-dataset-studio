@@ -2,18 +2,20 @@ package com.unicornwhodev.visiondatasetstudio.domain.validation
 
 import com.unicornwhodev.visiondatasetstudio.core.workflow.StudioTask
 import com.unicornwhodev.visiondatasetstudio.data.model.SampleAnnotations
+import com.unicornwhodev.visiondatasetstudio.data.model.PointLocalizationState
+import com.unicornwhodev.visiondatasetstudio.data.model.InstanceLinks
 
 /** No heuristically inferred empty annotation, no automatic acceptance of model suggestions. */
 object AnnotationReview {
     fun problems(a: SampleAnnotations, tasks: Set<StudioTask>): List<String> = buildList {
         fun valid(v: Float) = v.isFinite() && v in 0f..1f
-        val visiblePoints = a.points.filterNot { it.isAbsent || it.isAbstained }
-        if (a.points.any { !valid(it.x) || !valid(it.y) || it.label.isBlank() || (it.isAbsent && it.isAbstained) })
+        val visiblePoints = a.points.filter { it.effectiveLocalizationState==PointLocalizationState.LOCALIZED }
+        if (a.points.any { !valid(it.x) || !valid(it.y) || it.label.isBlank() || (it.localizationState==null && it.isAbsent && it.isAbstained) })
             add("Un point contient des coordonnées, une classe ou un état invalide.")
         if (a.boxes.any { !valid(it.xmin) || !valid(it.ymin) || !valid(it.xmax) || !valid(it.ymax) || it.xmin >= it.xmax || it.ymin >= it.ymax || it.label.isBlank() })
             add("Une boîte est vide, hors image ou sans classe.")
         if (StudioTask.POINTING in tasks && a.points.size > 1) add("Le profil Point unique n’autorise qu’une cible. Choisissez Points multiples pour ce cas.")
-        if ((a.points.any { !it.isHumanVerified }) || a.boxes.any { !it.isHumanVerified } || a.tags.any { !it.isHumanVerified } || a.captions.any { !it.isHumanVerified && it.sourceProvenance != "human" } || a.vqaList.any { !it.isHumanVerified && it.sourceProvenance != "human" } || a.counts.any { !it.isHumanVerified && it.sourceProvenance != "human" })
+        if ((a.points.any { !it.isHumanVerified }) || a.boxes.any { !it.isHumanVerified } || a.tags.any { !it.isHumanVerified } || a.captions.any { !it.isHumanVerified && it.sourceProvenance != "human" } || a.vqaList.any { !it.isHumanVerified && it.sourceProvenance != "human" } || a.counts.any { !it.isHumanVerified && it.sourceProvenance != "human" } || a.groundings.any { !it.isHumanVerified })
             add("Des propositions restent à relire. Acceptez-les explicitement ou supprimez-les.")
         if(a.masks.any { it.label.isBlank() || runCatching { com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.validate(it) }.isFailure }) add("Un masque est invalide.")
         if(a.masks.any { !it.isHumanVerified }) add("Des masques restent à relire.")
@@ -23,11 +25,13 @@ object AnnotationReview {
         if (absent && located) add("Une absence globale ne peut pas coexister avec une cible localisée. Précisez les annotations de ce cas.")
         if (absent && a.quality.isUnlocalizablePresent) add("Une cible ne peut pas être à la fois absente et présente non localisable.")
         if (a.quality.isUncertain) add("L’incertitude doit être résolue avant validation; utilisez Différer pour conserver ce cas à revoir.")
+        if(a.points.any{it.effectiveLocalizationState==PointLocalizationState.UNCERTAIN}) add("L’incertitude d’une cible doit être résolue avant validation; utilisez Différer pour la conserver.")
         val allIds = a.boxes.map { it.id } + a.points.map { it.id } + a.masks.map { it.id }
         if (allIds.any { it.isBlank() } || allIds.distinct().size != allIds.size) add("Les identifiants de régions doivent être renseignés et uniques.")
+        addAll(InstanceLinks.problems(a))
         if (a.captions.any { it.text.isBlank() || it.language.isBlank() }) add("Une légende est vide ou sans langue.")
         if (a.tags.any { it.label.isBlank() }) add("Un tag est vide.")
-        val explicitSpatialState = absent || a.quality.isUnlocalizablePresent
+        val explicitSpatialState = absent || a.quality.isUnlocalizablePresent || a.points.any{it.effectiveLocalizationState in setOf(PointLocalizationState.ABSENT,PointLocalizationState.UNLOCALIZABLE)}
         if ((StudioTask.POINTING in tasks || StudioTask.POINTING_MULTI in tasks) && a.points.isEmpty() && !explicitSpatialState)
             add("Placez une cible ou indiquez explicitement son absence / sa non-localisabilité dans Qualité.")
         if (StudioTask.DETECTION in tasks && a.boxes.isEmpty() && !explicitSpatialState)

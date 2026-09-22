@@ -292,7 +292,7 @@ class BatchEngine(
             }
             val existing = getSampleAnnotations(sample.sampleId)
             val project=db.projectDao().getProjectSync(projectId) ?: error("Projet absent")
-            val updated=ProposalMerger.merge(existing,proposals,project.activeTasksCsv,config.captionLanguage,ModelContract.outputTypes(config))
+            val updated=ProposalMerger.merge(existing,proposals,project.activeTasksCsv,config.captionLanguage,ModelContract.compatibility(config,project.activeTasksCsv).usableOutputs)
             val status=if(proposals.isEmpty()) AnnotationStatus.IN_PROGRESS.name else AnnotationStatus.PROPOSALS_AVAILABLE.name
             db.withTransaction {
                 saveSampleAnnotations(sample.sampleId, updated)

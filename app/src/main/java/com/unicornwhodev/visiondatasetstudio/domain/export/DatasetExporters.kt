@@ -155,16 +155,30 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
     fun exportCocoDetection(project: ProjectEntity, samples: List<Pair<SampleEntity, SampleAnnotations>>, outputFile: File) {
         require(samples.map{it.first.sampleId}.distinct().size==samples.size){"Identifiants d’images COCO dupliqués"}
         val labels = classes(project); var next = 0
-        val annotations = samples.flatMapIndexed { index, (_, a) -> a.boxes.map { b ->
-            val s = samples[index].first; val c = labels.indexOf(b.label); require(c >= 0) { "Classe COCO inconnue: ${b.label}" }
-            val bbox = NormalizedRect(b.xmin, b.ymin, b.xmax, b.ymax).toCocoPx(s.imageWidth, s.imageHeight)
-            mapOf("id" to ++next, "image_id" to index + 1, "category_id" to c + 1, "bbox" to bbox.toList(), "area" to bbox[2] * bbox[3], "iscrowd" to 0)
-        } + a.masks.mapNotNull { m ->
-            val sample=samples[index].first;val category=labels.indexOf(m.label);require(category>=0) { "Classe COCO inconnue: ${m.label}" }
-            val projection=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.projectCoco(m,sample.imageWidth,sample.imageHeight)
-            if(projection.area==0) null else mapOf("id" to ++next,"image_id" to index+1,"category_id" to category+1,"bbox" to projection.bbox,"area" to projection.area,"iscrowd" to 0,
-                "segmentation" to projection.segmentation)
-        } }
+        val annotations = samples.flatMapIndexed { index, (sample, a) ->
+            val relationProblems=com.unicornwhodev.visiondatasetstudio.data.model.InstanceLinks.problems(a)
+            require(relationProblems.isEmpty()){relationProblems.joinToString(" ")}
+            val masksByInstance=a.masks.filter{it.instanceId!=null}.associateBy{it.instanceId}
+            val mergedMaskIds=mutableSetOf<String>()
+            val rows=mutableListOf<Map<String,Any>>()
+            a.boxes.forEach { b ->
+                val category=labels.indexOf(b.label);require(category>=0) { "Classe COCO inconnue: ${b.label}" }
+                val bbox=NormalizedRect(b.xmin,b.ymin,b.xmax,b.ymax).toCocoPx(sample.imageWidth,sample.imageHeight)
+                val row=mutableMapOf<String,Any>("id" to ++next,"image_id" to index+1,"category_id" to category+1,"bbox" to bbox.toList(),"area" to bbox[2]*bbox[3],"iscrowd" to 0)
+                b.instanceId?.let(masksByInstance::get)?.let { mask ->
+                    require(mask.label==b.label){"Une instance COCO liée doit conserver la même classe"}
+                    val projection=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.projectCoco(mask,sample.imageWidth,sample.imageHeight)
+                    if(projection.area>0){row["segmentation"]=projection.segmentation;row["area"]=projection.area;mergedMaskIds+=mask.id}
+                }
+                rows+=row
+            }
+            a.masks.filterNot{it.id in mergedMaskIds}.forEach { m ->
+                val category=labels.indexOf(m.label);require(category>=0) { "Classe COCO inconnue: ${m.label}" }
+                val projection=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.projectCoco(m,sample.imageWidth,sample.imageHeight)
+                if(projection.area>0)rows+=mapOf("id" to ++next,"image_id" to index+1,"category_id" to category+1,"bbox" to projection.bbox,"area" to projection.area,"iscrowd" to 0,"segmentation" to projection.segmentation)
+            }
+            rows
+        }
         val document=mapOf<String,Any>("images" to samples.mapIndexed { i, (s, _) -> mapOf("id" to i + 1, "file_name" to "images/${imageName(s)}", "width" to s.imageWidth, "height" to s.imageHeight) },
             "categories" to labels.mapIndexed { i, label -> mapOf("id" to i + 1, "name" to label) }, "annotations" to annotations)
         validateCocoDocument(document)

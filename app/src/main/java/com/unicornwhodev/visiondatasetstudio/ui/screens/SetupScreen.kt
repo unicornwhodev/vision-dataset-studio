@@ -65,39 +65,39 @@ fun SetupScreen(viewModel: MainViewModel) {
     }, bottomBar = {
         Surface(shadowElevation = 3.dp) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (step > 0) OutlinedButton(onClick = { step-- }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("Précédent") }
+                if (step > 0) OutlinedButton(onClick = { step-- }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.common_previous)) }
                 Button(onClick = {
                     if (step < 2) step++ else viewModel.saveSetup(name, source, destination, config, split, imageColumn, classes,
                         budget.toLongOrNull() ?: 500L, tasks, prepare)
                 }, enabled = !busy && when(step) { 0 -> sourceOk; 1 -> classes.isNotBlank(); else -> sourceOk && destOk && (budget.toLongOrNull() ?: 0L) in 128L..65536L },
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("setup_next")) {
-                    Text(if (step < 2) "Continuer" else if (prepare) "Démarrer" else "Enregistrer")
+                    Text(if (step < 2) "Continuer" else if (prepare) stringResource(R.string.setup_start) else "Enregistrer")
                 }
             }
         }
     }) { inset ->
         Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = 820.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-                StudioTabs(listOf("Source", "Outils", "Sortie"), step, { if (!busy) step = it })
+                StudioTabs(listOf("Source", stringResource(R.string.prefs_tools), "Sortie"), step, { if (!busy) step = it })
                 when(step) {
                     0 -> {
-                        OutlinedTextField(name, { name = it }, label = { Text("Nom du projet") }, modifier = Modifier.fillMaxWidth(), singleLine = true, enabled = !busy)
-                        StudioSection("Images locales", "L’index référence les images. Seul le lot actif est copié dans le cache.", Icons.Default.FolderOpen) {
+                        OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.setup_project_name)) }, modifier = Modifier.fillMaxWidth(), singleLine = true, enabled = !busy)
+                        StudioSection(stringResource(R.string.setup_local_images), stringResource(R.string.setup_index_help), Icons.Default.FolderOpen) {
                             val localPolicy = com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(p)
-                            if (localPolicy.sourceMode == "LOCAL_INDEX" && localPolicy.sourceIndexReady) Text(localPolicy.localSourceLabel.ifBlank { "Dossier indexé" }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                            if (localPolicy.sourceMode == "LOCAL_INDEX" && localPolicy.sourceIndexReady) Text(localPolicy.localSourceLabel.ifBlank { stringResource(R.string.setup_folder_indexed) }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                             OutlinedButton(onClick = { chooseFolder.launch(null) }, enabled = !busy && batches.isEmpty(), shape = MaterialTheme.shapes.small, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                                Icon(Icons.Default.FolderOpen, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Choisir un dossier")
+                                Icon(Icons.Default.FolderOpen, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.setup_choose_folder))
                             }
                         }
-                        StudioDisclosure("Dataset Hugging Face", Icons.Default.CloudDownload, initiallyExpanded = p.hfSourceRepo.isNotBlank()) {
-                            OutlinedTextField(source, { source = it }, label = { Text("Lien ou identifiant du dataset") }, placeholder = { Text("organisation/dataset") },
-                                isError = source.isNotBlank() && !sourceOk, supportingText = { Text("URL de dataset ou identifiant, pas une URL de fichier.") },
+                        StudioDisclosure(stringResource(R.string.setup_hf_dataset), Icons.Default.CloudDownload, initiallyExpanded = p.hfSourceRepo.isNotBlank()) {
+                            OutlinedTextField(source, { source = it }, label = { Text(stringResource(R.string.setup_dataset_link)) }, placeholder = { Text("organisation/dataset") },
+                                isError = source.isNotBlank() && !sourceOk, supportingText = { Text(stringResource(R.string.setup_dataset_url_help)) },
                                 enabled = !busy, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("source_repo_input"))
                             FilledTonalButton(onClick = { viewModel.inspectSourceDataset(source, config, split) }, enabled = sourceOk && source.isNotBlank() && !busy, modifier = Modifier.fillMaxWidth()) {
-                                Icon(Icons.Default.Search, null); Spacer(Modifier.width(8.dp)); Text("Inspecter la source")
+                                Icon(Icons.Default.Search, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.setup_inspect_source))
                             }
                             if (inspection.isInspected && inspection.repoId == StudioWorkflow.normalizeRepo(source)) {
-                                StatusPill("${inspection.previewRows.size} lignes vérifiées", Icons.Default.CheckCircleOutline)
+                                StatusPill(stringResource(R.string.setup_rows_verified,inspection.previewRows.size), Icons.Default.CheckCircleOutline)
                                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     inspection.splits.forEach { item ->
                                         FilterChip(selected = config == item.config && split == item.split, onClick = {
@@ -109,28 +109,28 @@ fun SetupScreen(viewModel: MainViewModel) {
                                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     inspection.availableColumns.forEach { column -> FilterChip(selected = imageColumn == column, onClick = { imageColumn = column }, label = { Text(column) }) }
                                 }
-                                Text("Vérifiez que « $imageColumn » est bien la colonne contenant les images.", style = MaterialTheme.typography.bodySmall)
+                                Text(stringResource(R.string.setup_verify_image_column,imageColumn), style = MaterialTheme.typography.bodySmall)
                             }
-                            TextButton(onClick = { advanced = !advanced }) { Text(if (advanced) "Réduire" else "Options avancées") }
+                            TextButton(onClick = { advanced = !advanced }) { Text(if (advanced) stringResource(R.string.setup_collapse) else stringResource(R.string.setup_advanced)) }
                             if (advanced) {
-                                OutlinedTextField(config, { config = it }, label = { Text("Configuration HF") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                                OutlinedTextField(split, { split = it }, label = { Text("Split source") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                                OutlinedTextField(imageColumn, { imageColumn = it }, label = { Text("Colonne image") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                                OutlinedTextField(config, { config = it }, label = { Text(stringResource(R.string.setup_hf_config)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                                OutlinedTextField(split, { split = it }, label = { Text(stringResource(R.string.setup_source_split)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                                OutlinedTextField(imageColumn, { imageColumn = it }, label = { Text(stringResource(R.string.setup_image_column)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                             }
-                            if (batches.isNotEmpty()) StudioDetails("La provenance est verrouillée après l’acquisition du premier lot : modifier la source sera refusé, sans toucher aux données.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            if (batches.isNotEmpty()) StudioDetails(stringResource(R.string.setup_provenance_locked), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        StudioDisclosure("Connexion Hugging Face", Icons.Default.Key) {
-                            Text(if (auth?.isValid == true) "Connecté : ${auth?.username}" else "Lecture publique disponible", style = MaterialTheme.typography.bodyMedium)
-                            OutlinedTextField(token, { token = it }, label = { Text("Jeton Hugging Face") }, placeholder = { Text("hf_…") }, singleLine = true,
+                        StudioDisclosure(stringResource(R.string.setup_hf_login), Icons.Default.Key) {
+                            Text(if (auth?.isValid == true) stringResource(R.string.setup_connected,auth?.username.orEmpty()) else stringResource(R.string.setup_public_read), style = MaterialTheme.typography.bodyMedium)
+                            OutlinedTextField(token, { token = it }, label = { Text(stringResource(R.string.setup_hf_token)) }, placeholder = { Text("hf_…") }, singleLine = true,
                                 visualTransformation = if (showToken) VisualTransformation.None else PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth().testTag("token_input"),
                                 trailingIcon = { IconButton(onClick = { showToken = !showToken }) { Icon(if (showToken) Icons.Default.VisibilityOff else Icons.Default.Visibility, "Afficher ou masquer le jeton") } })
-                            Button(onClick = { viewModel.saveToken(token); token = "" }, enabled = token.isNotBlank() && !busy) { Text("Connecter") }
+                            Button(onClick = { viewModel.saveToken(token); token = "" }, enabled = token.isNotBlank() && !busy) { Text(stringResource(R.string.setup_connect)) }
                             if (auth?.error != null) Text(auth?.error ?: "", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("Stockage chiffré avec Android Keystore. Le jeton n’est pas inclus dans les exports.", style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.setup_token_security), style = MaterialTheme.typography.bodySmall)
                         }
                     }
                     1 -> {
-                        StudioSection("Tâches", "Vous pourrez combiner ou changer les tâches ensuite.", Icons.Default.Widgets) {
+                        StudioSection(stringResource(R.string.setup_tasks), stringResource(R.string.setup_tasks_help), Icons.Default.Widgets) {
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 StudioWorkflow.presets.forEach { preset -> FilterChip(selected = tasks == preset.tasks, onClick = { tasksCsv = StudioWorkflow.tasksCsv(preset.tasks) }, label = { Text(preset.title) }) }
                             }
@@ -138,42 +138,42 @@ fun SetupScreen(viewModel: MainViewModel) {
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 StudioTask.entries.forEach { task -> FilterChip(selected = task in tasks, onClick = { tasksCsv = StudioWorkflow.tasksCsv(StudioWorkflow.toggleTask(tasks, task)) }, label = { Text(task.title) }) }
                             }
-                            OutlinedTextField(classes, { classes = it }, label = { Text("Classes (séparées par des virgules)") }, supportingText = { Text("Identifiants stables de votre taxonomie. Les classes existantes ne sont pas renommées automatiquement.") }, minLines = 2, modifier = Modifier.fillMaxWidth())
+                            OutlinedTextField(classes, { classes = it }, label = { Text(stringResource(R.string.setup_classes)) }, supportingText = { Text(stringResource(R.string.setup_classes_help)) }, minLines = 2, modifier = Modifier.fillMaxWidth())
                         }
-                        StudioSection("Assistant IA", "Les propositions restent à vérifier. Sans modèle, tous les outils manuels restent disponibles.", Icons.Default.AutoAwesome) {
-                            StatusPill(if (p.modelPath.isNullOrBlank()) "Aucun modèle importé" else "Poids importés · compatibilité à vérifier", if (p.modelPath.isNullOrBlank()) Icons.Default.Info else Icons.Default.Memory)
-                            OutlinedButton(onClick = { chooseModel.launch(arrayOf("*/*")) }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.UploadFile, null); Spacer(Modifier.width(8.dp)); Text("Choisir un .tflite") }
-                            OutlinedTextField(modelUrl, { modelUrl = it }, label = { Text("Ou lien HTTPS direct vers les poids") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                            TextButton(onClick = { viewModel.importModelUrl(modelUrl) }, enabled = modelUrl.startsWith("https://") && !busy) { Text("Télécharger le modèle") }
-                            StudioDetails("Adaptateurs présents : détection SSD / TF Object Detection et classification. Un modèle YOLO, de pointing ou un VLM arbitraire nécessite son propre adaptateur.", style = MaterialTheme.typography.bodySmall)
-                            OutlinedTextField(modelJson, { modelJson = it }, label = { Text("model-config.json · optionnel") }, minLines = 3, maxLines = 8, modifier = Modifier.fillMaxWidth())
-                            TextButton(onClick = { viewModel.saveModelConfig(modelJson) }, enabled = !busy) { Text("Enregistrer le contrat") }
+                        StudioSection(stringResource(R.string.setup_ai_assistant), stringResource(R.string.setup_proposals_help), Icons.Default.AutoAwesome) {
+                            StatusPill(if (p.modelPath.isNullOrBlank()) stringResource(R.string.setup_no_model) else stringResource(R.string.setup_weights_imported), if (p.modelPath.isNullOrBlank()) Icons.Default.Info else Icons.Default.Memory)
+                            OutlinedButton(onClick = { chooseModel.launch(arrayOf("*/*")) }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.UploadFile, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.setup_choose_tflite)) }
+                            OutlinedTextField(modelUrl, { modelUrl = it }, label = { Text(stringResource(R.string.setup_weights_url)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                            TextButton(onClick = { viewModel.importModelUrl(modelUrl) }, enabled = modelUrl.startsWith("https://") && !busy) { Text(stringResource(R.string.setup_download_model)) }
+                            StudioDetails(stringResource(R.string.setup_adapters_help), style = MaterialTheme.typography.bodySmall)
+                            OutlinedTextField(modelJson, { modelJson = it }, label = { Text(stringResource(R.string.setup_optional_contract)) }, minLines = 3, maxLines = 8, modifier = Modifier.fillMaxWidth())
+                            TextButton(onClick = { viewModel.saveModelConfig(modelJson) }, enabled = !busy) { Text(stringResource(R.string.setup_save_contract)) }
                         }
                     }
                     2 -> {
-                        StudioSection("Destination du corpus", "L’export local reste possible sans dépôt de destination.", Icons.Default.IosShare) {
-                            OutlinedTextField(destination, { destination = it }, label = { Text("Dataset HF final · facultatif") }, placeholder = { Text("utilisateur/corpus-prepare") }, singleLine = true,
+                        StudioSection(stringResource(R.string.setup_dataset_destination), stringResource(R.string.setup_local_export_help), Icons.Default.IosShare) {
+                            OutlinedTextField(destination, { destination = it }, label = { Text(stringResource(R.string.setup_optional_destination)) }, placeholder = { Text("utilisateur/corpus-prepare") }, singleLine = true,
                                 isError = destination.isNotBlank() && !destOk, modifier = Modifier.fillMaxWidth())
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedButton(onClick = { viewModel.checkDestinationRepo(destination) }, enabled = destination.isNotBlank() && destOk && !busy) { Text("Vérifier l’accès") }
-                                OutlinedButton(onClick = { createRepo = true }, enabled = destination.isNotBlank() && destOk && auth?.isValid == true && !busy) { Text("Créer en privé") }
+                                OutlinedButton(onClick = { viewModel.checkDestinationRepo(destination) }, enabled = destination.isNotBlank() && destOk && !busy) { Text(stringResource(R.string.setup_verify_access)) }
+                                OutlinedButton(onClick = { createRepo = true }, enabled = destination.isNotBlank() && destOk && auth?.isValid == true && !busy) { Text(stringResource(R.string.setup_create_private)) }
                             }
-                            if (dest != null) Text(if (dest?.exists == true) "Dépôt accessible. Cela ne garantit pas le droit d’écriture." else dest?.message ?: "Accès non confirmé", style = MaterialTheme.typography.bodySmall)
-                            StudioDetails("Les formats et le contenu de l’archive seront choisis dans Export. Aucun téléversement ne démarre à cette étape.", style = MaterialTheme.typography.bodyMedium)
+                            if (dest != null) Text(if (dest?.exists == true) stringResource(R.string.setup_repo_accessible) else dest?.message ?: stringResource(R.string.setup_access_unconfirmed), style = MaterialTheme.typography.bodySmall)
+                            StudioDetails(stringResource(R.string.setup_export_later), style = MaterialTheme.typography.bodyMedium)
                         }
-                        StudioSection("Stockage et rythme", icon = Icons.Default.Storage) {
-                            OutlinedTextField(budget, { budget = it.filter(Char::isDigit).take(5) }, label = { Text("Budget local en Mo") }, supportingText = { Text("Entre 128 et 65 536 Mio. Lots de 1 à 1 000 cas, configurables.") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                        StudioSection(stringResource(R.string.setup_storage_pace), icon = Icons.Default.Storage) {
+                            OutlinedTextField(budget, { budget = it.filter(Char::isDigit).take(5) }, label = { Text(stringResource(R.string.setup_local_budget)) }, supportingText = { Text(stringResource(R.string.setup_budget_help)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                 Checkbox(prepare, { prepare = it })
-                                Text("Préparer le lot ensuite", style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.setup_prepare_next), style = MaterialTheme.typography.bodyMedium)
                             }
-                            StudioDetails("Les erreurs réseau ne doivent pas effacer les corrections. La purge automatique exige une vérification distante des fichiers publiés.", style = MaterialTheme.typography.bodySmall)
+                            StudioDetails(stringResource(R.string.setup_network_safety), style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
             }
         }
     }
-    if (createRepo) AlertDialog(onDismissRequest = { createRepo = false }, title = { Text("Créer un dataset privé ?") }, text = { Text("Le dépôt ${StudioWorkflow.normalizeRepo(destination, true)} sera créé sur votre compte Hugging Face. Aucun fichier ne sera publié maintenant.") },
-        confirmButton = { Button(onClick = { createRepo = false; viewModel.createDestinationRepo(destination) }) { Text("Créer le dépôt") } }, dismissButton = { TextButton(onClick = { createRepo = false }) { Text("Annuler") } })
+    if (createRepo) AlertDialog(onDismissRequest = { createRepo = false }, title = { Text(stringResource(R.string.setup_create_private_title)) }, text = { Text(stringResource(R.string.setup_create_private_body,StudioWorkflow.normalizeRepo(destination,true))) },
+        confirmButton = { Button(onClick = { createRepo = false; viewModel.createDestinationRepo(destination) }) { Text(stringResource(R.string.setup_create_repo)) } }, dismissButton = { TextButton(onClick = { createRepo = false }) { Text(stringResource(R.string.common_cancel)) } })
 }

@@ -6,7 +6,9 @@ import com.unicornwhodev.visiondatasetstudio.ui.NavigationHistory
 import org.junit.Assert.*
 import org.junit.Test
 import java.io.File
-import com.unicornwhodev.visiondatasetstudio.data.model.MaskTarget
+import com.unicornwhodev.visiondatasetstudio.data.model.*
+import com.unicornwhodev.visiondatasetstudio.core.workflow.StudioTask
+import com.unicornwhodev.visiondatasetstudio.domain.validation.AnnotationReview
 
 class StabilizationTest {
     @Test fun documentationNeverControlsRuntimeIntegrity() {
@@ -53,7 +55,7 @@ class StabilizationTest {
         assertEquals(QualificationStatus.INFERENCE_ONLY,ModelCapabilities.fromConfig(trainable,QualificationStatus.INFERENCE_ONLY).qualification)
     }
 
-    @Test fun modelContractRequiresEveryActiveTaskAndSupportsMultiplePoints() {
+    @Test fun modelContractSupportsHumanOnlyAndPartialProjects() {
         val point=ModelConfig(task="pointing",adapter="points",outputMode="points",labels=listOf("target"))
         val box=ModelConfig.defaultDetectionPreset(listOf("target"))
         val multitask=ModelConfig(task="multitask",adapter="fireviewer_dinov3_multitask",labels=listOf("target"))
@@ -61,10 +63,88 @@ class StabilizationTest {
         assertTrue(ModelContract.supportsTasks(point,"POINTING_MULTI"))
         assertFalse(ModelContract.supportsTasks(box,"POINTING_MULTI"))
         assertTrue(ModelContract.supportsTasks(multitask,"POINTING_MULTI"))
-        assertFalse(ModelContract.supportsTasks(box,"DETECTION,CAPTIONING"))
+        assertTrue(ModelContract.supportsTasks(box,"DETECTION,CAPTIONING"))
+        assertTrue(ModelContract.compatibility(ModelConfig.defaultClassifierPreset(listOf("a")),"CLASSIFICATION,NEGATIVE").fullyCovered)
+        assertFalse(ModelContract.compatibility(ModelConfig.defaultClassifierPreset(listOf("a")),"NEGATIVE").canRun)
+        assertTrue(ModelContract.compatibility(box,"DETECTION,NEGATIVE").fullyCovered)
+        assertTrue(ModelContract.compatibility(point,"POINTING,NEGATIVE").fullyCovered)
+        val partialClassification=ModelContract.compatibility(ModelConfig.defaultClassifierPreset(listOf("a")),"CLASSIFICATION,CAPTIONING")
+        assertTrue(partialClassification.canRun);assertFalse(partialClassification.fullyCovered)
+        assertTrue(ModelContract.compatibility(ModelConfig(runtime="local_http",task="multitask",labels=listOf("a")),"CLASSIFICATION,CAPTIONING").fullyCovered)
+        assertFalse(ModelContract.compatibility(box,"DETECTION,SEGMENTATION").fullyCovered)
+        assertFalse(ModelContract.compatibility(point,"POINTING,DETECTION").fullyCovered)
         assertFalse(ModelContract.supportsTasks(ModelConfig(adapter="embedding"),"DETECTION"))
         assertFalse(ModelContract.supportsTasks(ModelConfig(adapter="inspect_only"),"DETECTION"))
         assertFalse(ModelContract.supportsTasks(ModelConfig(runtime="local_http",task="multitask",labels=listOf("target")),"GROUNDING"))
+    }
+
+    @Test fun actionsAndExtendedCapabilitiesFollowTheContract() {
+        val classifier=ModelConfig.defaultClassifierPreset(listOf("a"))
+        assertEquals(ModelAction.PREANNOTATE_PARTIALLY,ModelCapabilities.action(classifier,"CLASSIFICATION,CAPTIONING"))
+        assertEquals(ModelAction.COMPUTE_REPRESENTATION,ModelCapabilities.action(ModelConfig(adapter="embedding"),"DETECTION"))
+        assertEquals(ModelAction.INSPECT,ModelCapabilities.action(ModelConfig(adapter="inspect_only"),"DETECTION"))
+        assertTrue(ModelCapability.VQA in ModelCapabilities.fromConfig(ModelConfig(runtime="local_http",task="vqa")).values)
+        assertTrue(ModelCapability.COUNTING in ModelCapabilities.fromConfig(ModelConfig(runtime="local_http",task="counting")).values)
+        val grounding=ModelPresets.create("http_grounding",listOf("object"))
+        assertTrue(ModelCapability.GROUNDING in ModelCapabilities.fromConfig(grounding).values)
+        assertEquals(setOf("grounding","box","point"),ModelContract.compatibility(grounding,"GROUNDING").usableOutputs)
+        assertFalse(ModelCapability.GROUNDING in ModelCapabilities.fromConfig(ModelConfig(runtime="local_http",task="grounding")).values)
+        assertFails { ModelContract.validate(ModelConfig(runtime="local_http",task="grounding")) }
+        assertFalse(ModelCapability.GROUNDING in ModelCapabilities.fromConfig(ModelConfig(bundleKind="florence2")).values)
+    }
+
+    @Test fun explicitGroundingLinksResolveToCanonicalTargets() {
+        val proposals=listOf(
+            ModelProposal("box","object",.9f,.1f,.2f,.7f,.8f,proposalId="region-1"),
+            ModelProposal("grounding","",.8f,text="the object",proposalId="phrase-1",linkedProposalIds=listOf("region-1")))
+        val merged=ProposalMerger.merge(SampleAnnotations(),proposals,"GROUNDING",replaceTypes=setOf("box","grounding"))
+        assertEquals(1,merged.boxes.size);assertEquals(listOf(merged.boxes.single().id),merged.groundings.single().boxIds)
+        assertEquals("the object",merged.groundings.single().phrase);assertFalse(merged.groundings.single().isHumanVerified)
+        assertFails{ProposalMerger.merge(SampleAnnotations(),proposals.map{if(it.type=="grounding")it.copy(linkedProposalIds=listOf("missing"))else it},"GROUNDING",replaceTypes=setOf("box","grounding"))}
+    }
+
+    @Test fun groundingWireContractIsExplicitReferentialAndThresholdSafe() {
+        val region=ModelProposal("point","object",.9f,pointX=.4f,pointY=.6f,proposalId="region")
+        val phrase=ModelProposal("grounding","",.8f,text="the object",linkedProposalIds=listOf("region"))
+        val accepted=GroundingProposalContract.validateAndFilter(listOf(region,phrase),setOf("point","grounding"),.5f)
+        assertEquals(2,accepted.size)
+        assertFails { GroundingProposalContract.validateAndFilter(listOf(region.copy(proposalId=""),phrase),setOf("point","grounding"),.5f) }
+        assertFails { GroundingProposalContract.validateAndFilter(listOf(region.copy(score=.2f),phrase),setOf("point","grounding"),.5f) }
+        assertFails { GroundingProposalContract.validateAndFilter(listOf(region,phrase.copy(linkedProposalIds=listOf("missing"))),setOf("point","grounding"),.5f) }
+        assertFails { GroundingProposalContract.validateAndFilter(listOf(region,region.copy(type="grounding",text="x",linkedProposalIds=listOf("region"))),setOf("point"),.5f) }
+    }
+
+    @Test fun groundingProposalRequiresExplicitHumanReview() {
+        val a=SampleAnnotations(
+            boxes=listOf(BoxTarget("box",.1f,.1f,.5f,.5f,"object",isHumanVerified=true)),
+            groundings=listOf(GroundingTarget("g","the object",boxIds=listOf("box"),sourceProvenance="model_local_http:test")))
+        assertTrue(AnnotationReview.problems(a,setOf(StudioTask.GROUNDING)).any{it.contains("propositions")})
+        assertFalse(AnnotationReview.problems(a.copy(groundings=a.groundings.map{it.copy(isHumanVerified=true)}),setOf(StudioTask.GROUNDING)).any{it.contains("propositions")})
+    }
+
+    @Test fun instanceLinksAreExplicitValidatedAndReversible() {
+        val source=SampleAnnotations(
+            boxes=listOf(BoxTarget("b",.1f,.1f,.5f,.5f,"object")),
+            masks=listOf(MaskTarget("m","object",2,2,listOf(0,1,3))))
+        assertEquals(listOf("m"),InstanceLinks.compatibleTargets(source,"b"))
+        val linked=InstanceLinks.link(source,setOf("b","m"),"instance-1")
+        assertEquals("instance-1",linked.boxes.single().instanceId)
+        assertEquals("instance-1",linked.masks.single().instanceId)
+        assertTrue(InstanceLinks.problems(linked).isEmpty())
+        val unlinked=InstanceLinks.unlink(linked,"m")
+        assertNull(unlinked.masks.single().instanceId);assertEquals("instance-1",unlinked.boxes.single().instanceId)
+        assertFails{InstanceLinks.link(source.copy(masks=listOf(source.masks.single().copy(label="other"))),setOf("b","m"),"instance-2")}
+        assertTrue(InstanceLinks.problems(linked.copy(masks=linked.masks+linked.masks.single().copy(id="m2"))).isNotEmpty())
+    }
+
+    @Test fun maskTopologyDoesNotDuplicateAnInstance() {
+        val base=MaskTarget("m","object",3,1,MaskCodec.encode(booleanArrayOf(true,false,true)),instanceId="instance")
+        val pieces=MaskCodec.split(base){"p$it"}
+        assertEquals(2,pieces.size);assertEquals(1,pieces.count{it.instanceId=="instance"})
+        val merged=MaskCodec.merge(pieces,"merged","object")
+        assertNull(merged.instanceId)
+        val same=listOf(base,base.copy(id="m2"))
+        assertEquals("instance",MaskCodec.merge(same,"merged-2","object").instanceId)
     }
 
     @Test fun trainingStorageEstimateIncludesPrimaryAndAuxiliaryTargets() {

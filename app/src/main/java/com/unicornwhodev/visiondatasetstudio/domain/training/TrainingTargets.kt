@@ -1,6 +1,7 @@
 package com.unicornwhodev.visiondatasetstudio.domain.training
 
 import com.unicornwhodev.visiondatasetstudio.data.model.SampleAnnotations
+import com.unicornwhodev.visiondatasetstudio.data.model.PointLocalizationState
 import com.unicornwhodev.visiondatasetstudio.domain.inference.*
 import kotlin.math.*
 
@@ -23,15 +24,15 @@ object TrainingTargets {
                 tags.forEach{out[it]=1f}
             }
             "points_xyv" -> {
-                require(shape==listOf(1,c.labels.size,3));require(a.points.all{it.isHumanVerified && !it.isAbstained})
-                val present=a.points.filterNot{it.isAbsent};require(a.points.map{it.label}.distinct().size==a.points.size){"Une cible par classe attendue"}
+                require(shape==listOf(1,c.labels.size,3));require(a.points.all{it.isHumanVerified && it.effectiveLocalizationState in setOf(PointLocalizationState.LOCALIZED,PointLocalizationState.ABSENT)})
+                val present=a.points.filter{it.isLocalized};require(a.points.map{it.label}.distinct().size==a.points.size){"Une cible par classe attendue"}
                 present.forEach{p->val k=cls(p.label);val point=xy(p.x,p.y);require(point.first in 0f..1f && point.second in 0f..1f){"La cible est hors du recadrage du modèle"};out[k*3]=point.first;out[k*3+1]=point.second;out[k*3+2]=1f}
                 require(c.labels.all{label->a.points.any{it.label==label} || label in a.quality.verifiedNegativeQueries}){"Présence/absence à vérifier pour chaque classe"}
             }
             "heatmap_nchw" -> {
                 require(shape.size==4 && shape[1]==c.labels.size);val h=shape[2];val w=shape[3]
-                require(a.points.all{it.isHumanVerified && !it.isAbstained})
-                a.points.filterNot{it.isAbsent}.forEach{p->val k=cls(p.label);val point=xy(p.x,p.y);require(point.first in 0f..1f && point.second in 0f..1f)
+                require(a.points.all{it.isHumanVerified && it.effectiveLocalizationState in setOf(PointLocalizationState.LOCALIZED,PointLocalizationState.ABSENT)})
+                a.points.filter{it.isLocalized}.forEach{p->val k=cls(p.label);val point=xy(p.x,p.y);require(point.first in 0f..1f && point.second in 0f..1f)
                     val x=point.first*(w-1);val y=point.second*(h-1)
                     for(dy in -3..3)for(dx in -3..3){val xx=x.roundToInt()+dx;val yy=y.roundToInt()+dy;if(xx in 0 until w && yy in 0 until h){val index=k*h*w+yy*w+xx;out[index]=max(out[index],exp(-((xx-x).pow(2)+(yy-y).pow(2))/2))}}
                 }
@@ -48,7 +49,7 @@ object TrainingTargets {
                     out[2*plane+idx]=1f
                     if(decoded.any { (m,values) -> values[(p.second*m.height).toInt().coerceAtMost(m.height-1)*m.width+(p.first*m.width).toInt().coerceAtMost(m.width-1)] })out[idx]=1f
                 }
-                points.filterNot { it.isAbsent || it.isAbstained }.forEach { p ->
+                points.filter { it.canProvideCoordinates }.forEach { p ->
                     val q=xy(p.x,p.y);require(q.first in 0f..1f && q.second in 0f..1f)
                     val cx=q.first*w-.5f;val cy=q.second*h-.5f
                     for(y in max(0,cy.toInt()-6)..min(h-1,cy.toInt()+6))for(x in max(0,cx.toInt()-6)..min(w-1,cx.toInt()+6)) {
@@ -80,12 +81,12 @@ object TrainingTargets {
         val presence=FloatArray(labels.size) { if(labels[it] in tags)1f else 0f }
         val presenceReviewed=labels.all { it in tags || it in negatives }
         val points=a.points.filter { it.label==c.spatialLabel && it.isHumanVerified }
-        val abstained=points.any { it.isAbstained } || a.quality.isUnlocalizablePresent
+        val abstained=points.any { it.effectiveLocalizationState==PointLocalizationState.UNLOCALIZABLE } || a.quality.isUnlocalizablePresent
         val spatialNegative=c.spatialLabel in negatives
         val supervision=floatArrayOf(
             if(a.masks.any { it.label==c.spatialLabel && it.isHumanVerified } || spatialNegative)1f else 0f,
-            if(points.any { !it.isAbstained } || spatialNegative)1f else 0f,
-            if(abstained || points.any { !it.isAbsent && !it.isAbstained })1f else 0f,
+            if(points.any { it.canProvideCoordinates } || spatialNegative)1f else 0f,
+            if(abstained || points.any { it.canProvideCoordinates })1f else 0f,
             if(presenceReviewed)1f else 0f)
         return mapOf("presence" to presence,"abstention" to floatArrayOf(if(abstained)1f else 0f),"supervision" to supervision)
     }

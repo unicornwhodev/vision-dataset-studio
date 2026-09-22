@@ -70,7 +70,8 @@ object MaskCodec {
     fun merge(masks:List<MaskTarget>,id:String,label:String):MaskTarget {
         require(masks.size>=2&&masks.all{it.width==masks[0].width&&it.height==masks[0].height})
         val pixels=BooleanArray(masks[0].width*masks[0].height);masks.forEach{m->decode(m).forEachIndexed{i,v->pixels[i]=pixels[i]||v}}
-        return MaskTarget(id,label,masks[0].width,masks[0].height,encode(pixels),true,explicitlyAdjusted=true)
+        val instanceId=masks.map{it.instanceId}.distinct().singleOrNull()?.takeIf{it!=null}
+        return MaskTarget(id,label,masks[0].width,masks[0].height,encode(pixels),true,explicitlyAdjusted=true,instanceId=instanceId)
     }
     fun split(m:MaskTarget,id:(Int)->String):List<MaskTarget> {
         val source=decode(m);val visited=BooleanArray(source.size);val result=mutableListOf<MaskTarget>()
@@ -78,7 +79,7 @@ object MaskCodec {
             while(q.isNotEmpty()){val p=q.removeFirst();component[p]=true;val x=p%m.width;val y=p/m.width
                 for(n in intArrayOf(if(x>0)p-1 else -1,if(x<m.width-1)p+1 else -1,if(y>0)p-m.width else -1,if(y<m.height-1)p+m.width else -1))if(n>=0&&source[n]&&!visited[n]){visited[n]=true;q.add(n)}
             }
-            result+=m.copy(id=id(result.size),runs=encode(component),isHumanVerified=true,explicitlyAdjusted=true)
+            result+=m.copy(id=id(result.size),runs=encode(component),isHumanVerified=true,explicitlyAdjusted=true,instanceId=m.instanceId.takeIf{result.isEmpty()})
         }
         return result
     }

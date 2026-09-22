@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -67,11 +70,11 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
         WorkspaceLink("Modèle", if(project?.modelPath != null || project?.modelConfigJson?.contains("local_http") == true) "Profil du projet"
             else if(models.isEmpty()) "Aucun modèle actif" else "${models.size} disponible(s)", Icons.Default.Memory, !busy) { viewModel.navigateTo(Screen.Models) }
         Box {
-            WorkspaceLink("Outils", currentPreset?.title ?: "Personnalisés", Icons.Default.CropFree, !busy) { presetMenu = true }
+            WorkspaceLink(stringResource(R.string.prefs_tools), currentPreset?.title ?: "Personnalisés", Icons.Default.CropFree, !busy) { presetMenu = true }
             DropdownMenu(expanded = presetMenu, onDismissRequest = { presetMenu = false }) {
                 StudioWorkflow.presets.forEach { preset -> DropdownMenuItem(text = { Text(preset.title) }, onClick = { presetMenu = false; presetId = preset.id }) }
                 HorizontalDivider()
-                DropdownMenuItem(text = { Text("Personnaliser les outils") }, onClick = { presetMenu = false; viewModel.navigateTo(Screen.Preferences) })
+                DropdownMenuItem(text = { Text(stringResource(R.string.editor_customize_tools)) }, onClick = { presetMenu = false; viewModel.navigateTo(Screen.Preferences) })
             }
         }
     }
@@ -149,8 +152,8 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
     presetId?.let { id -> StudioWorkflow.presets.firstOrNull { it.id == id }?.let { preset ->
         AlertDialog(onDismissRequest = { presetId = null }, title = { Text(preset.title) }, text = {
             Text("Activer ${preset.tasks.joinToString { it.title }} ? Vos annotations sont conservées.")
-        }, confirmButton = { Button(onClick = { viewModel.updateTasks(preset.tasks); presetId = null }) { Text("Appliquer") } },
-            dismissButton = { TextButton(onClick = { presetId = null }) { Text("Annuler") } })
+        }, confirmButton = { Button(onClick = { viewModel.updateTasks(preset.tasks); presetId = null }) { Text(stringResource(R.string.common_apply)) } },
+            dismissButton = { TextButton(onClick = { presetId = null }) { Text(stringResource(R.string.common_cancel)) } })
     } }
 }
 

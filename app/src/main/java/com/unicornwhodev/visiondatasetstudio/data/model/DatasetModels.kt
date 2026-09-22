@@ -52,6 +52,8 @@ enum class QualityFlag {
     CORRUPTED
 }
 
+enum class PointLocalizationState { LOCALIZED, ABSENT, UNLOCALIZABLE, UNCERTAIN }
+
 @JsonClass(generateAdapter = true)
 data class PointTarget(
     val id: String,
@@ -60,6 +62,8 @@ data class PointTarget(
     val label: String,
     val isAbsent: Boolean = false,
     val isAbstained: Boolean = false,
+    /** Canonical per-target state. Null means legacy JSON; old booleans remain readable. */
+    val localizationState: PointLocalizationState? = null,
     val isHumanVerified: Boolean = false,
     val modelScore: Float? = null,
     val sourceProvenance: String = "human",
@@ -69,8 +73,21 @@ data class PointTarget(
     val boxHeight: Float = 0f,
     val explicitlyAdjusted: Boolean = false,
     val modelLabel: String? = null,
-    val correctionGeneration: Int? = null
-)
+    val correctionGeneration: Int? = null,
+    val instanceId: String? = null
+) {
+    val effectiveLocalizationState:PointLocalizationState get() = localizationState ?: when {
+        isAbsent -> PointLocalizationState.ABSENT
+        isAbstained -> PointLocalizationState.UNLOCALIZABLE
+        else -> PointLocalizationState.LOCALIZED
+    }
+    val isLocalized get()=effectiveLocalizationState==PointLocalizationState.LOCALIZED
+    val canProvideCoordinates get()=isLocalized
+    val requiresDeferral get()=effectiveLocalizationState==PointLocalizationState.UNCERTAIN
+    fun withLocalizationState(state:PointLocalizationState)=copy(localizationState=state,
+        isAbsent=state==PointLocalizationState.ABSENT,
+        isAbstained=state==PointLocalizationState.UNLOCALIZABLE||state==PointLocalizationState.UNCERTAIN)
+}
 
 @JsonClass(generateAdapter = true)
 data class BoxTarget(
@@ -89,7 +106,8 @@ data class BoxTarget(
     val modelYmax: Float? = null,
     val explicitlyAdjusted: Boolean = false,
     val correctionGeneration: Int? = null,
-    val modelCoordinatesVersion: Int = 0
+    val modelCoordinatesVersion: Int = 0,
+    val instanceId: String? = null
 )
 
 @JsonClass(generateAdapter = true)
@@ -117,7 +135,8 @@ data class GroundingTarget(
     val phrase: String,
     val boxIds: List<String> = emptyList(),
     val pointIds: List<String> = emptyList(),
-    val isHumanVerified: Boolean = false
+    val isHumanVerified: Boolean = false,
+    val sourceProvenance: String = "human"
 )
 
 @JsonClass(generateAdapter = true)
@@ -156,7 +175,7 @@ data class QualityAuditTarget(
 data class MaskTarget(
     val id: String, val label: String, val width: Int, val height: Int, val runs: List<Int>,
     val isHumanVerified: Boolean = false, val sourceProvenance: String = "human",
-    val modelScore: Float? = null, val explicitlyAdjusted: Boolean = false
+    val modelScore: Float? = null, val explicitlyAdjusted: Boolean = false, val instanceId: String? = null
 )
 
 /**
@@ -174,6 +193,45 @@ data class SampleAnnotations(
     val masks: List<MaskTarget> = emptyList(),
     val quality: QualityAuditTarget = QualityAuditTarget()
 )
+
+/** Explicit instance relations only: geometry and labels never create links implicitly. */
+object InstanceLinks {
+    private data class Member(val id:String,val kind:String,val label:String,val instanceId:String?)
+    private fun members(a:SampleAnnotations)=
+        a.boxes.map{Member(it.id,"box",it.label,it.instanceId)}+
+        a.masks.map{Member(it.id,"mask",it.label,it.instanceId)}+
+        a.points.map{Member(it.id,"point",it.label,it.instanceId)}
+
+    fun instanceId(a:SampleAnnotations,targetId:String)=members(a).firstOrNull{it.id==targetId}?.instanceId
+    fun compatibleTargets(a:SampleAnnotations,targetId:String):List<String> {
+        val source=members(a).singleOrNull{it.id==targetId} ?: return emptyList()
+        val occupiedKinds=source.instanceId?.let{id->members(a).filter{it.instanceId==id}.map{it.kind}.toSet()}.orEmpty()
+        return members(a).filter{it.id!=targetId&&it.kind!=source.kind&&it.label==source.label&&(it.kind !in occupiedKinds||it.instanceId==source.instanceId)}.map{it.id}
+    }
+    fun unlink(a:SampleAnnotations,targetId:String)=a.copy(
+        boxes=a.boxes.map{if(it.id==targetId)it.copy(instanceId=null)else it},
+        masks=a.masks.map{if(it.id==targetId)it.copy(instanceId=null)else it},
+        points=a.points.map{if(it.id==targetId)it.copy(instanceId=null)else it})
+    fun link(a:SampleAnnotations,targetIds:Set<String>,instanceId:String):SampleAnnotations {
+        require(instanceId.isNotBlank()&&targetIds.isNotEmpty())
+        val selected=members(a).filter{it.id in targetIds}
+        require(selected.size==targetIds.size&&selected.map{it.kind}.distinct().size==selected.size)
+        require(selected.map{it.label}.distinct().size==1){"Une instance liée doit conserver la même classe"}
+        val cleared=targetIds.fold(a){state,id->unlink(state,id)}
+        return cleared.copy(
+            boxes=cleared.boxes.map{if(it.id in targetIds)it.copy(instanceId=instanceId)else it},
+            masks=cleared.masks.map{if(it.id in targetIds)it.copy(instanceId=instanceId)else it},
+            points=cleared.points.map{if(it.id in targetIds)it.copy(instanceId=instanceId)else it})
+    }
+    fun problems(a:SampleAnnotations):List<String> = buildList {
+        val linked=members(a).filter{it.instanceId!=null}
+        if(linked.any{it.instanceId!!.isBlank()})add("Un identifiant d’instance est vide.")
+        linked.filter{!it.instanceId.isNullOrBlank()}.groupBy{it.instanceId}.forEach{(_,group)->
+            if(group.groupBy{it.kind}.any{it.value.size>1})add("Une instance contient plusieurs régions du même type.")
+            if(group.map{it.label}.distinct().size>1)add("Une instance contient des classes contradictoires.")
+        }
+    }.distinct()
+}
 
 /**
  * Master Canonical JSON Schema for exports (spec v1.0.0).

@@ -1,5 +1,60 @@
 # Stabilisation — septembre 2026
 
+## Third stabilization pass — 22 septembre 2026
+
+### Instance linking completion
+
+- L’éditeur permet maintenant de créer, lier et dissocier explicitement une instance entre régions compatibles de même classe. Aucune proximité géométrique ne crée de lien.
+- Les duplications et copier-coller retirent le lien de la nouvelle cible. Une séparation de masque ne conserve le lien que sur une composante ; une fusion ne le conserve que si toutes les sources partagent le même identifiant.
+- La validation et l’export COCO refusent les identifiants vides, les classes contradictoires et plusieurs régions du même type dans une instance, au lieu de sélectionner silencieusement un masque.
+- Des tests couvrent liaison/dissociation, incohérences, topologie des masques et refus COCO des relations ambiguës. Leur exécution Kotlin reste conditionnée au SDK Android.
+
+### Main workflow i18n completion
+
+- Les actions et libellés statiques principaux de Setup, Annotation Editor, Publication, Controls, Quality, Workflow, Batch et préférences utilisent maintenant des ressources FR/EN partagées.
+- Les confirmations de rejet, publication, purge, téléchargement, suppression de profil et correction locale disposent de textes anglais dédiés sans affaiblir leurs protections.
+- Le test de locale anglaise couvre désormais des ressources critiques de Setup, Annotation Editor, Publication, Controls, Workflow et Quality, en plus de Models et Training.
+- Les derniers libellés statiques de configuration, sécurité du token, provenance, inspection de source, workflow local et absence de résultats similaires ont été ajoutés aux ressources FR/EN.
+- Les valeurs techniques et identifiants internes restent volontairement dans le code ; les derniers textes dynamiques et descriptions spécialisées doivent encore être classifiés avant de pouvoir revendiquer une extraction exhaustive.
+
+### Pointing multi and grounding completion
+
+- `PointTarget` expose maintenant des helpers canoniques de localisation ; SAM, dessin, hit-testing, correction adaptative et cibles d’apprentissage ne lisent plus directement les anciens booléens de point.
+- Le test canonique POINTING_MULTI écrit puis relit un enregistrement JSONL contenant les quatre états distincts.
+- Le runtime HTTP peut déclarer une sortie grounding explicite. Chaque région possède un `proposalId` local à la réponse et chaque phrase référence des `linkedProposalIds` validés ; aucune liaison n’est déduite de caption+box.
+- `ProposalMerger` résout ces références vers les identifiants canoniques de `BoxTarget`/`PointTarget`, préserve les groundings humains et marque les nouveaux liens comme propositions à relire.
+
+### Fixed
+
+- La compatibilité modèle/tâches est désormais un résultat structuré. `NEGATIVE` est explicitement humain, un projet uniquement négatif ne lance aucune préannotation, et un modèle peut assister la partie compatible d’un projet multi-tâches sans prétendre couvrir le reste.
+- La même table sorties/tâches alimente la compatibilité, les capacités et l’action de l’éditeur. Les capacités `VQA`, `COUNTING` et `GROUNDING` sont exposées ; le grounding requiert toujours une sortie liée explicite.
+- L’éditeur distingue préannotation complète, préannotation partielle, représentation, segmentation interactive et inspection. Ses nouveaux libellés disposent de ressources FR/EN.
+- Chaque `PointTarget` peut conserver un `PointLocalizationState` (`LOCALIZED`, `ABSENT`, `UNLOCALIZABLE`, `UNCERTAIN`). Les booléens historiques restent lus et écrits pendant la transition ; l’audit global n’est plus modifié pour exprimer l’état d’un point individuel.
+- `BoxTarget`, `MaskTarget` et `PointTarget` acceptent un `instanceId` optionnel. COCO fusionne une boîte et un masque uniquement lorsque cet identifiant est partagé et que leur classe concorde ; les anciennes données sans lien restent deux annotations indépendantes.
+- Les diagnostics des bundles, signatures d’apprentissage et appels HTTP contiennent maintenant runtime, entrée, durée, types de sorties, composants de bundle et endpoint loopback sans corps d’image ni secret.
+
+### Tests written
+
+- Compatibilité complète/partielle, tâches humaines, refus embedding, actions d’éditeur et capacités VQA/comptage/grounding.
+- Aller-retour Moshi des quatre états de quatre points et lecture des anciens booléens.
+- COCO lié, instances différentes et données historiques sans `instanceId`.
+
+### Tests executed
+
+- `python -m unittest discover -s tools/qa -p 'test_*.py'` : **47 réussis**.
+- `git diff --check` : réussi.
+
+### Not executed
+
+- `./gradlew test --no-daemon`, `./gradlew lint --no-daemon`, `./gradlew assembleDebug --no-daemon` et `./gradlew assembleDebugAndroidTest --no-daemon` ont chacun été tentés et arrêtés avant leurs tâches : SDK Android introuvable, `ANDROID_HOME` absent.
+- Tests Compose/instrumentés, APK, schémas KSP, appareil réel, téléphone ARM, RAM/latence, SAF réel et écritures HF autorisées.
+
+### Remaining issues
+
+- Les parcours anglais doivent encore être exécutés sur Android ; la présence et la parité des ressources ne remplacent pas un test Compose/navigation réel du commit final.
+- Des descriptions spécialisées, textes dynamiques et libellés d’accessibilité restent inline ; l’i18n exhaustive n’est donc pas encore revendiquée.
+- Le commit final doit être compilé et testé sur le pod Android avant toute qualification. Les nouveaux champs JSON n’imposent pas de migration Room, mais leur adaptateur Moshi généré doit y être compilé et exécuté.
+
 ## Second stabilization pass — 22 septembre 2026
 
 ### Fixed
@@ -91,3 +146,6 @@
 
 - Le nouveau type de résultat touche tous les appelants connus ; une compilation Android réelle reste obligatoire avant qualification.
 - Les capacités historiques sans preuve explicite restent volontairement `UNTESTED`/inspection uniquement, ce qui peut rendre certaines actions auparavant proposées indisponibles.
+### Grounding HTTP explicite
+
+Le grounding ne découle plus d’un simple couple caption + région ni du seul nom de tâche. Le profil doit déclarer `httpOutputMode=grounding_proposals`; chaque boîte ou point possède alors un `proposalId` unique et chaque expression référence explicitement un ou plusieurs de ces identifiants. La réponse est refusée si un lien manque, est dupliqué, cible une région absente ou si la région liée tombe sous le seuil. La fusion traduit ensuite ces identifiants éphémères en identifiants canoniques `GroundingTarget`, sans acceptation automatique : la revue humaine reste obligatoire.

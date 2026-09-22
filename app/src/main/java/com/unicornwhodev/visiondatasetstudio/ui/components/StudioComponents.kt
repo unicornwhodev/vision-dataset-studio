@@ -1,5 +1,8 @@
 package com.unicornwhodev.visiondatasetstudio.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.unicornwhodev.visiondatasetstudio.R
+
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -84,7 +87,7 @@ fun StudioSection(title: String, subtitle: String? = null, icon: ImageVector? = 
         HorizontalDivider(Modifier.padding(top = 10.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .65f))
     }
     if (help && subtitle != null) AlertDialog(onDismissRequest = { help = false }, title = { Text(title) },
-        text = { Text(subtitle) }, confirmButton = { TextButton(onClick = { help = false }) { Text("Compris") } })
+        text = { Text(subtitle) }, confirmButton = { TextButton(onClick = { help = false }) { Text(stringResource(R.string.common_understood)) } })
 }
 
 @Composable
