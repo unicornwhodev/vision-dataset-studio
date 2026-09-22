@@ -1,0 +1,67 @@
+[
+  {
+    "case": "Charlbi-edgenext_xx_small_learning",
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "build_id": "20260922T175957Z-8ef3e5cc2b0d",
+    "serial": "emulator-5554",
+    "passed": true,
+    "timed_out": false,
+    "controller_seconds": 159.517,
+    "android": {
+      "case": "Charlbi-edgenext_xx_small_learning",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 140025,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "72d87145acf5caf05095c1e4ab7c056ec0095b645d8a16b61c2dfbf9b0d0515d",
+      "threads": 2,
+      "adapter": "classification",
+      "training_scope": "pretrained_classification_head_only",
+      "output_shapes": [
+        [
+          1,
+          1000
+        ]
+      ],
+      "training_loss": 11.391106,
+      "output_max_change": 0.09351325,
+      "proposals": 0,
+      "checkpoint_files": 1,
+      "restore_max_difference": 0.0,
+      "resumed_loss": 11.297009,
+      "optimizer_steps_on_android": 2,
+      "application_checkpoint_loaded": true,
+      "training": "passed",
+      "success": true
+    }
+  },
+  {
+    "case": "Charlbi-repvit_m1",
+    "revision": "1244117f490e36ce321d70baa672753caeaef028",
+    "build_id": "20260922T175957Z-8ef3e5cc2b0d",
+    "serial": "emulator-5554",
+    "passed": true,
+    "timed_out": false,
+    "controller_seconds": 83.494,
+    "android": {
+      "case": "Charlbi-repvit_m1",
+      "runtime": "Android LiteRT Interpreter CPU",
+      "accuracy_evaluated": false,
+      "physical_arm_device": false,
+      "optimizer_on_host": false,
+      "phase": "complete",
+      "elapsed_ms": 65598,
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "model_sha256": "4849906123f080d356a02733324fae7059a56531fdd9fee70065bcf7f3ef77bc",
+      "threads": 2,
+      "adapter": "embedding",
+      "proposals": 0,
+      "embedding_values": 384,
+      "training": "not_exposed_by_conversion",
+      "success": true
+    }
+  }
+]

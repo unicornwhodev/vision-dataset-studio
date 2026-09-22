@@ -1,0 +1,248 @@
+test_all_kotlin_packages_match_source_paths (__main__.IdentityTests.test_all_kotlin_packages_match_source_paths) ... ok
+test_build_workflow_has_emulator_job_without_publication (__main__.IdentityTests.test_build_workflow_has_emulator_job_without_publication) ... ok
+test_device_scripts_use_canonical_id (__main__.IdentityTests.test_device_scripts_use_canonical_id) ... ok
+test_file_provider_uses_application_id (__main__.IdentityTests.test_file_provider_uses_application_id) ... ok
+test_gradle_aliases_resolve (__main__.IdentityTests.test_gradle_aliases_resolve) ... ok
+test_instrumented_provider_identity (__main__.IdentityTests.test_instrumented_provider_identity) ... ok
+test_namespace_and_application_id_match (__main__.IdentityTests.test_namespace_and_application_id_match) ... ok
+test_no_archived_docs_in_candidate (__main__.IdentityTests.test_no_archived_docs_in_candidate) ... ok
+test_no_private_weights_or_signing_keys (__main__.IdentityTests.test_no_private_weights_or_signing_keys) ... ok
+test_no_template_namespaces_in_sources (__main__.IdentityTests.test_no_template_namespaces_in_sources) ... ok
+test_selected_apache_license_and_notices_are_present (__main__.IdentityTests.test_selected_apache_license_and_notices_are_present) ... ok
+test_version_and_database_versions_distinct (__main__.IdentityTests.test_version_and_database_versions_distinct) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 11.776s
+
+OK
+test_absent_sdk_is_blocking (__main__.BuildEvidenceTests.test_absent_sdk_is_blocking) ... ok
+test_atomic_json_replaces_and_cleans_temp (__main__.BuildEvidenceTests.test_atomic_json_replaces_and_cleans_temp) ... ok
+test_attempt_does_not_reuse_prior_success (__main__.BuildEvidenceTests.test_attempt_does_not_reuse_prior_success) ... ok
+test_badging_identity_correct (__main__.BuildEvidenceTests.test_badging_identity_correct) ... ok
+test_badging_wrong_identity_refused (__main__.BuildEvidenceTests.test_badging_wrong_identity_refused) ... ok
+test_gradle_checksum_is_pinned_consistently (__main__.BuildEvidenceTests.test_gradle_checksum_is_pinned_consistently) ... ok
+test_invalid_java_version_refused (__main__.BuildEvidenceTests.test_invalid_java_version_refused) ... ok
+test_java_version_17 (__main__.BuildEvidenceTests.test_java_version_17) ... ok
+test_java_version_21 (__main__.BuildEvidenceTests.test_java_version_21) ... ok
+test_local_sdk_properties_win (__main__.BuildEvidenceTests.test_local_sdk_properties_win) ... ok
+test_missing_apk_never_promoted (__main__.BuildEvidenceTests.test_missing_apk_never_promoted) ... ok
+test_old_java_version (__main__.BuildEvidenceTests.test_old_java_version) ... ok
+test_preflight_block_writes_truthful_receipt (__main__.BuildEvidenceTests.test_preflight_block_writes_truthful_receipt) ... BLOCKED: JDK 17+ missing.
+ok
+test_resolver_refuses_latest_failed_attempt (__main__.BuildEvidenceTests.test_resolver_refuses_latest_failed_attempt) ... ok
+test_resolver_refuses_path_traversal_before_reading_artifacts (__main__.BuildEvidenceTests.test_resolver_refuses_path_traversal_before_reading_artifacts) ... ok
+test_runtime_and_configuration_are_allowed_without_weights (__main__.BuildEvidenceTests.test_runtime_and_configuration_are_allowed_without_weights) ... ok
+test_weight_inventory_detects_renamed_litert_and_named_weights (__main__.BuildEvidenceTests.test_weight_inventory_detects_renamed_litert_and_named_weights) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.119s
+
+OK
+Evidence: /tmp/tmpg6cdtd5m/dist/android/runs/20260922T175736Z-d2aaa5d9998c
+No APK was built or promoted by this attempt.
+app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/MaskCodec.kt:73:83: warning: condition is always 'true'.
+        val instanceId=masks.map{it.instanceId}.distinct().singleOrNull()?.takeIf{it!=null}
+                                                                                  ^^^^^^^^
+PASS viewport landscape FIT excludes top/bottom bars
+PASS viewport portrait FIT excludes side bars
+PASS viewport zoom is centred and translated
+PASS drag clamping is explicit
+PASS invalid geometry never returns image coordinates
+PASS 2000 random FIT/zoom/pan inverse round trips
+PASS COCO pixel conversion round trip
+PASS YOLO normalized conversion round trip
+PASS inference letterbox unprojection
+PASS seven unique nonempty workflow presets including segmentation
+PASS single and multi-point modes are mutually exclusive
+PASS cannot deselect final active task
+PASS task CSV ignores unknowns and round trips
+PASS canonical HF source URL normalization
+PASS destinations require namespace
+PASS reject arbitrary hosts, traversal and deep paths
+PASS editor policy locks every synced state
+PASS editor policy requires a local acquired file
+PASS automatic queue excludes rejected, deferred, validated
+PASS empty detection is not a verified negative
+PASS explicit negative allows empty detection
+PASS unlocalizable present is distinct and accepted
+PASS contradictory absence and presence blocked
+PASS valid human box accepted
+PASS unverified AI box blocked
+PASS degenerate box blocked
+PASS NaN box coordinates blocked
+PASS out-of-image point blocked
+PASS single-point cardinality enforced
+PASS multi-point cardinality allowed
+PASS duplicate region ids blocked
+PASS explicit VQA abstention accepted
+PASS unanswered VQA blocked
+PASS empty extra caption cannot silently export
+PASS zero is a valid explicit count
+PASS negative count blocked
+PASS grounding requires an existing target
+PASS grounding with text and actual target requires explicit review
+PASS uncertain cases require deferral not validation
+PASS TAR roundtrip fixture generated by real production writer
+PASS TAR refuses unsafe paths
+PASS TAR refuses truncated declared streams
+PASS TAR refuses longer-than-declared streams
+PASS TAR refuses overlong names rather than truncating
+PASS 44 policy tests; 2000 randomized coordinate round trips included. No Android UI, network or Moshi serialization tests run.
+PASS independent Python TAR reader: names, payloads and checksums.
+app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/MaskCodec.kt:73:83: warning: condition is always 'true'.
+        val instanceId=masks.map{it.instanceId}.distinct().singleOrNull()?.takeIf{it!=null}
+                                                                                  ^^^^^^^^
+PASS model contract version rejects unknown schemas
+PASS source identifiers preserve exact strings and safe integers
+PASS source identifiers refuse lossy doubles, fractions and objects
+PASS batch size differs from HTTP page size: 1/99/100/101/500/1000
+PASS batch boundaries and revisions fail closed
+PASS manifest/output paths reject traversal, absolute, encoded and empty segments
+PASS network and storage bounds enforced
+PASS every offered LiteRT template validates
+PASS unsupported runtime/backbone/shape contracts rejected
+PASS zero std, invalid class list and INT8 raw rejected
+PASS tensor extent matches its values
+PASS letterbox exact geometry for landscape
+PASS center crop inverts to original frame
+PASS 1500 randomized transform inverse tests including odd padding
+PASS YOLO BCN per-class NMS preserves separate labels
+PASS YOLO BNC matches BCN numerically
+PASS YOLO refuses mismatched class/channel contract
+PASS YOLO objectness multiplied exactly once
+PASS YOLO low objectness does not create a detection
+PASS YOLO box to bottom point uses unletterboxed coordinates
+PASS derived counts are post-NMS proposals
+PASS negative/degenerate boxes are excluded
+PASS NaN scores fail rather than fabricate output
+PASS SSD explicit indices and class offset
+PASS post-NMS xyxy score class is explicit, not guessed as raw YOLO
+PASS unknown class output rejected
+PASS classifier stable softmax large logits
+PASS classifier sigmoid multi-label and topK
+PASS probability outputs out of range refused
+PASS points one global class, invalid coordinates excluded
+PASS points per-slot labels preserved
+PASS point cardinality/class mapping mismatch refused
+PASS NHWC heatmap class-specific argmax at cell centre
+PASS NCHW heatmap matches NHWC
+PASS heatmap softmax mode deliberately refused
+PASS RGB FLOAT32 normalizes channel values
+PASS NCHW actually transposes pixels
+PASS BGR and channel-specific means/stds
+PASS UINT8 raw preserves V2 normalization semantics
+PASS INT8 tensor quantization and saturation
+PASS output dequantization uses real tensor scale and zero
+PASS invalid tensor quantization scale rejected
+PASS local endpoints cannot target LAN, Internet, credentials or redirects
+PASS response path traverses fields and indexed arrays only
+PASS request placeholders are whole JSON values, not string code interpolation
+PASS human points, boxes and text survive rerun
+PASS empty new output replaces only untouched proposals of declared types
+PASS referenced machine regions survive rerun
+PASS disabled tasks retain all their annotations
+PASS import is never human verified and drops quality decisions
+PASS machine captions and counts cannot bypass review
+PASS point proposal captures model origin and correction generation
+PASS pack cannot contain mutually exclusive pointing cardinalities
+PASS pack schema, task and class constraints
+PASS accepted predictions are never supervised correction examples
+PASS unverified and implausibly large corrections rejected
+PASS correction reservoir deterministic, bounded and de-duplicated
+PASS minimum evidence is distinct images, not number of points
+PASS ridge head can learn controlled spatial residuals
+PASS train and control sets never share the same image
+PASS head cannot move a point more than eight percent
+PASS reused control set does not blindly replace the champion
+PASS corrector stays isolated by model contract and label
+PASS shared work policy requires stable worker identity
+PASS shared claim policy skips completed and active foreign work but recovers expired leases
+PASS embedding and inspect-only contracts permit empty class vocabularies
+PASS box correction head can adjust centre and size without touching another label
+PASS mask canonical RLE and COCO column order remain distinct
+PASS mask brush, erase and human corrections survive new inference
+PASS wide masks and original camera resolution export without a full-size raster
+PASS named signature output order differs from default graph
+PASS RTMDet uses zero-offset grid and stride-scaled distances
+PASS 72 V4.2 engine tests; 1500 transform trials included. Numeric fixtures only: no Android runtime, live HF, actual weights, Room or real correction benchmark executed.
+PASS strong validators accepted
+PASS weak validators rejected
+PASS missing and malformed validators rejected
+PASS content range parsed exactly
+PASS wildcard and overflow ranges rejected
+PASS correct resume accepted
+PASS etag changes rejected
+PASS wrong offset rejected
+PASS overbudget range rejected
+PASS partial terminal ranges rejected
+PASS same parent retries immutable intent
+PASS lost response reconciles bytes at changed head
+PASS changed head without matching files is conflict
+PASS invalid commit names rejected
+PASS transfer and purge states lock edits
+PASS successful replacement
+PASS failure preserves original bytes
+PASS no pending file remains after handled failure
+PASS bounded copy exact payload
+PASS overbudget data rejected
+PASS cancellation propagates before copying
+PASS write error propagates
+PASS read error propagates
+PASS hash known bytes
+PASS hash rejects oversized provider
+PASS owned cache paths accepted
+PASS path traversal rejected
+PASS root deletion rejected
+PASS symlink escape rejected
+PASS directory handover retains new generation
+PASS handover recovers previous generation after interrupted rename
+PASS handover requires same parent
+PASS durable hashed prefix recovered
+PASS unjournaled trailing bytes truncated
+PASS corrupted prefix never resumed
+PASS changed source identity never resumed
+PASS reduced storage budget blocks resume
+PASS lost checkpoint blocks resume
+PASS shorter physical file blocks resume
+PASS checkpoint rejects weak server validator
+PASS p50 and p95 use documented nearest rank
+PASS invalid benchmark samples rejected
+PASS hash large streamed file without materializing payload
+PASS 43 V4 production-helper tests. Real JVM filesystem and hashing; no Android, HTTP client, Room or Compose runtime exercised.
+test_explicit_sqlite_default_values (__main__.MigrationTests.test_explicit_sqlite_default_values) ... ok
+test_failed_migration_rolls_back (__main__.MigrationTests.test_failed_migration_rolls_back) ... ok
+test_indexes_exist (__main__.MigrationTests.test_indexes_exist) ... ok
+test_legacy_table_definitions_match_after_migration (__main__.MigrationTests.test_legacy_table_definitions_match_after_migration) ... ok
+test_no_invented_verification (__main__.MigrationTests.test_no_invented_verification) ... ok
+test_page_query_uses_keyset_index (__main__.MigrationTests.test_page_query_uses_keyset_index) ... ok
+test_uncertain_v3_push_becomes_conflict (__main__.MigrationTests.test_uncertain_v3_push_becomes_conflict) ... ok
+test_v1_migrates_without_loss (__main__.MigrationTests.test_v1_migrates_without_loss) ... ok
+test_v2_migrates_without_loss (__main__.MigrationTests.test_v2_migrates_without_loss) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.075s
+
+OK
+{
+  "scope": "HOST SQLite metadata index only; not Android Room, image decoding or full corpus workflow",
+  "rows": 200000,
+  "sqlite": "3.45.1",
+  "insert_seconds": 2.0401401296257973,
+  "page_100_p50_ms": 0.1816973090171814,
+  "page_100_p95_ms": 0.2232193946838379,
+  "database_bytes": 19955712,
+  "process_max_rss_kib": 31056,
+  "migration_source_sha256": "ff25467d8dc22bffb9f740e805ddb79a8cf8d18b037368152d08b0a040e49b3d"
+}
+test_coco_preserves_pixels_and_path (__main__.ValidatorTests.test_coco_preserves_pixels_and_path) ... ok
+test_duplicate_ids (__main__.ValidatorTests.test_duplicate_ids) ... ok
+test_invalid_coordinates (__main__.ValidatorTests.test_invalid_coordinates) ... ok
+test_project_scoped_android_batch (__main__.ValidatorTests.test_project_scoped_android_batch) ... ok
+test_tampered_image (__main__.ValidatorTests.test_tampered_image) ... ok
+test_traversal_manifest (__main__.ValidatorTests.test_traversal_manifest) ... ok
+test_valid_fixture (__main__.ValidatorTests.test_valid_fixture) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.016s
+
+OK

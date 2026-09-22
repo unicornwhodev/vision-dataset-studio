@@ -1,4 +1,12 @@
-# rc3 validation — 20 September 2026 UTC
+# Validation — 22 September 2026 UTC
+
+Corrected build **`20260922T175957Z-8ef3e5cc2b0d`**, based on `351dd3f`: **54 JVM tests**, **48 Python tests**, **24 Android tests passed / 10 skipped**, zero failures. Lint: **0 errors, 89 warnings**. Both APKs were built, signed, installed and verified; no bundled weights, 181 source files matched.
+
+[Full bilingual report and evidence](../validation-20260922/README.md) cover fixes, skipped model fixtures and the software-emulator System UI ANR. Earlier SDK blockers below are historical. This is not a physical ARM or stable-release qualification.
+
+---
+
+# Historical rc3 validation — 20 September 2026 UTC
 
 [Français](../../TEST_REPORT.md) · **English**
 

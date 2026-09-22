@@ -1,0 +1,65 @@
+{
+  "date_utc": "2026-09-22",
+  "base_commit": "351dd3f3ba2a50f86e62137f24780699da0d4ac2",
+  "build_id": "20260922T175957Z-8ef3e5cc2b0d",
+  "app": {
+    "file": "vision-dataset-studio-uwd-debug.apk",
+    "sha256": "ce2035bae979282c1a577ff5de4f3653a5dee45838f8c67a7f8009093af53324",
+    "bytes": 366822260
+  },
+  "test_apk": {
+    "file": "vision-dataset-studio-uwd-test.apk",
+    "sha256": "73638287bc84f476568c77d348a24a4c8401c1ad4787f3ba2a08dc0680dd7bb1",
+    "bytes": 2945311
+  },
+  "build_checks_passed": true,
+  "python_tests": 48,
+  "jvm": {
+    "tests": 54,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "Warning": 89
+  },
+  "android": {
+    "passed": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 10,
+    "seconds": 205.008
+  },
+  "portable": {
+    "policy_checks": 44,
+    "engine_checks": 72,
+    "training_target_checks": 16
+  },
+  "compiled_source_files": 181,
+  "compiled_source_mismatches": 0,
+  "environment": {
+    "host": "Runpod CPU, 8 vCPU / 16 GiB",
+    "android": "API 28 x86_64 software emulator, no KVM",
+    "physical_arm": false
+  },
+  "system_ui_anr_observed": true,
+  "stable_release_qualified": false,
+  "source_fix_commit": "7f79b4b",
+  "converted_model_regressions": [
+    {
+      "case": "Charlbi-edgenext_xx_small_learning",
+      "passed": true,
+      "training": "passed"
+    },
+    {
+      "case": "Charlbi-repvit_m1",
+      "passed": true,
+      "training": "not_exposed_by_conversion"
+    }
+  ],
+  "new_models_qualified": 0,
+  "visual_locales_checked": [
+    "en-US",
+    "fr-FR"
+  ]
+}

@@ -1,4 +1,12 @@
-# État rc3 — build et tests du 20 septembre 2026 UTC
+# Validation du 22 septembre 2026
+
+Build corrigé **`20260922T175957Z-8ef3e5cc2b0d`**, base `351dd3f` : **54 tests JVM**, **48 tests Python**, **24 tests Android réussis et 10 ignorés**, aucun échec. Lint : **0 erreur, 89 avertissements**. APK construite, signée, installée et contrôlée sans poids embarqués ; 181 fichiers sources comparés, aucune différence.
+
+[Rapport détaillé FR/EN et preuves](docs/validation-20260922/README.md). Le rapport distingue les tests réellement exécutés des fixtures absentes, les corrections de compilation et le blocage System UI observé sur l’émulateur logiciel. Les paragraphes suivants conservent l’historique antérieur à cette qualification ; leur absence de SDK ne décrit plus le poste actuel.
+
+---
+
+# Historique rc3 — build et tests du 20 septembre 2026 UTC
 
 ## Third stabilization pass — 22 septembre 2026
 

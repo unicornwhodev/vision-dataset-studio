@@ -1,5 +1,7 @@
 # Stabilisation — septembre 2026
 
+**Qualification exécutée le 22 septembre sur le pod recréé** : [résultats FR/EN](validation-20260922/README.md). Les erreurs de compilation et des lanceurs portables ont été corrigées : 54 JVM, 48 Python et 24 Android réussis, 10 modèles ignorés, lint sans erreur. Les sections ci-dessous décrivent les passes antérieures à cette exécution ; leurs blocages SDK sont historiques.
+
 ## Third stabilization pass — 22 septembre 2026
 
 ### Instance linking completion

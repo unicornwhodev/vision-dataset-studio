@@ -9,6 +9,8 @@ An Android workspace for producing image datasets in batches: model proposals, h
 **4.2.0-rc3 · Apache-2.0 · Under qualification**
 Android application ID: `com.unicornwhodev.visiondatasetstudio`
 
+Latest source validation: **22 September 2026**, 54 JVM and 24 Android tests passed (10 model tests skipped). [Fixes, build and limitations](docs/validation-20260922/README.md).
+
 ## Application screenshots
 
 | Current rc3 workspace | Annotation editor |

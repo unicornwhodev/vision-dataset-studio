@@ -1,0 +1,4 @@
+app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/MaskCodec.kt:73:83: warning: condition is always 'true'.
+        val instanceId=masks.map{it.instanceId}.distinct().singleOrNull()?.takeIf{it!=null}
+                                                                                  ^^^^^^^^
+PASS 16 training target checks: verified labels, explicit negatives, geometry, contradictory points

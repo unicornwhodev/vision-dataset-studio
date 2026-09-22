@@ -9,6 +9,8 @@ Atelier Android pour produire des datasets d’images par lots : préannotation,
 **4.2.0-rc3 · Apache-2.0 · En qualification**
 Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
 
+Dernière validation du code : **22 septembre 2026**, 54 JVM et 24 Android réussis (10 tests de modèles ignorés). [Corrections, build et limites](docs/validation-20260922/README.md).
+
 ## L’application en images
 
 | Atelier rc3 actuel | Éditeur d’annotations |

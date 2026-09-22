@@ -1,16 +1,12 @@
 # Limites de qualification — 4.2.0-rc3
 
-## Third stabilization pass
+## Validation de la stabilisation — 22 septembre 2026
 
-La compatibilité partielle, les états de pointing par cible, la liaison d’instance COCO et les diagnostics multi-runtime sont implémentés mais restent non compilés sur Android dans cet environnement sans SDK. Les champs `localizationState` et `instanceId` sont optionnels afin de relire les JSON historiques ; une exécution Moshi/Room/export sur le pod reste obligatoire. Les actions et libellés statiques principaux des parcours ont des ressources FR/EN, mais le parcours anglais complet reste à exécuter sur Android. Aucune mesure appareil, écriture HF ou qualification APK n’a été effectuée.
+Les trois passes sont maintenant compilées sur le poste Android : **54 tests JVM et 24 tests Android réussis**, 10 tests de modèles ignorés faute de fixture ou de sélection. Voir le [rapport actuel](docs/validation-20260922/README.md). L’absence de SDK mentionnée dans les historiques est résolue. Les signatures, champs Moshi, migrations Room, instances COCO et masques passent les contrôles décrits ; ce résultat ne qualifie pas tous les parcours ni tous les modèles.
 
-La liaison d’instance est maintenant accessible dans l’éditeur et les ambiguïtés sont refusées. Les imports et sorties de modèles ne reçoivent toutefois aucun lien inventé : seuls des identifiants explicitement présents et contractuels pourront être préservés. Ce parcours reste à compiler et à tester sur Android.
+Les ressources anglaises et la navigation passent sur Android, mais des descriptions spécialisées et des valeurs dynamiques restent en français. L’émulateur logiciel a affiché un ANR de System UI au démarrage ; la suite a terminé et le catalogue a ensuite été contrôlé sans le dialogue. Aucune qualification de stabilité ni de performance d’un téléphone ARM n’en est déduite. Lint conserve 89 avertissements.
 
-Le grounding modèle est pris en charge uniquement par le contrat HTTP explicite `task=grounding` + `httpOutputMode=grounding_proposals`, avec identifiants uniques des régions et liens phrase-région contrôlés avant fusion. Une région filtrée par le seuil invalide la relation au lieu de créer une expression orpheline, et chaque proposition reste soumise à revue humaine. Les bundles Florence-2 et les couples caption+box restent volontairement non déclarés grounding. Aucun serveur HTTP grounding réel n’a encore été qualifié.
-
-La passe de stabilisation du 22 septembre introduit des contrats typés pour les capacités et les résultats d'inférence, mais n'a pas pu être recompilée dans l'environnement courant dépourvu de SDK Android. Elle reste donc à qualifier par le build Android complet ; voir [STABILIZATION_2026_09.md](docs/STABILIZATION_2026_09.md).
-
-La seconde passe ajoute les reçus d’inférence durables, la reprise des maintenances interrompues et les outils avancés de masque. Le test d’interruption injecte une mort après commit de manière déterministe ; une coupure réelle du processus et la compilation Android de cette passe restent à exécuter sur le poste de qualification.
+Le grounding modèle exige le contrat HTTP explicite `task=grounding` + `httpOutputMode=grounding_proposals`, des identifiants de régions uniques et des liens phrase-région contrôlés. Les tests de contrat et de revue humaine passent ; aucun serveur grounding réel n’a été qualifié. Les bundles Florence-2 et les couples caption+box ne sont pas déclarés grounding. Les imports et modèles ne reçoivent aucun lien d’instance inventé.
 
 ## Production par lots
 

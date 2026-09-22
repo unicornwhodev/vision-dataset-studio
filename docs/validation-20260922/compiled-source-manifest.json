@@ -1,0 +1,729 @@
+{
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "app/build.gradle.kts",
+      "sha256": "1885f271256ba7499db7843b7aa5cf515e82032ab5d2dcd0277569132537c6ab"
+    },
+    {
+      "path": "app/schemas/README.md",
+      "sha256": "adba202598d2f0108f5e7801f5ddd4072c38d067d39615ceb8d264a37e15e541"
+    },
+    {
+      "path": "app/schemas/com.unicornwhodev.visiondatasetstudio.data.db.AppDatabase/3.json",
+      "sha256": "41a1f674fa79fcb9f1c31b78de351e834b1927af395ba39c9f3b3cea491c422a"
+    },
+    {
+      "path": "app/schemas/com.unicornwhodev.visiondatasetstudio.data.db.AppDatabase/4.json",
+      "sha256": "8d2fcb88b731a0199000ade4b2a846878169ef4c7f45fc892ca4a93cf1b504dc"
+    },
+    {
+      "path": "app/src/androidTest/AndroidManifest.xml",
+      "sha256": "5b4cd4e90363c550c86e76c4a675cb6d16c7c16f9af9a4cce6b01f50b5bd9948"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/ApplicationIdentityTest.kt",
+      "sha256": "d524b248dd2dedf9e4ecb862ee5d58575e8295c1dfe18688c3a344b4a56e621f"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/BatchProductionTest.kt",
+      "sha256": "7897464936369e2d71859f262f6c75a96a228547a3032cbf84f05be1893382c0"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/ConvertedModelQualificationTest.kt",
+      "sha256": "91ec82281ce35e97ebae290aa9869a1f2f9cc93f6c3e351a25554a95c7b81249"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/EmbeddingIndexTest.kt",
+      "sha256": "831234de528cbb98bcf931da5cc61e2a85ce8891cb19559e77bc422e725dc7d0"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/EnglishLocaleComposeTest.kt",
+      "sha256": "8cc6d7dd410d3fa2441395aa9f7acd110d619517478b931b7bd5cf821e0aa3b0"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/HfModelRuntimeTest.kt",
+      "sha256": "1e5cb92ea1620b62ec2f0ad336c377a7e42211ff62414ef141e0f96724e9c264"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/HfTokenizerTest.kt",
+      "sha256": "524042556991e000f2fdd11df3740fd52f58861aa30e130f75363eec60d3cb22"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/OnDeviceTrainingTest.kt",
+      "sha256": "107b170d3dd81db4cd01fe1e8e4d7f6947b777e88288123f3092e893de802b72"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/ProjectMaintenanceTest.kt",
+      "sha256": "accbeff577107ab6ef3c5ee193e0a7ecaa42be61c20b40e64a0ab6ef397500c5"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/RoomMigrationOnDeviceTest.kt",
+      "sha256": "3cf7f99801a84f00394f99760ad96bfb9745eb8b0d8022c79a423f0e28c7ad7a"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/SafFaultProvider.java",
+      "sha256": "a8dd197f4abfd1580b3226d9beab2e6de16b5fabef91e4a7528275fde69ee093"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/SafV4Test.kt",
+      "sha256": "1e6b875dbd7cfcbf1bcf3e34ab265a7397f5ddb99295b21625520a5d1d395bd7"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/SegmentationCanvasTest.kt",
+      "sha256": "d35bd5f289613da1fdfbf311090c25a46cd30689e2bdde338ef3c26728e5460d"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/StudioComposeV4Test.kt",
+      "sha256": "2bc2c0332ed2e34648d35e2ec79ac6f5a79380163d08a34d7a368e89c6d206de"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/TrainingWorkflowTest.kt",
+      "sha256": "76e476fe69fd15ba7a354708ef430fa8f49bbbd26814be817cea3d1248f8d08e"
+    },
+    {
+      "path": "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/WorkflowExecutionTest.kt",
+      "sha256": "0fb93f1c1b4d56a01e38367498c6d650b2fbf81efd812cd0396291f1f5dae57d"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "sha256": "cad16e81cbadda2367575c89ab7d927ad4019612bd03a9d96f6d5b26c27f5f72"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/MainActivity.kt",
+      "sha256": "f74f36361b74988e03a15f2cd8e1fc613008964b0bac7354d28686a684d37fa1"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/crypto/KeystoreManager.kt",
+      "sha256": "ffe5361dcac4500c0724d04e5d06cfb3d170e5b0fc4fccfbd55d031868dc49b1"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/geometry/Geometry.kt",
+      "sha256": "efaef382e23c1ca687c81ff837a3da38ffcd18132456e03e38d8952f6a6bcbb6"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/geometry/HashUtils.kt",
+      "sha256": "3386605ecce8b170368a94b97202818c03ee0adf51e5de06f0f0ec7f44f53057"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/geometry/ImageViewport.kt",
+      "sha256": "7b5052b7f542bbd6f8589e2d81da5ae6c327a8c7822b935501c73997183b0dde"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/DownloadCheckpoint.kt",
+      "sha256": "17d589d8f684094704b6565c1d116ce780a63999177e529e30ae6853810b7ac2"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/DurableFiles.kt",
+      "sha256": "1128002f2dee9e9112fc22692015c70176e4f575a3166d2d6e2514c70b37dece"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/ImageNormalizer.kt",
+      "sha256": "1ff1abafa2b361c3b7730740aba242494d11b24dd56a304ce55164179f01c7d4"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/SafArchives.kt",
+      "sha256": "d3771cb1228633c5945be033d2f8ae5b8975487327c11b86f75996f0dbe0fe59"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/storage/StorageManager.kt",
+      "sha256": "2a0a6873acd9c6c4166ba4ec6d298f0cb12d515d14cd6f8b4c5b0cf40ef5604f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/workflow/ProcessingSettings.kt",
+      "sha256": "9701495f59c557dcd59b942854a71743eb0b779ae2f9985ec7736df06fb3347f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/workflow/StudioWorkflow.kt",
+      "sha256": "b0df13614d6ce534f7d89dda4ee7437c244b798c999b983240327f7ec1232d4f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/core/workflow/TransferSafety.kt",
+      "sha256": "25c4e57c76c33ee896deb7485b4f4c324d93bcac6bc626e788444f06eda50a88"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/db/AppDatabase.kt",
+      "sha256": "a4de21fd6a5d4c46c556aa75eebe9a7c672c83ed17ab7293a25374bebc6cb724"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/db/Daos.kt",
+      "sha256": "56feae1102daeeda961d643d4fdaafdfaf21d86e2f877e0aa5e81eae86be34e0"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/db/SchemaMigrations.kt",
+      "sha256": "ff25467d8dc22bffb9f740e805ddb79a8cf8d18b037368152d08b0a040e49b3d"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/hf/HfApiClient.kt",
+      "sha256": "3349e120adf9fdd7c819f8a13a97bfc7077bb340b775e5a17deb9e65d7de293a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/hf/RepoFileSource.kt",
+      "sha256": "a21b274dc22ec5cb0cfa65525f5de465f9635a84049706e656394c960c81bf36"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/json/StudioJson.kt",
+      "sha256": "3b8fb61945c2a83f7c435baa41c29f938cfa2f9af29ee3802549c08cd92d1623"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/model/DatasetModels.kt",
+      "sha256": "6f35cda86c1fde2d3b02a03e4b81ddb4625daaa1362b160663d0c65be280775c"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/model/Entities.kt",
+      "sha256": "0a18b85cc09f525d5bab7a755ce0e7f14beabe5d0500730bf74d1771e8aead75"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/preferences/ProjectSettings.kt",
+      "sha256": "79b8fe72bb3955326c52e708acfcacb09742304c2911f2c5057618cf08335f5f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/preferences/StudioPreferenceStore.kt",
+      "sha256": "740861cf9f8cd0984eb49dd4423bfb721dc6011874a951b02300543ad8a1dc0e"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/source/SourceCatalog.kt",
+      "sha256": "ffd3a4b39261732417ae1c17797cffce7842ffc640b3a77152bb625dd08a4202"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/BatchEngine.kt",
+      "sha256": "f82067efbebf453eee1f896651242e7b80f8c4a013a4c0809f04cec8bf3711f2"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/BatchSnapshot.kt",
+      "sha256": "c03b95d2ed86a27bc3da4f98ecd633353a0120e37b9401d2e5ef71b6eafbe8cf"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/ImageIdentity.kt",
+      "sha256": "bb9c52b3886c927f4a5cc532829736117533f0c6d1afb3cec345e608201e01a7"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/ProjectMaintenance.kt",
+      "sha256": "1b8b3aeb0bce036ddb24ab08545a7d6747a58705d729e4bd367951c232388856"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/batch/WorkClaimCoordinator.kt",
+      "sha256": "345a92cf21e035c0c0a0ddc530aab201942f07cbcc7456d37c934a21dd3e9837"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/export/DatasetExporters.kt",
+      "sha256": "c5831a7de43280f899539f131911fcc26221ca89f0cc79bb87dd85432ec1397e"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/export/WebDatasetTarWriter.kt",
+      "sha256": "377bec51c17acc579b33bfca49c2d24892853202c0429a680fbd71e4cae2fcb7"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/AdaptiveCorrection.kt",
+      "sha256": "fb160785b1921119ac9b37686db1c57876573f3183710832098e6cf4184e1bf2"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/AdaptiveCorrectionStore.kt",
+      "sha256": "d62bada64e0877f86d6aa3e66711500e74257ecdd5f6ccf86100e1116755ffdb"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/BytePairTokenizer.kt",
+      "sha256": "c077ab009ae82f5b0f9b63a6103ff7f74e6b98a887ce411537b3ef74711e4767"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/CommunityModelCatalog.kt",
+      "sha256": "9877e5795126285cc3b1bd9d7654cfd5ed4374dd3ce7ac9c20bc6804bce1a7cc"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/CommunityModelInstaller.kt",
+      "sha256": "0ed97525ac80660f73ea4d7351c7a59a09571a841ea5bd63a677eb5a12af2057"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/DeviceBenchmark.kt",
+      "sha256": "cd9aaafdaf7e715eb2177a2cefd9e3b0679afb5c715d57b1bceff0ba3b00d685"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/EmbeddingIndex.kt",
+      "sha256": "75d2b1e05193a4f237ed8b1d6ba5bb2928aa5bef046c8ddb313607c79bd027af"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/GroundingProposalContract.kt",
+      "sha256": "feea17f13ecca9cca306fc874c68dee7e82378ce2591f4e0b0f9d6684db9ea56"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/InferenceReceiptStore.kt",
+      "sha256": "dc4e845fd3ede747dc83623dbec16e4ed9cca11fa05a6d6a31be5ffba85dad18"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LiteRtBundle.kt",
+      "sha256": "1e347742fbb0365a42b09f00376f4cc9ff9eeb6dd4f86196ad60c0d08964d04e"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LiteRtEngine.kt",
+      "sha256": "c40a016315046ee2752f81a8fa3bc23910ee124047b50f6d2e4c58f31fda53b9"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LiteRtGraph.kt",
+      "sha256": "a95f941e3fe64a6c0a45f71efaa5c13ab5a110c40b043878c9647bd4573b29cb"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LiteRtOptions.kt",
+      "sha256": "369008c29c440a632cad015d16935f23a93c49658aeed152db75842606b10671"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LiteRtTrainingSession.kt",
+      "sha256": "e3fec9fbe149231c03a22d9e4a6e22a3e7622cbd605de1dccc10e0efdbb1dad2"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LocalModelClient.kt",
+      "sha256": "42f27bd96b7f8381b6fe4150bc140dd399a0e7c47f26fa8aba522cb6f740407a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/MaskCodec.kt",
+      "sha256": "4510829aa245a54f085bed05ce2bbc3e930a77340505a079050021a17eb6113d"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ModelAdapters.kt",
+      "sha256": "2dc264e5066752e1e04148032eed35277d97507fbf251107a7ce525c5fc2ba0d"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ModelCapabilities.kt",
+      "sha256": "6c194e649d4a6983b9a00ec63a7ddff94016615a90e0a526763511fd6683850a"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ModelConfig.kt",
+      "sha256": "47b8d65af25011702928dc3bdf173de753a402be0f01289ba47c3ecc6715f87f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ModelPresets.kt",
+      "sha256": "0590c54bc6658149c21ef48e70eddfd39c9caffd1350a891cac596eb8b1da996"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/ProposalMerger.kt",
+      "sha256": "0df4e78a12a6717496774677e768ae03fccdb50286eb3c5c766cfbc64b529acc"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/PublicModelCatalog.kt",
+      "sha256": "847881231b43defd3513a13f836c9a3a9fcd954bbe3b021675df55bbb2bcdcb3"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/StudioPack.kt",
+      "sha256": "facee9114c1ee8aa4a73013b076328f6d02acc0dd6b1696228c3cb01395300ba"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/TensorCodec.kt",
+      "sha256": "dbc3b684f766294fccf21e20a733de874443beec8e8b4fe6e3744c5fda0d3c7e"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/training/OnDeviceTraining.kt",
+      "sha256": "9d89aca9f4cda5f5ea5874790951abfae43eb5afc1be0e69fb967cb15221ae28"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/training/TrainingPreflight.kt",
+      "sha256": "f18f50877aaa52dedc696a107cf9476a7aa6aaaef71763fec52c1e0d9874d6ee"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/training/TrainingTargets.kt",
+      "sha256": "5cea529c943dc00ef407c7365ad28e893720039a013f1972a2fac3ae8123deb7"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/validation/AnnotationReview.kt",
+      "sha256": "32261907a19bc6d485a40a6640d318422a93d581cb561cad82ea9ed2adb11801"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/workflow/WorkflowRunner.kt",
+      "sha256": "912718170987466f645e9cf4dc9f065658179c68e88e1c18cb3ce0d7cb826a55"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/MainViewModel.kt",
+      "sha256": "c0b6e7555fc6a957c3fb7fea91af7458c8ca6b31a5609ca0c2f4f1d2959e83a0"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/NavigationHistory.kt",
+      "sha256": "2937e42992ee4750496d2527bf8126063d264b113abb552a66054586b023fb6f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/StudioRoot.kt",
+      "sha256": "9f5dade11fadb0507c8f5db574def2cdd2fd2505e3e8e7cbf3f7bdf3b47b9025"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/components/StudioComponents.kt",
+      "sha256": "2b37502cd8d2d265c0188c0fd87dc15758da19312538c8f7cb22ee736c450602"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/AnnotationEditorScreen.kt",
+      "sha256": "8f7559278b7e61d890fed8e399651e2ca1f0fb98efedc05828d4ac8319a7a94d"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/BatchGridScreen.kt",
+      "sha256": "d715eaa9317f17cb69f575bd0f14ace7a27a0c72636c763267b2c6bf6962afbb"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/ModelLibraryScreen.kt",
+      "sha256": "1bdcc9a84e4d04685fb348a79754341c4ba7e50fa6b769dc3f1a1639a0b1dba7"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/PublicationScreen.kt",
+      "sha256": "94a643dafc7e52a6f50c1e0553f89308be35d0b8d73d8309e26ce885cb0e74c0"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/QualityDashboardScreen.kt",
+      "sha256": "d5ef9ba1572723e4e1bfcbef87ca617c14fc15f89385b834d90ff2e742dd774b"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/SetupScreen.kt",
+      "sha256": "b432ed6af3a4723aecfe7172e3c22863e570fe0cc534e765ddbcd2047c1d76f5"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/SimilarityScreen.kt",
+      "sha256": "54815c7882684a4497a67dfad7c3ddfc31be8f5649afb27d2aeeedf4b6ffb26f"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioControlsScreen.kt",
+      "sha256": "d6f362b50ffe8685159403470ad0d54578ff2dffb2a28301c9867657022c33fb"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioHomeScreen.kt",
+      "sha256": "a124ad4b0e4c457598bdabc51fec7ae0e8224ed4fc72289edf2775df5d38b38d"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioPreferencesScreen.kt",
+      "sha256": "5f0aed5ff7d3975106976d853ad055bde93334a19d7a87ee512aaed38468433b"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/TrainingScreen.kt",
+      "sha256": "7b4416963a0a1d20638bd381b10defef7cd55324b6738b50823a088c38fe301d"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/WorkflowScreen.kt",
+      "sha256": "86f7f1d8890cec3d0fafd50d0c354a29741f3019ce1a9580621e499af104b40d"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Color.kt",
+      "sha256": "1db4d8435aa2a2cef2ff81c2875f986abe3927eb2f40cadaf9c7d5b08a0ad965"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Theme.kt",
+      "sha256": "3e2fa83a1b17dd5af70cc2d769ff1c68e7406bd41b1206599f9696d7c5fe6bc1"
+    },
+    {
+      "path": "app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/theme/Type.kt",
+      "sha256": "de0fddcf5324a2a4912cc8cf1f682df6083ada9440ca627c40e55c9ee3659e7e"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_background.xml",
+      "sha256": "76ae8c517e5f97eeadd060ad5d3eb703c616e036b23c8ae41e88614892174eb6"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "sha256": "d3d35736931b78efcbeb0933c45a4232619fe5a99bfb932e4bb01b4eb853dd94"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "6d0988175971f41bdc83eadb144af3d84c40052fa125e90edbe7d89227be4b25"
+    },
+    {
+      "path": "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+      "sha256": "6d0988175971f41bdc83eadb144af3d84c40052fa125e90edbe7d89227be4b25"
+    },
+    {
+      "path": "app/src/main/res/mipmap-hdpi/ic_launcher.webp",
+      "sha256": "99221f2905af79868986b0dd1701ea91a5387146ba701c18b2ee2252a67be481"
+    },
+    {
+      "path": "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp",
+      "sha256": "7c93f81de792b7216b0db55c1471abe5fccbbcde8278a25264d83ebf8464f498"
+    },
+    {
+      "path": "app/src/main/res/mipmap-mdpi/ic_launcher.webp",
+      "sha256": "b9089fe59f9049e993f92646161e0723496224a44436a2500087e2d05409e8f7"
+    },
+    {
+      "path": "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp",
+      "sha256": "943bd647827e0e7f0fa51be8164f9f1835202d90af6d95ffae44dbb094f44060"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xhdpi/ic_launcher.webp",
+      "sha256": "b3a0802c4fc82b3fd796cc2d57c0c1ea93e64fdfc46aab1e74a0bfa45fcef4f4"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp",
+      "sha256": "2df674233ecc4e9fe6c8d4dfceb6c3257995e6613b0447b93c4a4893ff61c675"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp",
+      "sha256": "b479b07551ee8fd8ba4f96dc0e5d34ae675d485d8a341c369443b397a2defdbf"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp",
+      "sha256": "cb1b8197fa5009f511a5e9aea71e2eff952355cadaf776a83ab99db28fadb24f"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp",
+      "sha256": "fe039e8aff6718652748d5d2daa5743cbf38759392a7feb723e7c032349b6e81"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp",
+      "sha256": "4d95c8cb035a1827eef9c0cf065e4be0f8fc0b86d6c420e9f3bccc366fba921d"
+    },
+    {
+      "path": "app/src/main/res/values-en/strings.xml",
+      "sha256": "bd9ccbe381607f00b1079d5a65b0a5887e9282a0e6a11c08f0c5b5681fdd4ff2"
+    },
+    {
+      "path": "app/src/main/res/values/colors.xml",
+      "sha256": "57681038afd005dcd260eabdd6d16619709c4a3fe20324362ea00e093e85b5fd"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "sha256": "d02dba498d2a7111997987b1ba986773bf4271689f4f2b026066de0dbb91d95b"
+    },
+    {
+      "path": "app/src/main/res/values/themes.xml",
+      "sha256": "ea41f98f2cc88a0a31d045085f068dd4aa8c680a885cb920761ccc0b0c68d401"
+    },
+    {
+      "path": "app/src/main/res/xml/backup_rules.xml",
+      "sha256": "7169ef847d08531864882661b06d743d85305f781585ac35799d3754a52f32b4"
+    },
+    {
+      "path": "app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "bdd4b2c8a3e18d1970767e8f7c7696b66a20cf566112619f847985ad0425b6ff"
+    },
+    {
+      "path": "app/src/main/res/xml/file_paths.xml",
+      "sha256": "50e326d007a09536f77b9b170a07340d6167d4b98e89bc55f1694ed2bde961f9"
+    },
+    {
+      "path": "app/src/main/res/xml/network_security_config.xml",
+      "sha256": "c869d1fafdd3261c25f2973afa1d7f77e4e0f476d3dbfe5cfe00028fe81a513a"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/BasicJvmTest.kt",
+      "sha256": "0cad73de6617b67f3185f0b46b01d0df58c7da382ae2aceb4b96fdc49302a129"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/CoreArchitectureTest.kt",
+      "sha256": "c6ca2dd9ec368ef44c7aa38cf0c53b061d425d9bca44ae3f0e9b60071bc0ab39"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/HfTransferV4Test.kt",
+      "sha256": "eed5946fcb0fd8feaee4f20501e6e555eb9384c80f0c958d3b84a40999ab8c52"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/MoshiV4Test.kt",
+      "sha256": "6bbde36dcf4448ede88fe8ad8530a21a084a8db5ffa705d6b762cf6c602175bc"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/RoomMigrationV4Test.kt",
+      "sha256": "b300a6e0fe207dad9e761a00da734e584f3650da12b6bad2957a121af12854a6"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/RuntimeSmokeTest.kt",
+      "sha256": "55f3b43dc05e0b33832a1a7914d36057e21a5acb88bbc3c2e7dc985ab48188fa"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/StabilizationTest.kt",
+      "sha256": "7ed1ec92b07d7b91f12a3642e89b136d0d7e0c1ac24f60fe6ee64ecb54b5f7db"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/StudioScreenshotTest.kt",
+      "sha256": "598fd70552b9ca970560b12f41ff4fe6c70c1658e029c13cf18376a4ee925597"
+    },
+    {
+      "path": "app/src/test/java/com/unicornwhodev/visiondatasetstudio/TrainingPreflightTest.kt",
+      "sha256": "923ab7ebc2d76323b85b6ef718a7eea8c53cf3d791ca4780ddd815c084c27c92"
+    },
+    {
+      "path": "app/src/test/resources/legacy-v1.sql",
+      "sha256": "a35117f51a1147ebe69079ecc89f09a41404f3cba72548c704f90426664b58c4"
+    },
+    {
+      "path": "app/src/test/resources/legacy-v2.sql",
+      "sha256": "96bda39e7498a6a72f25d6c63baad47fea43ad1b08e6ea0eb780c7df606ffbc8"
+    },
+    {
+      "path": "app/src/test/resources/legacy-v3.sql",
+      "sha256": "2659b2e06d3b8cda8341b58e4bca54defe35ddf206be21e5525e42723cd84b15"
+    },
+    {
+      "path": "build.gradle.kts",
+      "sha256": "71a325324526b83f32b37433f07fc5777b745eaf8a79b116fb50ecb309675038"
+    },
+    {
+      "path": "gradle.properties",
+      "sha256": "f448172179c9ff90cb6e97a3ee1d5666e668c2c3740e5256066dca86b8dcf79e"
+    },
+    {
+      "path": "gradle/libs.versions.toml",
+      "sha256": "ff40c2dbd534614f8704118753d3d51d75b78044504b63d9a2326a4799bdabb1"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "sha256": "40c4ac801fa3d3029cc46957c91216f9fcff52a05a011a0579357bae3dc4c441"
+    },
+    {
+      "path": "settings.gradle.kts",
+      "sha256": "b317c4b2fea3620978fbe71a59fab0323947f48d520a7b61c9b3a508aee0681b"
+    },
+    {
+      "path": "tools/build_android.py",
+      "sha256": "b3bf55bb7e65f2495a27d38b3a7c86014628fba837ae3a7df5eedc7ef437ba5a"
+    },
+    {
+      "path": "tools/build_android.sh",
+      "sha256": "2f2e1e24e368d75c8685bb49af6a64ae611d024ea219dff9e5ac1fa672446063"
+    },
+    {
+      "path": "tools/docs/plot_litert_evidence.py",
+      "sha256": "1052fac0ddfb05609de36d108a547f26890b0a8142bfc9902ebb63b6831d2339"
+    },
+    {
+      "path": "tools/gradle_bootstrap.py",
+      "sha256": "66f34aa8fe801025ed4d81dd02effb8f173a097e9445c61f3c8079b92e2fb10d"
+    },
+    {
+      "path": "tools/hf_validate_and_convert.py",
+      "sha256": "10911a572a3d71926bb6a4fecaf01879306b4459217b22f29b2f81bd3f1ce196"
+    },
+    {
+      "path": "tools/package_pod_qualification.py",
+      "sha256": "4180e44518b7cc828dad8c37e388dbb4a07f6059d2012c63613e8a1869f79386"
+    },
+    {
+      "path": "tools/package_qualification.py",
+      "sha256": "3a83000264b424ae7ea9b4706b867a80afbe801a8508da4438cd440f0131375c"
+    },
+    {
+      "path": "tools/package_workstation_release.py",
+      "sha256": "6d5bb1014c3c59f98375e0db4ff0aad74635995174a0bc85b153d49583c427d0"
+    },
+    {
+      "path": "tools/prepare_release.py",
+      "sha256": "1b7909d561ff1a149bba07dd058e1f726519b98d4a1ef84a1a853f0e56f648a6"
+    },
+    {
+      "path": "tools/qa/EngineRegression.kt",
+      "sha256": "d88f180109e65dcb60d4333d3505ea7c1b805f0d075f13c71f5150c67c537634"
+    },
+    {
+      "path": "tools/qa/MetadataAnnotation.kt",
+      "sha256": "fe7e26dabd765806cf2d2113644747ccbfa44a5387251daf5b551c49f1bc4a33"
+    },
+    {
+      "path": "tools/qa/ParseKotlin.java",
+      "sha256": "a40356615a86df23c510d6a35f673d24e69bfd0da89814df1cbc6efd4c71407e"
+    },
+    {
+      "path": "tools/qa/PolicyRegression.kt",
+      "sha256": "3e8b5fa108a18876a9e1840105167447a934803383da6d9f254bdd2ffc6b7d47"
+    },
+    {
+      "path": "tools/qa/TrainingTargetsRegression.kt",
+      "sha256": "80b22e94b549ac139e1e7248734be28c5ea6655b0ab44d821c510f4929d0f2d4"
+    },
+    {
+      "path": "tools/qa/V4Reliability.kt",
+      "sha256": "6fc9c3cdd199c095851ba4cad41cfddf3f8c92c2614ae38ec2f8f2461c50fcfb"
+    },
+    {
+      "path": "tools/qa/audit/CorrectionProvenanceAudit.kt",
+      "sha256": "b88241702962dd62f83b4866d4c25682226b26bbc7169790ae6001022695ec64"
+    },
+    {
+      "path": "tools/qa/audit/FeatureImplementationAuditTest.kt",
+      "sha256": "d6e4ba12ac9030903ac26251d16d48d23689499bd22588f988079a825b6ec0d6"
+    },
+    {
+      "path": "tools/qa/audit/README.md",
+      "sha256": "cc83644fd7f8582307e84cc417854ff7895816bd0ed2379f28c571017f51623f"
+    },
+    {
+      "path": "tools/qa/audit/check_android_export.py",
+      "sha256": "67c81d385863130162fb4a378525ed3759ad4f6548db45a2e5b464cde5b1a3e2"
+    },
+    {
+      "path": "tools/qa/capture_device_metrics.sh",
+      "sha256": "a2e5a36e45e8910e3fb30ab0cc8a234b3dca60a41d39e63ea519e234a516e290"
+    },
+    {
+      "path": "tools/qa/create_tokenizer_reference.py",
+      "sha256": "138bc2ce06c591e203a893160cf602cdc98c06b918767e444219d7fa02771556"
+    },
+    {
+      "path": "tools/qa/create_training_fixture.py",
+      "sha256": "c890891c4cf4f0a29c8f9ce17dcb38d53cfcd4d672cff96c5bde2bdb5b53a580"
+    },
+    {
+      "path": "tools/qa/fetch_model_fixtures.py",
+      "sha256": "0bbedb74c6be74b07a53cf3eabf36346583d751923900f8d8237a0ba7f80cf5d"
+    },
+    {
+      "path": "tools/qa/qualify_converted_models.py",
+      "sha256": "52c162367c825126da0f20f5777fb1a5f5b86de3dd5c3e3d54dc8281c4e33d4c"
+    },
+    {
+      "path": "tools/qa/resolve_apks.py",
+      "sha256": "b60601e9d4fc5f9d7b2af61fc308e525edf3937d5e144501ce74add9af50f2d9"
+    },
+    {
+      "path": "tools/qa/run_device_qualification.sh",
+      "sha256": "dc705f08d192c531340c417eea41651699264c16e32cbdee567bebf76dc64c40"
+    },
+    {
+      "path": "tools/qa/run_engine_tests.sh",
+      "sha256": "0686fa5f7b683c69a567d95c4c3f82972475381c9adae6071a30393ef61b0805"
+    },
+    {
+      "path": "tools/qa/run_policy_tests.sh",
+      "sha256": "98ff2cd0aa1dd8524000fb683965b29a01b1af57e1346c4f178785f5294fbf77"
+    },
+    {
+      "path": "tools/qa/run_training_target_tests.sh",
+      "sha256": "72ea1dc5baedb6a4e56aa5ff8e739ddcf931b7526b594a0c5223cf345aab88d9"
+    },
+    {
+      "path": "tools/qa/run_v4_reliability.sh",
+      "sha256": "d7b60da338b4519a9ed384a8a843105f54de03240bbefbe071a81c9bedeaf564"
+    },
+    {
+      "path": "tools/qa/stage_android_fixture.py",
+      "sha256": "76dd3fb9c30ad0a18cff9fc474cc9e4326a5cc460566f6d813d0c218494c83f3"
+    },
+    {
+      "path": "tools/qa/test_build_evidence.py",
+      "sha256": "5c93f463275e180d683a413f27a36621b111bd65429ee5e0a48f49a3688a3366"
+    },
+    {
+      "path": "tools/qa/test_export_validator.py",
+      "sha256": "0c4fabd38dd7fbf5f9d80f0c130d5bdcd00575e9563a6c15361289171d3961a4"
+    },
+    {
+      "path": "tools/qa/test_identity.py",
+      "sha256": "9c8bd0daba846e8413058ae1677dc86dadaa73a981cca3068ff8623b6c451b2b"
+    },
+    {
+      "path": "tools/qa/test_ui_localization.py",
+      "sha256": "0257b929031c001084166fd6b2acb14abd59abbea35d1f968aa1e2cfd2632eec"
+    },
+    {
+      "path": "tools/qa/test_v4_sqlite.py",
+      "sha256": "ccefb2d6f42c4bcc0997cf7c5fa51a72be2fef9e55c9bf3cfb6887e1392ce8cc"
+    },
+    {
+      "path": "tools/workstation/android-env.sh",
+      "sha256": "c8a962321286eec8eb13315249b17a5072dd9d3af112b442e86bf7e6e7d76386"
+    },
+    {
+      "path": "tools/workstation/install-android-native-tools.sh",
+      "sha256": "f93d9328df6a919ecdcedca3f06b4d13e911eb6c14e93fba6639d123f60fc730"
+    },
+    {
+      "path": "tools/workstation/run.sh",
+      "sha256": "d89f30aa77b8a92250dff3d808e97cfe26aa835e493179c0557d06e2eeed5aaa"
+    },
+    {
+      "path": "tools/workstation/setup-android-toolchain.py",
+      "sha256": "5bd19add63c3c9c4997757a79902d565ddcebb93501ad36a737c991ebd5bc3c1"
+    },
+    {
+      "path": "tools/workstation/start-android-emulator.sh",
+      "sha256": "330cc22e26059e3b48b3f45f1ef3f3e7fd55fc65da38bdb0abae8902dd97398c"
+    }
+  ]
+}

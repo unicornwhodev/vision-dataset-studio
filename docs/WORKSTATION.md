@@ -124,7 +124,7 @@ Références officielles :
 
 ## Reprise après la session rc3
 
-Le poste recréé utilise une RTX 2000 Ada et le volume réseau conservé. À la reprise, relire l’adresse/port SSH du pod avant d’actualiser l’alias local ; ils peuvent changer. Réinstaller les dépendances système temporaires si nécessaire. Le SDK, les AVD et la clé Debug rc3 sont sous `/workspace/toolchains/` ; aucune clé ne doit entrer dans Git.
+Le 22 septembre 2026, le poste a été recréé sur le volume réseau conservé avec **8 vCPU et 16 Go de RAM, sans GPU**, à **0,24 USD/h de calcul** (stockage séparé). SSH et Jupyter ont été contrôlés depuis le Chromebook, y compris un calcul dans un noyau authentifié. Le poste reste en marche ; aucun arrêt automatique n’est configuré. À la reprise, relire l’adresse/port SSH du pod avant d’actualiser l’alias local ; ils peuvent changer. Réinstaller les dépendances système temporaires si nécessaire. Le SDK, les AVD et la clé Debug rc3 sont sous `/workspace/toolchains/` ; aucune clé ne doit entrer dans Git.
 
 Les preuves de la session sont dans `/workspace/qa/` et les logs dans `/workspace/setup-logs/`. La file de conversions a été arrêtée avec `STOP_AFTER_CURRENT`. Reprendre uniquement les cas non terminés listés dans la matrice, dans un nouveau dossier de preuves ; ne pas écraser les résultats antérieurs. L’apprentissage de qualification reste exécuté dans l’émulateur Android.
 
