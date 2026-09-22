@@ -42,6 +42,11 @@ data class DeviceTrainingRun(
     val checkpoint:CheckpointReceipt?=null,val error:String?=null,val createdAt:Long=System.currentTimeMillis()
 )
 
+data class PreparedTrainingSample(val image:File,val sha256:String,val annotationJson:String,val width:Int,val height:Int)
+data class TrainingInspection(val batch:com.unicornwhodev.visiondatasetstudio.data.model.BatchEntity,val config:ModelConfig,
+    val source:File,val samples:List<PreparedTrainingSample>,val trainCount:Int,val validationCount:Int,val requiredBytes:Long,
+    val previousCompleted:Boolean,val checkpoint:CheckpointReceipt?)
+
 class OnDeviceTraining(private val context:Context) {
     private val adapter=StudioJson.moshi.adapter(DeviceTrainingRun::class.java)
     private val configAdapter=StudioJson.moshi.adapter(ModelConfig::class.java)
@@ -68,51 +73,47 @@ class OnDeviceTraining(private val context:Context) {
         val receipt=AtomicFile(File(File(run.modelFile).parentFile,"training-run.json"));val out=receipt.startWrite()
         try{out.write(adapter.toJson(run).toByteArray());receipt.finishWrite(out)}catch(e:Exception){receipt.failWrite(out);throw e}
     }
+    /** Single read-only source of truth used by both preflight and materialization. */
+    suspend fun inspectPreparation(project:ProjectEntity,batchNumber:Int,requireReady:Boolean=false):TrainingInspection = withContext(Dispatchers.IO) {
+        val config=configAdapter.failOnUnknown().fromJson(project.modelConfigJson ?: error("Contrat modèle absent")) ?: error("Contrat absent")
+        ModelContract.validate(config);require(config.training!=null){"La conversion active ne fournit pas encore train/infer/save/restore"}
+        require(config.bundleKind.isBlank()){"Le contrat d’apprentissage doit désigner un graphe entraînable unique"}
+        val source=File(project.modelPath ?: error("Poids absents"));require(source.isFile&&source.canRead()){"Poids absents ou illisibles"}
+        val db=AppDatabase.getInstance(context)
+        db.modelProfileDao().getByPath(source.path)?.let{profile->require(HashUtils.computeSha256(source)==profile.sha256){"Poids actifs altérés depuis leur enregistrement"}}
+        val (batch,rows)=db.withTransaction {
+            val batch=db.batchDao().getBatchSync(project.id,batchNumber) ?: error("Lot absent")
+            require(batch.status=="VERIFIED" && batch.verificationKind in setOf("local","hf","both")){"Exportez et vérifiez ce lot avant l’apprentissage"}
+            require(batch.archiveSnapshot==com.unicornwhodev.visiondatasetstudio.domain.batch.BatchSnapshot.compute(db,project.id,batchNumber)){"Les données du lot diffèrent de l’export vérifié"}
+            val samples=db.sampleDao().getSamplesForBatchSync(project.id,batchNumber)
+            require(samples.all{it.annotationStatus in setOf("VALIDATED","REJECTED","DUPLICATE")}){"Lot non terminé"}
+            batch to samples.filter{it.annotationStatus=="VALIDATED"}.sortedBy{it.sampleId}.map{row->row to (db.annotationDao().getAnnotationSync(row.sampleId)?.dataJson ?: error("Annotations absentes : ${row.sampleId}"))}
+        }
+        require(rows.isNotEmpty()){"Aucune image acceptée dans cet export"}
+        val prepared=rows.map{(row,json)->
+            val image=File(row.localImagePath ?: error("Image validée sans chemin : ${row.sampleId}"));require(image.isFile){"Image validée absente : ${row.sampleId}"}
+            val sha=HashUtils.computeSha256(image);require(row.sha256==null||row.sha256==sha){"Image modifiée après annotation : ${row.sampleId}"}
+            val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true};BitmapFactory.decodeFile(image.path,bounds);require(bounds.outWidth>0&&bounds.outHeight>0){"Image indécodable : ${row.sampleId}"}
+            val annotations=annotationsAdapter.fromJson(json) ?: error("Annotations invalides : ${row.sampleId}")
+            TrainingTargets.encode(annotations,config,bounds.outWidth,bounds.outHeight)
+            TrainingTargets.auxiliary(annotations,config)
+            PreparedTrainingSample(image,sha,json,bounds.outWidth,bounds.outHeight)
+        }
+        val groups=prepared.groupBy{it.sha256};require(groups.values.all{g->g.map{it.annotationJson}.distinct().size==1}){"Annotations contradictoires pour des fichiers identiques"}
+        val unique=groups.values.map{it.first()};val train=unique.count{!holdout(it.sha256)};val validation=unique.size-train
+        if(requireReady)require(train>=32&&validation>=8){"Il faut 32 images d’apprentissage et 8 de contrôle ; disponibles : $train / $validation"}
+        val previous=readBatch(project.id,batchNumber);val completed=previous?.exportSnapshot==batch.archiveSnapshot&&previous.phase in setOf("completed","rejected")
+        if(requireReady)check(!completed){"L’apprentissage de cet export est déjà terminé"}
+        val inherited=if(config.trainingCheckpoint.isBlank())null else readCheckpoint(source,config.trainingCheckpoint)
+        LiteRtTrainingSession(source,config.copy(trainingCheckpoint="")).use{session->inherited?.let(session::restore)}
+        TrainingInspection(batch,config,source,unique,train,validation,estimateRequiredBytes(source.length(),unique.map{it.image.length()},config),completed,inherited)
+    }
     suspend fun prepare(project:ProjectEntity,batchNumber:Int,epochs:Int=3,learningRate:Float=.001f):DeviceTrainingRun = withContext(Dispatchers.IO) { executionMutex.withLock {
         require(epochs in 1..30 && learningRate in .000001f..1f)
         val old=read(project.id)
         check(old?.phase !in setOf("queued","training","evaluating")){"Un apprentissage est déjà en cours"}
-        val config=configAdapter.failOnUnknown().fromJson(project.modelConfigJson ?: error("Contrat modèle absent")) ?: error("Contrat absent")
-        ModelContract.validate(config);require(config.training!=null){"La conversion active ne fournit pas encore train/infer/save/restore"}
-        require(config.bundleKind.isBlank()){"Le contrat d’apprentissage doit désigner un graphe entraînable unique"}
-        val source=File(project.modelPath ?: error("Poids absents"));require(source.isFile)
-        val db=AppDatabase.getInstance(context)
-        val (batch,rows)=db.withTransaction {
-            val batch=db.batchDao().getBatchSync(project.id,batchNumber) ?: error("Lot absent")
-            require(batch.status=="VERIFIED" && batch.verificationKind in setOf("local","hf","both")) {
-                "Exportez et vérifiez ce lot avant l’apprentissage"
-            }
-            require(batch.archiveSnapshot==com.unicornwhodev.visiondatasetstudio.domain.batch.BatchSnapshot.compute(db,project.id,batchNumber)) {
-                "Les données du lot diffèrent de l’export vérifié"
-            }
-            val previousBatch=readBatch(project.id,batchNumber)
-            check(previousBatch?.exportSnapshot!=batch.archiveSnapshot || previousBatch.phase !in setOf("completed","rejected")) {
-                "L’apprentissage de cet export est déjà terminé"
-            }
-            val samples=db.sampleDao().getSamplesForBatchSync(project.id,batchNumber)
-            require(samples.all{it.annotationStatus in setOf("VALIDATED","REJECTED","DUPLICATE")}){"Lot non terminé"}
-            batch to samples.filter{it.annotationStatus=="VALIDATED"}.sortedBy{it.sampleId}
-                .map{row -> row to (db.annotationDao().getAnnotationSync(row.sampleId)?.dataJson ?: error("Annotations absentes"))}
-        }
-        val targetBytes=config.training.targetShape.fold(1L){a,b->a*b}*4
-        require(targetBytes in 4..4_000_000L)
-        require(rows.isNotEmpty()){"Aucune image acceptée dans cet export"}
-        LiteRtTrainingSession(source,config).use{} // Verify signatures before copying the exported corpus.
-        val prepared=rows.map { (row,annotationJson) ->
-            val image=File(row.localImagePath!!);require(image.isFile){"Image validée absente du stockage local"}
-            val sha=HashUtils.computeSha256(image)
-            require(row.sha256==null || row.sha256==sha){"Image modifiée après annotation"}
-            val bounds=BitmapFactory.Options().apply{inJustDecodeBounds=true};BitmapFactory.decodeFile(image.path,bounds)
-            require(bounds.outWidth>0 && bounds.outHeight>0)
-            // Keep annotation text only while preparing; dense masks are encoded one image at a time.
-            Triple(image,sha,annotationJson)
-        }
-        val byImage=prepared.groupBy{it.second}
-        require(byImage.values.all{group->group.map{it.third}.distinct().size==1}){"Annotations contradictoires pour des fichiers identiques"}
-        val unique=byImage.values.map{it.first()}
-        val train=unique.count{!holdout(it.second)};val validation=unique.size-train
-        require(train>=32 && validation>=8){"Il faut 32 images d’apprentissage et 8 de contrôle ; disponibles : $train / $validation"}
-        val needed=source.length()*3+unique.sumOf{it.first.length()}+targetBytes*unique.size+16L*1024*1024
+        val inspection=inspectPreparation(project,batchNumber,requireReady=true);val config=inspection.config;val source=inspection.source;val batch=inspection.batch;val unique=inspection.samples;val train=inspection.trainCount
+        val needed=inspection.requiredBytes
         val policy=ProjectSettings.read(project)
         require(StorageManager(context).hasAvailableBudget(needed,project.diskBudgetMb,policy.reserveFreeMb)){"Budget disque insuffisant pour conserver les checkpoints et images d’apprentissage"}
         val id=UUID.randomUUID().toString();val directory=File(context.filesDir,"models/training-$id").apply{mkdirs()}
@@ -120,10 +121,10 @@ class OnDeviceTraining(private val context:Context) {
             val model=File(directory,"model.tflite");source.copyTo(model)
             // Delegate requirements belong to the conversion and survive each learned generation.
             File(source.parentFile,"runtime_contract.json").takeIf { it.isFile }?.copyTo(File(directory,"runtime_contract.json"))
-            val samples=unique.map { (image,sha,annotationJson) ->
+            val samples=unique.map { prepared ->
+                val image=prepared.image;val sha=prepared.sha256;val annotationJson=prepared.annotationJson
                 val annotations=annotationsAdapter.fromJson(annotationJson) ?: error("Annotations invalides")
-                val bounds=BitmapFactory.Options().apply { inJustDecodeBounds=true };BitmapFactory.decodeFile(image.path,bounds)
-                val target=TrainingTargets.encode(annotations,config,bounds.outWidth,bounds.outHeight)
+                val target=TrainingTargets.encode(annotations,config,prepared.width,prepared.height)
                 val auxiliary=TrainingTargets.auxiliary(annotations,config).mapValues { it.value.toList() }
                 val copy=File(directory,"images/$sha").apply { parentFile?.mkdirs() };image.copyTo(copy)
                 val targetFile=File(directory,"targets/$sha.f32").apply { parentFile?.mkdirs() }
@@ -131,7 +132,7 @@ class OnDeviceTraining(private val context:Context) {
                 TrainingSample(copy.path,sha,emptyList(),holdout(sha),targetFile.relativeTo(directory).invariantSeparatorsPath,HashUtils.computeSha256(targetFile),auxiliary)
             }
             // A resumed generation starts from the active checkpoint; the original profile is never modified.
-            val inherited=if(config.trainingCheckpoint.isBlank())null else readCheckpoint(source,config.trainingCheckpoint)
+            val inherited=inspection.checkpoint
             val baseConfig=config.copy(trainingCheckpoint="")
             val checkpoint=if(inherited!=null)LiteRtTrainingSession(model,baseConfig).use{session->session.restore(inherited);session.save(File(directory,"inherited"))}else null
             DeviceTrainingRun(id,project.id,model.path,HashUtils.computeSha256(model),baseConfig,samples,epochs,learningRate,totalSteps=train*epochs,sourceBatchNumber=batchNumber,exportSnapshot=batch.archiveSnapshot!!,exportProof=batch.verifiedArchiveSha256 ?: batch.preparedManifestSha256 ?: error("Preuve d’export absente"),checkpoint=checkpoint).also(::write)
@@ -156,6 +157,26 @@ class OnDeviceTraining(private val context:Context) {
         val images=File(root,"images")
         check(!images.exists() || images.deleteRecursively()){"Nettoyage des images d’apprentissage incomplet; relancez le nettoyage"}
     }
+    /** Removes only private training generations which are no longer referenced anywhere. */
+    suspend fun cleanupOrphanedCandidates(db:AppDatabase):Int = withContext(Dispatchers.IO) {
+        val models=File(context.filesDir,"models").canonicalFile
+        val referenced=mutableSetOf<String>()
+        db.projectDao().getProjectsSync().mapNotNullTo(referenced){it.modelPath?.let(::File)?.canonicalPath}
+        db.modelProfileDao().getAllSync().mapTo(referenced){File(it.modelPath).canonicalPath}
+        File(context.filesDir,"training").listFiles()?.filter{it.isFile&&it.extension=="json"}?.forEach { record ->
+            runCatching{readRecord(record)}.getOrNull()?.let { run ->
+                referenced+=File(run.modelFile).canonicalPath
+            }
+        }
+        var deleted=0
+        models.listFiles()?.filter{it.isDirectory&&it.name.matches(Regex("training-[0-9a-fA-F-]{36}"))}?.forEach { candidate ->
+            val root=candidate.canonicalFile
+            check(root.parentFile==models)
+            val live=referenced.any{path->path==root.path||path.startsWith(root.path+File.separator)}
+            if(!live&&root.deleteRecursively())deleted++
+        }
+        deleted
+    }
     fun enqueue(projectId:Long) {
         val run=read(projectId) ?: error("Apprentissage absent")
         val request=OneTimeWorkRequestBuilder<DeviceTrainingWorker>().setInputData(workDataOf("projectId" to projectId,"runId" to run.id))
@@ -179,6 +200,13 @@ class OnDeviceTraining(private val context:Context) {
         internal val executionMutex=Mutex()
         private val recordLock=Any()
         fun holdout(sha:String)=sha.take(8).toLong(16)%5==0L
+        fun estimateRequiredBytes(modelBytes:Long,imageBytes:List<Long>,config:ModelConfig):Long {
+            val training=requireNotNull(config.training){"Contrat d’apprentissage absent"}
+            val targetBytes=training.targetShape.fold(1L){a,b->a*b}*4L
+            val auxiliaryBytes=training.auxiliaryTargets.values.sumOf { target -> target.shape.fold(1L){a,b->a*b}*4L }
+            // Active model, working copy and checkpoint generation, corpus snapshot, targets and safety margin.
+            return modelBytes*3L+imageBytes.sum()+imageBytes.size*(targetBytes+auxiliaryBytes)+16L*1024*1024
+        }
         fun readCheckpoint(model:File,relative:String):CheckpointReceipt {
             val file=File(model.parentFile,relative)
             require(file.canonicalPath.startsWith(model.parentFile!!.canonicalPath+File.separator))

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager
 import com.unicornwhodev.visiondatasetstudio.data.hf.HfApiClient
+import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
 import com.unicornwhodev.visiondatasetstudio.data.model.*
 import com.unicornwhodev.visiondatasetstudio.domain.export.DatasetExportFormat
 import com.unicornwhodev.visiondatasetstudio.domain.export.DatasetExporters
@@ -58,7 +59,9 @@ class RuntimeSmokeTest {
       ),
       vqaList = listOf(
         VqaTarget("v1", "What animal is visible?", "A dog.", isHumanVerified = true)
-      )
+      ),
+      masks = listOf(MaskTarget("m1","dog",4,3,com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.encode(booleanArrayOf(
+        true,true,false,false,true,true,false,false,false,false,false,false)),isHumanVerified=true))
     )
 
     // 1. Canonical JSON
@@ -72,6 +75,19 @@ class RuntimeSmokeTest {
     assertTrue(cocoSnippet.contains("bbox_pixels"))
     assertTrue(cocoSnippet.contains("dog"))
     assertTrue(cocoSnippet.contains("\"bbox_pixels\":"))
+    assertTrue(cocoSnippet.contains("mask_rle"))
+
+    val cocoFile=java.io.File(context.cacheDir,"coco-export-test.json")
+    exporters.exportCocoDetection(project,listOf(sample to annot),cocoFile)
+    val coco=StudioJson.moshi.adapter(Map::class.java).fromJson(cocoFile.readText()) as Map<String,Any>
+    assertTrue(exporters.validateCocoDocument(coco))
+    val rows=coco["annotations"] as List<*>
+    assertEquals(2,rows.size)
+    assertTrue((rows.last() as Map<*,*>).containsKey("segmentation"))
+    val broken=coco.toMutableMap();val brokenRows=rows.map{(it as Map<*,*>).toMutableMap()}.toMutableList()
+    val last=brokenRows.last();val segmentation=(last["segmentation"] as Map<*,*>).toMutableMap();segmentation["counts"]=listOf(1,1);last["segmentation"]=segmentation;broken["annotations"]=brokenRows
+    assertThrows(IllegalArgumentException::class.java){exporters.validateCocoDocument(broken)}
+    cocoFile.delete()
 
     // 3. YOLO Format
     val yoloSnippet = exporters.generatePreviewSnippet(DatasetExportFormat.YOLO.key, sample, annot, project)

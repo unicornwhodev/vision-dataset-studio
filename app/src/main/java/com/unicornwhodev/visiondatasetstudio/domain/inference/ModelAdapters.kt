@@ -39,11 +39,30 @@ object ModelContract {
         return when(adapter(c)) { "fireviewer_dinov3_multitask"->setOf("tag","mask","point"); "classification"->setOf("tag");"points","heatmap"->setOf("point");"embedding","inspect_only"->emptySet();else->when(c.outputMode){"points"->setOf("point");"both"->setOf("point","box");else->setOf("box")} } + if(c.deriveCounts) setOf("count") else emptySet()
     }
     fun supportsTasks(c:ModelConfig,tasksCsv:String):Boolean {
-        val tasks=tasksCsv.split(',').map(String::trim).map(String::uppercase).toSet()
+        val tasks=tasksCsv.split(',').map(String::trim).filter(String::isNotEmpty).map(String::uppercase).toSet()
         val outputs=outputTypes(c)
-        return ("DETECTION" in tasks && "box" in outputs) || ("POINTING" in tasks && "point" in outputs) ||
-            ("SEGMENTATION" in tasks && "mask" in outputs) || ("CLASSIFICATION" in tasks && "tag" in outputs) ||
-            ("CAPTIONING" in tasks && "caption" in outputs) || ("VQA" in tasks && "vqa" in outputs) || ("COUNTING" in tasks && "count" in outputs)
+        if(tasks.isEmpty())return false
+        return tasks.all { task -> when(task) {
+            "DETECTION" -> "box" in outputs
+            "POINTING", "POINTING_MULTI" -> "point" in outputs
+            "SEGMENTATION" -> "mask" in outputs
+            "CLASSIFICATION" -> "tag" in outputs
+            "CAPTIONING" -> "caption" in outputs
+            "VQA" -> "vqa" in outputs
+            "COUNTING" -> "count" in outputs
+            // Grounding needs both the phrase and the region it denotes. Merely loading a
+            // detector (or a captioner) is not sufficient to fulfil the task contract.
+            // A caption and a region are not grounding unless the adapter also emits their link.
+            "GROUNDING" -> "grounding" in outputs
+            else -> false
+        } }
+    }
+    fun requireTaskCompatibility(c:ModelConfig,tasksCsv:String) {
+        check(supportsTasks(c,tasksCsv)) {
+            if(adapter(c) in setOf("embedding","inspect_only"))
+                "Ce modèle produit des représentations visuelles, pas des annotations pour les tâches actives."
+            else "Sorties modèle incompatibles avec les tâches actives : ${tasksCsv.ifBlank { "aucune tâche" }}."
+        }
     }
     fun validate(c: ModelConfig) {
         require(c.bundleKind in setOf("","tinyclip","efficientvit_sam","florence2"))
@@ -173,7 +192,7 @@ object ModelAdapters {
                         listOf(ModelProposal("point",c.spatialLabel,pointProbs[best],pointX=position.first,pointY=position.second,modelX=position.first,modelY=position.second)) else emptyList()
                     // Store a raster in original-image coordinates, excluding padding and undoing crop/resize.
                     val seg=scores(segmentation.values,"sigmoid")
-                    val mw=minOf(512,t.imageWidth);val mh=maxOf(1,(t.imageHeight.toDouble()*mw/t.imageWidth).roundToInt()).coerceAtMost(2048)
+                    val (mw,mh)=MaskCodec.rasterSizeForImage(t.imageWidth,t.imageHeight)
                     val raster=BooleanArray(mw*mh) { i ->
                         val nx=((i%mw+.5f)/mw*t.fittedWidth+t.left)/t.width
                         val ny=((i/mw+.5f)/mh*t.fittedHeight+t.top)/t.height

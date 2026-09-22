@@ -341,7 +341,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
         val old=origin.masks.firstOrNull { it.id==(paintingId ?: selectedId) }
         if(old==null && activeTool==EditorTool.ERASE) return origin
         val iw=(sample?.imageWidth ?: 512).coerceAtLeast(1);val ih=(sample?.imageHeight ?: 512).coerceAtLeast(1)
-        val factor=minOf(1f,512f/maxOf(iw,ih));val w=maxOf(1,(iw*factor).toInt());val h=maxOf(1,(ih*factor).toInt())
+        val (w,h)=MaskCodec.rasterSizeForImage(iw,ih)
         val mask=old ?: MaskTarget(newId(),selectedClass,w,h,listOf(w*h),isHumanVerified=true)
         val updated=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.stroke(mask,previous.x,previous.y,at.x,at.y,brushFraction,activeTool==EditorTool.ERASE)
         paintingId=updated.id
@@ -358,7 +358,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
         .semantics { contentDescription = "Image à annoter. ${annotations.boxes.size} boîtes et ${annotations.points.size} points. Les régions sont aussi accessibles dans le panneau de correction." }
         .then(if(activeTool == EditorTool.PAN_ZOOM) Modifier.transformable(transformState) else Modifier)
         .pointerInput(sample?.sampleId, activeTool, selectedClass, viewport) {
-            detectTapGestures(onDoubleTap = when(activeTool){EditorTool.PAN_ZOOM->{{_:Offset->transform(1f,Offset.Zero)}};EditorTool.POLYGON->{{_:Offset->if(polygonPoints.size>=3){val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskTarget(newId(),selectedClass,(sample?.imageWidth?:512).coerceAtMost(512),(sample?.imageHeight?:512).coerceAtMost(512),listOf((sample?.imageWidth?:512).coerceAtMost(512)*(sample?.imageHeight?:512).coerceAtMost(512)),true);val next=MaskCodec.polygon(mask,polygonPoints);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id);polygonPoints=emptyList()}}};else->null}, onTap = { at ->
+            detectTapGestures(onDoubleTap = when(activeTool){EditorTool.PAN_ZOOM->{{_:Offset->transform(1f,Offset.Zero)}};EditorTool.POLYGON->{{_:Offset->if(polygonPoints.size>=3){val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskCodec.empty(newId(),selectedClass,sample?.imageWidth?:512,sample?.imageHeight?:512);val next=MaskCodec.polygon(mask,polygonPoints);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id);polygonPoints=emptyList()}}};else->null}, onTap = { at ->
                 val n = viewport.toImage(at.x, at.y) ?: return@detectTapGestures
                 when(activeTool) {
                     EditorTool.SAM_POINT -> selectPrompt(n)
@@ -375,7 +375,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
                     }?.id)
                     EditorTool.MASK, EditorTool.ERASE -> { paintingId=selectedId; emit(maskStroke(n)); paintingId=null }
                     EditorTool.POLYGON -> polygonPoints=polygonPoints+(n.x to n.y)
-                    EditorTool.FILL -> {val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val w=(sample?.imageWidth?:512).coerceAtMost(512);val h=(sample?.imageHeight?:512).coerceAtMost(512);val mask=old?:MaskTarget(newId(),selectedClass,w,h,listOf(w*h),true);val next=MaskCodec.fill(mask,n.x,n.y);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id)}
+                    EditorTool.FILL -> {val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskCodec.empty(newId(),selectedClass,sample?.imageWidth?:512,sample?.imageHeight?:512);val next=MaskCodec.fill(mask,n.x,n.y);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id)}
                     EditorTool.LASSO -> Unit
                     EditorTool.PAN_ZOOM -> Unit
                 }
@@ -388,7 +388,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
                 val at=viewport.toImage(change.position.x,change.position.y,clamp=true)
                 if(at!=null) { change.consume();draft=maskStroke(at,dragStart ?: at);dragStart=at }
             },onDragEnd={draft?.let(emit);draft=null;dragStart=null;paintingId=null},onDragCancel={draft=null;dragStart=null;paintingId=null})
-        } else Modifier).then(if(activeTool==EditorTool.LASSO)Modifier.pointerInput(sample?.sampleId,selectedClass,viewport){detectDragGestures(onDragStart={at->lassoPoints=viewport.toImage(at.x,at.y)?.let{listOf(it.x to it.y)}.orEmpty()},onDrag={change,_->viewport.toImage(change.position.x,change.position.y,true)?.let{lassoPoints=lassoPoints+(it.x to it.y)};change.consume()},onDragEnd={if(lassoPoints.size>=3){val origin=latest;val w=(sample?.imageWidth?:512).coerceAtMost(512);val h=(sample?.imageHeight?:512).coerceAtMost(512);val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskTarget(newId(),selectedClass,w,h,listOf(w*h),true);val next=MaskCodec.polygon(mask,lassoPoints);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id)};lassoPoints=emptyList()},onDragCancel={lassoPoints=emptyList()})}else Modifier)
+        } else Modifier).then(if(activeTool==EditorTool.LASSO)Modifier.pointerInput(sample?.sampleId,selectedClass,viewport){detectDragGestures(onDragStart={at->lassoPoints=viewport.toImage(at.x,at.y)?.let{listOf(it.x to it.y)}.orEmpty()},onDrag={change,_->viewport.toImage(change.position.x,change.position.y,true)?.let{lassoPoints=lassoPoints+(it.x to it.y)};change.consume()},onDragEnd={if(lassoPoints.size>=3){val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskCodec.empty(newId(),selectedClass,sample?.imageWidth?:512,sample?.imageHeight?:512);val next=MaskCodec.polygon(mask,lassoPoints);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id)};lassoPoints=emptyList()},onDragCancel={lassoPoints=emptyList()})}else Modifier)
         .then(if (activeTool == EditorTool.BOX || activeTool == EditorTool.SELECT) Modifier.pointerInput(sample?.sampleId, activeTool, selectedClass, viewport) {
             detectDragGestures(onDragStart = { at ->
                 dragStart = viewport.toImage(at.x, at.y)
@@ -523,9 +523,13 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
             }
             Text(if(box!=null) "Glissez les coins pour redimensionner." else "Glissez ou utilisez les flèches.",style=MaterialTheme.typography.bodySmall)
             if(point!=null) FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-                FilterChip(selected=!point.isAbsent&&!point.isAbstained,onClick={onUpdate(a.copy(points=a.points.map{if(it.id==point.id)it.copy(isAbsent=false,isAbstained=false,isHumanVerified=true)else it}))},label={Text("Cible localisée")})
-                FilterChip(selected=point.isAbsent,onClick={onUpdate(a.copy(points=a.points.map{if(it.id==point.id)it.copy(isAbsent=true,isAbstained=false,isHumanVerified=true)else it}))},label={Text("Cible absente")})
-                FilterChip(selected=point.isAbstained,onClick={onUpdate(a.copy(points=a.points.map{if(it.id==point.id)it.copy(isAbsent=false,isAbstained=true,isHumanVerified=true)else it}))},label={Text("Présente mais non localisable / incertain")})
+                fun state(absent:Boolean=false,abstained:Boolean=false,unlocalizable:Boolean=false,uncertain:Boolean=false) = onUpdate(a.copy(
+                    points=a.points.map{if(it.id==point.id)it.copy(isAbsent=absent,isAbstained=abstained,isHumanVerified=true)else it},
+                    quality=a.quality.copy(isUnlocalizablePresent=unlocalizable,isUncertain=uncertain)))
+                FilterChip(selected=!point.isAbsent&&!point.isAbstained&&!a.quality.isUnlocalizablePresent&&!a.quality.isUncertain,onClick={state()},label={Text("Cible localisée")})
+                FilterChip(selected=point.isAbsent,onClick={state(absent=true)},label={Text("Cible absente")})
+                FilterChip(selected=point.isAbstained&&a.quality.isUnlocalizablePresent,onClick={state(abstained=true,unlocalizable=true)},label={Text("Présente mais non localisable")})
+                FilterChip(selected=point.isAbstained&&a.quality.isUncertain,onClick={state(abstained=true,uncertain=true)},label={Text("Incertain / abstention")})
             }
             Row(horizontalArrangement=Arrangement.spacedBy(4.dp),verticalAlignment=Alignment.CenterVertically) {
                 listOf(Icons.Default.KeyboardArrowLeft to (-.002f to 0f),Icons.Default.KeyboardArrowUp to (0f to -.002f),Icons.Default.KeyboardArrowDown to (0f to .002f),Icons.Default.KeyboardArrowRight to (.002f to 0f)).forEachIndexed { i,(icon,d) ->

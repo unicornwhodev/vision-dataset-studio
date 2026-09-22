@@ -25,6 +25,7 @@ import com.unicornwhodev.visiondatasetstudio.domain.inference.QualificationStatu
 
 @Composable
 fun ModelLibraryScreen(vm: MainViewModel) {
+    val language=androidx.compose.ui.platform.LocalConfiguration.current.locales[0].language
     val source by vm.catalogSource.collectAsState()
     var editSource by remember { mutableStateOf(false) }
     val remote by vm.communityModels.collectAsState()
@@ -43,62 +44,63 @@ fun ModelLibraryScreen(vm: MainViewModel) {
         })
     }) { inset ->
         Column(Modifier.fillMaxSize().padding(inset)) {
-            StudioTabs(listOf("Explorer", "Installés", "Importer"), tab, { tab = it }, Modifier.padding(horizontal = 16.dp))
+            StudioTabs(listOf(stringResource(R.string.models_tab_explore), stringResource(R.string.models_tab_installed), stringResource(R.string.models_tab_import)), tab, { tab = it }, Modifier.padding(horizontal = 16.dp))
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                 LazyColumn(Modifier.widthIn(max = 1000.dp).fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     if (tab == 0) {
                         item {
                             Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text("CATALOGUE", Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Text("${remote.count { it.installableNow }} téléchargeables", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(stringResource(R.string.models_catalogue), Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(stringResource(R.string.models_downloadable,remote.count { it.installableNow }), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         }
-                        if(remote.isEmpty()) item { EmptyWorkspace("Catalogue non chargé", "Actualisez pour voir les modèles disponibles.", Icons.Default.Memory, if (!busy) "Explorer le catalogue" else null, vm::refreshCommunityModelCatalog) }
+                        if(remote.isEmpty()) item { EmptyWorkspace(stringResource(R.string.models_empty_title), stringResource(R.string.models_empty_body), Icons.Default.Memory, if (!busy) stringResource(R.string.models_explore) else null, vm::refreshCommunityModelCatalog) }
                         items(remote.size, key = { remote[it].entry.id }) { index ->
                             val item = remote[index]
                             var showInfo by remember { mutableStateOf(false) }
-                            val state = when {
-                                !item.available -> "À venir"
-                                !item.installableNow -> "Bundle non pris en charge"
-                                item.entry.adapterStatus == "contract" -> "Contrat fourni"
-                                item.entry.adapterStatus == "heatmap" -> "Contrat heatmap"
-                                item.entry.adapterStatus == "embedding" -> "Représentations visuelles"
-                                item.entry.adapterStatus == "bundle" -> "Pipeline local"
-                                item.entry.adapterStatus == "rfdetr" -> "Détection"
-                                else -> "Inspection"
+                            val state = stringResource(when {
+                                !item.available -> R.string.model_state_upcoming
+                                !item.installableNow -> R.string.model_state_unsupported
+                                item.entry.adapterStatus == "contract" -> R.string.model_state_contract
+                                item.entry.adapterStatus == "heatmap" -> R.string.model_state_heatmap
+                                item.entry.adapterStatus == "embedding" -> R.string.model_state_embedding
+                                item.entry.adapterStatus == "bundle" -> R.string.model_state_bundle
+                                item.entry.adapterStatus == "rfdetr" -> R.string.model_state_detection
+                                else -> R.string.model_state_inspection
                             }
-                            val capabilityText=item.entry.capabilities.values.joinToString(" · ") { when(it) {
-                                ModelCapability.DETECTION->"Détection";ModelCapability.POINTING->"Pointing";ModelCapability.SEGMENTATION->"Masques"
-                                ModelCapability.CLASSIFICATION->"Classification";ModelCapability.EMBEDDING->"Embeddings";ModelCapability.TRAINING->"Entraînable"
-                                ModelCapability.INSPECTION_ONLY->"Inspection uniquement";else->it.name.lowercase().replace('_',' ')
-                            } + " · " + when(item.entry.capabilities.qualification) {
-                                QualificationStatus.QUALIFIED->"Qualifié";QualificationStatus.PARTIALLY_QUALIFIED->"Partiellement qualifié"
-                                QualificationStatus.INFERENCE_ONLY->"Inférence qualifiée";QualificationStatus.TRAINING_QUALIFIED->"Apprentissage qualifié"
-                                QualificationStatus.FAILED->"Échec connu";QualificationStatus.UNTESTED->"Non qualifié"
+                            val capabilityNames=mutableListOf<String>();for(capability in item.entry.capabilities.values)capabilityNames+=when(capability) {
+                                ModelCapability.DETECTION->stringResource(R.string.cap_detection);ModelCapability.POINTING->stringResource(R.string.cap_pointing);ModelCapability.SEGMENTATION->stringResource(R.string.cap_segmentation)
+                                ModelCapability.CLASSIFICATION->stringResource(R.string.cap_classification);ModelCapability.CAPTIONING->stringResource(R.string.cap_captioning);ModelCapability.EMBEDDING->stringResource(R.string.cap_embedding)
+                                ModelCapability.SIMILARITY->stringResource(R.string.cap_similarity);ModelCapability.INTERACTIVE_SEGMENTATION->stringResource(R.string.cap_interactive_segmentation);ModelCapability.TRAINING->stringResource(R.string.cap_training)
+                                ModelCapability.INSPECTION_ONLY->stringResource(R.string.cap_inspection)
+                            };val capabilityText=capabilityNames.joinToString(" · ") + " · " + when(item.entry.capabilities.qualification) {
+                                QualificationStatus.QUALIFIED->stringResource(R.string.qualification_qualified);QualificationStatus.PARTIALLY_QUALIFIED->stringResource(R.string.qualification_partial)
+                                QualificationStatus.INFERENCE_ONLY->stringResource(R.string.qualification_inference);QualificationStatus.TRAINING_QUALIFIED->stringResource(R.string.qualification_training)
+                                QualificationStatus.FAILED->stringResource(R.string.qualification_failed);QualificationStatus.UNTESTED->stringResource(R.string.qualification_untested)
                             }
                             Column {
                                 Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Default.Memory, null, Modifier.size(18.dp), tint = if(item.installableNow) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
                                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                                         Text(item.entry.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        Text(item.entry.purpose, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(if(language=="fr")item.entry.purpose else capabilityNames.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text("$state  ·  ${item.entry.upstreamLicense}", style = MaterialTheme.typography.labelSmall, color = if(item.installableNow) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text(capabilityText,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=2)
                                     }
-                                    IconButton(onClick = { showInfo = true }) { Icon(Icons.Default.Info, "Détails : ${item.entry.title}", Modifier.size(17.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) }
+                                    IconButton(onClick = { showInfo = true }) { Icon(Icons.Default.Info, stringResource(R.string.models_details,item.entry.title), Modifier.size(17.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) }
                                     if(item.installableNow) IconButton(onClick = { vm.downloadCommunityModel(item.entry.id) }, enabled = !busy) {
-                                        Icon(Icons.Default.Download, "Installer ${item.entry.title}", Modifier.size(19.dp), tint = MaterialTheme.colorScheme.primary)
+                                        Icon(Icons.Default.Download, stringResource(R.string.models_install,item.entry.title), Modifier.size(19.dp), tint = MaterialTheme.colorScheme.primary)
                                     }
                                 }
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
                             }
                             if(showInfo) AlertDialog(onDismissRequest = { showInfo = false }, title = { Text(item.entry.title) },
-                                text = { Text("${item.entry.purpose}\n\n$capabilityText\n${item.entry.accent} · ${item.entry.expectedFiles.size} fichier(s)\n\n${item.note}") },
-                                confirmButton = { TextButton(onClick = { showInfo = false }) { Text("Fermer") } })
+                                text = { Text((if(language=="fr")item.entry.purpose else capabilityNames.joinToString(" · "))+"\n\n$capabilityText\n"+stringResource(R.string.model_files,item.entry.expectedFiles.size)+"\n\n"+(if(language=="fr")item.note else stringResource(R.string.model_test_required))) },
+                                confirmButton = { TextButton(onClick = { showInfo = false }) { Text(stringResource(R.string.action_close)) } })
                         }
                     } else if(tab == 1) {
-                        if(local.isEmpty()) item { EmptyWorkspace("Aucun modèle installé", "Importez un fichier .tflite compatible.", Icons.Default.Memory, "Importer", { tab = 2 }) }
+                        if(local.isEmpty()) item { EmptyWorkspace(stringResource(R.string.models_none_installed), stringResource(R.string.models_import_compatible), Icons.Default.Memory, stringResource(R.string.models_tab_import), { tab = 2 }) }
                         items(local.size, key = { local[it].id }) { index ->
                             val profile = local[index]
                             val active = project?.modelPath == profile.modelPath && profile.modelPath.isNotBlank()
@@ -108,16 +110,19 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                         Text(profile.name, style = MaterialTheme.typography.titleSmall)
                                         Text(profile.tensorReport.lineSequence().firstOrNull().orEmpty(), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        if(active) Text("Actif", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                                        val config=remember(profile.configJson){runCatching{com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(com.unicornwhodev.visiondatasetstudio.domain.inference.ModelConfig::class.java).fromJson(profile.configJson)}.getOrNull()}
+                                        config?.let { cfg -> val names=mutableListOf<String>();for(cap in com.unicornwhodev.visiondatasetstudio.domain.inference.ModelCapabilities.fromConfig(cfg).values)names+=when(cap){
+                                            ModelCapability.DETECTION->stringResource(R.string.cap_detection);ModelCapability.POINTING->stringResource(R.string.cap_pointing);ModelCapability.SEGMENTATION->stringResource(R.string.cap_segmentation);ModelCapability.CLASSIFICATION->stringResource(R.string.cap_classification);ModelCapability.CAPTIONING->stringResource(R.string.cap_captioning);ModelCapability.EMBEDDING->stringResource(R.string.cap_embedding);ModelCapability.SIMILARITY->stringResource(R.string.cap_similarity);ModelCapability.INTERACTIVE_SEGMENTATION->stringResource(R.string.cap_interactive_segmentation);ModelCapability.TRAINING->stringResource(R.string.cap_training);ModelCapability.INSPECTION_ONLY->stringResource(R.string.cap_inspection)};Text(names.joinToString(" · "),style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant) }
+                                        if(active) Text(stringResource(R.string.models_active), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                                     }
-                                    if(!active) StudioAction("Utiliser", { vm.selectModelProfile(profile.id) }, enabled = !busy)
-                                    IconButton(onClick = { deleteId = profile.id }, enabled = !busy) { Icon(Icons.Default.DeleteOutline, "Supprimer ${profile.name}", Modifier.size(18.dp)) }
+                                    if(!active) StudioAction(stringResource(R.string.models_use), { vm.selectModelProfile(profile.id) }, enabled = !busy)
+                                    IconButton(onClick = { deleteId = profile.id }, enabled = !busy) { Icon(Icons.Default.DeleteOutline, stringResource(R.string.models_delete,profile.name), Modifier.size(18.dp)) }
                                 }
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             }
                         }
                         if(!project?.modelPath.isNullOrBlank() || project?.modelConfigJson != null) item {
-                            TextButton(onClick = vm::detachModel, enabled = !busy) { Text("Détacher du projet") }
+                            TextButton(onClick = vm::detachModel, enabled = !busy) { Text(stringResource(R.string.models_detach)) }
                         }
                     } else {
                         item {
@@ -125,20 +130,20 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Default.InsertDriveFile, null, Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Column {
-                                        Text("Fichier LiteRT", style = MaterialTheme.typography.titleMedium)
-                                        Text("Poids .tflite sur cet appareil", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        Text(stringResource(R.string.models_litert_file), style = MaterialTheme.typography.titleMedium)
+                                        Text(stringResource(R.string.models_device_weights), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                 }
-                                StudioAction("Choisir un .tflite", { weights.launch(arrayOf("application/octet-stream", "*/*")) }, icon = Icons.Default.UploadFile, primary = true, enabled = !busy)
+                                StudioAction(stringResource(R.string.models_choose_file), { weights.launch(arrayOf("application/octet-stream", "*/*")) }, icon = Icons.Default.UploadFile, primary = true, enabled = !busy)
                             }
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             Spacer(Modifier.height(16.dp))
                         }
-                        item { StudioDisclosure("Depuis une URL", Icons.Default.Link) {
-                            OutlinedTextField(url, { url = it }, label = { Text("URL HTTPS directe") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                            StudioAction("Importer l’URL", { vm.importModelUrl(url) }, enabled = !busy && url.startsWith("https://"))
+                        item { StudioDisclosure(stringResource(R.string.models_from_url), Icons.Default.Link) {
+                            OutlinedTextField(url, { url = it }, label = { Text(stringResource(R.string.models_url_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                            StudioAction(stringResource(R.string.models_import_url), { vm.importModelUrl(url) }, enabled = !busy && url.startsWith("https://"))
                         } }
-                        item { TextButton(onClick = { vm.navigateTo(Screen.Controls) }, enabled = !busy) { Text("Contrats et options avancées", style = MaterialTheme.typography.labelMedium) } }
+                        item { TextButton(onClick = { vm.navigateTo(Screen.Controls) }, enabled = !busy) { Text(stringResource(R.string.models_advanced), style = MaterialTheme.typography.labelMedium) } }
                     }
                 }
             }
@@ -148,18 +153,18 @@ fun ModelLibraryScreen(vm: MainViewModel) {
         var repo by remember { mutableStateOf(source.repository) }
         var revision by remember { mutableStateOf(source.revision) }
         var folder by remember { mutableStateOf(source.folder) }
-        AlertDialog(onDismissRequest = { editSource = false }, title = { Text("Catalogue Hugging Face") }, text = {
+        AlertDialog(onDismissRequest = { editSource = false }, title = { Text(stringResource(R.string.models_catalog_source)) }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(repo, { repo = it }, label = { Text("Compte / dépôt") }, singleLine = true)
-                OutlinedTextField(revision, { revision = it }, label = { Text("Révision") }, singleLine = true)
-                OutlinedTextField(folder, { folder = it }, label = { Text("Dossier · vide pour la racine") }, singleLine = true)
-                Text("L’accès privé utilise la connexion HF de l’application.", style = MaterialTheme.typography.bodySmall)
+                OutlinedTextField(repo, { repo = it }, label = { Text(stringResource(R.string.models_repo)) }, singleLine = true)
+                OutlinedTextField(revision, { revision = it }, label = { Text(stringResource(R.string.models_revision)) }, singleLine = true)
+                OutlinedTextField(folder, { folder = it }, label = { Text(stringResource(R.string.models_folder)) }, singleLine = true)
+                Text(stringResource(R.string.models_private_access), style = MaterialTheme.typography.bodySmall)
             }
-        }, confirmButton = { TextButton(onClick = { vm.setModelCatalog(repo, revision, folder); editSource = false }) { Text("Ouvrir") } },
-            dismissButton = { TextButton(onClick = { editSource = false }) { Text("Annuler") } })
+        }, confirmButton = { TextButton(onClick = { vm.setModelCatalog(repo, revision, folder); editSource = false }) { Text(stringResource(R.string.action_open)) } },
+            dismissButton = { TextButton(onClick = { editSource = false }) { Text(stringResource(R.string.action_cancel)) } })
     }
-    deleteId?.let { id -> AlertDialog(onDismissRequest = { deleteId = null }, title = { Text("Supprimer ce profil ?") },
-        text = { Text("Les annotations et les correcteurs ne sont pas supprimés. Les poids sont effacés uniquement s’ils ne sont plus référencés.") },
-        confirmButton = { TextButton(onClick = { deleteId = null; vm.removeModelProfile(id) }) { Text("Supprimer") } },
-        dismissButton = { TextButton(onClick = { deleteId = null }) { Text("Annuler") } }) }
+    deleteId?.let { id -> AlertDialog(onDismissRequest = { deleteId = null }, title = { Text(stringResource(R.string.models_delete_title)) },
+        text = { Text(stringResource(R.string.models_delete_body)) },
+        confirmButton = { TextButton(onClick = { deleteId = null; vm.removeModelProfile(id) }) { Text(stringResource(R.string.action_delete)) } },
+        dismissButton = { TextButton(onClick = { deleteId = null }) { Text(stringResource(R.string.action_cancel)) } }) }
 }

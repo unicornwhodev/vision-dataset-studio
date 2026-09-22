@@ -2,6 +2,12 @@
 
 ## Passe de stabilisation du 22 septembre 2026
 
+La passe de finalisation du catalogue dérive maintenant les capacités des contrats installés sans transformer cette capacité théorique en qualification. Les actions principales Modèles/Apprentissage ont été externalisées et un test Compose anglais a été ajouté. Il n’a pas été exécuté ici : le conteneur ne contient ni SDK Android, ni `adb`, ni appareil. Les mesures téléphone ARM, RAM, latence, thermique, SAF réel et corpus représentatif restent **non exécutées**. Aucun nombre de qualification existant n’a été augmenté.
+
+La revue suivante fait partager au preflight et à `prepare()` une inspection unique et valide les contrats distants avant d’afficher leurs capacités. Un test pur de projection COCO a été ajouté. Les 45 contrôles Python hôte passent, mais les nouveaux tests Kotlin/Android ne sont toujours pas exécutés faute de SDK ; aucune qualification supplémentaire n’est annoncée. L’anglais des écrans Modèles/Apprentissage est étendu, tandis que l’externalisation des autres écrans reste ouverte.
+
+La validation suivante porte les contrôles Python hôte à **47 réussites** grâce à la parité stricte des ressources FR/EN et aux libellés anglais critiques. L’export COCO de boîtes et masques ajoute une validation structurelle avant écriture atomique et des tests Kotlin de RLE/JSON, présents mais non exécutés ici faute de SDK Android. Ce résultat ne qualifie toujours ni APK ni appareil.
+
 Les tests unitaires de l'intégrité runtime/documentation, des capacités, de la navigation et du préflight ont été ajoutés. La commande `./gradlew test --no-daemon` a été exécutée mais s'est arrêtée avant les tests faute de SDK Android configuré (`ANDROID_HOME` absent). Aucun nouveau succès Android/JVM n'est revendiqué. Le détail et les limites sont consignés dans [docs/STABILIZATION_2026_09.md](docs/STABILIZATION_2026_09.md).
 
 La seconde passe ajoute les chemins d’exécution du préflight, de maintenance locale et des outils d’annotation. Le téléchargement direct du SDK Android a été tenté mais refusé par le serveur (`HTTP 403`) ; la compilation et les nouveaux tests Kotlin restent donc non exécutés dans ce conteneur.

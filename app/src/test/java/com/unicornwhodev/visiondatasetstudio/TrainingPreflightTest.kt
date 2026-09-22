@@ -16,4 +16,9 @@ class TrainingPreflightTest {
     @Test fun insufficientStorage() { assertFalse(TrainingPreflight.evaluate(input(available=49)).canStart) }
     @Test fun alreadyTrainedExport() { assertFalse(TrainingPreflight.evaluate(input(already=true)).canStart) }
     @Test fun configuredCheckpointMustBeAvailable() { assertFalse(TrainingPreflight.evaluate(input().copy(checkpointAvailable=false)).canStart) }
+    @Test fun modelPathAndFileAreCheckedSeparately() {
+        assertFalse(TrainingPreflight.evaluate(input().copy(modelPathConfigured=false)).canStart)
+        assertFalse(TrainingPreflight.evaluate(input().copy(modelFileAvailable=false)).canStart)
+        assertFalse(TrainingPreflight.evaluate(input().copy(modelFileReadable=false)).canStart)
+    }
 }

@@ -6,6 +6,16 @@ import kotlin.math.*
 /** Canonical RLE is row-major, starts with background, and carries its own raster dimensions. */
 object MaskCodec {
     const val MAX_PIXELS = 4_194_304
+    /** One canonical, aspect-preserving raster for every manually created mask. */
+    fun rasterSizeForImage(width:Int,height:Int,maxSide:Int=512):Pair<Int,Int> {
+        require(width>0&&height>0&&maxSide>0)
+        val scale=minOf(1.0,maxSide.toDouble()/maxOf(width,height))
+        return maxOf(1,(width*scale).roundToInt()) to maxOf(1,(height*scale).roundToInt())
+    }
+    fun empty(id:String,label:String,imageWidth:Int,imageHeight:Int,maxSide:Int=512):MaskTarget {
+        val (width,height)=rasterSizeForImage(imageWidth,imageHeight,maxSide)
+        return MaskTarget(id,label,width,height,listOf(width*height),true)
+    }
     fun validate(m: MaskTarget) {
         require(m.width > 0 && m.height > 0 && m.width.toLong()*m.height <= MAX_PIXELS)
         require(m.runs.isNotEmpty() && m.runs.size <= m.width*m.height+1 && m.runs.all { it >= 0 })

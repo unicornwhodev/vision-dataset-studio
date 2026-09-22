@@ -256,6 +256,10 @@ class BatchEngine(
         freshOnly: Boolean = false,
         onProgress: (Int, Int) -> Unit = { _, _ -> }
     ): Int = withContext(Dispatchers.Default) {
+        val projectPolicy=db.projectDao().getProjectSync(projectId) ?: error("Projet absent")
+        // This guard deliberately precedes sample selection and every mutation. UI, automatic
+        // preparation and workflows therefore share exactly the same fail-closed behaviour.
+        ModelContract.requireTaskCompatibility(config,projectPolicy.activeTasksCsv)
         check(db.batchDao().getBatchSync(projectId, batchNumber)?.status !in PublicationSafety.lockedStates) {
             "Ce lot est verrouillé par sa publication."
         }
@@ -263,7 +267,6 @@ class BatchEngine(
             com.unicornwhodev.visiondatasetstudio.core.workflow.StudioWorkflow.canEdit(it.acquisitionStatus, it.syncStatus, it.localImagePath != null) &&
                 (if(freshOnly) it.annotationStatus=="PENDING" else com.unicornwhodev.visiondatasetstudio.core.workflow.StudioWorkflow.isPending(it.annotationStatus))
         }
-        val projectPolicy=db.projectDao().getProjectSync(projectId) ?: error("Projet absent")
         val ledger=if(ProjectSettings.read(projectPolicy).adaptiveCorrection)AdaptiveCorrectionStore(storageManager.context).read(projectId) else CorrectionLedger()
         var processed = 0
         onProgress(0, samples.size)

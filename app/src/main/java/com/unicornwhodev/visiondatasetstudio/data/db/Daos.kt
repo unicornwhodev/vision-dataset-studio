@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.Flow
 interface ProjectDao {
     @Query("SELECT * FROM projects ORDER BY updatedAt DESC")
     fun getProjects(): Flow<List<ProjectEntity>>
+    @Query("SELECT * FROM projects")
+    suspend fun getProjectsSync(): List<ProjectEntity>
 
     @Query("SELECT * FROM projects WHERE id = :id LIMIT 1")
     fun getProject(id: Long = 1L): Flow<ProjectEntity?>
@@ -151,8 +153,12 @@ interface SourceEntryDao {
 interface ModelProfileDao {
     @Query("SELECT * FROM model_profiles ORDER BY createdAt DESC")
     fun observe(): Flow<List<ModelProfileEntity>>
+    @Query("SELECT * FROM model_profiles")
+    suspend fun getAllSync(): List<ModelProfileEntity>
     @Query("SELECT * FROM model_profiles WHERE id = :id")
     suspend fun get(id: String): ModelProfileEntity?
+    @Query("SELECT * FROM model_profiles WHERE modelPath = :path LIMIT 1")
+    suspend fun getByPath(path:String): ModelProfileEntity?
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(profile: ModelProfileEntity)
     @Query("DELETE FROM model_profiles WHERE id = :id")

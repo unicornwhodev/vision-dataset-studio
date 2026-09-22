@@ -542,7 +542,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun preannotateActiveBatch() = operation {
         val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: error("Projet absent")
         val c=modelConfig(p)
-        check(ModelContract.supportsTasks(c,p.activeTasksCsv)) { if(ModelContract.adapter(c) in setOf("embedding","inspect_only")) "Ce modèle produit des représentations visuelles, pas des annotations pour cette tâche." else "Ce modèle ne produit pas d’annotations compatibles avec les tâches actives." }
+        ModelContract.requireTaskCompatibility(c,p.activeTasksCsv)
         try {
             loadForInference(p,c)
             val processed=batchEngine.runBatchInference(p.id,_activeBatchNumber.value,c) { done,total ->
@@ -827,7 +827,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _lastExportedZip.value=null;_previewSnippet.value=null;_editorIssues.value=emptyList()
         preferenceStore.activeProjectId=id;_activeProjectId.value=id
         loadBatch(db.batchDao().getBatchSync(id,preferenceStore.lastBatch)?.batchNumber ?: db.batchDao().getLatestBatchSync(id)?.batchNumber ?: 1)
-        _operationProgress.value=null;setScreen(Screen.Controls)
+        _operationProgress.value=null
+        navigation.reset(Screen.Controls)
+        _currentScreen.value=Screen.Controls
     }
     fun selectProject(id:Long)=operation { switchProject(id) }
     fun createProject(name:String)=operation {
@@ -995,17 +997,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val p=db.projectDao().getProjectSync(_activeProjectId.value) ?: return@launch
         val batch=db.batchDao().getBatchSync(p.id,_activeBatchNumber.value)
         val config=runCatching{modelConfig(p)}.getOrNull()
-        val accepted=db.sampleDao().getSamplesForBatchSync(p.id,_activeBatchNumber.value).filter{it.annotationStatus=="VALIDATED"}.distinctBy{it.sha256 ?: it.sampleId}
-        val validation=accepted.count{row->row.sha256?.let{com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.holdout(it)}==true}
-        val train=accepted.size-validation
-        val source=p.modelPath?.let(::File);val needed=(source?.length() ?: 0L)*3+accepted.sumOf{it.localImagePath?.let(::File)?.length() ?: 0L}+16L*1024*1024
+        val inspected=runCatching{deviceTraining.inspectPreparation(p,_activeBatchNumber.value)}
+        val inspection=inspected.getOrNull()
+        val train=inspection?.trainCount ?: 0;val validation=inspection?.validationCount ?: 0
+        val source=p.modelPath?.let(::File)
+        val needed=inspection?.requiredBytes ?: Long.MAX_VALUE
         val prior=deviceTraining.readBatch(p.id,_activeBatchNumber.value)
         val already=prior?.let{it.exportSnapshot==batch?.archiveSnapshot && it.phase in setOf("completed","rejected")}==true
         val available=minOf(storageManager.getFreeSpaceBytes(),(p.diskBudgetMb*1024*1024-storageManager.getUsedSpaceBytes()).coerceAtLeast(0))
         _trainingPreflight.value=com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPreflight.evaluate(
             com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPreflightInput(config,batch?.status=="VERIFIED" && batch.verificationKind in setOf("local","hf","both"),train,validation,needed,available,
-                config?.training!=null && accepted.all{db.annotationDao().getAnnotationSync(it.sampleId)!=null},
-                config?.trainingCheckpoint.isNullOrBlank() || (source?.parentFile?.let{File(it,config!!.trainingCheckpoint).isFile}==true),already))
+                inspection!=null,
+                config?.trainingCheckpoint.isNullOrBlank() || inspection!=null,already,
+                p.modelPath!=null,source?.isFile==true,source?.canRead()==true),inspected.exceptionOrNull()?.message)
     }
     fun cancelDeviceTraining()=operation {deviceTraining.cancel(_activeProjectId.value)}
     fun resumeDeviceTraining()=operation {

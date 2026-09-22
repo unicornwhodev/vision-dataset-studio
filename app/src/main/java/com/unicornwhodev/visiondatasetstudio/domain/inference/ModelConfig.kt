@@ -175,7 +175,13 @@ data class InferenceDiagnostics(
     val threshold: Float,
     val proposalCount: Int,
     val emptyReason: String? = null,
-    val error: String? = null
+    val error: String? = null,
+    val inputLayout: String = "",
+    val inputDtype: String = "",
+    val outputIndices: List<Int> = emptyList(),
+    val outputDtypes: List<String> = emptyList(),
+    val nativeDurationNanos: Long? = null,
+    val configSha256: String = ""
 )
 
 sealed interface InferenceResult {

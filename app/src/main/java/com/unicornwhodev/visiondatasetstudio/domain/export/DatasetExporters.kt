@@ -5,6 +5,7 @@ import com.unicornwhodev.visiondatasetstudio.core.geometry.NormalizedRect
 import com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager
 import com.unicornwhodev.visiondatasetstudio.data.hf.HfApiClient
 import com.unicornwhodev.visiondatasetstudio.data.model.*
+import com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 enum class DatasetExportFormat(val key: String, val label: String) {
-    CANONICAL_JSONL("CANONICAL_JSON", "JSONL complet"), COCO("COCO", "COCO — boîtes"),
+    CANONICAL_JSONL("CANONICAL_JSON", "JSONL complet"), COCO("COCO", "COCO — boîtes + masques"),
     YOLO("YOLO", "YOLO — boîtes"), VISION_LANGUAGE("VL", "Questions / réponses")
 }
 
@@ -152,6 +153,7 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
     }
 
     fun exportCocoDetection(project: ProjectEntity, samples: List<Pair<SampleEntity, SampleAnnotations>>, outputFile: File) {
+        require(samples.map{it.first.sampleId}.distinct().size==samples.size){"Identifiants d’images COCO dupliqués"}
         val labels = classes(project); var next = 0
         val annotations = samples.flatMapIndexed { index, (_, a) -> a.boxes.map { b ->
             val s = samples[index].first; val c = labels.indexOf(b.label); require(c >= 0) { "Classe COCO inconnue: ${b.label}" }
@@ -163,8 +165,39 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
             if(projection.area==0) null else mapOf("id" to ++next,"image_id" to index+1,"category_id" to category+1,"bbox" to projection.bbox,"area" to projection.area,"iscrowd" to 0,
                 "segmentation" to projection.segmentation)
         } }
-        outputFile.writeText(json(mapOf("images" to samples.mapIndexed { i, (s, _) -> mapOf("id" to i + 1, "file_name" to "images/${imageName(s)}", "width" to s.imageWidth, "height" to s.imageHeight) },
-            "categories" to labels.mapIndexed { i, label -> mapOf("id" to i + 1, "name" to label) }, "annotations" to annotations)))
+        val document=mapOf<String,Any>("images" to samples.mapIndexed { i, (s, _) -> mapOf("id" to i + 1, "file_name" to "images/${imageName(s)}", "width" to s.imageWidth, "height" to s.imageHeight) },
+            "categories" to labels.mapIndexed { i, label -> mapOf("id" to i + 1, "name" to label) }, "annotations" to annotations)
+        validateCocoDocument(document)
+        DurableFiles.replace(outputFile){out->out.write(json(document).toByteArray(Charsets.UTF_8))}
+    }
+    /** Independent structural validation before an export can enter a package manifest. */
+    internal fun validateCocoDocument(document:Map<String,Any>):Boolean {
+        val images=(document["images"] as? List<*>)?.map{it as? Map<*,*> ?: error("Image COCO invalide")} ?: error("Images COCO absentes")
+        val categories=(document["categories"] as? List<*>)?.map{it as? Map<*,*> ?: error("Catégorie COCO invalide")} ?: error("Catégories COCO absentes")
+        val annotations=(document["annotations"] as? List<*>)?.map{it as? Map<*,*> ?: error("Annotation COCO invalide")} ?: error("Annotations COCO absentes")
+        fun uniqueIds(rows:List<Map<*,*>>,kind:String)=rows.map{(it["id"] as? Number)?.toInt() ?: error("ID $kind absent")}.also{require(it.size==it.distinct().size){"ID $kind dupliqué"}}
+        val imageIds=uniqueIds(images,"image").toSet();val categoryIds=uniqueIds(categories,"catégorie").toSet();uniqueIds(annotations,"annotation")
+        val dimensions=images.associate{row->
+            val id=(row["id"] as Number).toInt();val width=(row["width"] as? Number)?.toInt() ?: 0;val height=(row["height"] as? Number)?.toInt() ?: 0
+            require(width>0&&height>0&&(row["file_name"] as? String).orEmpty().isNotBlank());id to (width to height)
+        }
+        categories.forEach{require((it["name"] as? String).orEmpty().isNotBlank())}
+        annotations.forEach{row->
+            val imageId=(row["image_id"] as? Number)?.toInt() ?: error("image_id absent");require(imageId in imageIds)
+            val categoryId=(row["category_id"] as? Number)?.toInt() ?: error("category_id absent");require(categoryId in categoryIds)
+            val isCrowd=(row["iscrowd"] as? Number)?.toInt() ?: error("iscrowd absent");require(isCrowd in 0..1){"iscrowd COCO invalide"}
+            val (width,height)=dimensions.getValue(imageId);val bbox=(row["bbox"] as? List<*>)?.map{(it as Number).toDouble()} ?: error("bbox absente")
+            require(bbox.size==4&&bbox.all{it.isFinite()}&&bbox[0]>=0&&bbox[1]>=0&&bbox[2]>0&&bbox[3]>0&&bbox[0]+bbox[2]<=width+1e-6&&bbox[1]+bbox[3]<=height+1e-6)
+            val area=(row["area"] as? Number)?.toDouble() ?: 0.0;require(area>0&&area<=width.toDouble()*height)
+            row["segmentation"]?.let{raw->
+                val segmentation=raw as? Map<*,*> ?: error("Segmentation COCO invalide")
+                require((segmentation["size"] as? List<*>)?.map{(it as Number).toInt()}==listOf(height,width))
+                val counts=(segmentation["counts"] as? List<*>)?.map{(it as Number).toLong()} ?: error("RLE COCO absente")
+                require(counts.isNotEmpty()&&counts.all{it>=0}&&counts.sum()==width.toLong()*height)
+                require(counts.withIndex().filter{it.index%2==1}.sumOf{it.value}==area.toLong())
+            }
+        }
+        return true
     }
     fun exportYoloDetection(project: ProjectEntity, samples: List<Pair<SampleEntity, SampleAnnotations>>, outputDir: File) {
         val labels = classes(project); val dir = File(outputDir, "labels").apply { mkdirs() }
@@ -187,7 +220,8 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
     fun generatePreviewSnippet(format: String, sample: SampleEntity, annot: SampleAnnotations, project: ProjectEntity): String = try {
         when (format) {
             "YOLO" -> yolo(annot, classes(project)).ifBlank { "# Pas de boîte : vérifier l’absence explicitement avant export." }
-            "COCO" -> json(mapOf("image" to imageName(sample), "bbox_pixels" to annot.boxes.map { b -> mapOf("label" to b.label, "bbox" to NormalizedRect(b.xmin, b.ymin, b.xmax, b.ymax).toCocoPx(sample.imageWidth, sample.imageHeight).toList()) }))
+            "COCO" -> json(mapOf("image" to imageName(sample), "bbox_pixels" to annot.boxes.map { b -> mapOf("label" to b.label, "bbox" to NormalizedRect(b.xmin, b.ymin, b.xmax, b.ymax).toCocoPx(sample.imageWidth, sample.imageHeight).toList()) },
+                "mask_rle" to annot.masks.mapNotNull{m->MaskCodec.projectCoco(m,sample.imageWidth,sample.imageHeight).takeIf{it.area>0}?.let{mapOf("label" to m.label,"bbox" to it.bbox,"area" to it.area,"segmentation" to it.segmentation)}}))
             "VL" -> annot.vqaList.joinToString("\n") { json(vqaRow(sample, it)) }.ifBlank { "Aucune question / réponse. Les autres annotations restent dans le JSONL complet." }
             else -> sampleAdapter.indent("  ").toJson(toCanonical(sample, annot, project))
         }

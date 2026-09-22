@@ -36,6 +36,11 @@ class LiteRtEngine : AutoCloseable {
     private var modelHash=""
     private var originalModelHash=""
     private var currentThreads=2
+    private var lastInputShape:List<Int> = emptyList()
+    private var lastInputDtype=""
+    private var lastOutputShapes:List<List<Int>> = emptyList()
+    private var lastOutputIndices:List<Int> = emptyList()
+    private var lastOutputDtypes:List<String> = emptyList()
     private val lock=Any()
     private val localClient=LocalModelClient()
     fun loadModel(file: File, threads: Int=2):Boolean = synchronized(lock) {
@@ -61,9 +66,13 @@ class LiteRtEngine : AutoCloseable {
     }
     suspend fun runInference(bitmap:Bitmap,config:ModelConfig):InferenceResult {
         val proposals = runInferenceProposals(bitmap, config)
+        val configHash=java.security.MessageDigest.getInstance("SHA-256").digest(config.toString().toByteArray()).joinToString(""){"%02x".format(it)}
         val diagnostics=InferenceDiagnostics(modelHash,ModelContract.adapter(config),config.task,
-            listOf(1,config.inputChannels,config.inputHeight,config.inputWidth),threshold=config.threshold,
-            proposalCount=proposals.size,emptyReason=if(proposals.isEmpty() && lastError==null) (lastNote.ifBlank { "Aucune proposition au-dessus du seuil" }) else null,error=lastError)
+            lastInputShape.ifEmpty { if(config.inputLayout=="NHWC")listOf(1,config.inputHeight,config.inputWidth,config.inputChannels)else listOf(1,config.inputChannels,config.inputHeight,config.inputWidth) },
+            outputShapes=lastOutputShapes,threshold=config.threshold,proposalCount=proposals.size,
+            emptyReason=if(proposals.isEmpty() && lastError==null) (lastNote.ifBlank { "Aucune proposition au-dessus du seuil" }) else null,error=lastError,
+            inputLayout=config.inputLayout,inputDtype=lastInputDtype.ifBlank{config.inputType},outputIndices=lastOutputIndices,
+            outputDtypes=lastOutputDtypes,nativeDurationNanos=lastNativeDurationNanos,configSha256=configHash)
         return when {
             lastError!=null -> InferenceResult.Failure(requireNotNull(lastError),diagnostics)
             proposals.isEmpty() -> InferenceResult.Empty(diagnostics.emptyReason!!,diagnostics)
@@ -72,6 +81,7 @@ class LiteRtEngine : AutoCloseable {
     }
     private suspend fun runInferenceProposals(bitmap:Bitmap,config:ModelConfig):List<ModelProposal> = withContext(Dispatchers.Default) {
         lastError=null;lastNativeDurationNanos=null;lastNote="";lastEmbedding=null;lastPatches=null;lastTransform=null
+        lastInputShape=emptyList();lastInputDtype="";lastOutputShapes=emptyList();lastOutputIndices=emptyList();lastOutputDtypes=emptyList()
         try {
             ModelContract.validate(config)
             embeddingSpaceHash=AdaptiveCorrection.hash(modelHash+config.toString())
@@ -112,6 +122,7 @@ class LiteRtEngine : AutoCloseable {
                 }
                 val input=i.getInputTensor(0)
                 require(input.shape().contentEquals(expected) && input.dataType().name==config.inputType) { "Forme/type d’entrée différents du contrat. Inspectez les tenseurs." }
+                lastInputShape=input.shape().toList();lastInputDtype=input.dataType().name
                 val t=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config),config.cropFraction)
                 lastTransform=t
                 val fitted=Bitmap.createBitmap(config.inputWidth,config.inputHeight,Bitmap.Config.ARGB_8888)
@@ -153,6 +164,9 @@ class LiteRtEngine : AutoCloseable {
                     val out=i.getOutputTensor(idx);val shape=out.shape().toList()
                     TensorValues(shape,TensorCodec.decode(out.asReadOnlyBuffer(),out.dataType().name,out.numElements(),out.quantizationParams().scale,out.quantizationParams().zeroPoint))
                 }
+                lastOutputIndices=indices
+                lastOutputShapes=indices.map{i.getOutputTensor(it).shape().toList()}
+                lastOutputDtypes=indices.map{i.getOutputTensor(it).dataType().name}
                 val embeddingIndex=if(config.embeddingOutputIndex>=0)config.embeddingOutputIndex else if(ModelContract.adapter(config)=="embedding")config.outputIndex else -1
                 if(embeddingIndex>=0)lastEmbedding=tensors.getValue(embeddingIndex).values.copyOf().also { values->
                     require(values.size in 1..8192 && values.all(Float::isFinite))
