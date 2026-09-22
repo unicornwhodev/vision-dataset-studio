@@ -14,8 +14,8 @@ android {
     minSdk = 28
     targetSdk = 36
     testApplicationId = "com.unicornwhodev.visiondatasetstudio.test"
-    versionCode = 8
-    versionName = "4.2.0-rc3"
+    versionCode = 9
+    versionName = "4.2.0-rc4"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
