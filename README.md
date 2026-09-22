@@ -9,7 +9,7 @@ Atelier Android pour produire des datasets d’images par lots : préannotation,
 **4.2.0-rc5 · Apache-2.0 · En qualification**
 Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
 
-Dernière validation **rc4 · 22 septembre 2026** : **54 JVM, 24 Android de base, 2 régressions LiteRT et 52 Python réussis**. [Build, preuves et limites](test-results/stabilization-rc4/README.md).
+Dernière validation **rc5 · 23 septembre 2026** : **67 JVM, 52 Python ; 38 tests Android réussis puis le dernier réussi à la reprise après archivage des fixtures de QA**. [Build, preuves et limites](test-results/functional-audit-20260922/README.md).
 
 ## L’application en images
 
@@ -47,7 +47,7 @@ L’audit fonctionnel ajoute les réglages réellement appliqués, les consignes
 |---|---|
 | Import local / HF, lots configurables, correction et exports | Implémentés ; cycle local 2+1 vérifié sur Android |
 | Identité persistante, reprise et purge protégée | Tests Android réussis, dont copies renommées et concurrence |
-| Apprentissage Android, checkpoints, interruption/reprise | Sept conversions HF ont passé train/save/restore/reprise ; encodeurs figés par ces conversions |
+| Apprentissage Android, checkpoints, interruption/reprise | Huit conversions HF ont passé train/save/restore/reprise ; encodeurs figés par ces conversions |
 | Téléchargement HF, contrats et prétraitement LiteRT | Catalogue configurable, manifeste SHA facultatif, contrats vérifiés sur les tenseurs ; voir la matrice d’exécution |
 | Tokeniseurs et similarité persistante | Tests Android réussis |
 | Bundles TinyCLIP / SAM / Florence-2 | TinyCLIP exécuté avec propositions visibles ; SAM et Florence restent à qualifier |
@@ -74,6 +74,8 @@ Les annotations canoniques sont conservées. COCO, YOLO, WebDataset et vision-la
 ![Qualification du catalogue public](docs/visuals/benchmarks/android-coverage.png)
 
 Ce graphique couvre les **25 variantes publiques Charlbi**. Quatre ont passé train/save/restore/reprise Android ; RepViT a passé l’inférence. Les six conversions d’une autre source autorisée sont hors de ce graphique public. [Résultats, checkpoints et limites des durées](docs/LITERT_QUALIFICATION.md) · [Documentation complète des modèles](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder). Aucune vitesse téléphone ni précision métier annoncée.
+
+[Reprendre sur ton poste de travail](docs/DEVELOPMENT_RESUME.md) : installation, commandes, état des tests et travaux restants.
 
 ## Construire
 

@@ -1,0 +1,653 @@
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.AnnotationPreservationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.AnnotationPreservationTest:
+INSTRUMENTATION_STATUS: test=automaticPreannotationNeverTouchesExistingRecordsEvenWithStalePendingStatus
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.AnnotationPreservationTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=automaticPreannotationNeverTouchesExistingRecordsEvenWithStalePendingStatus
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ApplicationIdentityTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.ApplicationIdentityTest:
+INSTRUMENTATION_STATUS: test=useAppContext
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ApplicationIdentityTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=useAppContext
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.BatchProductionTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.BatchProductionTest:
+INSTRUMENTATION_STATUS: test=uniqueTwoPlusOneSurvivesExportPurgeReopenAndRenamedCopies
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.BatchProductionTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=uniqueTwoPlusOneSurvivesExportPurgeReopenAndRenamedCopies
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.BatchProductionTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=concurrentClaimsHaveOneOwnerAndDoNotMergeDifferentImages
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.BatchProductionTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=concurrentClaimsHaveOneOwnerAndDoNotMergeDifferentImages
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.EmbeddingIndexTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.EmbeddingIndexTest:
+INSTRUMENTATION_STATUS: test=cosineSearchPersistsAndIsolatesModelContracts
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.EmbeddingIndexTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=cosineSearchPersistsAndIsolatesModelContracts
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.EnglishLocaleComposeTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.EnglishLocaleComposeTest:
+INSTRUMENTATION_STATUS: test=primaryWorkflowsUseEnglishResources
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.EnglishLocaleComposeTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=primaryWorkflowsUseEnglishResources
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest:
+INSTRUMENTATION_STATUS: test=publicSsdDownloadInspectAndInfer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=publicSsdDownloadInspectAndInfer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=promptIsTransportedToLocalFixtureAndResponseDecoded
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=promptIsTransportedToLocalFixtureAndResponseDecoded
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=localExportContainsCanonicalAndRequestedProjections
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=localExportContainsCanonicalAndRequestedProjections
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=publicEfficientDetDownloadInspectAndInfer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=publicEfficientDetDownloadInspectAndInfer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=pointCorrectionStoreLearnsPersistsAndResets
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=pointCorrectionStoreLearnsPersistsAndResets
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=realBatchInferencePreservesHumanAndSkipsFinalCases
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=realBatchInferencePreservesHumanAndSkipsFinalCases
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=publicClassifierDownloadInspectAndInfer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=publicClassifierDownloadInspectAndInfer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=studioPackRetainsPromptAndRejectsUnknownFields
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=studioPackRetainsPromptAndRejectsUnknownFields
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FunctionalUiAuditTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.FunctionalUiAuditTest:
+INSTRUMENTATION_STATUS: test=englishScreensPersistModelSettingsAndIsolateMultipleProjects
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.FunctionalUiAuditTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=englishScreensPersistModelSettingsAndIsolateMultipleProjects
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.HfTokenizerTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.HfTokenizerTest:
+INSTRUMENTATION_STATUS: test=nativeEncodingMatchesPinnedHuggingFaceTokenizer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.HfTokenizerTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=nativeEncodingMatchesPinnedHuggingFaceTokenizer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest:
+INSTRUMENTATION_STATUS: test=legacyBundleDigestsDoNotBlockLoading
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=legacyBundleDigestsDoNotBlockLoading
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: OperationProgress(message=Modèle trop volumineux ou budget disque insuffisant., current=0, total=1, isError=true)
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertFalse(Assert.java:65)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1.invokeSuspend$act(InferenceOnlyModelTest.kt:60)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1.access$invokeSuspend$act(Unknown Source:0)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1$act$1.invokeSuspend(Unknown Source:13)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTaskKt.resume(DispatchedTask.kt:233)
+	at kotlinx.coroutines.DispatchedTaskKt.dispatch(DispatchedTask.kt:152)
+	at kotlinx.coroutines.CancellableContinuationImpl.dispatchResume(CancellableContinuationImpl.kt:470)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeImpl$kotlinx_coroutines_core(CancellableContinuationImpl.kt:504)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeImpl$kotlinx_coroutines_core$default(CancellableContinuationImpl.kt:493)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeUndispatched(CancellableContinuationImpl.kt:596)
+	at kotlinx.coroutines.EventLoopImplBase$DelayedResumeTask.run(EventLoop.common.kt:497)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest.importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup(InferenceOnlyModelTest.kt:44)
+
+INSTRUMENTATION_STATUS: stream=
+Error in importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup(com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest):
+java.lang.AssertionError: OperationProgress(message=Modèle trop volumineux ou budget disque insuffisant., current=0, total=1, isError=true)
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertFalse(Assert.java:65)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1.invokeSuspend$act(InferenceOnlyModelTest.kt:60)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1.access$invokeSuspend$act(Unknown Source:0)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1$act$1.invokeSuspend(Unknown Source:13)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTaskKt.resume(DispatchedTask.kt:233)
+	at kotlinx.coroutines.DispatchedTaskKt.dispatch(DispatchedTask.kt:152)
+	at kotlinx.coroutines.CancellableContinuationImpl.dispatchResume(CancellableContinuationImpl.kt:470)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeImpl$kotlinx_coroutines_core(CancellableContinuationImpl.kt:504)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeImpl$kotlinx_coroutines_core$default(CancellableContinuationImpl.kt:493)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeUndispatched(CancellableContinuationImpl.kt:596)
+	at kotlinx.coroutines.EventLoopImplBase$DelayedResumeTask.run(EventLoop.common.kt:497)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest.importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup(InferenceOnlyModelTest.kt:44)
+
+INSTRUMENTATION_STATUS: test=importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.LocalEndpointWorkflowTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.LocalEndpointWorkflowTest:
+INSTRUMENTATION_STATUS: test=modelPromptThresholdAndAgentInstructionsReachTheLocalServer
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.LocalEndpointWorkflowTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=modelPromptThresholdAndAgentInstructionsReachTheLocalServer
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.OnDeviceTrainingTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.OnDeviceTrainingTest:
+INSTRUMENTATION_STATUS: test=internalVisualWeightsTrainPersistAndReloadOnAndroid
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.OnDeviceTrainingTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=internalVisualWeightsTrainPersistAndReloadOnAndroid
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest:
+INSTRUMENTATION_STATUS: test=discardedBatchRetainsCursorAndDeduplicationAfterInterruptedCleanup
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=discardedBatchRetainsCursorAndDeduplicationAfterInterruptedCleanup
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=interruptedCleanupResumesFromDurableReceipt
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=interruptedCleanupResumesFromDurableReceipt
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=resetBatchPreservesProjectConfigurationAndSharedModelProfile
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=resetBatchPreservesProjectConfigurationAndSharedModelProfile
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=resetProjectForgetsIdentityAndAllowsTheSameCorpusAgain
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=resetProjectForgetsIdentityAndAllowsTheSameCorpusAgain
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=orphanTrainingCleanupPreservesActiveAndSharedModels
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=orphanTrainingCleanupPreservesActiveAndSharedModels
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest:
+INSTRUMENTATION_STATUS: test=version1To4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=version1To4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=version2To4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=version2To4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=version3To4
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=version3To4
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.SafV4Test:
+INSTRUMENTATION_STATUS: test=changedCopyDoesNotProduceReceipt
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=changedCopyDoesNotProduceReceipt
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=failedWritePreservesPrivateSource
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=failedWritePreservesPrivateSource
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=31
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=lostReadGrantDoesNotProduceReceipt
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=31
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=lostReadGrantDoesNotProduceReceipt
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=32
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=successfulCopyIsReopenedAndHashed
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SafV4Test
+INSTRUMENTATION_STATUS: current=32
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=successfulCopyIsReopenedAndHashed
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SegmentationCanvasTest
+INSTRUMENTATION_STATUS: current=33
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.SegmentationCanvasTest:
+INSTRUMENTATION_STATUS: test=separateMasksCanBePaintedAndSamPromptDoesNotBecomeAnAnnotation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.SegmentationCanvasTest
+INSTRUMENTATION_STATUS: current=33
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=separateMasksCanBePaintedAndSamPromptDoesNotBecomeAnAnnotation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test
+INSTRUMENTATION_STATUS: current=34
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test:
+INSTRUMENTATION_STATUS: test=controlsAndCatalogueRenderWithoutDownloadingModels
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test
+INSTRUMENTATION_STATUS: current=34
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=controlsAndCatalogueRenderWithoutDownloadingModels
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test
+INSTRUMENTATION_STATUS: current=35
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=compactNavigationKeepsImportAndExportAccessible
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test
+INSTRUMENTATION_STATUS: current=35
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=compactNavigationKeepsImportAndExportAccessible
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.TrainingWorkflowTest
+INSTRUMENTATION_STATUS: current=36
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.TrainingWorkflowTest:
+INSTRUMENTATION_STATUS: test=validatedCorrectionsTrainThroughWorkManagerAndResume
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.TrainingWorkflowTest
+INSTRUMENTATION_STATUS: current=36
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=validatedCorrectionsTrainThroughWorkManagerAndResume
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest
+INSTRUMENTATION_STATUS: current=37
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest:
+INSTRUMENTATION_STATUS: test=reviewGateRejectionAndFinishedBatchesSurviveResume
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest
+INSTRUMENTATION_STATUS: current=37
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=reviewGateRejectionAndFinishedBatchesSurviveResume
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest
+INSTRUMENTATION_STATUS: current=38
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=journalAndPlannerRejectUnrecognizedToolsAndRemoteEndpoints
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest
+INSTRUMENTATION_STATUS: current=38
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=journalAndPlannerRejectUnrecognizedToolsAndRemoteEndpoints
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest
+INSTRUMENTATION_STATUS: current=39
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=manualAndAssistedTemplatesImportReviewExportCleanAndContinue
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest
+INSTRUMENTATION_STATUS: current=39
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=39
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=manualAndAssistedTemplatesImportReviewExportCleanAndContinue
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 371,032
+There was 1 failure:
+1) importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup(com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest)
+java.lang.AssertionError: OperationProgress(message=Modèle trop volumineux ou budget disque insuffisant., current=0, total=1, isError=true)
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at org.junit.Assert.assertFalse(Assert.java:65)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1.invokeSuspend$act(InferenceOnlyModelTest.kt:60)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1.access$invokeSuspend$act(Unknown Source:0)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest$importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup$1$act$1.invokeSuspend(Unknown Source:13)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.internal.ScopeCoroutine.afterResume(Scopes.kt:35)
+	at kotlinx.coroutines.AbstractCoroutine.resumeWith(AbstractCoroutine.kt:101)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:46)
+	at kotlinx.coroutines.DispatchedTaskKt.resume(DispatchedTask.kt:233)
+	at kotlinx.coroutines.DispatchedTaskKt.dispatch(DispatchedTask.kt:152)
+	at kotlinx.coroutines.CancellableContinuationImpl.dispatchResume(CancellableContinuationImpl.kt:470)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeImpl$kotlinx_coroutines_core(CancellableContinuationImpl.kt:504)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeImpl$kotlinx_coroutines_core$default(CancellableContinuationImpl.kt:493)
+	at kotlinx.coroutines.CancellableContinuationImpl.resumeUndispatched(CancellableContinuationImpl.kt:596)
+	at kotlinx.coroutines.EventLoopImplBase$DelayedResumeTask.run(EventLoop.common.kt:497)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest.importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup(InferenceOnlyModelTest.kt:44)
+
+FAILURES!!!
+Tests run: 39,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

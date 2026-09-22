@@ -1,3 +1,13 @@
+# Publication des sources rc5 · rc5 source publication
+
+23 septembre 2026. Sources Android `a0d9737`, build `20260922T223550Z-3ee0d233110c` ; 158 fichiers compilés comparés au commit sans différence. Cette mise à jour publie les sources et la documentation de reprise ; les artefacts rc4 existants ne sont pas remplacés.
+
+Les fichiers ajoutés/modifiés et les nouveaux commits sont analysés avec Gitleaks 8.30.1 et relus avant push. Les preuves sont sélectionnées : aucun poids, corpus utilisateur, identifiant de modèle privé, fichier d’authentification ni clé de signature n’est ajouté. Les journaux conservent le premier échec de budget Android et son retest réussi ; les résultats incomplets restent explicitement identifiés. Les empreintes de build et de clés publiques servent uniquement à la provenance et ne sont pas des secrets. Le scan des fichiers candidats signale huit empreintes SHA de clés publiques imprimées par `apksigner` : les huit lignes ont été vérifiées individuellement, aucun jeton ni clé privée.
+
+This update publishes source and handoff documentation, without replacing the existing rc4 distribution. The 158 compiled files match `a0d9737`. Added/modified files and new commits are scanned with Gitleaks 8.30.1 and reviewed before push. Selected evidence excludes weights, user datasets, private model identifiers, authentication files and signing keys. The initial Android storage-budget failure and successful retry are both retained. Build and public-key fingerprints are provenance, not credentials. The candidate-file scan reports eight public-key SHA fingerprints printed by `apksigner`; each line was verified individually, with no access token or private key.
+
+---
+
 # Contrôles de publication rc4 · rc4 publication checks
 
 22 septembre 2026 UTC. Sources Android `d9b2239`, build `20260922T183415Z-818e4cf57d14`.

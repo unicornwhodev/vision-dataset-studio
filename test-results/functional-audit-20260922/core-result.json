@@ -1,0 +1,28 @@
+{
+  "build_run": "20260922T223550Z-3ee0d233110c",
+  "android_tests_passed": 39,
+  "skipped": 0,
+  "unresolved_failures": 0,
+  "initial_suite": {
+    "tests": 39,
+    "passed": 38,
+    "failed": 1,
+    "runtime_seconds": 371.032,
+    "evidence": "final-device/instrumentation.txt"
+  },
+  "targeted_retry": {
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "runtime_seconds": 48.567,
+    "evidence": "inference-only-retry/instrumentation.txt"
+  },
+  "resolution": "Completed conversion QA fixtures exceeded the test project storage budget. Moved them reversibly to app no_backup; no code, corpus, database or stored annotations changed. Inference-only import then passed.",
+  "single_green_full_suite": false,
+  "excluded_classes": [
+    "HfModelRuntimeTest",
+    "ConvertedModelQualificationTest",
+    "NativePhotoInferenceUiTest",
+    "HfLivePublicationTest"
+  ]
+}

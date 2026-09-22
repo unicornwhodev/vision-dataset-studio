@@ -479,6 +479,45 @@
         "threads": 2,
         "adapter": "rfdetr"
       }
+    },
+    {
+      "case": "Charlbi-hgnetv2_b0_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T214516Z-3f844ff6cb1e",
+      "serial": "emulator-5554",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 185.694,
+      "android": {
+        "case": "Charlbi-hgnetv2_b0_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 166652,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "9bebb60ba5bbe6c187dafa79be380e71572892ebeb96a1e440a20e41716ad420",
+        "threads": 2,
+        "adapter": "classification",
+        "training_scope": "pretrained_classification_head_only",
+        "output_shapes": [
+          [
+            1,
+            1000
+          ]
+        ],
+        "training_loss": 12.02113,
+        "output_max_change": 0.94526744,
+        "proposals": 1,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 11.015847,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
     }
   ]
 }

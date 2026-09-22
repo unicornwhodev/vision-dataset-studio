@@ -1,0 +1,3 @@
+/workspace/projects/vision-dataset-studio/dist/android/runs/20260922T214516Z-3f844ff6cb1e/vision-dataset-studio-uwd-test.apk: 1 file pushed, 0 skipped. 269.1 MB/s (3306475 bytes in 0.012s)
+Performing Push Install
+Success

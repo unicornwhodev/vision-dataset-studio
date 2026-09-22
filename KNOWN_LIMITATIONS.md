@@ -14,9 +14,9 @@ Les réservations HF, conflits de commits, réponse perdue, publication distante
 
 ## Apprentissage facultatif Android
 
-L’apprentissage est désactivé par défaut. Il utilise uniquement le lot terminé dont l’export a été vérifié. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; annulation et erreur conservent les images. L’activation des nouveaux poids reste manuelle.
+L’apprentissage est désactivé par défaut. Il utilise uniquement le lot terminé dont l’export a été vérifié. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; annulation et erreur conservent les images. L’activation des nouveaux poids reste manuelle. En cas d’erreur ou d’annulation, **Modèles → Apprentissage → Abandonner** clôt explicitement la tentative après confirmation, sans activer de poids ni supprimer d’images. Le nettoyage du lot reste une action distincte après vérification de l’export. Une nouvelle tentative peut être lancée explicitement ; un ancien apprentissage terminé ne satisfait pas la condition de nettoyage si l’export du lot a changé.
 
-Sept conversions HF ont passé inférence, apprentissage, sauvegarde/restauration et reprise Android ; cinq autres ont passé l’inférence. Les encodeurs des conversions HF fournies restent figés. Le réseau de contrôle synthétique modifie séparément ses couches visuelles internes. Voir la [matrice par conversion](docs/LITERT_QUALIFICATION.md) : 12 succès, un délai dépassé RF-DETR, 18 conversions encore en recette. Aucun gain de précision n’est démontré.
+Huit conversions HF ont passé inférence, apprentissage, sauvegarde/restauration et reprise Android ; cinq autres ont passé l’inférence. Les encodeurs des conversions HF fournies restent figés. Le réseau de contrôle synthétique modifie séparément ses couches visuelles internes. Voir la [matrice par conversion](docs/LITERT_QUALIFICATION.md) : 13 succès, trois délais dépassés sur émulateur (RF-DETR et deux conversions privées), 15 conversions non exécutées. Aucun gain de précision n’est démontré.
 
 Le chemin Interpreter/Flex emploie LiteRT 1.4.2 et Select TF Ops 2.16.1. L’intégration LiteRT 2.2 essayée n’expose pas l’API Java Delegate requise ; sa sauvegarde FlexSave a échoué. Les opérateurs des conversions HF récentes doivent être vérifiés sous le runtime retenu. GPU/NPU et apprentissage distribué ne sont pas intégrés.
 

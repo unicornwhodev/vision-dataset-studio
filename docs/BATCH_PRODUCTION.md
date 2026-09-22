@@ -4,9 +4,11 @@ Le parcours principal est : **importer → préannoter → corriger/valider → 
 
 L’apprentissage est désactivé par défaut. Il ne se déclenche jamais à la validation d’une image. Lorsqu’il est activé, il utilise exclusivement les images acceptées et les annotations finales du lot dont l’export local ou HF a été vérifié. Un lot non exporté ou incomplet est refusé. Les autres lots et les cas rejetés ne sont pas ajoutés au corpus. L’empreinte du lot et la preuve d’export figurent dans le reçu d’apprentissage.
 
-Le nettoyage est interdit pendant un apprentissage en attente, actif, interrompu ou en échec. Il devient disponible après sa fin et son évaluation, y compris lorsque le candidat est rejeté. La suppression conserve sa confirmation et la relecture de la copie externe. Elle supprime les images de travail et la copie d’apprentissage du lot, mais conserve annotations, historique, empreintes, preuves d’export et checkpoints. Les nouveaux poids ne sont jamais activés automatiquement.
+Le nettoyage est interdit pendant un apprentissage en attente, actif, interrompu ou en échec. Il devient disponible après sa fin et son évaluation, y compris lorsque le candidat est rejeté, ou après abandon explicite d’une tentative interrompue. La suppression conserve sa confirmation et la relecture de la copie externe. Elle supprime les images de travail et la copie d’apprentissage du lot, mais conserve annotations, historique, empreintes, preuves d’export et checkpoints. Les nouveaux poids ne sont jamais activés automatiquement.
 
 Sans apprentissage, aucun modèle n’est nécessaire à l’import, à la correction manuelle ou à l’export. Avec un modèle actif, la préannotation automatique des nouvelles images est activable dans les réglages ; elle ne traite que les cas encore vierges et ne remplace pas les annotations importées ou humaines. Les erreurs d’inférence laissent le lot disponible pour correction et reprise.
+
+En cas d’erreur ou d’annulation, **Modèles → Apprentissage → Abandonner** clôt explicitement la tentative après confirmation, sans activer de poids ni supprimer d’images. Le nettoyage du lot reste une action distincte après vérification de l’export. Une nouvelle tentative peut être lancée explicitement ; un ancien apprentissage terminé ne satisfait pas la condition de nettoyage si l’export du lot a changé.
 
 ## Identité des images
 

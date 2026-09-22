@@ -1,0 +1,36 @@
+{
+  "runtime": "Android LiteRT CPU",
+  "photo_sha256": "cf6f3c4befa148732c7453e0de5afab00f682427435fead2d88b07a9615cdac2",
+  "first_prompt": "a photo of {label}",
+  "second_prompt": "a drawing of {label}",
+  "first_outputs": [
+    {
+      "label": "cats",
+      "score": 0.9930859
+    },
+    {
+      "label": "dogs",
+      "score": 0.006863946
+    },
+    {
+      "label": "bicycles",
+      "score": 5.0143353E-5
+    }
+  ],
+  "second_outputs": [
+    {
+      "label": "cats",
+      "score": 0.99482894
+    },
+    {
+      "label": "dogs",
+      "score": 0.005137595
+    }
+  ],
+  "settings_change_preserved_existing_annotations": true,
+  "ordinary_preannotation_preserved_existing_annotations": true,
+  "visible_in_editor": true,
+  "persisted_in_room": true,
+  "human_correction_preserved": true,
+  "accuracy_evaluated": false
+}

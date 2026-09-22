@@ -1,3 +1,23 @@
+# Reprise sur le poste habituel — 23 septembre 2026
+
+Sources compilées `a0d9737`, build `20260922T223550Z-3ee0d233110c` : **67 tests JVM et 52 tests Python réussis**, lint **0 erreur / 90 avertissements** ; les 158 fichiers compilés correspondent au commit. L’APK ne contient aucun poids.
+
+**Android : 38/39 réussis, puis le test restant réussi à la reprise ciblée (1/1), aucun ignoré.** L’import sans apprentissage a d’abord été refusé car les fixtures de conversions dépassaient le budget de stockage. Leur déplacement réversible hors du répertoire de travail a permis le succès sans modification de code, suppression de données ni réinstallation. Les deux journaux sont conservés ; aucune suite complète verte en une seule passe n’est revendiquée pour ce dernier build.
+
+L’abandon explicite, la reprise d’une nouvelle tentative et le refus de nettoyage fondé sur un ancien export passent dans `TrainingWorkflowTest`. La fixture utilise 88 images acceptées, exclut 8 rejets et le lot voisin, s’interrompt après 9 étapes puis reprend jusqu’à 198. Les bundles acceptent un manifeste minimal ou d’anciennes empreintes tout en exigeant leurs fichiers runtime réels.
+
+[Preuves](test-results/functional-audit-20260922/README.md) · [Reprendre le développement](docs/DEVELOPMENT_RESUME.md). Les modèles ont 13 succès, dont 8 avec apprentissage ; trois délais dépassés et 15 conversions non exécutées. rc5 est poussé en sources ; la distribution publiée reste rc4.
+
+---
+
+# Recette rc5 — 22 septembre 2026 UTC
+
+Build `20260922T214516Z-3f844ff6cb1e` (versionCode 10) : **66 tests JVM et 39 tests Android réussis**, aucun échec ni ignoré dans ces sélections. **52 tests Python**, lint **0 erreur / 90 avertissements**. APK sans poids ; 158 fichiers compilés correspondent au commit `c3c9cb1`. [Rapport bilingue et preuves](test-results/functional-audit-20260922/development-audit9/README.md).
+
+Import sans apprentissage, utilisation avec empreinte de profil périmée, conservation des annotations, paramètres, projets, lots, UI anglaise et workflows passent sur Android. L’apprentissage de la fixture utilise les 88 images acceptées du lot exporté, reprend après annulation jusqu’à 198 étapes, puis autorise le nettoyage. La campagne des conversions reste séparée et en cours ; aucune qualification ARM, précision métier ou publication HF réelle n’est revendiquée.
+
+---
+
 # Validation de la release 4.2.0-rc4 — 22 septembre 2026
 
 Build `20260922T183415Z-818e4cf57d14` (versionCode 9) : **54 tests JVM, 24 tests Android de base et 2 régressions HF réussis**, sans échec ni test ignoré dans ces sélections. **52 tests Python**, lint **0 erreur / 89 avertissements**. APK sans poids, 143 fichiers de compilation comparés au commit `d9b2239`. [Rapport bilingue et preuves rc4](test-results/stabilization-rc4/README.md).

@@ -1,6 +1,6 @@
 # LiteRT qualification — 22 September 2026 audit
 
-**12 conversions passed**, including **7 with Android training**, out of 31 downloaded conversions. RF-DETR reached the 30-minute software-emulator limit: this run cannot determine compatibility. The other 18 conversions are under test, including six from the private source. The rc3 RTMDet defect is fixed and inference passes. No private identifier or weight is published.
+**13 conversions passed**, including **8 with Android training**, out of 31 downloaded conversions. Three conversions reached the software-emulator time limit (RF-DETR and two from the private source): these runs cannot determine compatibility. The other 15 conversions remain unexecuted. The rc3 RTMDet defect is fixed and inference passes. No private identifier or weight is published.
 
 | Conversion | Inference | Train / save / restore / resume | Output delta | Restore delta | Build |
 |---|---|---|---:|---:|---|
@@ -16,6 +16,7 @@
 | efficientformer_l1_learning | PASS | PASS | 0.1378746 | 0.0 | `20260922T204312Z-40a01b844d03` |
 | dinov2 | PASS | — | — | — | `20260922T204312Z-40a01b844d03` |
 | tinyclip | PASS | — | — | — | `20260922T204312Z-40a01b844d03` |
+| hgnetv2_b0_learning | PASS | PASS | 0.94526744 | 0.0 | `20260922T214516Z-3f844ff6cb1e` |
 | rfdetr | TIMEOUT | — | — | — | `20260922T204312Z-40a01b844d03` |
 
 [JSON evidence](../../test-results/functional-audit-20260922/public-model-results.json).

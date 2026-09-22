@@ -26,6 +26,8 @@ L’apprentissage visuel reste désactivé par défaut. Il utilise les annotatio
 
 Le périmètre dépend de la conversion : certaines signatures ne modifient qu’une tête ou une adaptation des sorties, avec encodeur figé. Le réseau synthétique de recette permet de tester séparément la modification de couches visuelles internes. Un succès de cette fixture ne prouve pas que les conversions HF entraînent leurs encodeurs.
 
+En cas d’erreur ou d’annulation, **Modèles → Apprentissage → Abandonner** clôt explicitement la tentative après confirmation, sans activer de poids ni supprimer d’images. Le nettoyage du lot reste une action distincte après vérification de l’export. Une nouvelle tentative peut être lancée explicitement ; un ancien apprentissage terminé ne satisfait pas la condition de nettoyage si l’export du lot a changé.
+
 ## Recette reproductible
 
 `tools/build_android.py` produit les APK et leurs reçus immuables. `tools/qa/run_device_qualification.sh` contrôle leurs empreintes avant installation et conserve le résultat d’instrumentation. Les classes `AnnotationPreservationTest`, `FunctionalUiAuditTest`, `WorkflowExecutionTest`, `LocalEndpointWorkflowTest`, `ProjectMaintenanceTest` et `TrainingWorkflowTest` exercent les parcours concernés.
@@ -40,13 +42,15 @@ Les essais opt-in restent séparés :
 
 Les tests ignorés faute de fixture ou d’autorisation ne sont pas comptés comme réussis. Les reçus associent chaque essai au build réellement installé. Le planificateur HTTP testé avec une réponse contrôlée valide son protocole, pas la qualité d’un agent réel.
 
-## Résultats intermédiaires vérifiés
+## Recette rc5 et résultats de développement
+
+**Build `20260922T223550Z-3ee0d233110c` : 67 JVM réussis ; Android 38/39 puis reprise ciblée 1/1 réussie, aucun ignoré ; lint 0 erreur / 90 avertissements.** Le premier échec d’import provenait du budget occupé par les fixtures de conversions. Leur archivage réversible a permis le succès sans changement de code. Il ne s’agit pas d’une suite complète verte en une seule passe. [Preuves complètes](../test-results/functional-audit-20260922/README.md). Les contrôles SHA des modèles sont retirés ; le profil à empreinte périmée passe l’inférence Android.
 
 Les essais du 22 septembre conservent leurs builds de développement :
 
 | Essai | Résultat exécuté | Limite |
 |---|---|---|
-| Build `20260922T211013Z-a83cfea465e4` | 63 tests JVM réussis, aucun échec ni ignoré ; APK et APK instrumentée construites | Les derniers ajustements doivent encore repasser le build final |
+| Build `20260922T211013Z-a83cfea465e4` | 63 tests JVM réussis, aucun échec ni ignoré ; APK et APK instrumentée construites | Build de développement ; recette rc5 ci-dessus |
 | `FunctionalUiAuditTest`, build `20260922T204312Z-40a01b844d03` | Parcours anglais, dialogues, création et changement de projets, prompt persisté, propositions visibles | Émulateur API 28 ; pas de qualification TalkBack ou téléphone |
 | `NativePhotoInferenceUiTest`, build `20260922T211013Z-a83cfea465e4` | TinyCLIP reconnaît les chats d’une photo publique ; prompt et top-K changent les sorties à la relance explicite ; correction humaine préservée | Conservation passive des annotations, du statut et des reçus vérifiée ; un exemple ne mesure pas la précision |
 | `FeatureImplementationAuditTest`, build `20260922T203037Z-00cb2a227a15` | 8 tests réussis : modèles publics, préannotation, contrat HTTP, corrections numériques et export | Les fixtures HTTP ne sont pas un agent réel |
@@ -57,6 +61,6 @@ Les essais du 22 septembre conservent leurs builds de développement :
 
 Le nouvel essai de DINOv2 produit 384 valeurs globales et une carte de 256×384 valeurs. TinyCLIP sans apprentissage produit deux propositions et 512 valeurs de représentation. EfficientFormer entraînable passe deux étapes Android, sauvegarde, restauration et reprise. Les reçus de conversion restent distincts des tests métier.
 
-La campagne exhaustive est encore en cours. Une interruption de l’émulateur par manque de mémoire a précédé le lancement HGNetV2 entraînable : elle ne constitue ni un succès ni un échec d’inférence de ce modèle. Les écritures HF réelles attendent l’autorisation du dépôt de QA dédié. Le bilan final ne doit pas compter les essais en attente comme réussis.
+La campagne s’arrête ici pour la reprise sur le poste habituel : 13 conversions réussies, dont 8 avec apprentissage ; trois délais dépassés sur émulateur et 15 conversions non exécutées. HGNetV2 entraînable a passé inférence, apprentissage, sauvegarde/restauration et reprise après l’interruption initiale de l’émulateur. Les écritures HF réelles attendent l’autorisation du dépôt de QA dédié. Les essais non terminés ne sont pas comptés comme réussis.
 
 La révision HF personnelle actuelle `36026262693de56b2cf45a6337a405297bfcfff6` conserve les 25 manifestes de la révision testée. L’identité de **118 artefacts runtime** a été vérifiée : 30 empreintes LFS exposées par HF et 88 fichiers auxiliaires téléchargés et hachés. Cette équivalence explicite permet de réutiliser les résultats des mêmes octets ; elle ne qualifie pas les conversions encore non exécutées. [Preuve des empreintes](../test-results/functional-audit-20260922/public-revision-equivalence.json). Les badges ne sont transmis à aucune autre révision ou copie du dépôt.

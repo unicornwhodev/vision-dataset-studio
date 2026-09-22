@@ -1,0 +1,189 @@
+{
+  "jvm": [
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.BasicJvmTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "addition_isCorrect"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "testLetterboxCalculations",
+        "testCanonicalSampleJsonSerialization",
+        "testNormalizedPointClamp",
+        "testSha256Checksum",
+        "testNormalizedRectConversions",
+        "testWebDatasetTarArchiveCreation"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.FunctionalAuditTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "workflowTitlesAndValidationMessagesFollowLocaleChanges",
+        "clipPreservesCustomPromptsInsteadOfReplacingThemWithTheDefault",
+        "rtmdetRejectsMissingOrAmbiguousFeatureMaps",
+        "unsupportedTextPromptsAreRejectedInsteadOfSilentlyIgnored",
+        "catalogQualificationNeverTransfersToAnotherRevisionOrRepository",
+        "dynamicYoloUsesDeclaredLabelsNormalizationAndPixelBoxes",
+        "rtmdetDecodesReorderedPyramidOutputsAndAppliesThreshold",
+        "modelWithoutDigestManifestIsInstallableAtAnyRevision"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.HfTransferV4Test",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "fullResponseRestartsInsteadOfAppending",
+        "commitConflictPreservesPinnedParent",
+        "wrongRangeNeverOverwritesFinalFile",
+        "overSizeResponseRejected",
+        "occupiedPathIsNeverOverwritten",
+        "disconnectedDownloadResumesHashedPrefix",
+        "remoteReceiptVerifiesWithoutLocalPayload",
+        "lostCommitReplyIsNotAutomaticallyReplayed"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.MoshiV4Test",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "canonicalSampleKeepsFourPointStatesThroughExportJson",
+        "annotationsRoundTrip",
+        "contractRejectsUnknownKeys",
+        "nullForNonNullFieldIsRejected",
+        "pointingMultiKeepsFourPerTargetStatesAndLegacyBooleans",
+        "receiptKeepsLongSizes",
+        "historicalDefaultsRemainUnverified",
+        "reflectionFallbackForEntitiesKeepsDefaults"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.RoomMigrationV4Test",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "version1To4",
+        "version2To4"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.RuntimeSmokeTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "test multi-format export snippet generation",
+        "read string from context"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.StabilizationTest",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "explicitGroundingLinksResolveToCanonicalTargets",
+        "modelContractSupportsHumanOnlyAndPartialProjects",
+        "inferenceReceiptIsDurableAndDistinguishesEmpty",
+        "actionsAndExtendedCapabilitiesFollowTheContract",
+        "navigationUsesHistoryWithoutDuplicates",
+        "capabilitiesComeFromContractWithoutInventingQualification",
+        "trainingStorageEstimateIncludesPrimaryAndAuxiliaryTargets",
+        "instanceLinksAreExplicitValidatedAndReversible",
+        "groundingProposalRequiresExplicitHumanReview",
+        "maskTopologyDoesNotDuplicateAnInstance",
+        "advancedMaskOperationsAreComplete",
+        "requiredRuntimeFilesMustExistAndRemainWithinInstallation",
+        "cocoMaskProjectionIsColumnMajorAndMatchesAreaAndBox",
+        "absentOrStaleModelManifestDoesNotBlockRuntimeFiles",
+        "annotationCompatibilityIsExplicit",
+        "brushSizeChangesPaintedAreaAndEraserRemovesPixels",
+        "groundingWireContractIsExplicitReferentialAndThresholdSafe",
+        "everyMaskToolStartsFromTheSameAspectPreservingRaster"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.StudioScreenshotTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "sample_thumbnail_screenshot"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "insufficientDataset",
+        "completePreflight",
+        "onlyFinishedOrExplicitlyAbandonedRunsPermitCleanup",
+        "modelPathAndFileAreCheckedSeparately",
+        "unverifiedBatch",
+        "insufficientStorage",
+        "modelWithoutSignatures",
+        "alreadyTrainedExport",
+        "configuredCheckpointMustBeAvailable",
+        "inferenceOnlyProfilesRemainRunnableAndIgnoreStaleTrainingPreferences"
+      ]
+    },
+    {
+      "suite": "com.unicornwhodev.visiondatasetstudio.WorkClaimConcurrencyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        "concurrentReservationCannotBeOverwrittenWithANewerParent",
+        "completionCannotStealAnotherWorkersLeaseAndDoneIsIdempotent",
+        "corruptClaimIsNeverTreatedAsUnreserved"
+      ]
+    }
+  ],
+  "lint_severities": {
+    "Warning": 90
+  },
+  "lint_categories": {
+    "ApplySharedPref": 1,
+    "ExifInterface": 2,
+    "RedundantLabel": 1,
+    "AndroidGradlePluginVersion": 2,
+    "GradleDependency": 16,
+    "NewerVersionAvailable": 15,
+    "Aligned16KB": 3,
+    "PluralsCandidate": 14,
+    "ObsoleteSdkInt": 1,
+    "UnusedResources": 11,
+    "UsableSpace": 1,
+    "IconDipSize": 2,
+    "UseKtx": 16,
+    "UseTomlInstead": 5
+  }
+}

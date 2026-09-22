@@ -1,0 +1,21 @@
+{
+  "build_run": "20260922T214516Z-3f844ff6cb1e",
+  "android_tests_passed": 39,
+  "skipped": 0,
+  "failed": 0,
+  "excluded_classes": [
+    "HfModelRuntimeTest",
+    "ConvertedModelQualificationTest",
+    "NativePhotoInferenceUiTest",
+    "HfLivePublicationTest"
+  ],
+  "version": "4.2.0-rc5",
+  "jvm_tests_passed": 66,
+  "lint_errors": 0,
+  "lint_warnings": 90,
+  "python_tests_passed": 52,
+  "physical_arm_device": false,
+  "weights_embedded": false,
+  "real_hf_writes_tested": false,
+  "model_campaign_complete": false
+}

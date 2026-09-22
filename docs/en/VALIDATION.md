@@ -1,3 +1,23 @@
+# Workstation handoff — 23 September 2026
+
+Compiled source `a0d9737`, build `20260922T223550Z-3ee0d233110c`: **67 JVM and 52 Python tests passed**, lint **0 errors / 90 warnings**; 158 compiled files match the commit. The APK contains no model weights.
+
+**Android: 38/39 passed, then the remaining test passed in a targeted retry (1/1), no skips.** Inference-only import initially hit the storage budget consumed by conversion fixtures. Reversibly moving those fixtures out of the working directory allowed it to pass without code changes, data deletion or reinstallation. Both logs are retained; no single green full-suite run is claimed for this build.
+
+Explicit abandonment, starting a fresh attempt and refusing cleanup based on an obsolete export pass in `TrainingWorkflowTest`. Its 88 accepted images exclude 8 rejections and the neighboring batch, pause after 9 steps and resume to 198. Bundles accept minimal manifests and stale digests while requiring their actual runtime files.
+
+[Evidence](../../test-results/functional-audit-20260922/README.md) · [Resume development](DEVELOPMENT_RESUME.md). Models have 13 passes, including 8 with learning; three timeouts and 15 unexecuted conversions. rc5 source is pushed; the published distribution remains rc4.
+
+---
+
+# rc5 qualification — 22 September 2026 UTC
+
+Build `20260922T214516Z-3f844ff6cb1e` (versionCode 10): **66 JVM and 39 Android tests passed**, no failures or skips in these selections. **52 Python tests**, lint **0 errors / 90 warnings**. No model weights embedded; 158 compiled files match commit `c3c9cb1`. [Bilingual report and evidence](../../test-results/functional-audit-20260922/development-audit9/README.md).
+
+Inference-only import, stale-digest profile selection, annotation preservation, model settings, projects, batches, English UI and workflows pass on Android. Fixture learning consumes the 88 accepted images from the verified exported batch, resumes after cancellation to 198 steps, then permits cleanup. The separate conversion campaign is ongoing; no ARM, task-accuracy or real HF publication qualification is claimed.
+
+---
+
 # Release 4.2.0-rc4 validation — 22 September 2026
 
 Build `20260922T183415Z-818e4cf57d14` (versionCode 9): **54 JVM, 24 core Android and 2 HF regression tests passed**, with no failures or skips in these selections. **52 Python tests**, lint **0 errors / 89 warnings**. Weight-free APK, 143 compiled files matched to `d9b2239`. [Bilingual rc4 report and evidence](../../test-results/stabilization-rc4/README.md).

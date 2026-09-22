@@ -6,9 +6,11 @@ The main workflow is **import → preannotate → human correction/review → ve
 
 Learning is off by default. Accepting an image never starts it. When enabled, it uses only accepted images and final annotations from that fully reviewed batch after its local or HF export has been verified. Incomplete or unexported batches are rejected. Other batches, rejected images and duplicate audit rows are excluded. The run receipt records the batch fingerprint and export proof.
 
-Cleanup is blocked while that batch’s learning is queued, active, cancelled or failed. It becomes available after learning and evaluation finish, including when the candidate is rejected. Cleanup still requires confirmation and a fresh readback of the backup. It removes working images and the training snapshot, while retaining annotations, history, image identities, export receipts and checkpoints. New weights require manual activation.
+Cleanup is blocked while that batch’s learning is queued, active, cancelled or failed. It becomes available after learning and evaluation finish, including when the candidate is rejected, or after explicit abandonment of an interrupted attempt. Cleanup still requires confirmation and a fresh readback of the backup. It removes working images and the training snapshot, while retaining annotations, history, image identities, export receipts and checkpoints. New weights require manual activation.
 
 Without learning, imports, manual corrections and exports do not require a model. With an active model, automatic preannotation can run on newly imported images. It processes only untouched cases; imported annotations and human work are preserved. Inference errors leave the batch available for manual correction and retry.
+
+After failure or cancellation, **Models → Training → Abandon** explicitly closes the attempt after confirmation, without activating weights or deleting images. Batch cleanup remains a separate action after export verification. A new attempt can be started explicitly; a previously completed run cannot satisfy the cleanup requirement if the batch export changed.
 
 ## Image identity
 

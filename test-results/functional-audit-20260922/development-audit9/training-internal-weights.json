@@ -1,0 +1,11 @@
+{
+  "runtime": "Android LiteRT Interpreter",
+  "optimizer_steps": 48,
+  "initial_loss": 0.6854044694986214,
+  "final_loss": 0.01837361347916884,
+  "internal_weights_before": "953589b2fe25ac8406555116cccc923749b6046d73212281a8a5c3cc8575d959",
+  "internal_weights_after": "9f0d0b7c2b2f30849220870aa9fa67380e5ff29228c369712cf7aead1054eea4",
+  "checkpoint_reload_matches": true,
+  "production_hf_models_trained": false,
+  "fixture": "synthetic red/blue images; untrained two-layer visual network"
+}

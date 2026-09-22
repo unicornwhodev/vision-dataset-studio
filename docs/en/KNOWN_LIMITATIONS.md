@@ -4,11 +4,11 @@
 
 ## Models and learning
 
-Twelve converted models have passed Android execution, including seven with train/save/restore/resume. RF-DETR reached the 30-minute software-emulator limit; this does not establish model incompatibility. Eighteen further conversions are under test. The [per-conversion matrix](LITERT_QUALIFICATION.md) retains the actual build and scope of each result.
+Thirteen converted models have passed Android execution, including eight with train/save/restore/resume. Three conversions reached the software-emulator time limit (RF-DETR and two private conversions); this does not establish model incompatibility. Fifteen further conversions remain unexecuted. The [per-conversion matrix](LITERT_QUALIFICATION.md) retains the actual build and scope of each result.
 
 All twenty supplied trainable HF conversions freeze their visual encoder and update a head or output adapter. The separate synthetic QA network changes internal visual layers; that proof does not apply to those HF encoders. No accuracy improvement, generalization result or physical ARM benchmark is claimed.
 
-Learning is optional and off by default. It consumes the completed batch after its export is verified and before cleanup. Failure or cancellation retains the images; activating learned weights remains manual. Models without training signatures remain usable for inference. SHA manifests and stored model digests do not gate model import or use.
+Learning is optional and off by default. It consumes the completed batch after its export is verified and before cleanup. Failure or cancellation retains the images; activating learned weights remains manual. After failure or cancellation, **Models → Training → Abandon** explicitly closes the attempt after confirmation, without activating weights or deleting images. Batch cleanup remains a separate action after export verification. A new attempt can be started explicitly; a previously completed run cannot satisfy the cleanup requirement if the batch export changed. Models without training signatures remain usable for inference. SHA manifests and stored model digests do not gate model import or use.
 
 Training requires at least 32 training and 8 control images under the deterministic split. Targets are limited to one million values per image and stored separately. Masks and auxiliary presence/abstention/supervision targets follow the conversion contract; training text inputs are unsupported. Reusing a control set is not evaluation on an independent corpus.
 

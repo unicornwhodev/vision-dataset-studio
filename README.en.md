@@ -9,7 +9,7 @@ An Android workspace for producing image datasets in batches: model proposals, h
 **4.2.0-rc5 · Apache-2.0 · Under qualification**
 Android application ID: `com.unicornwhodev.visiondatasetstudio`
 
-Latest validation **rc4 · 22 September 2026**: **54 JVM, 24 core Android, 2 LiteRT regressions and 52 Python tests passed**. [Build, evidence and limits](test-results/stabilization-rc4/README.md).
+Latest validation **rc5 · 23 September 2026**: **67 JVM, 52 Python; 38 Android tests passed, then the final test passed after archiving QA fixtures**. [Build, evidence and limits](test-results/functional-audit-20260922/README.md).
 
 ## Application screenshots
 
@@ -47,7 +47,7 @@ The functional audit adds applied model settings, visible workflow instructions,
 |---|---|
 | Local / HF import, configurable batches, correction and export | Implemented; local 2+1 cycle verified on Android |
 | Persistent identity, resume and protected cleanup | Android tests passed, including renamed copies and concurrent claims |
-| Android learning, checkpoints, cancel/resume | Seven HF conversions passed train/save/restore/resume; their encoders remain frozen |
+| Android learning, checkpoints, cancel/resume | Eight HF conversions passed train/save/restore/resume; their encoders remain frozen |
 | HF download, LiteRT contracts and preprocessing | Configurable catalogue, optional SHA manifests, tensor-checked contracts; see the execution matrix |
 | Tokenizers and persistent similarity index | Android tests passed |
 | TinyCLIP / SAM / Florence-2 bundles | TinyCLIP executed with visible proposals; SAM and Florence remain to be qualified |
@@ -74,6 +74,8 @@ Canonical annotations are retained. COCO, YOLO, WebDataset and vision-language o
 ![Public catalogue qualification](docs/visuals/benchmarks/android-coverage.png)
 
 This figure covers the **25 public Charlbi variants**. Four passed Android train/save/restore/resume; RepViT passed inference. The six additional authorized-source conversions are outside this public chart. [Executed results, checkpoint figures and timing limitations](docs/en/LITERT_QUALIFICATION.md) · [Full model documentation](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder). No phone speed or accuracy claim.
+
+[Resume on your workstation](docs/en/DEVELOPMENT_RESUME.md): setup, commands, test status and remaining work.
 
 ## Build and test
 

@@ -7,6 +7,7 @@
 | Contrat des modèles entraînables / Trainable model contract | [Contrat](LITERT_TRAINING_CONTRACT.md) | [Contract](en/LITERT_TRAINING_CONTRACT.md) |
 | Résultats et limites / Results and limitations | [Tests](../TEST_REPORT.md) · [Limites](../KNOWN_LIMITATIONS.md) | [Validation](en/VALIDATION.md) |
 | Recette fonctionnelle / Functional audit | [FR](FUNCTIONAL_AUDIT_2026_09.md) | [EN](en/FUNCTIONAL_AUDIT_2026_09.md) |
+| Reprise sur poste local / Local workstation | [FR](DEVELOPMENT_RESUME.md) | [EN](en/DEVELOPMENT_RESUME.md) |
 | Architecture | [FR](ARCHITECTURE.md) | [EN](en/ARCHITECTURE.md) |
 | Captures, diagrammes, graphiques / Visual evidence | [FR/EN](VISUALS.md) | [FR/EN](VISUALS.md) |
 | Workflows | [FR](WORKFLOWS.md) | [EN](en/WORKFLOWS.md) |

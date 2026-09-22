@@ -2,8 +2,8 @@
   "schema": 1,
   "product": "Vision Dataset Studio",
   "brand": "Unicorn Who Dev",
-  "version": "4.2.0-rc4",
-  "date": "2026-09-22",
+  "version": "4.2.0-rc5",
+  "date": "2026-09-23",
   "namespace": "com.unicornwhodev.visiondatasetstudio",
   "application_id": "com.unicornwhodev.visiondatasetstudio",
   "room_schema_version": 4,
@@ -12,38 +12,52 @@
   "license": "Apache-2.0",
   "rights_and_transitive_notices_review": "pending",
   "android": {
-    "current_build_run": "20260922T183415Z-818e4cf57d14",
-    "compiled_source_commit": "d9b22399f5121d05d31ab4aaa67fdc7e9742c3e2",
+    "current_build_run": "20260922T223550Z-3ee0d233110c",
+    "compiled_source_commit": "a0d9737586971ac243252cb147a62010a4398083",
     "build_outcome": "build_checks_passed",
     "apk_built": true,
     "test_apk_built": true,
     "unit_tests": {
-      "passed": 54,
+      "passed": 67,
       "failed": 0,
       "skipped": 0
     },
     "lint": {
       "errors": 0,
-      "warnings": 89
+      "warnings": 90
     },
     "instrumented_tests": {
-      "passed": 24,
-      "failed": 0,
+      "build_run": "20260922T223550Z-3ee0d233110c",
+      "android_tests_passed": 39,
       "skipped": 0,
-      "runtime_seconds": 219.285,
-      "build_run": "20260922T183415Z-818e4cf57d14",
-      "evidence": "test-results/stabilization-rc4/final-device/instrumentation.txt",
-      "selection": "Core suite excludes opt-in model classes"
+      "unresolved_failures": 0,
+      "initial_suite": {
+        "tests": 39,
+        "passed": 38,
+        "failed": 1,
+        "runtime_seconds": 371.032,
+        "evidence": "final-device/instrumentation.txt"
+      },
+      "targeted_retry": {
+        "tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "runtime_seconds": 48.567,
+        "evidence": "inference-only-retry/instrumentation.txt"
+      },
+      "resolution": "Completed conversion QA fixtures exceeded the test project storage budget. Moved them reversibly to app no_backup; no code, corpus, database or stored annotations changed. Inference-only import then passed.",
+      "single_green_full_suite": false,
+      "excluded_classes": [
+        "HfModelRuntimeTest",
+        "ConvertedModelQualificationTest",
+        "NativePhotoInferenceUiTest",
+        "HfLivePublicationTest"
+      ],
+      "evidence": "test-results/functional-audit-20260922/core-result.json"
     },
     "physical_device_tested": false,
     "room_schema_generated": true,
-    "weights_embedded": false,
-    "converted_model_regressions": {
-      "passed": 2,
-      "failed": 0,
-      "evidence": "test-results/stabilization-rc4/conversions.json",
-      "new_qualifications": 0
-    }
+    "weights_embedded": false
   },
   "portable_tests": {
     "python_host_suite_passed": 52,
@@ -71,7 +85,12 @@
     "point_correction_store_android_fixture": true,
     "export_archive_android_produced": true,
     "shipped_export_validator_accepts_current_android_archive": true,
-    "community_hf_repvit_android_passed": true
+    "community_hf_repvit_android_passed": true,
+    "inference_only_model_import_test": true,
+    "stale_model_digest_blocks_usage": false,
+    "ordinary_preannotation_preserves_saved_annotations": true,
+    "explicit_prompt_rerun_changes_native_outputs": true,
+    "english_project_settings_ui_test": true
   },
   "ci": {
     "prepared": true,
@@ -87,7 +106,7 @@
     "blocker": "GitHub Actions account billing lock; job not started",
     "run_url": "https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35539418339",
     "current_release_executed": false,
-    "attempt_scope": "Historical attempt, not rc4"
+    "attempt_scope": "Historical attempt; no workflow run found for the rc5 source commit"
   },
   "data_transition": {
     "in_place_update_from_previous_application_id": false,
@@ -183,7 +202,9 @@
     "cleanup_waits_for_training_completion": true,
     "cleanup_execution_after_training": "passed_on_android",
     "apk_contains_weights": false,
-    "report": "docs/BATCH_PRODUCTION.md"
+    "report": "docs/BATCH_PRODUCTION.md",
+    "explicit_training_abandonment_available": true,
+    "explicit_abandonment_exception": "An interrupted run can be explicitly abandoned; export verification and cleanup confirmation still required"
   },
   "native_training": {
     "execution": "Android only",
@@ -200,11 +221,13 @@
     "workflow_initial_loss": 0.6897399500194918,
     "workflow_final_loss": 0.003557757622006894,
     "cleanup_after_training_passed": true,
-    "hf_conversions_runtime_passed": 4,
+    "hf_conversions_runtime_passed": 8,
     "hf_conversions_trainable_total": 20,
     "hf_backbone_trainable": false,
     "hf_scope": "heads and output adapters only; encoder frozen",
-    "report": "docs/LITERT_QUALIFICATION.md"
+    "report": "docs/LITERT_QUALIFICATION.md",
+    "explicit_abandonment_cleanup_test_passed": true,
+    "stale_export_cleanup_rejected": true
   },
   "documentation": {
     "languages": [
@@ -213,15 +236,16 @@
     ],
     "index": "docs/README.md",
     "raw_evidence_language": "original",
-    "app_english_localization": false
+    "app_english_localization": true,
+    "functional_audit": "docs/FUNCTIONAL_AUDIT_2026_09.md"
   },
   "source_publication": {
     "authorized": true,
     "repository": "https://github.com/unicornwhodev/vision-dataset-studio",
     "visibility": "public",
-    "tested_source_commit": "d9b22399f5121d05d31ab4aaa67fdc7e9742c3e2",
+    "tested_source_commit": "a0d9737586971ac243252cb147a62010a4398083",
     "secret_review": "docs/PUBLICATION_CHECKS.md",
-    "status": "rc4 publication authorized"
+    "status": "Source handoff on main; rc5 distribution not yet published"
   },
   "distribution": {
     "kind": "workstation-tested Debug prerelease",
@@ -230,16 +254,22 @@
     "oci_kind": "qualification archive, not a runnable build image",
     "build_image_status": "Prepared, not built; no rc4 CI run; historical Actions billing failure",
     "oci_visibility": "private",
-    "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc4"
+    "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc4",
+    "version_in_preparation": "4.2.0-rc5",
+    "latest_published_version": "4.2.0-rc4"
   },
   "lite_rt_matrix": {
     "model_conversions_downloaded_verified": 31,
-    "model_conversions_passed": 5,
-    "model_conversions_failed": 1,
-    "model_conversions_pending": 25,
-    "hf_trainable_conversions_passed": 4,
+    "model_conversions_passed": 13,
+    "model_conversions_failed": 0,
+    "model_conversions_pending": 15,
+    "hf_trainable_conversions_passed": 8,
     "hf_trainable_conversions_total": 20,
-    "evidence": "test-results/litert-rc3/models-passed.json"
+    "evidence": "test-results/functional-audit-20260922/public-model-results.json",
+    "model_conversions_timed_out": 3,
+    "model_retests_pending": 3,
+    "campaign_complete": false,
+    "model_conversions_pending_definition": "Unexecuted conversions, excludes timed-out cases awaiting retest"
   },
   "workflows": {
     "templates": 3,
