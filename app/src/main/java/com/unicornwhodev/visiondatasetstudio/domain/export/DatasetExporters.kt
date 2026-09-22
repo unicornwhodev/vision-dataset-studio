@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.export
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils
 import com.unicornwhodev.visiondatasetstudio.core.geometry.NormalizedRect
 import com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager
@@ -19,9 +20,12 @@ import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-enum class DatasetExportFormat(val key: String, val label: String) {
-    CANONICAL_JSONL("CANONICAL_JSON", "JSONL complet"), COCO("COCO", "COCO — boîtes + masques"),
-    YOLO("YOLO", "YOLO — boîtes"), VISION_LANGUAGE("VL", "Questions / réponses")
+enum class DatasetExportFormat(val key: String, private val labelText: () -> String) {
+    CANONICAL_JSONL("CANONICAL_JSON", { tr("JSONL complet", "Full JSONL") }),
+    COCO("COCO", { tr("COCO — boîtes + masques", "COCO — boxes + masks") }),
+    YOLO("YOLO", { tr("YOLO — boîtes", "YOLO — boxes") }),
+    VISION_LANGUAGE("VL", { tr("Questions / réponses", "Questions / answers") });
+    val label get() = labelText()
 }
 
 /** Canonical annotations are always retained; projections never silently replace unknown labels. */
@@ -43,21 +47,21 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
         val root=File(finalRoot.parentFile,finalRoot.name+".building")
         try {
             val pairs = validatedSamplesWithAnnotations
-            require(pairs.isNotEmpty()) { "Aucun cas validé à exporter" }
+            require(pairs.isNotEmpty()) { tr("Aucun cas validé à exporter", "No approved samples to export") }
             require(pairs.map { it.first.sampleId }.distinct().size == pairs.size)
             val split = project.targetSplit.ifBlank { "train" }
-            require(split.matches(Regex("[a-zA-Z0-9_-]+"))) { "Nom de split invalide" }
+            require(split.matches(Regex("[a-zA-Z0-9_-]+"))) { tr("Nom de split invalide", "Invalid split name") }
             pairs.forEach { (s, _) ->
-                require(s.annotationStatus == "VALIDATED") { "Un cas non validé est présent" }
-                require(s.imageWidth > 0 && s.imageHeight > 0 && s.localImagePath?.let { File(it).isFile } == true) { "Image locale absente ou invalide" }
-                require(HashUtils.computeSha256(File(s.localImagePath!!))==s.sha256) { "Image modifiée après acquisition : ${s.sampleId}" }
+                require(s.annotationStatus == "VALIDATED") { tr("Un cas non validé est présent", "An unapproved sample is present") }
+                require(s.imageWidth > 0 && s.imageHeight > 0 && s.localImagePath?.let { File(it).isFile } == true) { tr("Image locale absente ou invalide", "Local image missing or invalid") }
+                require(HashUtils.computeSha256(File(s.localImagePath!!))==s.sha256) { tr("Image modifiée après acquisition : ${s.sampleId}", "Image changed after acquisition: ${s.sampleId}") }
             }
             val imageBytes = pairs.sumOf { File(it.first.localImagePath!!).length() }
             // Reserve space for the package, optional TAR and ZIP before writing; never purge originals to make room.
             require(storageManager.hasAvailableBudget(imageBytes * (if (includeWebDataset) 4 else 2) + 8L * 1024 * 1024, project.diskBudgetMb, com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(project).reserveFreeMb)) {
-                "Espace insuffisant pour images + archive. Augmentez le budget disque ou désactivez WebDataset."
+                tr("Espace insuffisant pour images + archive. Augmentez le budget disque ou désactivez WebDataset.", "Insufficient space for images + archive. Increase the storage budget or disable WebDataset.")
             }
-            if (root.exists()) check(root.deleteRecursively()) { "Ancien export inaccessible" }
+            if (root.exists()) check(root.deleteRecursively()) { tr("Ancien export inaccessible", "Previous export inaccessible") }
             check(root.mkdirs())
             val batchId = finalRoot.name
             val prefix = "batches/$batchId"
@@ -103,10 +107,10 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
                 "source" to project.hfSourceRepo.ifBlank { "local-index:project-${project.id}" }, "source_revision_resolved" to (com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(project).resolvedSourceRevision != null), "sample_count" to pairs.size,
                 "files" to root.walkTopDown().filter { it.isFile }.map { f -> mapOf("path" to f.relativeTo(root).invariantSeparatorsPath, "size" to f.length(), "sha256" to HashUtils.computeSha256(f)) }.toList())
             File(dir, "manifest.json").writeText(json(manifest))
-            check(verifyPreparedPackage(root)) { "Paquet local incomplet ou incohérent" }
+            check(verifyPreparedPackage(root)) { tr("Paquet local incomplet ou incohérent", "Local package incomplete or inconsistent") }
             DurableFiles.replaceDirectory(root,finalRoot)
             ExportPackageResult(true, finalRoot, finalRoot.walkTopDown().filter { it.isFile }.map { it.relativeTo(finalRoot).invariantSeparatorsPath to it }.toList(), pairs.size)
-        } catch (e: CancellationException) { root.deleteRecursively(); throw e } catch (e: Exception) { root.deleteRecursively(); ExportPackageResult(false, finalRoot, emptyList(), 0, error = e.message ?: "Échec de préparation") }
+        } catch (e: CancellationException) { root.deleteRecursively(); throw e } catch (e: Exception) { root.deleteRecursively(); ExportPackageResult(false, finalRoot, emptyList(), 0, error = e.message ?: tr("Échec de préparation", "Preparation failed")) }
     }
 
     /** Verify every listed payload and reject unlisted or missing files. A partial directory is never upload-ready. */
@@ -114,11 +118,11 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
         require(root.isDirectory)
         val manifests=root.walkTopDown().filter{it.isFile && it.name=="manifest.json"}.toList();require(manifests.size==1)
         val manifest=manifests.single();require(manifest.length()<=16L*1024*1024)
-        val parsed=moshi.adapter(Map::class.java).fromJson(manifest.readText()) ?: error("Manifest absent")
-        val files=parsed["files"] as? List<*> ?: error("Liste des fichiers absente")
+        val parsed=moshi.adapter(Map::class.java).fromJson(manifest.readText()) ?: error(tr("Manifest absent", "Manifest missing"))
+        val files=parsed["files"] as? List<*> ?: error(tr("Liste des fichiers absente", "Missing file list"))
         val names=mutableSetOf<String>()
         for(entry in files) {
-            val row=entry as? Map<*,*> ?: error("Entrée invalide");val name=row["path"] as? String ?: error("Chemin absent")
+            val row=entry as? Map<*,*> ?: error(tr("Entrée invalide", "Invalid entry"));val name=row["path"] as? String ?: error(tr("Chemin absent", "Missing path"))
             require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(name) && names.add(name))
             val file=File(root,name);require(file.canonicalPath.startsWith(root.canonicalPath+File.separator) && file.isFile)
             require(file.length()==(row["size"] as Number).toLong() && HashUtils.computeSha256(file)==row["sha256"])
@@ -136,7 +140,7 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
         val zip = File(storageManager.exportsDir, "${p.outputDirectory.name}.zip")
         
         try {
-            check(storageManager.hasAvailableBudget(p.generatedFiles.sumOf { it.second.length() } + 1048576L, project.diskBudgetMb, com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(project).reserveFreeMb)) { "Budget insuffisant pour la copie ZIP; paquet préparé conservé" }
+            check(storageManager.hasAvailableBudget(p.generatedFiles.sumOf { it.second.length() } + 1048576L, project.diskBudgetMb, com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(project).reserveFreeMb)) { tr("Budget insuffisant pour la copie ZIP; paquet préparé conservé", "Insufficient budget for the ZIP copy; prepared package preserved") }
             val exportContext=coroutineContext
             DurableFiles.replace(zip) { raw ->
                 // finish(), not close(): DurableFiles owns flush/fsync/close of the underlying file.
@@ -153,7 +157,7 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
     }
 
     fun exportCocoDetection(project: ProjectEntity, samples: List<Pair<SampleEntity, SampleAnnotations>>, outputFile: File) {
-        require(samples.map{it.first.sampleId}.distinct().size==samples.size){"Identifiants d’images COCO dupliqués"}
+        require(samples.map{it.first.sampleId}.distinct().size==samples.size){tr("Identifiants d’images COCO dupliqués", "Duplicate COCO image identifiers")}
         val labels = classes(project); var next = 0
         val annotations = samples.flatMapIndexed { index, (sample, a) ->
             val relationProblems=com.unicornwhodev.visiondatasetstudio.data.model.InstanceLinks.problems(a)
@@ -162,18 +166,18 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
             val mergedMaskIds=mutableSetOf<String>()
             val rows=mutableListOf<Map<String,Any>>()
             a.boxes.forEach { b ->
-                val category=labels.indexOf(b.label);require(category>=0) { "Classe COCO inconnue: ${b.label}" }
+                val category=labels.indexOf(b.label);require(category>=0) { tr("Classe COCO inconnue: ${b.label}", "Unknown COCO class: ${b.label}") }
                 val bbox=NormalizedRect(b.xmin,b.ymin,b.xmax,b.ymax).toCocoPx(sample.imageWidth,sample.imageHeight)
                 val row=mutableMapOf<String,Any>("id" to ++next,"image_id" to index+1,"category_id" to category+1,"bbox" to bbox.toList(),"area" to bbox[2]*bbox[3],"iscrowd" to 0)
                 b.instanceId?.let(masksByInstance::get)?.let { mask ->
-                    require(mask.label==b.label){"Une instance COCO liée doit conserver la même classe"}
+                    require(mask.label==b.label){tr("Une instance COCO liée doit conserver la même classe", "A linked COCO instance must keep the same class")}
                     val projection=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.projectCoco(mask,sample.imageWidth,sample.imageHeight)
                     if(projection.area>0){row["segmentation"]=projection.segmentation;row["area"]=projection.area;mergedMaskIds+=mask.id}
                 }
                 rows+=row
             }
             a.masks.filterNot{it.id in mergedMaskIds}.forEach { m ->
-                val category=labels.indexOf(m.label);require(category>=0) { "Classe COCO inconnue: ${m.label}" }
+                val category=labels.indexOf(m.label);require(category>=0) { tr("Classe COCO inconnue: ${m.label}", "Unknown COCO class: ${m.label}") }
                 val projection=com.unicornwhodev.visiondatasetstudio.domain.inference.MaskCodec.projectCoco(m,sample.imageWidth,sample.imageHeight)
                 if(projection.area>0)rows+=mapOf("id" to ++next,"image_id" to index+1,"category_id" to category+1,"bbox" to projection.bbox,"area" to projection.area,"iscrowd" to 0,"segmentation" to projection.segmentation)
             }
@@ -186,27 +190,27 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
     }
     /** Independent structural validation before an export can enter a package manifest. */
     internal fun validateCocoDocument(document:Map<String,Any>):Boolean {
-        val images=(document["images"] as? List<*>)?.map{it as? Map<*,*> ?: error("Image COCO invalide")} ?: error("Images COCO absentes")
-        val categories=(document["categories"] as? List<*>)?.map{it as? Map<*,*> ?: error("Catégorie COCO invalide")} ?: error("Catégories COCO absentes")
-        val annotations=(document["annotations"] as? List<*>)?.map{it as? Map<*,*> ?: error("Annotation COCO invalide")} ?: error("Annotations COCO absentes")
-        fun uniqueIds(rows:List<Map<*,*>>,kind:String)=rows.map{(it["id"] as? Number)?.toInt() ?: error("ID $kind absent")}.also{require(it.size==it.distinct().size){"ID $kind dupliqué"}}
-        val imageIds=uniqueIds(images,"image").toSet();val categoryIds=uniqueIds(categories,"catégorie").toSet();uniqueIds(annotations,"annotation")
+        val images=(document["images"] as? List<*>)?.map{it as? Map<*,*> ?: error(tr("Image COCO invalide", "Invalid COCO image"))} ?: error(tr("Images COCO absentes", "COCO images missing"))
+        val categories=(document["categories"] as? List<*>)?.map{it as? Map<*,*> ?: error(tr("Catégorie COCO invalide", "Invalid COCO category"))} ?: error(tr("Catégories COCO absentes", "Missing COCO categories"))
+        val annotations=(document["annotations"] as? List<*>)?.map{it as? Map<*,*> ?: error(tr("Annotation COCO invalide", "Invalid COCO annotation"))} ?: error(tr("Annotations COCO absentes", "COCO annotations missing"))
+        fun uniqueIds(rows:List<Map<*,*>>,kind:String)=rows.map{(it["id"] as? Number)?.toInt() ?: error(tr("ID $kind absent", "Missing $kind ID"))}.also{require(it.size==it.distinct().size){tr("ID $kind dupliqué", "Duplicate $kind ID")}}
+        val imageIds=uniqueIds(images,"image").toSet();val categoryIds=uniqueIds(categories,tr("catégorie", "category")).toSet();uniqueIds(annotations,"annotation")
         val dimensions=images.associate{row->
             val id=(row["id"] as Number).toInt();val width=(row["width"] as? Number)?.toInt() ?: 0;val height=(row["height"] as? Number)?.toInt() ?: 0
             require(width>0&&height>0&&(row["file_name"] as? String).orEmpty().isNotBlank());id to (width to height)
         }
         categories.forEach{require((it["name"] as? String).orEmpty().isNotBlank())}
         annotations.forEach{row->
-            val imageId=(row["image_id"] as? Number)?.toInt() ?: error("image_id absent");require(imageId in imageIds)
-            val categoryId=(row["category_id"] as? Number)?.toInt() ?: error("category_id absent");require(categoryId in categoryIds)
-            val isCrowd=(row["iscrowd"] as? Number)?.toInt() ?: error("iscrowd absent");require(isCrowd in 0..1){"iscrowd COCO invalide"}
-            val (width,height)=dimensions.getValue(imageId);val bbox=(row["bbox"] as? List<*>)?.map{(it as Number).toDouble()} ?: error("bbox absente")
+            val imageId=(row["image_id"] as? Number)?.toInt() ?: error(tr("image_id absent", "image_id missing"));require(imageId in imageIds)
+            val categoryId=(row["category_id"] as? Number)?.toInt() ?: error(tr("category_id absent", "category_id missing"));require(categoryId in categoryIds)
+            val isCrowd=(row["iscrowd"] as? Number)?.toInt() ?: error(tr("iscrowd absent", "iscrowd missing"));require(isCrowd in 0..1){tr("iscrowd COCO invalide", "Invalid COCO iscrowd")}
+            val (width,height)=dimensions.getValue(imageId);val bbox=(row["bbox"] as? List<*>)?.map{(it as Number).toDouble()} ?: error(tr("bbox absente", "bbox missing"))
             require(bbox.size==4&&bbox.all{it.isFinite()}&&bbox[0]>=0&&bbox[1]>=0&&bbox[2]>0&&bbox[3]>0&&bbox[0]+bbox[2]<=width+1e-6&&bbox[1]+bbox[3]<=height+1e-6)
             val area=(row["area"] as? Number)?.toDouble() ?: 0.0;require(area>0&&area<=width.toDouble()*height)
             row["segmentation"]?.let{raw->
-                val segmentation=raw as? Map<*,*> ?: error("Segmentation COCO invalide")
+                val segmentation=raw as? Map<*,*> ?: error(tr("Segmentation COCO invalide", "Invalid COCO segmentation"))
                 require((segmentation["size"] as? List<*>)?.map{(it as Number).toInt()}==listOf(height,width))
-                val counts=(segmentation["counts"] as? List<*>)?.map{(it as Number).toLong()} ?: error("RLE COCO absente")
+                val counts=(segmentation["counts"] as? List<*>)?.map{(it as Number).toLong()} ?: error(tr("RLE COCO absente", "COCO RLE missing"))
                 require(counts.isNotEmpty()&&counts.all{it>=0}&&counts.sum()==width.toLong()*height)
                 require(counts.withIndex().filter{it.index%2==1}.sumOf{it.value}==area.toLong())
             }
@@ -220,7 +224,7 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
         File(outputDir, "dataset.yaml").writeText("# Set path to this extracted batch directory in your trainer.\n${project.targetSplit.ifBlank { "train" }}: images\nnames: ${json(labels)}\n")
     }
     private fun yolo(a: SampleAnnotations, labels: List<String>) = a.boxes.joinToString("\n") { b ->
-        val index = labels.indexOf(b.label); require(index >= 0) { "Classe YOLO inconnue: ${b.label}" }
+        val index = labels.indexOf(b.label); require(index >= 0) { tr("Classe YOLO inconnue: ${b.label}", "Unknown YOLO class: ${b.label}") }
         val xywh = NormalizedRect(b.xmin, b.ymin, b.xmax, b.ymax).toYolo()
         String.format(Locale.US, "%d %.8f %.8f %.8f %.8f", index, xywh[0], xywh[1], xywh[2], xywh[3])
     }
@@ -233,13 +237,13 @@ class DatasetExporters(private val storageManager: StorageManager, private val h
 
     fun generatePreviewSnippet(format: String, sample: SampleEntity, annot: SampleAnnotations, project: ProjectEntity): String = try {
         when (format) {
-            "YOLO" -> yolo(annot, classes(project)).ifBlank { "# Pas de boîte : vérifier l’absence explicitement avant export." }
+            "YOLO" -> yolo(annot, classes(project)).ifBlank { tr("# Pas de boîte : vérifier l’absence explicitement avant export.", "# No boxes: explicitly verify absence before export.") }
             "COCO" -> json(mapOf("image" to imageName(sample), "bbox_pixels" to annot.boxes.map { b -> mapOf("label" to b.label, "bbox" to NormalizedRect(b.xmin, b.ymin, b.xmax, b.ymax).toCocoPx(sample.imageWidth, sample.imageHeight).toList()) },
                 "mask_rle" to annot.masks.mapNotNull{m->MaskCodec.projectCoco(m,sample.imageWidth,sample.imageHeight).takeIf{it.area>0}?.let{mapOf("label" to m.label,"bbox" to it.bbox,"area" to it.area,"segmentation" to it.segmentation)}}))
-            "VL" -> annot.vqaList.joinToString("\n") { json(vqaRow(sample, it)) }.ifBlank { "Aucune question / réponse. Les autres annotations restent dans le JSONL complet." }
+            "VL" -> annot.vqaList.joinToString("\n") { json(vqaRow(sample, it)) }.ifBlank { tr("Aucune question / réponse. Les autres annotations restent dans le JSONL complet.", "No questions / answers. Other annotations remain in the full JSONL.") }
             else -> sampleAdapter.indent("  ").toJson(toCanonical(sample, annot, project))
         }
-    } catch (e: Exception) { "Aperçu non disponible : ${e.message}" }
+    } catch (e: Exception) { tr("Aperçu non disponible : ${e.message}", "Preview unavailable: ${e.message}") }
 
     private fun toCanonical(s: SampleEntity, a: SampleAnnotations, p: ProjectEntity) = CanonicalDatasetSample(
         sample_id = s.sampleId, asset_id = s.assetId, dataset_source = p.hfSourceRepo.ifBlank { "local-index:project-${p.id}" }, source_revision = com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(p).resolvedSourceRevision ?: "UNRESOLVED",

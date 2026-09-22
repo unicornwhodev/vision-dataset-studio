@@ -14,7 +14,7 @@ class StudioComposeV4Test {
         rule.onNodeWithTag("controls_shortcut").assertIsDisplayed()
         rule.onNodeWithTag("controls_shortcut").performClick()
         rule.onNodeWithText(rule.activity.getString(R.string.screen_controls)).assertIsDisplayed()
-        rule.onNodeWithText("Modèles").performClick()
+        rule.onNodeWithText(rule.activity.getString(R.string.screen_models)).performClick()
         rule.onNodeWithText(rule.activity.getString(R.string.controls_public_catalog)).assertExists()
         rule.onNodeWithText("SSD MobileNet V1").assertExists()
     }

@@ -36,6 +36,7 @@ fun StudioRoot(viewModel: MainViewModel) {
     val projectId by viewModel.activeProjectId.collectAsState()
     val activeProject by viewModel.projectFlow.collectAsState()
     val editorBusy by viewModel.editorBusy.collectAsState()
+    val preferences by viewModel.preferences.collectAsState()
     val holder = rememberSaveableStateHolder()
     val destinations = listOf(
         StudioDestination(Screen.Home, stringResource(R.string.nav_studio), Icons.Default.SpaceDashboard),
@@ -45,6 +46,7 @@ fun StudioRoot(viewModel: MainViewModel) {
         StudioDestination(Screen.QualityDashboard, stringResource(R.string.nav_quality), Icons.Default.Insights)
     )
     BackHandler(enabled = screen !is Screen.Home) { viewModel.back() }
+    CompositionLocalProvider(LocalStudioGuidance provides preferences.showGuidance) {
     BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars.union(WindowInsets.displayCutout))) {
         val editor = screen is Screen.AnnotationEditor
         val showNavigation = !editor && screen !is Screen.Setup && screen !is Screen.Preferences && screen !is Screen.Controls
@@ -113,6 +115,7 @@ fun StudioRoot(viewModel: MainViewModel) {
                 }
             }
         }
+    }
     }
 }
 

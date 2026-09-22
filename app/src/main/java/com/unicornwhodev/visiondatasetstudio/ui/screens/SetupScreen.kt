@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
 import com.unicornwhodev.visiondatasetstudio.R
 
@@ -71,14 +72,14 @@ fun SetupScreen(viewModel: MainViewModel) {
                         budget.toLongOrNull() ?: 500L, tasks, prepare)
                 }, enabled = !busy && when(step) { 0 -> sourceOk; 1 -> classes.isNotBlank(); else -> sourceOk && destOk && (budget.toLongOrNull() ?: 0L) in 128L..65536L },
                     modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("setup_next")) {
-                    Text(if (step < 2) "Continuer" else if (prepare) stringResource(R.string.setup_start) else "Enregistrer")
+                    Text(if (step < 2) tr("Continuer", "Continue") else if (prepare) stringResource(R.string.setup_start) else tr("Enregistrer", "Save"))
                 }
             }
         }
     }) { inset ->
         Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = 820.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-                StudioTabs(listOf("Source", stringResource(R.string.prefs_tools), "Sortie"), step, { if (!busy) step = it })
+                StudioTabs(listOf("Source", stringResource(R.string.prefs_tools), tr("Sortie", "Output")), step, { if (!busy) step = it })
                 when(step) {
                     0 -> {
                         OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.setup_project_name)) }, modifier = Modifier.fillMaxWidth(), singleLine = true, enabled = !busy)
@@ -90,7 +91,7 @@ fun SetupScreen(viewModel: MainViewModel) {
                             }
                         }
                         StudioDisclosure(stringResource(R.string.setup_hf_dataset), Icons.Default.CloudDownload, initiallyExpanded = p.hfSourceRepo.isNotBlank()) {
-                            OutlinedTextField(source, { source = it }, label = { Text(stringResource(R.string.setup_dataset_link)) }, placeholder = { Text("organisation/dataset") },
+                            OutlinedTextField(source, { source = it }, label = { Text(stringResource(R.string.setup_dataset_link)) }, placeholder = { Text(tr("organisation/dataset", "organization/dataset")) },
                                 isError = source.isNotBlank() && !sourceOk, supportingText = { Text(stringResource(R.string.setup_dataset_url_help)) },
                                 enabled = !busy, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("source_repo_input"))
                             FilledTonalButton(onClick = { viewModel.inspectSourceDataset(source, config, split) }, enabled = sourceOk && source.isNotBlank() && !busy, modifier = Modifier.fillMaxWidth()) {
@@ -123,7 +124,7 @@ fun SetupScreen(viewModel: MainViewModel) {
                             Text(if (auth?.isValid == true) stringResource(R.string.setup_connected,auth?.username.orEmpty()) else stringResource(R.string.setup_public_read), style = MaterialTheme.typography.bodyMedium)
                             OutlinedTextField(token, { token = it }, label = { Text(stringResource(R.string.setup_hf_token)) }, placeholder = { Text("hf_…") }, singleLine = true,
                                 visualTransformation = if (showToken) VisualTransformation.None else PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth().testTag("token_input"),
-                                trailingIcon = { IconButton(onClick = { showToken = !showToken }) { Icon(if (showToken) Icons.Default.VisibilityOff else Icons.Default.Visibility, "Afficher ou masquer le jeton") } })
+                                trailingIcon = { IconButton(onClick = { showToken = !showToken }) { Icon(if (showToken) Icons.Default.VisibilityOff else Icons.Default.Visibility, tr("Afficher ou masquer le jeton", "Show or hide token")) } })
                             Button(onClick = { viewModel.saveToken(token); token = "" }, enabled = token.isNotBlank() && !busy) { Text(stringResource(R.string.setup_connect)) }
                             if (auth?.error != null) Text(auth?.error ?: "", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(stringResource(R.string.setup_token_security), style = MaterialTheme.typography.bodySmall)
@@ -152,7 +153,7 @@ fun SetupScreen(viewModel: MainViewModel) {
                     }
                     2 -> {
                         StudioSection(stringResource(R.string.setup_dataset_destination), stringResource(R.string.setup_local_export_help), Icons.Default.IosShare) {
-                            OutlinedTextField(destination, { destination = it }, label = { Text(stringResource(R.string.setup_optional_destination)) }, placeholder = { Text("utilisateur/corpus-prepare") }, singleLine = true,
+                            OutlinedTextField(destination, { destination = it }, label = { Text(stringResource(R.string.setup_optional_destination)) }, placeholder = { Text(tr("utilisateur/corpus-prepare", "user/prepared-corpus")) }, singleLine = true,
                                 isError = destination.isNotBlank() && !destOk, modifier = Modifier.fillMaxWidth())
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 OutlinedButton(onClick = { viewModel.checkDestinationRepo(destination) }, enabled = destination.isNotBlank() && destOk && !busy) { Text(stringResource(R.string.setup_verify_access)) }

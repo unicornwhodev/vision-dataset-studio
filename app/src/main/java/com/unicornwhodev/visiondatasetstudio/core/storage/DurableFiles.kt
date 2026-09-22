@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.core.storage
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -12,8 +13,8 @@ import java.security.MessageDigest
 /** Atomic replacement of an app-private file. Never truncate the previous valid file. */
 object DurableFiles {
     fun replace(target: File, write: (FileOutputStream) -> Unit) {
-        val parent = target.canonicalFile.parentFile ?: error("Parent absent")
-        check(parent.isDirectory || parent.mkdirs()) { "Dossier inaccessible" }
+        val parent = target.canonicalFile.parentFile ?: error(tr("Parent absent", "Parent missing"))
+        check(parent.isDirectory || parent.mkdirs()) { tr("Dossier inaccessible", "Folder inaccessible") }
         val pending = File.createTempFile(".${target.name}.", ".pending", parent)
         try {
             FileOutputStream(pending).use { out -> write(out); out.flush(); out.fd.sync() }
@@ -25,16 +26,16 @@ object DurableFiles {
     fun replaceDirectory(prepared: File, target: File) {
         require(prepared.isDirectory && prepared.canonicalFile.parentFile == target.canonicalFile.parentFile)
         val previous = File(target.path + ".previous")
-        if (!target.exists() && previous.exists()) check(previous.renameTo(target)) { "Récupération du précédent export impossible" }
+        if (!target.exists() && previous.exists()) check(previous.renameTo(target)) { tr("Récupération du précédent export impossible", "Cannot recover the previous export") }
         if (target.exists()) {
-            check(!previous.exists() || previous.deleteRecursively()) { "Ancien export en cours de nettoyage" }
-            check(target.renameTo(previous)) { "Conservation du précédent export impossible" }
+            check(!previous.exists() || previous.deleteRecursively()) { tr("Ancien export en cours de nettoyage", "Previous export cleanup in progress") }
+            check(target.renameTo(previous)) { tr("Conservation du précédent export impossible", "Cannot preserve the previous export") }
         }
         if (!prepared.renameTo(target)) {
             if (!target.exists() && previous.exists()) previous.renameTo(target)
-            error("Nouveau paquet non finalisé; version précédente conservée")
+            error(tr("Nouveau paquet non finalisé; version précédente conservée", "New package incomplete; previous version preserved"))
         }
-        check(!previous.exists() || previous.deleteRecursively()) { "Paquet prêt mais ancien export non nettoyé" }
+        check(!previous.exists() || previous.deleteRecursively()) { tr("Paquet prêt mais ancien export non nettoyé", "Package ready but previous export not cleaned up") }
     }
 
     fun copyBounded(input: InputStream, output: OutputStream, maxBytes: Long,
@@ -47,7 +48,7 @@ object DurableFiles {
             val count = input.read(buffer)
             if (count < 0) break
             if (count == 0) continue
-            if (count.toLong() > maxBytes - total) throw IOException("Plafond de stockage atteint")
+            if (count.toLong() > maxBytes - total) throw IOException(tr("Plafond de stockage atteint", "Storage limit reached"))
             output.write(buffer, 0, count)
             total += count; progress(total)
         }
@@ -67,7 +68,7 @@ object DurableFiles {
     fun ownedFile(root: File, path: String): File {
         val parent = root.canonicalFile
         val candidate = File(path).canonicalFile
-        require(candidate != parent && candidate.toPath().startsWith(parent.toPath())) { "Chemin hors du cache géré" }
+        require(candidate != parent && candidate.toPath().startsWith(parent.toPath())) { tr("Chemin hors du cache géré", "Path outside the managed cache") }
         return candidate
     }
 }

@@ -22,8 +22,8 @@ collect_failure_evidence() {
 trap collect_failure_evidence EXIT
 adb -s "$ANDROID_SERIAL" get-state
 # Existing app data is not erased. Signature mismatch is a deliberate stop: never uninstall to bypass it.
-adb -s "$ANDROID_SERIAL" install -r "$APK" | tee "$OUT/install-main.txt"
-adb -s "$ANDROID_SERIAL" install -r "$TEST_APK" | tee "$OUT/install-test.txt"
+adb -s "$ANDROID_SERIAL" install --no-streaming -r "$APK" | tee "$OUT/install-main.txt"
+adb -s "$ANDROID_SERIAL" install --no-streaming -r "$TEST_APK" | tee "$OUT/install-test.txt"
 adb -s "$ANDROID_SERIAL" shell am instrument -w -r \
  com.unicornwhodev.visiondatasetstudio.test/androidx.test.runner.AndroidJUnitRunner | tee "$OUT/instrumentation.txt"
 # adb may return zero even when the instrumentation itself failed.

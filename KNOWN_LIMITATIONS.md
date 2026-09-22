@@ -1,12 +1,6 @@
-# Limites de qualification — 4.2.0-rc4
+# Limites de qualification — audit rc5
 
-La [recette rc4](test-results/stabilization-rc4/README.md) passe 24 tests Android de base et 2 régressions LiteRT sélectionnées, sans test ignoré. Les modèles non exécutés restent non qualifiés ; les preuves précédentes restent historiques.
-
-## Validation de la stabilisation — 22 septembre 2026
-
-Les trois passes sont maintenant compilées sur le poste Android : **54 tests JVM et 24 tests Android réussis**, 10 tests de modèles ignorés faute de fixture ou de sélection. Voir le [rapport actuel](docs/validation-20260922/README.md). L’absence de SDK mentionnée dans les historiques est résolue. Les signatures, champs Moshi, migrations Room, instances COCO et masques passent les contrôles décrits ; ce résultat ne qualifie pas tous les parcours ni tous les modèles.
-
-Les ressources anglaises et la navigation passent sur Android, mais des descriptions spécialisées et des valeurs dynamiques restent en français. L’émulateur logiciel a affiché un ANR de System UI au démarrage ; la suite a terminé et le catalogue a ensuite été contrôlé sans le dialogue. Aucune qualification de stabilité ni de performance d’un téléphone ARM n’en est déduite. Lint conserve 89 avertissements.
+[English](docs/en/KNOWN_LIMITATIONS.md) · [Recette fonctionnelle](docs/FUNCTIONAL_AUDIT_2026_09.md)
 
 Le grounding modèle exige le contrat HTTP explicite `task=grounding` + `httpOutputMode=grounding_proposals`, des identifiants de régions uniques et des liens phrase-région contrôlés. Les tests de contrat et de revue humaine passent ; aucun serveur grounding réel n’a été qualifié. Les bundles Florence-2 et les couples caption+box ne sont pas déclarés grounding. Les imports et modèles ne reçoivent aucun lien d’instance inventé.
 
@@ -22,7 +16,7 @@ Les réservations HF, conflits de commits, réponse perdue, publication distante
 
 L’apprentissage est désactivé par défaut. Il utilise uniquement le lot terminé dont l’export a été vérifié. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; annulation et erreur conservent les images. L’activation des nouveaux poids reste manuelle.
 
-Quatre conversions HF ont passé inférence, apprentissage, sauvegarde/restauration et reprise Android ; RepViT a passé l’inférence. Les encodeurs des conversions HF fournies restent figés. Le réseau de contrôle synthétique modifie séparément ses couches visuelles internes. Voir la [matrice par conversion](docs/LITERT_QUALIFICATION.md) : 5 succès, 1 échec RTMDet, 25 essais restants. Aucun gain de précision n’est démontré.
+Sept conversions HF ont passé inférence, apprentissage, sauvegarde/restauration et reprise Android ; cinq autres ont passé l’inférence. Les encodeurs des conversions HF fournies restent figés. Le réseau de contrôle synthétique modifie séparément ses couches visuelles internes. Voir la [matrice par conversion](docs/LITERT_QUALIFICATION.md) : 12 succès, un délai dépassé RF-DETR, 18 conversions encore en recette. Aucun gain de précision n’est démontré.
 
 Le chemin Interpreter/Flex emploie LiteRT 1.4.2 et Select TF Ops 2.16.1. L’intégration LiteRT 2.2 essayée n’expose pas l’API Java Delegate requise ; sa sauvegarde FlexSave a échoué. Les opérateurs des conversions HF récentes doivent être vérifiés sous le runtime retenu. GPU/NPU et apprentissage distribué ne sont pas intégrés.
 
@@ -30,11 +24,15 @@ Le lot doit contenir au moins 32 images d’apprentissage et 8 de contrôle selo
 
 ## Modèles et fonctions complémentaires
 
-Les adaptateurs multi-graphes TinyCLIP, EfficientViT-SAM et Florence-2, les tokeniseurs et l’index de similarité sont implémentés. La tokenisation et la persistance de l’index passent leurs tests Android. RepViT HF a exécuté son inférence avec succès sous le runtime retenu. Leur présence ne prouve pas l’exécution de tous les modèles HF : DINOv2 a dépassé dix minutes dans l’émulateur logiciel, puis a été arrêté. Les autres conversions et gros bundles restent à qualifier individuellement ; aucune précision ni performance ARM n’est annoncée.
+Les adaptateurs multi-graphes TinyCLIP, EfficientViT-SAM et Florence-2, les tokeniseurs et l’index de similarité sont implémentés. La tokenisation et la persistance de l’index passent leurs tests Android. RepViT, HGNetV2, RTMDet, DINOv2 et TinyCLIP ont passé leur inférence Android. TinyCLIP produit des propositions visibles sur une photo réelle et applique le prompt lors d’une relance explicite. RF-DETR a dépassé 30 minutes dans l’émulateur logiciel ; cela ne démontre pas une incompatibilité du modèle. Les autres conversions et gros bundles restent à qualifier individuellement ; aucune précision ni performance ARM n’est annoncée.
 
-Le décodeur RTMDet est implémenté mais l’essai de la conversion sans apprentissage échoue sur une forme de sortie. Le masque dispose d’un éditeur multi-instance (pinceau/gomme), d’un export canonique et d’une projection COCO ; le point SAM temporaire ne devient pas une annotation. La chaîne SAM réelle reste à qualifier. Florence utilise un décodage greedy borné ; précision et tâches réelles restent à mesurer.
+Le défaut de lecture des sorties dynamiques RTMDet est corrigé et le test passe. Le masque dispose d’un éditeur multi-instance (pinceau/gomme), d’un export canonique et d’une projection COCO ; le point SAM temporaire ne devient pas une annotation. La chaîne SAM réelle reste à qualifier. Florence utilise un décodage greedy borné ; précision et tâches réelles restent à mesurer.
 
 Trois workflows exécutables disposent d’un journal et de pauses pour revue, export vérifié et nettoyage. Un planificateur HTTP local optionnel valide les sorties structurées et les consignes ; aucun serveur VLM n’est embarqué. Les tests des gardes ne remplacent pas une intégration avec un véritable serveur d’agent. Voir [WORKFLOWS.md](docs/WORKFLOWS.md).
+
+## Interface et localisation
+
+Les textes applicatifs français et anglais sont implémentés. Le parcours anglais de création/changement de projets, réglages persistés et propositions visibles a passé Compose sur API 28. Les noms et contenus saisis par l’utilisateur restent dans leur langue. TalkBack, une grande police sur tous les écrans, les fournisseurs SAF réels et un téléphone ARM restent à qualifier.
 
 ## Distribution
 

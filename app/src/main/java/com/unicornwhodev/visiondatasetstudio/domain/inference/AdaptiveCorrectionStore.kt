@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.content.Context
 import android.util.AtomicFile
 import com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager
@@ -18,10 +19,10 @@ class AdaptiveCorrectionStore(private val context:Context) {
         val f=file(projectId);val atomic=AtomicFile(f)
         if(!f.exists() && !File(f.path+".bak").exists())return CorrectionLedger()
         require(f.length()<=16L*1024*1024)
-        return (adapter.fromJson(atomic.openRead().bufferedReader().use{it.readText()}) ?: error("Journal de correction invalide")).also{require(it.schema==1)}
+        return (adapter.fromJson(atomic.openRead().bufferedReader().use{it.readText()}) ?: error(tr("Journal de correction invalide", "Invalid correction journal"))).also{require(it.schema==1)}
     }
     suspend fun train(project:ProjectEntity,pairs:List<Pair<SampleEntity,SampleAnnotations>>):String = withContext(Dispatchers.IO) {
-        check(pairs.isNotEmpty() && pairs.all{it.first.annotationStatus in setOf("VALIDATED","REJECTED","DUPLICATE")}) { "Le lot doit avoir une décision humaine finale pour chaque cas" }
+        check(pairs.isNotEmpty() && pairs.all{it.first.annotationStatus in setOf("VALIDATED","REJECTED","DUPLICATE")}) { tr("Le lot doit avoir une décision humaine finale pour chaque cas", "Every sample needs a final human decision") }
         val additions=mutableMapOf<String,MutableList<CorrectionExample>>()
         pairs.filter{it.first.annotationStatus=="VALIDATED"}.forEach{(s,a)->
             val image=s.sha256 ?: return@forEach
@@ -37,13 +38,13 @@ class AdaptiveCorrectionStore(private val context:Context) {
                 additions.getOrPut(key){mutableListOf()}.add(CorrectionExample(AdaptiveCorrection.hash("$image:${b.id}:box"),image,mx,my,mw,mh,(b.modelScore ?: .5f).toDouble(),cx,cy,true,true,"box",w,h))
             }
         }
-        if(additions.isEmpty())return@withContext "Aucune correction géométrique humaine supervisée éligible. Les propositions simplement acceptées ne sont pas des exemples d’entraînement."
+        if(additions.isEmpty())return@withContext tr("Aucune correction géométrique humaine supervisée éligible. Les propositions simplement acceptées ne sont pas des exemples d’entraînement.", "No eligible supervised human geometry corrections. Merely accepted proposals are not training examples.")
         val old=read(project.id);val groups=old.groups.associateBy{it.key}.toMutableMap()
         additions.forEach{(key,rows)->groups[key]=AdaptiveCorrection.train(AdaptiveCorrection.add(groups[key] ?: CorrectionGroup(key),rows)).group}
-        check(groups.size<=128){"Trop de contextes de correction : réinitialisation explicite nécessaire"}
+        check(groups.size<=128){tr("Trop de contextes de correction : réinitialisation explicite nécessaire", "Too many correction contexts: explicit reset required")}
         val ledger=CorrectionLedger(groups=groups.values.toList());val bytes=adapter.toJson(ledger).toByteArray(Charsets.UTF_8)
-        require(bytes.size<=16*1024*1024){"Journal de corrections trop volumineux"}
-        check(StorageManager(context).hasAvailableBudget(bytes.size.toLong(),project.diskBudgetMb,com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(project).reserveFreeMb)){"Budget disque insuffisant; ancien correcteur conservé"}
+        require(bytes.size<=16*1024*1024){tr("Journal de corrections trop volumineux", "Correction journal too large")}
+        check(StorageManager(context).hasAvailableBudget(bytes.size.toLong(),project.diskBudgetMb,com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(project).reserveFreeMb)){tr("Budget disque insuffisant; ancien correcteur conservé", "Insufficient storage budget; previous corrector preserved")}
         val atomic=AtomicFile(file(project.id));val stream=atomic.startWrite()
         try{stream.write(bytes);atomic.finishWrite(stream)}catch(e:Exception){atomic.failWrite(stream);throw e}
         additions.keys.joinToString("\n"){groups.getValue(it).report}
@@ -51,6 +52,6 @@ class AdaptiveCorrectionStore(private val context:Context) {
     fun reset(projectId:Long){AtomicFile(file(projectId)).delete()}
     fun report(projectId:Long):String {
         val state=read(projectId)
-        return if(state.groups.isEmpty())"Aucune correction locale apprise" else state.groups.joinToString("\n"){"${it.examples.size} corrections · ${it.report}"}
+        return if(state.groups.isEmpty())tr("Aucune correction locale apprise", "No local corrections learned") else state.groups.joinToString("\n"){tr("${it.examples.size} corrections · ${it.report}", "${it.examples.size} corrections · ${it.report}")}
     }
 }

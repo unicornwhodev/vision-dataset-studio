@@ -6,14 +6,14 @@
 
 Atelier Android pour produire des datasets d’images par lots : préannotation, correction humaine et export. Interface sombre compacte, image au centre du travail.
 
-**4.2.0-rc4 · Apache-2.0 · En qualification**
+**4.2.0-rc5 · Apache-2.0 · En qualification**
 Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
 
 Dernière validation **rc4 · 22 septembre 2026** : **54 JVM, 24 Android de base, 2 régressions LiteRT et 52 Python réussis**. [Build, preuves et limites](test-results/stabilization-rc4/README.md).
 
 ## L’application en images
 
-| Atelier rc3 actuel | Éditeur d’annotations |
+| Atelier rc3 historique | Éditeur d’annotations |
 |---|---|
 | [![Atelier rc3](test-results/litert-rc3/final-device/app-ready.png)](test-results/litert-rc3/final-device/app-ready.png) | [![Éditeur d’annotations](docs/ui-refined/refined-editor-persisted.png)](docs/ui-refined/refined-editor-persisted.png) |
 
@@ -23,7 +23,9 @@ Captures réelles sur émulateur Android. À gauche : build rc3 final après dé
 
 **Importer → préannoter → corriger/valider → exporter et vérifier → apprentissage facultatif → nettoyer → lot suivant.**
 
-L’apprentissage est **désactivé par défaut**. S’il est activé, il porte uniquement sur le lot corrigé et exporté ; le nettoyage attend sa fin. Les nouveaux poids sont activés manuellement. Le traitement manuel et les exports fonctionnent sans modèle.
+L’apprentissage est **désactivé par défaut**. S’il est activé, il porte uniquement sur le lot corrigé et exporté ; le nettoyage attend sa fin. Les nouveaux poids sont activés manuellement. Le traitement manuel et les exports fonctionnent sans modèle. Un modèle sans signatures d’apprentissage reste importable et utilisable en inférence, sans manifeste SHA requis.
+
+Changer un prompt ou un réglage ne modifie jamais les annotations enregistrées. Leur recalcul exige une relance explicite de l’utilisateur ; les corrections humaines restent protégées.
 
 Les empreintes de fichiers et de pixels empêchent de réintroduire une copie identique dans les lots suivants du même projet. Elles restent en base après la purge. Les quasi-doublons retouchés ou recompressés avec pertes ne sont pas couverts par cette garantie.
 
@@ -39,18 +41,18 @@ L’état de production, l’inférence et l’apprentissage facultatif restent 
 
 ## Fonctions et état
 
-La stabilisation de septembre 2026 sépare maintenant l'intégrité des artefacts runtime de la documentation des modèles, expose les capacités/qualifications et distingue une inférence vide d'un échec. Voir [le rapport de stabilisation](docs/STABILIZATION_2026_09.md). Ces corrections ne valent pas qualification d'un modèle non exécuté.
+L’audit fonctionnel ajoute les réglages réellement appliqués, les consignes de workflow visibles, l’anglais des parcours et la conservation des annotations existantes. Voir [le rapport fonctionnel](docs/FUNCTIONAL_AUDIT_2026_09.md).
 
 | Fonction | État |
 |---|---|
 | Import local / HF, lots configurables, correction et exports | Implémentés ; cycle local 2+1 vérifié sur Android |
 | Identité persistante, reprise et purge protégée | Tests Android réussis, dont copies renommées et concurrence |
-| Apprentissage Android, checkpoints, interruption/reprise | Quatre conversions HF ont passé train/save/restore/reprise ; encodeurs figés par ces conversions |
-| Téléchargement HF, contrats et prétraitement LiteRT | Catalogue configurable, révisions et SHA-256 vérifiés ; RepViT et quatre conversions entraînables exécutés |
+| Apprentissage Android, checkpoints, interruption/reprise | Sept conversions HF ont passé train/save/restore/reprise ; encodeurs figés par ces conversions |
+| Téléchargement HF, contrats et prétraitement LiteRT | Catalogue configurable, manifeste SHA facultatif, contrats vérifiés sur les tenseurs ; voir la matrice d’exécution |
 | Tokeniseurs et similarité persistante | Tests Android réussis |
-| Bundles TinyCLIP / SAM / Florence-2 | Adaptateurs présents ; tests des conversions à terminer |
+| Bundles TinyCLIP / SAM / Florence-2 | TinyCLIP exécuté avec propositions visibles ; SAM et Florence restent à qualifier |
 | Éditeur/export de masques | Pinceau, gomme, instances distinctes, export canonique et COCO ; test de geste réussi |
-| RTMDet sans apprentissage | Décodeur implémenté ; incompatibilité de forme encore ouverte à l’exécution |
+| RTMDet sans apprentissage | Inférence et sorties dynamiques vérifiées après correction du décodeur |
 | Workflows exécutables | Trois templates, journal/reprise, pauses de revue/export/nettoyage ; tests de garde réussis |
 | Agent | Planificateur HTTP local optionnel ; serveur fourni séparément, intégration réelle à qualifier |
 

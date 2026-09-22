@@ -10,10 +10,10 @@ Adding JSON cannot make an inference graph trainable. The converter must export 
 
 - `model.tflite` with mutable variables and train/infer/save/restore signatures.
 - `android_model_config.json` or `model_config.json` describing the Android contract.
-- `artifact_manifest.json` with file sizes and SHA-256 hashes.
+- Optional `artifact_manifest.json` with converter provenance.
 - Model card, licence, preprocessing details, upstream revision and conversion report.
 
-Downloads pin the HF revision and verify hashes. Dynamic models retain their runtime contract and configuration. Incompatible contracts are rejected instead of guessing target semantics.
+Downloads use a resolved HF revision to retrieve a consistent set of files. No SHA manifest or digest comparison is required to import or use a model. Dynamic models retain their runtime contract and configuration. Incompatible contracts are rejected instead of guessing target semantics.
 
 ## Classification example
 

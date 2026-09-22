@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.core.workflow
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.squareup.moshi.JsonClass
 
 /** Versioned, domain-independent policy. Only settings with an implemented execution path are exposed. */
@@ -42,20 +43,20 @@ data class ProcessingSettings(
     val claimLeaseMinutes: Int = 720
 ) {
     fun validate(): ProcessingSettings {
-        require(schemaVersion == 1) { "Version des réglages inconnue" }
-        require(batchSize in 1..1000) { "Lot : 1 à 1 000 cas" }
+        require(schemaVersion == 1) { tr("Version des réglages inconnue", "Unknown settings version") }
+        require(batchSize in 1..1000) { tr("Lot : 1 à 1 000 cas", "Batch: 1 to 1,000 samples") }
         require(sourceMode in setOf("HF_VIEWER", "HF_MANIFEST", "LOCAL_INDEX"))
         require(downloadConcurrency in 1..4 && retryCount in 0..5)
         require(timeoutSeconds in 10..300 && maxImageMb in 1..256 && reserveFreeMb in 32..4096)
         require(sourceMaxPixels in 1_000_000..100_000_000)
-        require(validRevision(destBranch)) { "Branche de destination invalide" }
-        require(validRevision(sourceRevision)) { "Révision source invalide" }
-        require(safeRelativePath(destPrefix)) { "Préfixe de destination invalide" }
-        require(safeRelativePath(manifestPath)) { "Chemin du manifeste invalide" }
+        require(validRevision(destBranch)) { tr("Branche de destination invalide", "Invalid destination branch") }
+        require(validRevision(sourceRevision)) { tr("Révision source invalide", "Invalid source revision") }
+        require(safeRelativePath(destPrefix)) { tr("Préfixe de destination invalide", "Invalid destination prefix") }
+        require(safeRelativePath(manifestPath)) { tr("Chemin du manifeste invalide", "Invalid manifest path") }
         require(filterExpression.length <= 4000 && orderBy.length <= 500)
-        require(claimLeaseMinutes in 15..4320) { "Bail partagé : 15 minutes à 72 heures" }
+        require(claimLeaseMinutes in 15..4320) { tr("Bail partagé : 15 minutes à 72 heures", "Shared lease: 15 minutes to 72 hours") }
         if (collaborationEnabled) require(collaborationWorkerId.matches(Regex("[A-Za-z0-9._-]{3,64}"))) {
-            "Identifiant collaborateur : 3 à 64 caractères (lettres, chiffres, . _ -)"
+            tr("Identifiant collaborateur : 3 à 64 caractères (lettres, chiffres, . _ -)", "Collaborator ID: 3 to 64 characters (letters, digits, . _ -)")
         }
         return this
     }
@@ -78,14 +79,14 @@ data class ProcessingSettings(
 object SourceIdentity {
     fun string(value: Any?): String? = when(value) {
         null -> null
-        is String -> value.also { require(it.isNotBlank() && it.length<=4096) { "Identifiant vide ou trop long" } }
+        is String -> value.also { require(it.isNotBlank() && it.length<=4096) { tr("Identifiant vide ou trop long", "Empty or excessive identifier") } }
         is Byte, is Short, is Int, is Long -> value.toString()
         is Number -> value.toDouble().let { n ->
             require(n.isFinite() && kotlin.math.abs(n)<=9_007_199_254_740_991.0 && n%1.0==0.0) {
-                "Identifiant numérique ambigu : utilisez une chaîne JSON, notamment au-delà de 2^53-1"
+                tr("Identifiant numérique ambigu : utilisez une chaîne JSON, notamment au-delà de 2^53-1", "Ambiguous numeric ID: use a JSON string, especially above 2^53-1")
             }; n.toLong().toString()
         }
-        else -> error("Identifiant non scalaire : une chaîne JSON est attendue")
+        else -> error(tr("Identifiant non scalaire : une chaîne JSON est attendue", "Non-scalar ID: expected a JSON string"))
     }
 }
 

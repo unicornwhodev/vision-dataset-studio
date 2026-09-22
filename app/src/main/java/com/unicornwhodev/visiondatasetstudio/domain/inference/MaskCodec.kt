@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.unicornwhodev.visiondatasetstudio.data.model.MaskTarget
 import kotlin.math.*
 
@@ -91,7 +92,7 @@ object MaskCodec {
     data class CocoProjection(val segmentation: Map<String, Any>, val area: Int, val bbox: List<Int>)
     /** Stream original-resolution, column-major RLE without allocating a full camera-size raster. */
     fun projectCoco(m: MaskTarget, width: Int, height: Int): CocoProjection {
-        require(width > 0 && height > 0 && width.toLong()*height <= 100_000_000) { "Image trop grande pour l’export COCO" }
+        require(width > 0 && height > 0 && width.toLong()*height <= 100_000_000) { tr("Image trop grande pour l’export COCO", "Image too large for COCO export") }
         val source=decode(m); val runs=mutableListOf<Int>()
         var value=false; var count=0; var area=0
         var minX=width; var minY=height; var maxX=-1; var maxY=-1
@@ -101,7 +102,7 @@ object MaskCodec {
                 val sy=((y+.5)*m.height/height).toInt().coerceAtMost(m.height-1)
                 val pixel=source[sy*m.width+sx]
                 if(pixel!=value) {
-                    require(runs.size <= MAX_PIXELS) { "Masque trop complexe pour l’export COCO" }
+                    require(runs.size <= MAX_PIXELS) { tr("Masque trop complexe pour l’export COCO", "Mask too complex for COCO export") }
                     runs.add(count); count=0; value=pixel
                 }
                 count++

@@ -18,6 +18,14 @@ Le registre survit aux exports, à la purge et au redémarrage de l’applicatio
 
 La portée est le projet sur cette installation. Une nouvelle installation sans restauration de sa base, ou un autre projet indépendant, n’hérite pas du registre. L’archive dataset ne remplace pas une sauvegarde complète du projet.
 
+## Supprimer, réinitialiser ou changer de projet
+
+**Atelier → Projets** permet de créer et choisir plusieurs projets. Chaque projet conserve ses sources, lots, annotations, paramètres de modèle et empreintes. La bibliothèque de poids et la connexion HF appartiennent à l’appareil.
+
+**Supprimer le lot · conserver l’historique** abandonne un lot non exporté après confirmation : ses images de travail et annotations sont supprimées, mais le curseur source, les empreintes et le numéro de lot restent réservés. Les mêmes images ne reviennent donc pas dans un lot ultérieur de ce projet. Les lots exportés passent par le nettoyage vérifié habituel.
+
+**Réinitialiser** efface explicitement l’historique concerné et permet de réimporter. Cette action, comme la suppression complète d’un projet, abandonne volontairement sa protection historique contre les réimports. Ne pas la confondre avec le nettoyage d’un lot.
+
 ## APK et modèles
 
 L’APK contient le runtime, les adaptateurs, les contrats, le catalogue, les tokeniseurs et la logique de téléchargement/import. Les poids sont téléchargés ou importés après installation et conservés dans le stockage privé Android. Aucun corpus ni poids n’est intégré à l’APK.

@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.graphics.*
 import com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils
 import kotlinx.coroutines.Dispatchers
@@ -52,11 +53,11 @@ class LiteRtEngine : AutoCloseable {
             if(file.extension=="json")bundle=LiteRtBundle(file) else interpreter=Interpreter(file,LiteRtOptions.forFile(file,threads).setCancellable(true))
             currentModelPath=file.absolutePath;currentThreads=threads;modelHash=HashUtils.computeSha256(file);originalModelHash=modelHash
             true
-        } catch(e:Exception) { lastError=e.message ?: "Modèle non chargeable";close();false }
+        } catch(e:Exception) { lastError=e.message ?: tr("Modèle non chargeable", "Model could not be loaded");close();false }
     }
     fun tensorReport():String = synchronized(lock) {
-        bundle?.let{return@synchronized "Bundle ${it.manifest.kind} · ${it.manifest.revision} · ${it.manifest.files.size} fichiers vérifiés"}
-        val i=interpreter ?: error("Aucun modèle chargé")
+        bundle?.let{return@synchronized tr("Bundle ${it.manifest.kind} · ${it.manifest.revision} · ${it.manifest.files.size} fichiers vérifiés", "Bundle ${it.manifest.kind} · ${it.manifest.revision} · ${it.manifest.files.size} verified files")}
+        val i=interpreter ?: error(tr("Aucun modèle chargé", "No model loaded"))
         buildString {
             appendLine("Runtime CPU · $currentThreads threads · SHA-256 $modelHash")
             appendLine("Signatures : ${i.signatureKeys.joinToString()}")
@@ -70,11 +71,11 @@ class LiteRtEngine : AutoCloseable {
         val diagnostics=InferenceDiagnostics(modelHash,ModelContract.adapter(config),config.task,
             lastInputShape.ifEmpty { if(config.inputLayout=="NHWC")listOf(1,config.inputHeight,config.inputWidth,config.inputChannels)else listOf(1,config.inputChannels,config.inputHeight,config.inputWidth) },
             outputShapes=lastOutputShapes,threshold=config.threshold,proposalCount=proposals.size,
-            emptyReason=if(proposals.isEmpty() && lastError==null) (lastNote.ifBlank { "Aucune proposition au-dessus du seuil" }) else null,error=lastError,
+            emptyReason=if(proposals.isEmpty() && lastError==null) (lastNote.ifBlank { tr("Aucune proposition au-dessus du seuil", "No proposals above the threshold") }) else null,error=lastError,
             inputLayout=config.inputLayout,inputDtype=lastInputDtype.ifBlank{config.inputType},outputIndices=lastOutputIndices,
             outputDtypes=lastOutputDtypes,nativeDurationNanos=lastNativeDurationNanos,configSha256=configHash,
             runtime=config.runtime,outputTypes=proposals.map{it.type}.distinct(),bundleType=config.bundleKind.takeIf(String::isNotBlank),
-            executedComponents=when(config.bundleKind){"tinyclip"->listOf("image_encoder");"efficientvit_sam"->listOf("image_encoder","prompt_encoder","mask_decoder");"florence2"->listOf("image_encoder","text_decoder");else->emptyList()},
+            executedComponents=when(config.bundleKind){"tinyclip"->listOf("image_encoder","text_encoder");"efficientvit_sam"->listOf("image_encoder",if(config.promptPoint.size==2)"decoder_point" else "decoder_box");"florence2"->listOf("image_encoder","multimodal_encoder","decoder");else->emptyList()},
             endpoint=config.endpoint.takeIf{config.runtime=="local_http"}?.let{java.net.URI(it).let{uri->"${uri.scheme}://${uri.host}:${uri.port}${uri.path}"}})
         return when {
             lastError!=null -> InferenceResult.Failure(requireNotNull(lastError),diagnostics)
@@ -91,7 +92,7 @@ class LiteRtEngine : AutoCloseable {
             embeddingSpaceHash=AdaptiveCorrection.hash(modelHash+config.toString())
             if(config.runtime=="local_http") return@withContext localClient.run(bitmap,config).also{lastNativeDurationNanos=System.nanoTime()-started;lastInputShape=listOf(bitmap.height,bitmap.width,3);lastInputDtype="image"}
             if(config.bundleKind.isNotBlank()) {
-                val runtime=requireNotNull(bundle){"Bundle non chargé"};require(runtime.manifest.kind==config.bundleKind)
+                val runtime=requireNotNull(bundle){tr("Bundle non chargé", "Bundle not loaded")};require(runtime.manifest.kind==config.bundleKind)
                 val result=runtime.run(bitmap,config);lastEmbedding=runtime.embedding;lastNote=runtime.note
                 lastNativeDurationNanos=System.nanoTime()-started;lastInputShape=listOf(1,config.inputHeight,config.inputWidth,config.inputChannels);lastInputDtype=config.inputType
                 lastOutputDtypes=result.map{"proposal:${it.type}"}.distinct()
@@ -120,16 +121,18 @@ class LiteRtEngine : AutoCloseable {
                     val transform=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config),config.cropFraction)
                     return@synchronized ModelAdapters.decode(tensors,config.signatureConfig(),transform).map{it.copy(source="model_litert:$modelHash:trained")}
                 }
-                val i=interpreter ?: error("Aucun modèle chargé")
-                require(i.inputTensorCount==1+config.extraIntInputs.size) { "Nombre d’entrées différent du contrat" }
+                val i=interpreter ?: error(tr("Aucun modèle chargé", "No model loaded"))
+                require(i.inputTensorCount==1+config.extraIntInputs.size) { tr("Nombre d’entrées différent du contrat", "Input count differs from the contract") }
                 val expected=if(config.inputLayout=="NHWC") intArrayOf(1,config.inputHeight,config.inputWidth,config.inputChannels) else intArrayOf(1,config.inputChannels,config.inputHeight,config.inputWidth)
                 if(!i.getInputTensor(0).shape().contentEquals(expected)) {
                     require(config.inputWidth in config.dynamicMinSize..config.dynamicMaxSize && config.inputHeight in config.dynamicMinSize..config.dynamicMaxSize)
                     require(config.inputWidth%config.dynamicStride==0 && config.inputHeight%config.dynamicStride==0)
-                    i.resizeInput(0,expected,true);i.allocateTensors()
+                    // Defer allocation to invocation. The Java wrapper refreshes dynamic output
+                    // shapes after run only when it performed that allocation itself.
+                    i.resizeInput(0,expected,true)
                 }
                 val input=i.getInputTensor(0)
-                require(input.shape().contentEquals(expected) && input.dataType().name==config.inputType) { "Forme/type d’entrée différents du contrat. Inspectez les tenseurs." }
+                require(input.shape().contentEquals(expected) && input.dataType().name==config.inputType) { tr("Forme/type d’entrée différents du contrat. Inspectez les tenseurs.", "Input shape/type differs from the contract. Inspect the tensors.") }
                 lastInputShape=input.shape().toList();lastInputDtype=input.dataType().name
                 val t=InputTransform.create(bitmap.width,bitmap.height,config.inputWidth,config.inputHeight,ModelContract.resize(config),config.cropFraction)
                 lastTransform=t
@@ -149,15 +152,15 @@ class LiteRtEngine : AutoCloseable {
                     else -> listOf(config.outputIndex)
                 }
                 val indices=(baseIndices+listOf(config.embeddingOutputIndex,config.patchOutputIndex).filter{it>=0}).distinct()
-                require(indices.distinct().size==indices.size) { "Indices de sorties dupliqués" }
-                require(indices.all{it<i.outputTensorCount}) { "Sortie demandée absente du modèle" }
+                require(indices.distinct().size==indices.size) { tr("Indices de sorties dupliqués", "Duplicate output indices") }
+                require(indices.all{it<i.outputTensorCount}) { tr("Sortie demandée absente du modèle", "Requested output missing from the model") }
                 val bytes=indices.sumOf{i.getOutputTensor(it).numBytes().toLong()}
-                require(bytes<=64L*1024*1024) { "Sorties trop volumineuses pour le budget mémoire de l’adaptateur" }
+                require(bytes<=64L*1024*1024) { tr("Sorties trop volumineuses pour le budget mémoire de l’adaptateur", "Outputs exceed the adapter's memory budget") }
                 // Some Flex/dynamic outputs keep a placeholder shape until the first invocation.
                 val outputObjects=indices.associateWith { null as Any? }.toMutableMap()
                 val inputs=Array<Any>(i.inputTensorCount){index->
                     if(index==0) buffer else {
-                        val values=config.extraIntInputs[index.toString()] ?: error("Entrée auxiliaire $index absente")
+                        val values=config.extraIntInputs[index.toString()] ?: error(tr("Entrée auxiliaire $index absente", "Auxiliary input $index missing"))
                         val tensor=i.getInputTensor(index)
                         require(tensor.dataType().name=="INT32" && tensor.numElements()==values.size)
                         ByteBuffer.allocateDirect(values.size*4).order(ByteOrder.nativeOrder()).apply { values.forEach(::putInt);rewind() }
@@ -166,7 +169,7 @@ class LiteRtEngine : AutoCloseable {
                 i.runForMultipleInputsOutputs(inputs,outputObjects)
                 lastNativeDurationNanos=i.lastNativeInferenceDurationNanoseconds
                 require(indices.sumOf { i.getOutputTensor(it).numBytes().toLong() } <= 64L*1024*1024) {
-                    "Sorties trop volumineuses pour le budget mémoire de l’adaptateur"
+                    tr("Sorties trop volumineuses pour le budget mémoire de l’adaptateur", "Outputs exceed the adapter's memory budget")
                 }
                 val tensors=indices.associateWith { idx ->
                     val out=i.getOutputTensor(idx);val shape=out.shape().toList()
@@ -186,11 +189,11 @@ class LiteRtEngine : AutoCloseable {
                 ModelAdapters.get(ModelContract.adapter(config)).decode(tensors,config,t).map{it.copy(source="model_litert:$modelHash:$configHash")}
             }
         } catch(e: kotlinx.coroutines.CancellationException) { throw e }
-        catch(e:Exception) { lastError=e.message ?: "Inférence échouée";emptyList() }
+        catch(e:Exception) { lastError=e.message ?: tr("Inférence échouée", "Inference failed");emptyList() }
     }
     suspend fun dryRun(bitmap:Bitmap,config:ModelConfig):DryRunResult {
         val start=System.nanoTime();val result=runInference(bitmap,config)
-        return DryRunResult(result !is InferenceResult.Failure,if(config.runtime=="local_http") "HTTP loopback · serveur utilisateur" else "LiteRT Interpreter CPU · $currentThreads threads",(System.nanoTime()-start)/1_000_000,runCatching{result.orThrow()}.getOrDefault(emptyList()),(result as? InferenceResult.Failure)?.error)
+        return DryRunResult(result !is InferenceResult.Failure,if(config.runtime=="local_http") tr("HTTP loopback · serveur utilisateur", "HTTP loopback · user-provided server") else "LiteRT Interpreter CPU · $currentThreads threads",(System.nanoTime()-start)/1_000_000,runCatching{result.orThrow()}.getOrDefault(emptyList()),(result as? InferenceResult.Failure)?.error)
     }
     override fun close() = synchronized(lock) {
         bundle?.close();bundle=null;trainingSession?.close();trainingSession=null;trainingConfig=null;interpreter?.close();interpreter=null;currentModelPath=null

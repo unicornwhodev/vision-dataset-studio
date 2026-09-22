@@ -1,30 +1,33 @@
 package com.unicornwhodev.visiondatasetstudio.core.workflow
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 /** Pure Kotlin policies: shared by UI and regression tests. No Android dependency. */
-enum class StudioTask(val title: String, val hint: String) {
-    POINTING("Point unique", "Une cible localisée, absente ou non localisable"),
-    POINTING_MULTI("Points multiples", "Plusieurs instances dans une image"),
-    DETECTION("Détection", "Boîtes englobantes et classes d’objets"),
-    SEGMENTATION("Masques", "Segmentation et correction au pinceau"),
-    CAPTIONING("Légendes", "Descriptions courtes, détaillées et multilingues"),
-    CLASSIFICATION("Tags & classes", "Étiquettes et classification multi-label"),
-    GROUNDING("Texte ↔ région", "Relier une expression à des points ou des boîtes"),
-    VQA("Questions / réponses", "Paires visuelles, avec abstention explicite"),
-    COUNTING("Comptage", "Nombre d’instances, exhaustif ou partiel"),
-    NEGATIVE("Qualité & négatifs", "Absence vérifiée, ambiguïté et audit")
+enum class StudioTask(private val titleText: () -> String, private val hintText: () -> String) {
+    POINTING({ tr("Point unique", "Single point") }, { tr("Une cible localisée, absente ou non localisable", "One located, absent or unlocatable target") }),
+    POINTING_MULTI({ tr("Points multiples", "Multiple points") }, { tr("Plusieurs instances dans une image", "Multiple instances in an image") }),
+    DETECTION({ tr("Détection", "Detection") }, { tr("Boîtes englobantes et classes d’objets", "Bounding boxes and object classes") }),
+    SEGMENTATION({ tr("Masques", "Masks") }, { tr("Segmentation et correction au pinceau", "Segmentation and brush corrections") }),
+    CAPTIONING({ tr("Légendes", "Captions") }, { tr("Descriptions courtes, détaillées et multilingues", "Short, detailed and multilingual descriptions") }),
+    CLASSIFICATION({ "Tags & classes" }, { tr("Étiquettes et classification multi-label", "Tags and multilabel classification") }),
+    GROUNDING({ tr("Texte ↔ région", "Text ↔ region") }, { tr("Relier une expression à des points ou des boîtes", "Link an expression to points or boxes") }),
+    VQA({ tr("Questions / réponses", "Questions / answers") }, { tr("Paires visuelles, avec abstention explicite", "Visual pairs, with explicit abstention") }),
+    COUNTING({ tr("Comptage", "Counting") }, { tr("Nombre d’instances, exhaustif ou partiel", "Instance count, exhaustive or partial") }),
+    NEGATIVE({ tr("Qualité & négatifs", "Quality & negatives") }, { tr("Absence vérifiée, ambiguïté et audit", "Verified absence, ambiguity and audit") });
+    val title get() = titleText()
+    val hint get() = hintText()
 }
 
 data class WorkflowPreset(val id: String, val title: String, val subtitle: String, val tasks: Set<StudioTask>)
 
 object StudioWorkflow {
-    val presets = listOf(
-        WorkflowPreset("point", "Pointer une cible", "Un point par image", setOf(StudioTask.POINTING)),
-        WorkflowPreset("multi", "Pointer plusieurs cibles", "Toutes les instances utiles", setOf(StudioTask.POINTING_MULTI)),
-        WorkflowPreset("detect", "Détecter des objets", "Boîtes et classes", setOf(StudioTask.DETECTION)),
-        WorkflowPreset("segment", "Segmenter des régions", "Masques et corrections", setOf(StudioTask.SEGMENTATION)),
-        WorkflowPreset("caption", "Décrire des images", "Légendes et tags", setOf(StudioTask.CAPTIONING, StudioTask.CLASSIFICATION)),
-        WorkflowPreset("vl", "Préparer un corpus VL", "Régions, questions et descriptions", setOf(StudioTask.DETECTION, StudioTask.GROUNDING, StudioTask.CAPTIONING, StudioTask.VQA)),
-        WorkflowPreset("sort", "Trier et qualifier", "Tags et contrôle qualité", setOf(StudioTask.CLASSIFICATION, StudioTask.NEGATIVE))
+    val presets get() = listOf(
+        WorkflowPreset("point", tr("Pointer une cible", "Point to a target"), tr("Un point par image", "One point per image"), setOf(StudioTask.POINTING)),
+        WorkflowPreset("multi", tr("Pointer plusieurs cibles", "Point to multiple targets"), tr("Toutes les instances utiles", "All relevant instances"), setOf(StudioTask.POINTING_MULTI)),
+        WorkflowPreset("detect", tr("Détecter des objets", "Detect objects"), tr("Boîtes et classes", "Boxes and classes"), setOf(StudioTask.DETECTION)),
+        WorkflowPreset("segment", tr("Segmenter des régions", "Segment regions"), tr("Masques et corrections", "Masks and corrections"), setOf(StudioTask.SEGMENTATION)),
+        WorkflowPreset("caption", tr("Décrire des images", "Describe images"), tr("Légendes et tags", "Captions and tags"), setOf(StudioTask.CAPTIONING, StudioTask.CLASSIFICATION)),
+        WorkflowPreset("vl", tr("Préparer un corpus VL", "Prepare a VL corpus"), tr("Régions, questions et descriptions", "Regions, questions and descriptions"), setOf(StudioTask.DETECTION, StudioTask.GROUNDING, StudioTask.CAPTIONING, StudioTask.VQA)),
+        WorkflowPreset("sort", tr("Trier et qualifier", "Sort and assess"), tr("Tags et contrôle qualité", "Tags and quality checks"), setOf(StudioTask.CLASSIFICATION, StudioTask.NEGATIVE))
     )
     fun parseTasks(csv: String): Set<StudioTask> = csv.split(',').mapNotNull { name ->
         StudioTask.entries.firstOrNull { it.name == name.trim() }

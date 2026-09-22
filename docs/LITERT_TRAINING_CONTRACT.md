@@ -14,10 +14,10 @@ pas seulement la tête. La propriété `scope` documente ce choix ; elle ne le p
 
 - `model.tflite` : graphe avec signatures et variables mutables.
 - `android_model_config.json` (ou `model_config.json`) : contrat Android ci-dessous.
-- `artifact_manifest.json` : taille et SHA-256 de chaque poids et fichier de support.
+- `artifact_manifest.json` : optionnel ; informations de provenance du convertisseur.
 - Model card, licence, prétraitement, révision upstream et rapport de conversion.
 
-Le téléchargement épingle le SHA HF et vérifie les empreintes avant enregistrement.
+Le téléchargement utilise une révision HF résolue pour récupérer un ensemble cohérent. Aucun manifeste SHA ni comparaison d’empreinte ne conditionne l’import ou l’utilisation du modèle.
 Les conversions dynamiques conservent `runtime_contract.json` et `config.json`.
 Le runtime refuse un contrat incompatible ; il ne devine pas l’encodage des cibles.
 

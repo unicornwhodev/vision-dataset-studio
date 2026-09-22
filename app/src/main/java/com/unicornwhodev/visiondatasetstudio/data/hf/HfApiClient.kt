@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.data.hf
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.squareup.moshi.JsonClass
 import com.unicornwhodev.visiondatasetstudio.core.storage.DurableFiles
 import com.unicornwhodev.visiondatasetstudio.core.workflow.RangeSafety
@@ -50,17 +51,17 @@ class HfApiClient(
         client=client.newBuilder().readTimeout(seconds.toLong(),TimeUnit.SECONDS).writeTimeout(seconds.toLong(),TimeUnit.SECONDS).callTimeout(seconds.toLong(),TimeUnit.SECONDS).build()
     }
     suspend fun resolveRevision(repoId:String,revision:String="main"):String = withContext(Dispatchers.IO) {
-        val repo=StudioWorkflow.normalizeRepo(repoId) ?: error("Dépôt invalide")
+        val repo=StudioWorkflow.normalizeRepo(repoId) ?: error(tr("Dépôt invalide", "Invalid repository"))
         require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.validRevision(revision))
         val url="https://huggingface.co/api/datasets/$repo/revision/".toHttpUrlOrNull()!!.newBuilder().addPathSegment(revision).build().toString()
         client.newCall(newRequestBuilder(url).build()).execute().use { r->
-            check(r.isSuccessful){"Branche/révision inaccessible (HTTP ${r.code})"}
-            val sha=parseObject(r.body?.let(::boundedJson) ?: error("Réponse vide"))["sha"] as? String ?: error("SHA source absent")
+            check(r.isSuccessful){tr("Branche/révision inaccessible (HTTP ${r.code})", "Branch/revision inaccessible (HTTP ${r.code})")}
+            val sha=parseObject(r.body?.let(::boundedJson) ?: error(tr("Réponse vide", "Empty response")))["sha"] as? String ?: error(tr("SHA source absent", "Source SHA missing"))
             require(sha.matches(Regex("[a-fA-F0-9]{40}|[a-fA-F0-9]{64}")));sha
         }
     }
     fun resolveUrl(repoId:String,revision:String,path:String):String {
-        val repo=StudioWorkflow.normalizeRepo(repoId) ?: error("Dépôt invalide")
+        val repo=StudioWorkflow.normalizeRepo(repoId) ?: error(tr("Dépôt invalide", "Invalid repository"))
         require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(path))
         return "https://huggingface.co/datasets/$repo/resolve/".toHttpUrlOrNull()!!.newBuilder().addPathSegment(revision).addPathSegments(path).build().toString()
     }
@@ -72,7 +73,7 @@ class HfApiClient(
 
     private fun newRequestBuilder(url: String): Request.Builder {
         val parsed = url.toHttpUrlOrNull()
-        require(parsed != null && parsed.isHttps && parsed.username.isEmpty() && parsed.password.isEmpty()) { "HTTPS sans identifiants dans l’URL requis" }
+        require(parsed != null && parsed.isHttps && parsed.username.isEmpty() && parsed.password.isEmpty()) { tr("HTTPS sans identifiants dans l’URL requis", "HTTPS without credentials in the URL is required") }
         val builder = Request.Builder().url(url)
         val token = tokenProvider()
         val parsedUri = url.toHttpUrlOrNull()
@@ -89,23 +90,23 @@ class HfApiClient(
         try {
             client.newCall(request).execute().use { response ->
                 if (response.code == 401) {
-                    return@withContext HfWhoAmIResult(isValid = false, error = "Token invalide ou expiré (401)")
+                    return@withContext HfWhoAmIResult(isValid = false, error = tr("Token invalide ou expiré (401)", "Invalid or expired token (401)"))
                 }
                 if (!response.isSuccessful) {
-                    return@withContext HfWhoAmIResult(isValid = false, error = "Erreur HTTP ${response.code}")
+                    return@withContext HfWhoAmIResult(isValid = false, error = tr("Erreur HTTP ${response.code}", "HTTP error ${response.code}"))
                 }
                 val body = response.body?.let(::boundedJson) ?: ""
                 val adapter = moshi.adapter(WhoAmIResponse::class.java)
                 val parsed = adapter.fromJson(body)
                 HfWhoAmIResult(
                     isValid = true,
-                    username = parsed?.name ?: parsed?.username ?: "Utilisateur HF",
+                    username = parsed?.name ?: parsed?.username ?: tr("Utilisateur HF", "HF user"),
                     email = parsed?.email,
                     orgs = parsed?.orgs?.map { it.name } ?: emptyList()
                 )
             }
         } catch (e: CancellationException) { throw e } catch (e: Exception) {
-            HfWhoAmIResult(isValid = false, error = e.localizedMessage ?: "Erreur réseau")
+            HfWhoAmIResult(isValid = false, error = e.localizedMessage ?: tr("Erreur réseau", "Network error"))
         }
     }
 
@@ -126,17 +127,17 @@ class HfApiClient(
                             isPrivate = isPrivate,
                             isGated = isGated,
                             sha = shaMatch,
-                            message = "Accessible (${if (isPrivate) "Privé" else "Public"}${if (isGated) ", Gated" else ""})"
+                            message = tr("Accessible (${if (isPrivate) "Privé" else "Public"}${if (isGated) ", Gated" else ""})", "Accessible (${if (isPrivate) "Private" else "Public"}${if (isGated) ", Gated" else ""})")
                         )
                     }
-                    401 -> HfRepoAccessResult(exists = false, isUnauthorized = true, message = "Accès non autorisé (401) : Token requis ou droits insuffisants")
-                    403 -> HfRepoAccessResult(exists = false, isForbidden = true, message = "Accès interdit (403) : Dépôt restreint ou gated non accepté")
-                    404 -> HfRepoAccessResult(exists = false, message = "Dépôt introuvable (404)")
+                    401 -> HfRepoAccessResult(exists = false, isUnauthorized = true, message = tr("Accès non autorisé (401) : Token requis ou droits insuffisants", "Unauthorized (401): token required or insufficient permissions"))
+                    403 -> HfRepoAccessResult(exists = false, isForbidden = true, message = tr("Accès interdit (403) : Dépôt restreint ou gated non accepté", "Forbidden (403): restricted repository or gating not accepted"))
+                    404 -> HfRepoAccessResult(exists = false, message = tr("Dépôt introuvable (404)", "Repository not found (404)"))
                     else -> HfRepoAccessResult(exists = false, message = "Code HTTP ${response.code}")
                 }
             }
         } catch (e: CancellationException) { throw e } catch (e: Exception) {
-            HfRepoAccessResult(exists = false, message = e.localizedMessage ?: "Erreur réseau")
+            HfRepoAccessResult(exists = false, message = e.localizedMessage ?: tr("Erreur réseau", "Network error"))
         }
     }
 
@@ -149,7 +150,7 @@ class HfApiClient(
                 if (!response.isSuccessful) {
                     return@withContext HfSplitsResult(
                         success = false,
-                        error = "Dataset Viewer indisponible (${response.code}). Ce dataset utilise peut-être des fichiers directs."
+                        error = tr("Dataset Viewer indisponible (${response.code}). Ce dataset utilise peut-être des fichiers directs.", "Dataset Viewer unavailable (${response.code}). This dataset may use direct files.")
                     )
                 }
                 val body = response.body?.let(::boundedJson) ?: ""
@@ -186,7 +187,7 @@ class HfApiClient(
                 if (!response.isSuccessful) {
                     return@withContext HfRowsResult(
                         success = false,
-                        error = "Erreur lecture /rows HTTP ${response.code}: ${response.message}"
+                        error = tr("Erreur lecture /rows HTTP ${response.code}: ${response.message}", "Error reading /rows HTTP ${response.code}: ${response.message}")
                     )
                 }
                 val body = response.body?.let(::boundedJson) ?: ""
@@ -200,7 +201,7 @@ class HfApiClient(
                     )
                 } ?: emptyList()
                 val columns = parsed?.features?.map { it.name } ?: emptyList()
-                if (parsed?.partial == true) return@withContext HfRowsResult(false, error = "Le Viewer ne couvre qu’une partie du corpus. Import suspendu pour ne pas annoncer un parcours complet.")
+                if (parsed?.partial == true) return@withContext HfRowsResult(false, error = tr("Le Viewer ne couvre qu’une partie du corpus. Import suspendu pour ne pas annoncer un parcours complet.", "The Viewer covers only part of the corpus. Import suspended to avoid claiming complete coverage."))
 
                 HfRowsResult(
                     success = true,
@@ -245,12 +246,12 @@ class HfApiClient(
                 val append = response.code == 206
                 if (append) {
                     check(RangeSafety.validResume(offset, previousTag, tag, range, maxBytes) && range!!.total == knownTotal) {
-                        temp.delete(); stateFile.delete(); "Réponse partielle incohérente; reprise refusée"
+                        temp.delete(); stateFile.delete(); tr("Réponse partielle incohérente; reprise refusée", "Inconsistent partial response; resumption refused")
                     }
-                } else check(response.code == 200) { "Réponse téléchargement inattendue" }
+                } else check(response.code == 200) { tr("Réponse téléchargement inattendue", "Unexpected download response") }
                 val start = if (append) offset else 0L
                 val total = if (append) range!!.total else body.contentLength()
-                check(total <= maxBytes) { "Fichier trop volumineux" }
+                check(total <= maxBytes) { tr("Fichier trop volumineux", "File too large") }
                 if (!append) { temp.delete(); stateFile.delete() }
                 val canCheckpoint=RangeSafety.strongEtag(tag) && total>0
                 var copied = start
@@ -261,7 +262,7 @@ class HfApiClient(
                     try { while (true) {
                         context.ensureActive()
                         val n = input.read(bytes); if (n < 0) break
-                        check(n.toLong() <= maxBytes - copied) { "Plafond de téléchargement atteint" }
+                        check(n.toLong() <= maxBytes - copied) { tr("Plafond de téléchargement atteint", "Download limit reached") }
                         output.write(bytes, 0, n); copied += n
                         onProgress?.invoke(copied, total)
                         if(canCheckpoint && copied-checkpointAt>=4L*1024*1024) {
@@ -276,7 +277,7 @@ class HfApiClient(
                             com.unicornwhodev.visiondatasetstudio.core.storage.DownloadCheckpoint.save(temp,stateFile,identity!!,tag!!,total)
                     }
                 } }
-                check(copied > 0 && (total < 0 || copied == total)) { "Téléchargement incomplet" }
+                check(copied > 0 && (total < 0 || copied == total)) { tr("Téléchargement incomplet", "Incomplete download") }
                 java.nio.file.Files.move(temp.toPath(), destFile.toPath(), java.nio.file.StandardCopyOption.ATOMIC_MOVE,
                     java.nio.file.StandardCopyOption.REPLACE_EXISTING)
                 stateFile.delete()
@@ -317,15 +318,15 @@ class HfApiClient(
     suspend fun uploadBatchFiles(repoId: String, branch: String = "main", commitMessage: String,
                                 files: List<Pair<String, File>>, expectedParentCommit: String): HfUploadResult = withContext(Dispatchers.IO) {
         try {
-            val repo = StudioWorkflow.normalizeRepo(repoId, destination = true) ?: error("Dépôt de destination invalide")
-            require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.validRevision(branch)) { "Branche invalide" }
+            val repo = StudioWorkflow.normalizeRepo(repoId, destination = true) ?: error(tr("Dépôt de destination invalide", "Invalid destination repository"))
+            require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.validRevision(branch)) { tr("Branche invalide", "Invalid branch") }
             val encodedBranch=java.net.URLEncoder.encode(branch,"UTF-8").replace("+","%20")
             val parentCommit = expectedParentCommit
-            require(parentCommit.matches(Regex("[a-fA-F0-9]{40}|[a-fA-F0-9]{64}"))) { "Parent de publication non épinglé" }
+            require(parentCommit.matches(Regex("[a-fA-F0-9]{40}|[a-fA-F0-9]{64}"))) { tr("Parent de publication non épinglé", "Publication parent not pinned") }
             require(files.isNotEmpty() && files.map { it.first }.distinct().size == files.size)
             files.forEach { (path, file) ->
                 require(!path.startsWith('/') && path.split('/').none { it == ".." || it.isEmpty() } && !path.contains('\\'))
-                require(file.isFile) { "Fichier local absent" }
+                require(file.isFile) { tr("Fichier local absent", "Local file missing") }
             }
             val modes = mutableMapOf<String, String>()
             for (chunk in files.chunked(100)) {
@@ -334,9 +335,9 @@ class HfApiClient(
                     mapOf("path" to path, "size" to file.length(), "sample" to Base64.getEncoder().encodeToString(sample))
                 })
                 val response = postJson("https://huggingface.co/api/datasets/$repo/preupload/$encodedBranch", payload)
-                for (entry in response["files"] as? List<*> ?: error("Réponse preupload incomplète")) {
-                    val e = entry as? Map<*, *> ?: error("Réponse preupload invalide")
-                    check(e["shouldIgnore"] != true) { "Le dépôt ignore un fichier demandé. Publication arrêtée." }
+                for (entry in response["files"] as? List<*> ?: error(tr("Réponse preupload incomplète", "Incomplete preupload response"))) {
+                    val e = entry as? Map<*, *> ?: error(tr("Réponse preupload invalide", "Invalid preupload response"))
+                    check(e["shouldIgnore"] != true) { tr("Le dépôt ignore un fichier demandé. Publication arrêtée.", "The repository ignores a requested file. Publication stopped.") }
                     modes[e["path"] as String] = e["uploadMode"] as String
                 }
             }
@@ -345,7 +346,7 @@ class HfApiClient(
                 when (if (file.length() == 0L) "regular" else modes[path]) {
                     "lfs" -> uploadLfs(repo, file, hashes.getValue(path), branch)
                     "regular" -> Unit
-                    else -> error("Mode de transfert non pris en charge; aucun commit créé.")
+                    else -> error(tr("Mode de transfert non pris en charge; aucun commit créé.", "Unsupported transfer mode; no commit created."))
                 }
             }
             // Small fixed-size base64 blocks (multiples of 3) avoid loading an entire TAR into RAM.
@@ -374,14 +375,14 @@ class HfApiClient(
             }
             client.newCall(newRequestBuilder("https://huggingface.co/api/datasets/$repo/commit/$encodedBranch").post(body).build()).execute().use { response ->
                 if (response.code == 409 || response.code == 412) return@withContext HfUploadResult(false,
-                    message = "La branche a changé : conflit détecté. Aucun rebase automatique.", conflict = true)
-                check(response.isSuccessful) { "Commit refusé (HTTP ${response.code}). Fichiers locaux conservés." }
-                val parsed = parseObject(response.body?.let(::boundedJson) ?: error("Réponse commit absente"))
-                val sha = parsed["commitOid"] as? String ?: error("Aucun identifiant de commit vérifiable reçu.")
+                    message = tr("La branche a changé : conflit détecté. Aucun rebase automatique.", "The branch changed: conflict detected. No automatic rebase."), conflict = true)
+                check(response.isSuccessful) { tr("Commit refusé (HTTP ${response.code}). Fichiers locaux conservés.", "Commit refused (HTTP ${response.code}). Local files preserved.") }
+                val parsed = parseObject(response.body?.let(::boundedJson) ?: error(tr("Réponse commit absente", "Missing commit response")))
+                val sha = parsed["commitOid"] as? String ?: error(tr("Aucun identifiant de commit vérifiable reçu.", "No verifiable commit identifier received."))
                 require(sha.matches(Regex("[a-fA-F0-9]{40}|[a-fA-F0-9]{64}")))
-                HfUploadResult(true, sha, "Commit reçu. Vérification des contenus requise avant purge.")
+                HfUploadResult(true, sha, tr("Commit reçu. Vérification des contenus requise avant purge.", "Commit received. Contents must be verified before cleanup."))
             }
-        } catch (e: CancellationException) { throw e } catch (e: Exception) { HfUploadResult(false, message = e.message ?: "Échec du transfert; données locales conservées.") }
+        } catch (e: CancellationException) { throw e } catch (e: Exception) { HfUploadResult(false, message = e.message ?: tr("Échec du transfert; données locales conservées.", "Transfer failed; local data preserved.")) }
     }
 
     private fun boundedJson(body:okhttp3.ResponseBody):String {
@@ -392,10 +393,10 @@ class HfApiClient(
 
     private fun json(value: Any): String = moshi.adapter(Any::class.java).toJson(value)
     @Suppress("UNCHECKED_CAST")
-    private fun parseObject(value: String) = moshi.adapter(Map::class.java).fromJson(value) as? Map<String, Any?> ?: error("JSON distant invalide")
+    private fun parseObject(value: String) = moshi.adapter(Map::class.java).fromJson(value) as? Map<String, Any?> ?: error(tr("JSON distant invalide", "Invalid remote JSON"))
     private fun postJson(url: String, payload: Any, mediaType: String = "application/json", headers: Map<String, String> = emptyMap()): Map<String, Any?> {
         client.newCall(newRequestBuilder(url).apply { headers.forEach { (k,v) -> header(k,v) } }.header("Accept", mediaType).post(json(payload).toRequestBody(mediaType.toMediaType())).build()).execute().use { r ->
-            check(r.isSuccessful) { "Transfert refusé (HTTP ${r.code})." }
+            check(r.isSuccessful) { tr("Transfert refusé (HTTP ${r.code}).", "Transfer refused (HTTP ${r.code}).") }
             return parseObject(r.body?.let(::boundedJson)?.ifBlank { "{}" } ?: "{}")
         }
     }
@@ -403,11 +404,11 @@ class HfApiClient(
         val result = postJson("https://huggingface.co/datasets/$repo.git/info/lfs/objects/batch", mapOf(
             "operation" to "upload", "transfers" to listOf("basic", "multipart"), "hash_algo" to "sha256",
             "ref" to mapOf("name" to "refs/heads/$branch"), "objects" to listOf(mapOf("oid" to hash, "size" to file.length()))), "application/vnd.git-lfs+json")
-        val obj = (result["objects"] as? List<*>)?.singleOrNull() as? Map<*, *> ?: error("Réponse LFS incomplète")
-        check(obj["oid"] == hash && obj["error"] == null) { "Objet LFS refusé" }
+        val obj = (result["objects"] as? List<*>)?.singleOrNull() as? Map<*, *> ?: error(tr("Réponse LFS incomplète", "Incomplete LFS response"))
+        check(obj["oid"] == hash && obj["error"] == null) { tr("Objet LFS refusé", "LFS object refused") }
         val actions = obj["actions"] as? Map<*, *> ?: return // content already exists server-side
-        val upload = actions["upload"] as? Map<*, *> ?: error("Action LFS absente")
-        val href = upload["href"] as? String ?: error("URL LFS absente")
+        val upload = actions["upload"] as? Map<*, *> ?: error(tr("Action LFS absente", "LFS action missing"))
+        val href = upload["href"] as? String ?: error(tr("URL LFS absente", "LFS URL missing"))
         val headers = upload["header"] as? Map<*, *> ?: emptyMap<Any, Any>()
         val chunkSize = headers["chunk_size"]?.toString()?.toLongOrNull()
         if (chunkSize == null) {
@@ -419,7 +420,7 @@ class HfApiClient(
             val parts = urls.mapIndexed { i, (number, url) ->
                 check(number == i + 1)
                 val etag = putPart(url, file, i * chunkSize, minOf(chunkSize, file.length() - i * chunkSize))
-                check(!etag.isNullOrBlank()) { "ETag multipart absent" }
+                check(!etag.isNullOrBlank()) { tr("ETag multipart absent", "Multipart ETag missing") }
                 mapOf("partNumber" to number, "etag" to etag)
             }
             postJson(href, mapOf("oid" to hash, "parts" to parts), "application/vnd.git-lfs+json")
@@ -431,7 +432,7 @@ class HfApiClient(
     private fun safeActionHeaders(headers: Map<*, *>): Map<String, String> = headers.entries.mapNotNull { (k,v) ->
         val name = k as? String ?: return@mapNotNull null
         if (name.toIntOrNull() != null || name.lowercase() in setOf("chunk_size", "host", "content-length", "transfer-encoding")) null
-        else name to (v as? String ?: error("En-tête LFS invalide"))
+        else name to (v as? String ?: error(tr("En-tête LFS invalide", "Invalid LFS header")))
     }.toMap()
     private fun putPart(url: String, file: File, start: Long, length: Long, headers: Map<String, String> = emptyMap()): String? {
         require(url.toHttpUrlOrNull()?.isHttps == true)
@@ -442,23 +443,23 @@ class HfApiClient(
                 input.seek(start); var remaining = length; val buffer = ByteArray(64 * 1024)
                 while (remaining > 0) {
                     val n = input.read(buffer, 0, minOf(buffer.size.toLong(), remaining).toInt())
-                    check(n > 0) { "Fichier modifié pendant le transfert" }; sink.write(buffer, 0, n); remaining -= n
+                    check(n > 0) { tr("Fichier modifié pendant le transfert", "File changed during transfer") }; sink.write(buffer, 0, n); remaining -= n
                 }
             } }
         }
         // Signed storage URLs never receive the user's HF token.
         client.newBuilder().followRedirects(false).build().newCall(Request.Builder().url(url).apply { headers.forEach { (k,v) -> header(k,v) } }.put(body).build()).execute().use { r ->
-            check(r.isSuccessful) { "Envoi binaire refusé (HTTP ${r.code})" }; return r.header("ETag")
+            check(r.isSuccessful) { tr("Envoi binaire refusé (HTTP ${r.code})", "Binary upload refused (HTTP ${r.code})") }; return r.header("ETag")
         }
     }
     suspend fun resolveModelRevision(repoId: String, revision: String = "main"): String = withContext(Dispatchers.IO) {
         val clean = repoId.trim().removePrefix("https://huggingface.co/").removePrefix("models/")
-        require(clean.matches(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"))) { "Dépôt modèle invalide" }
+        require(clean.matches(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"))) { tr("Dépôt modèle invalide", "Invalid model repository") }
         require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.validRevision(revision))
         val url = "https://huggingface.co/api/models/$clean/revision/".toHttpUrlOrNull()!!.newBuilder().addPathSegment(revision).build().toString()
         client.newCall(newRequestBuilder(url).get().build()).execute().use { r ->
-            check(r.isSuccessful) { "Révision modèle inaccessible (HTTP ${r.code})" }
-            val sha = parseObject(r.body?.let(::boundedJson) ?: error("Réponse vide"))["sha"] as? String ?: error("SHA modèle absent")
+            check(r.isSuccessful) { tr("Révision modèle inaccessible (HTTP ${r.code})", "Model revision inaccessible (HTTP ${r.code})") }
+            val sha = parseObject(r.body?.let(::boundedJson) ?: error(tr("Réponse vide", "Empty response")))["sha"] as? String ?: error(tr("SHA modèle absent", "Model SHA missing"))
             require(sha.matches(Regex("[a-fA-F0-9]{40}|[a-fA-F0-9]{64}")))
             sha
         }
@@ -466,7 +467,7 @@ class HfApiClient(
 
     fun resolveModelUrl(repoId: String, revision: String, path: String): String {
         val clean = repoId.trim().removePrefix("https://huggingface.co/").removePrefix("models/")
-        require(clean.matches(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"))) { "Dépôt modèle invalide" }
+        require(clean.matches(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"))) { tr("Dépôt modèle invalide", "Invalid model repository") }
         require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(path))
         return "https://huggingface.co/$clean/resolve/".toHttpUrlOrNull()!!.newBuilder().addPathSegment(revision).addPathSegments(path).build().toString()
     }
@@ -484,19 +485,19 @@ class HfApiClient(
         val visited = mutableSetOf<String>()
         val items = linkedMapOf<String, HfTreeItem>()
         while (next != null) {
-            val url = next!!.toHttpUrlOrNull() ?: error("Pagination invalide")
+            val url = next!!.toHttpUrlOrNull() ?: error(tr("Pagination invalide", "Invalid pagination"))
             require(url.scheme == "https" && url.host == initial.host && url.encodedPath == initial.encodedPath && url.username.isEmpty() && url.password.isEmpty())
-            require(visited.add(url.toString()) && visited.size <= 100) { "Pagination cyclique ou trop longue" }
+            require(visited.add(url.toString()) && visited.size <= 100) { tr("Pagination cyclique ou trop longue", "Cyclic or excessive pagination") }
             client.newCall(newRequestBuilder(url.toString()).get().build()).execute().use { r ->
-                check(r.isSuccessful) { "Catalogue modèles inaccessible (HTTP ${r.code})" }
+                check(r.isSuccessful) { tr("Catalogue modèles inaccessible (HTTP ${r.code})", "Model catalog inaccessible (HTTP ${r.code})") }
                 @Suppress("UNCHECKED_CAST")
-                val rows = moshi.adapter(List::class.java).fromJson(r.body?.let(::boundedJson) ?: "[]") as? List<Map<String, Any?>> ?: error("Catalogue invalide")
+                val rows = moshi.adapter(List::class.java).fromJson(r.body?.let(::boundedJson) ?: "[]") as? List<Map<String, Any?>> ?: error(tr("Catalogue invalide", "Invalid catalog"))
                 rows.forEach { row ->
-                    val itemPath = row["path"] as? String ?: error("Chemin absent")
+                    val itemPath = row["path"] as? String ?: error(tr("Chemin absent", "Missing path"))
                     require(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(itemPath))
                     items[itemPath] = HfTreeItem(itemPath, row["type"] as? String ?: "file", (row["size"] as? Number)?.toLong() ?: 0L)
                 }
-                require(items.size <= 5000) { "Catalogue distant trop volumineux" }
+                require(items.size <= 5000) { tr("Catalogue distant trop volumineux", "Remote catalog too large") }
                 next = r.headers.values("Link").flatMap { it.split(',') }.firstOrNull { it.contains("rel=\"next\"") }
                     ?.substringAfter('<')?.substringBefore('>')
             }
@@ -513,7 +514,7 @@ class HfApiClient(
         val request = newRequestBuilder(resolveUrl(repoId, revision, path)).get().build()
         client.newCall(request).execute().use { r ->
             if (r.code == 404) return@withContext null
-            check(r.isSuccessful) { "Lecture coordination refusée (HTTP ${r.code})" }
+            check(r.isSuccessful) { tr("Lecture coordination refusée (HTTP ${r.code})", "Coordination read refused (HTTP ${r.code})") }
             val body = r.body ?: return@withContext ""
             val out = java.io.ByteArrayOutputStream()
             body.byteStream().use { DurableFiles.copyBounded(it, out, maxBytes) }
@@ -525,8 +526,8 @@ class HfApiClient(
         for (path in paths) {
             coroutineContext.ensureActive()
             client.newCall(newRequestBuilder(resolveUrl(repoId, commit, path)).head().build()).execute().use { r ->
-                check(r.code == 404) { if (r.isSuccessful) "Chemin distant déjà occupé : nouvel emplacement requis"
-                    else "Impossible de vérifier l’absence du chemin distant (HTTP ${r.code})" }
+                check(r.code == 404) { if (r.isSuccessful) tr("Chemin distant déjà occupé : nouvel emplacement requis", "Remote path already in use: new location required")
+                    else tr("Impossible de vérifier l’absence du chemin distant (HTTP ${r.code})", "Cannot verify that the remote path is absent (HTTP ${r.code})") }
             }
         }
     }
@@ -534,7 +535,7 @@ class HfApiClient(
     suspend fun verifyRemoteCommit(repoId: String, commitSha: String): Boolean = withContext(Dispatchers.IO) {
         if (!commitSha.matches(Regex("[a-fA-F0-9]{40}|[a-fA-F0-9]{64}"))) return@withContext false
         try {
-            val repo = StudioWorkflow.normalizeRepo(repoId, destination = true) ?: error("Dépôt de destination invalide")
+            val repo = StudioWorkflow.normalizeRepo(repoId, destination = true) ?: error(tr("Dépôt de destination invalide", "Invalid destination repository"))
             client.newCall(newRequestBuilder("https://huggingface.co/api/datasets/$repo/revision/$commitSha").build()).execute().use { r ->
                 r.isSuccessful && parseObject(r.body?.let(::boundedJson)?.ifBlank { "{}" } ?: "{}")["sha"] == commitSha
             }
@@ -556,12 +557,12 @@ class HfApiClient(
                 client.newCall(newRequestBuilder(resolveUrl(repoId, commitSha, file.path)).build()).execute().use { response ->
                     check(response.isSuccessful)
                     val digest = MessageDigest.getInstance("SHA-256"); var count = 0L
-                    (response.body ?: error("Contenu absent")).byteStream().use { input ->
+                    (response.body ?: error(tr("Contenu absent", "Content missing"))).byteStream().use { input ->
                         val buffer = ByteArray(65536)
                         while (true) {
                             coroutineContext.ensureActive()
                             val n = input.read(buffer); if (n < 0) break
-                            check(n.toLong() <= file.size - count) { "Contenu distant trop long" }
+                            check(n.toLong() <= file.size - count) { tr("Contenu distant trop long", "Remote content too long") }
                             count += n; digest.update(buffer, 0, n)
                         }
                     }

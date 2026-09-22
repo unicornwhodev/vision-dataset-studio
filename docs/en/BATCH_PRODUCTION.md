@@ -20,6 +20,14 @@ The ledger survives export, purge and application restart. Migration seeds it fr
 
 The scope is one project on this installation. A separate project or a new installation without database restoration does not inherit the ledger. A dataset export is not a full project backup.
 
+## Delete, reset or switch projects
+
+**Workspace → Projects** creates and selects independent projects. Each retains its sources, batches, annotations, model settings and fingerprints. The model library and HF connection belong to the device.
+
+**Delete batch · keep history** discards an unexported batch after confirmation. Working images and annotations are removed, but its source cursor, fingerprints and batch number remain reserved. The same images cannot return in a later batch of that project. Exported batches use the usual verified cleanup action.
+
+**Reset** explicitly removes the relevant history and allows reimporting. Resetting, or deleting a whole project, intentionally discards its historical reimport protection. It is distinct from normal batch cleanup.
+
 ## APK and models
 
 The APK includes runtimes, adapters, contracts, catalogue, tokenization and download/import logic. Weights are obtained after installation and stored in Android private storage. No user corpus or model weights are bundled.

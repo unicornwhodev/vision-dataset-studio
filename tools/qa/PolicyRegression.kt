@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
     test("unlocalizable present is distinct and accepted") { check(issues(SampleAnnotations(quality=QualityAuditTarget(isUnlocalizablePresent=true)),StudioTask.POINTING).isEmpty()) }
     test("contradictory absence and presence blocked") { check(issues(SampleAnnotations(quality=QualityAuditTarget(verifiedNegativeQueries=listOf("object"),isUnlocalizablePresent=true)),StudioTask.DETECTION).isNotEmpty()) }
     test("valid human box accepted") { check(issues(SampleAnnotations(boxes=listOf(validBox())),StudioTask.DETECTION).isEmpty()) }
-    test("unverified AI box blocked") { check(issues(SampleAnnotations(boxes=listOf(validBox().copy(isHumanVerified=false))),StudioTask.DETECTION).any{it.contains("propositions")}) }
+    test("unverified AI box blocked") { check(issues(SampleAnnotations(boxes=listOf(validBox().copy(isHumanVerified=false))),StudioTask.DETECTION).isNotEmpty()) }
     test("degenerate box blocked") { check(issues(SampleAnnotations(boxes=listOf(validBox().copy(xmax=.1f))),StudioTask.DETECTION).isNotEmpty()) }
     test("NaN box coordinates blocked") { check(issues(SampleAnnotations(boxes=listOf(validBox().copy(xmin=Float.NaN))),StudioTask.DETECTION).isNotEmpty()) }
     test("out-of-image point blocked") { check(issues(SampleAnnotations(points=listOf(validPoint().copy(x=1.1f))),StudioTask.POINTING).isNotEmpty()) }
@@ -62,7 +62,7 @@ fun main(args: Array<String>) {
     test("grounding requires an existing target") { check(issues(SampleAnnotations(groundings=listOf(GroundingTarget("g","object",boxIds=listOf("missing")))),StudioTask.GROUNDING).isNotEmpty()) }
     test("grounding with text and actual target requires explicit review") {
         val a=SampleAnnotations(boxes=listOf(validBox()),groundings=listOf(GroundingTarget("g","object",boxIds=listOf("box"))))
-        check(issues(a,StudioTask.GROUNDING).any{it.contains("propositions")})
+        check(issues(a,StudioTask.GROUNDING).isNotEmpty())
         check(issues(a.copy(groundings=a.groundings.map{it.copy(isHumanVerified=true)}),StudioTask.GROUNDING).isEmpty())
     }
     test("uncertain cases require deferral not validation") { check(issues(SampleAnnotations(quality=QualityAuditTarget(isUncertain=true)),StudioTask.NEGATIVE).isNotEmpty()) }

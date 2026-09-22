@@ -39,7 +39,7 @@ class TrainingWorkflowTest {
         }
         val store=OnDeviceTraining(context)
         var refused=false
-        try {store.prepare(project,1,epochs=3,learningRate=.05f)}catch(e:IllegalArgumentException){refused=e.message?.contains("Exportez")==true}
+        try {store.prepare(project,1,epochs=3,learningRate=.05f)}catch(e:IllegalArgumentException){refused=true}
         assertTrue("A corrected but unexported batch cannot train",refused)
         val hf=com.unicornwhodev.visiondatasetstudio.data.hf.HfApiClient{null}
         val exporter=com.unicornwhodev.visiondatasetstudio.domain.export.DatasetExporters(storage,hf)

@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.unicornwhodev.visiondatasetstudio.data.model.*
 import java.util.UUID
 
@@ -26,7 +27,7 @@ object ProposalMerger {
         if("count" in replaceTypes && "COUNTING" in enabled) counts=counts.filter{retain(it.isHumanVerified,it.sourceProvenance,it.id)}+proposals.filter{it.type=="count"}.map{p->CountingTarget(id(),p.label,p.count,isExhaustive=false,sourceProvenance=p.source)}
         if("grounding" in replaceTypes && "GROUNDING" in enabled) {
             val generated=proposals.filter{it.type=="grounding"}.map { p ->
-                val targets=p.linkedProposalIds.map{proposalTargets[it] ?: error("Référence grounding absente de la fusion")}
+                val targets=p.linkedProposalIds.map{proposalTargets[it] ?: error(tr("Référence grounding absente de la fusion", "Grounding reference missing from the merge"))}
                 GroundingTarget(id(),p.text,boxIds=targets.filter{target->boxes.any{it.id==target}},pointIds=targets.filter{target->points.any{it.id==target}},isHumanVerified=false,sourceProvenance=p.source)
             }
             groundings=groundings.filter{it.isHumanVerified||!machine(it.sourceProvenance)}+generated
@@ -44,5 +45,5 @@ object ProposalMerger {
         captions=a.captions.map{it.copy(isHumanVerified=false,sourceProvenance="import")},
         tags=a.tags.map{it.copy(isHumanVerified=false,sourceProvenance="import")},
         groundings=a.groundings.map{it.copy(isHumanVerified=false,sourceProvenance="import")},vqaList=a.vqaList.map{it.copy(isHumanVerified=false,sourceProvenance="import")},
-        counts=a.counts.map{it.copy(isHumanVerified=false,sourceProvenance="import")},quality=QualityAuditTarget(auditNotes="Annotations importées à relire; aucun état de validation importé."))
+        counts=a.counts.map{it.copy(isHumanVerified=false,sourceProvenance="import")},quality=QualityAuditTarget(auditNotes=tr("Annotations importées à relire; aucun état de validation importé.", "Imported annotations need review; approval states are never imported.")))
 }

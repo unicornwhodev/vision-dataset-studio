@@ -161,7 +161,7 @@ class FeatureImplementationAuditTest {
             val human=TagTarget("human-1","human-reviewed",isHumanVerified=true)
             batch.saveSampleAnnotations("pending",SampleAnnotations(tags=listOf(human)))
             assertTrue(engine.lastError,engine.loadModel(file))
-            assertEquals(1,batch.runBatchInference(project.id,1,config))
+            assertEquals(1,batch.runBatchInference(project.id,1,config,replaceExistingProposals=true))
             val annotations=batch.getSampleAnnotations("pending")
             assertTrue(annotations.tags.contains(human))
             assertEquals(3,annotations.tags.count { !it.isHumanVerified && it.sourceProvenance.startsWith("model_litert:") })

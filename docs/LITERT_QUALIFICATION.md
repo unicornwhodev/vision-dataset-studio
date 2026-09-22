@@ -1,4 +1,30 @@
-# Qualification LiteRT — 4.2.0-rc3
+# Qualification LiteRT — audit du 22 septembre 2026
+
+**12 conversions réussies**, dont **7 avec apprentissage Android**, sur 31 conversions téléchargées. RF-DETR a atteint la limite de 30 minutes de l’émulateur logiciel : cet essai ne permet pas de conclure sur sa compatibilité. Les 18 autres conversions sont en cours de recette, dont les six de la source privée. Le défaut RTMDet de rc3 est corrigé et son inférence passe. Aucun identifiant ni poids privé n’est publié.
+
+| Conversion | Inference | Train / save / restore / resume | Output delta | Restore delta | Build |
+|---|---|---|---:|---:|---|
+| edgenext_xx_small_learning | PASS | PASS | 0.09351325 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| edgenext_x_small_learning | PASS | PASS | 0.09805727 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| repvit_m1 | PASS | — | — | — | `20260922T192944Z-f27bfcef901a` |
+| rtmdet_tiny | PASS | — | — | — | `20260922T201906Z-8b8b1f4b8b2d` |
+| rtmdet_tiny_learning | PASS | PASS | 0.15809631 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| hgnetv2_b0 | PASS | — | — | — | `20260922T192944Z-f27bfcef901a` |
+| edgenext_small_usi_learning | PASS | PASS | 0.07088137 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| repvit_m1_learning | PASS | PASS | 4.5994983 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| tinyclip_learning | PASS | PASS | 0.0015258789 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| efficientformer_l1_learning | PASS | PASS | 0.1378746 | 0.0 | `20260922T204312Z-40a01b844d03` |
+| dinov2 | PASS | — | — | — | `20260922T204312Z-40a01b844d03` |
+| tinyclip | PASS | — | — | — | `20260922T204312Z-40a01b844d03` |
+| rfdetr | TIMEOUT | — | — | — | `20260922T204312Z-40a01b844d03` |
+
+[JSON evidence](../test-results/functional-audit-20260922/public-model-results.json).
+
+Les tests utilisent les APK indiquées dans chaque reçu. Les SHA sont conservés dans ces preuves pour identifier les artefacts testés ; **ils ne conditionnent plus l’import ni l’utilisation dans l’application**. Un modèle sans apprentissage reste utilisable en inférence. Les signatures entraînables actuelles modifient une tête ou une adaptation de sortie, avec encodeur figé. Aucun gain de précision ni résultat sur téléphone ARM n’est revendiqué.
+
+---
+
+# Historique figé — 4.2.0-rc3
 
 **Français** · [English](en/LITERT_QUALIFICATION.md)
 

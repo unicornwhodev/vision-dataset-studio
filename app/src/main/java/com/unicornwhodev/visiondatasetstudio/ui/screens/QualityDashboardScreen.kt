@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
 import com.unicornwhodev.visiondatasetstudio.R
 
@@ -47,8 +48,8 @@ fun QualityDashboardScreen(viewModel: MainViewModel) {
             LazyColumn(Modifier.widthIn(max = 900.dp).fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
                 if (samples.isEmpty()) item {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("Aucun lot à analyser", style = MaterialTheme.typography.titleLarge)
-                        Text("Les résultats apparaîtront après l’import des images.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(tr("Aucun lot à analyser", "No batch to analyze"), style = MaterialTheme.typography.titleLarge)
+                        Text(tr("Les résultats apparaîtront après l’import des images.", "Results will appear after importing images."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         OutlinedButton(onClick = { viewModel.navigateTo(com.unicornwhodev.visiondatasetstudio.ui.Screen.BatchGrid) }) {
                             Text(stringResource(R.string.quality_open_batches)); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ArrowForward, null, Modifier.size(18.dp))
                         }
@@ -59,16 +60,16 @@ fun QualityDashboardScreen(viewModel: MainViewModel) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween) {
                                 Column {
-                                    Text("REVUE DU LOT", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(tr("REVUE DU LOT", "BATCH REVIEW"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Text("$reviewed / ${samples.size}", style = MaterialTheme.typography.headlineLarge)
                                 }
                                 Text("${(progress * 100).toInt()} %", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                             }
                             LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().height(4.dp), trackColor = MaterialTheme.colorScheme.surfaceVariant)
                             Row(Modifier.fillMaxWidth()) {
-                                MetricTile("$validated", "Validés", Modifier.weight(1f))
-                                MetricTile("$deferred", "À revoir", Modifier.weight(1f))
-                                MetricTile("$rejected", "Rejetés", Modifier.weight(1f))
+                                MetricTile("$validated", tr("Validés", "Approved"), Modifier.weight(1f))
+                                MetricTile("$deferred", tr("À revoir", "To review"), Modifier.weight(1f))
+                                MetricTile("$rejected", tr("Rejetés", "Rejected"), Modifier.weight(1f))
                             }
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         }
@@ -77,18 +78,18 @@ fun QualityDashboardScreen(viewModel: MainViewModel) {
                 item {
                     StudioSection(stringResource(R.string.quality_storage), icon = Icons.Default.Storage) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("${metrics.second} Mo", style = MaterialTheme.typography.titleLarge)
-                            Text("/ ${project?.diskBudgetMb ?: 500} Mo", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(tr("${metrics.second} Mo", "${metrics.second} MB"), style = MaterialTheme.typography.titleLarge)
+                            Text(tr("/ ${project?.diskBudgetMb ?: 500} Mo", "/ ${project?.diskBudgetMb ?: 500} MB"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         LinearProgressIndicator(progress = { (metrics.second.toFloat() / (project?.diskBudgetMb ?: 500L).coerceAtLeast(1L)).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(3.dp), color = MaterialTheme.colorScheme.secondary, trackColor = MaterialTheme.colorScheme.surfaceVariant)
-                        Text("${metrics.first} Mo libres sur l’appareil", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(tr("${metrics.first} Mo libres sur l’appareil", "${metrics.first} MB free on device"), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-                item { Text("Activité récente", style = MaterialTheme.typography.titleMedium) }
+                item { Text(tr("Activité récente", "Recent activity"), style = MaterialTheme.typography.titleMedium) }
                 if (logs.isEmpty()) item {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.History, null, tint = MaterialTheme.colorScheme.secondary)
-                        Text("Aucune activité enregistrée.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(tr("Aucune activité enregistrée.", "No activity recorded."), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 items(logs) { AuditLogItem(it) }
@@ -109,7 +110,7 @@ fun MetricColumn(label: String, value: String, color: Color) {
 fun AuditLogItem(log: AuditLogEntity) {
     var expanded by remember(log) { mutableStateOf(false) }
     val format = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
-    val title = when (log.action) { "VALIDATE" -> "Image validée"; "REJECT" -> "Image rejetée"; "DEFER" -> "Image à revoir"; "PUBLISHED_AND_PURGED" -> "Publication terminée"; else -> log.action }
+    val title = when (log.action) { "VALIDATE" -> tr("Image validée", "Image approved"); "REJECT" -> tr("Image rejetée", "Image rejected"); "DEFER" -> tr("Image à revoir", "Image deferred for review"); "PUBLISHED_AND_PURGED" -> tr("Publication terminée", "Publication completed"); else -> log.action }
     Column(Modifier.fillMaxWidth().clickable { expanded = !expanded }.animateContentSize()) {
         Row(Modifier.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Icon(when (log.action) { "VALIDATE" -> Icons.Default.CheckCircleOutline; "REJECT" -> Icons.Default.Block; "DEFER" -> Icons.Default.Schedule; else -> Icons.Default.History },

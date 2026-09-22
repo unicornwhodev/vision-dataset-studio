@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.data.model
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.squareup.moshi.JsonClass
 
 enum class TaskType {
@@ -194,6 +195,12 @@ data class SampleAnnotations(
     val quality: QualityAuditTarget = QualityAuditTarget()
 )
 
+/** Shared by persistence, batch filters and the editor; includes non-spatial proposals. */
+val SampleAnnotations.unreviewedCount: Int get() =
+    points.count{!it.isHumanVerified}+boxes.count{!it.isHumanVerified}+masks.count{!it.isHumanVerified}+
+    captions.count{!it.isHumanVerified}+tags.count{!it.isHumanVerified}+groundings.count{!it.isHumanVerified}+
+    vqaList.count{!it.isHumanVerified}+counts.count{!it.isHumanVerified}
+
 /** Explicit instance relations only: geometry and labels never create links implicitly. */
 object InstanceLinks {
     private data class Member(val id:String,val kind:String,val label:String,val instanceId:String?)
@@ -216,7 +223,7 @@ object InstanceLinks {
         require(instanceId.isNotBlank()&&targetIds.isNotEmpty())
         val selected=members(a).filter{it.id in targetIds}
         require(selected.size==targetIds.size&&selected.map{it.kind}.distinct().size==selected.size)
-        require(selected.map{it.label}.distinct().size==1){"Une instance liée doit conserver la même classe"}
+        require(selected.map{it.label}.distinct().size==1){tr("Une instance liée doit conserver la même classe", "A linked instance must keep the same class")}
         val cleared=targetIds.fold(a){state,id->unlink(state,id)}
         return cleared.copy(
             boxes=cleared.boxes.map{if(it.id in targetIds)it.copy(instanceId=instanceId)else it},
@@ -225,10 +232,10 @@ object InstanceLinks {
     }
     fun problems(a:SampleAnnotations):List<String> = buildList {
         val linked=members(a).filter{it.instanceId!=null}
-        if(linked.any{it.instanceId!!.isBlank()})add("Un identifiant d’instance est vide.")
+        if(linked.any{it.instanceId!!.isBlank()})add(tr("Un identifiant d’instance est vide.", "An instance identifier is empty."))
         linked.filter{!it.instanceId.isNullOrBlank()}.groupBy{it.instanceId}.forEach{(_,group)->
-            if(group.groupBy{it.kind}.any{it.value.size>1})add("Une instance contient plusieurs régions du même type.")
-            if(group.map{it.label}.distinct().size>1)add("Une instance contient des classes contradictoires.")
+            if(group.groupBy{it.kind}.any{it.value.size>1})add(tr("Une instance contient plusieurs régions du même type.", "An instance contains multiple regions of the same type."))
+            if(group.map{it.label}.distinct().size>1)add(tr("Une instance contient des classes contradictoires.", "An instance contains conflicting classes."))
         }
     }.distinct()
 }

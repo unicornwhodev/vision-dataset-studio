@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import java.io.File
 import java.text.Normalizer
 import java.util.Locale
@@ -46,7 +47,7 @@ class BytePairTokenizer(file:File) {
                 val pair=encoded[index] to encoded[index+1];var i=0
                 while(i<encoded.lastIndex)if(encoded[i]==pair.first && encoded[i+1]==pair.second){encoded[i]+=encoded.removeAt(i+1);i++}else i++
             }
-            encoded.map{vocab[it] ?: error("Jeton BPE absent du vocabulaire")}
+            encoded.map{vocab[it] ?: error(tr("Jeton BPE absent du vocabulaire", "BPE token missing from vocabulary"))}
         }
     }
     fun encode(text:String,capacity:Int,pad:Int):Pair<IntArray,IntArray> {
@@ -59,14 +60,14 @@ class BytePairTokenizer(file:File) {
         fun append(part:String){(if(clip)clipPattern else bytePattern).findAll(part).forEach{ids.addAll(word(it.value))}}
         for(match in special.findAll(normalized)){append(normalized.substring(cursor,match.range.first));ids.add(added.getValue(match.value));cursor=match.range.last+1}
         append(normalized.substring(cursor));ids.add(eos)
-        require(ids.size<=capacity){"Prompt trop long pour les $capacity jetons du modèle"}
+        require(ids.size<=capacity){tr("Prompt trop long pour les $capacity jetons du modèle", "Prompt too long for the model's $capacity tokens")}
         return IntArray(capacity){ids.getOrElse(it){pad}} to IntArray(capacity){if(it<ids.size)1 else 0}
     }
     fun decode(ids:List<Int>,skipSpecial:Boolean=false):String {
         val result=StringBuilder();val bytes=ByteArrayOutputStream()
         fun flush(){result.append(bytes.toString("UTF-8"));bytes.reset()}
         for(id in ids){
-            val token=inverse[id] ?: added.entries.firstOrNull{it.value==id}?.key ?: error("ID jeton inconnu")
+            val token=inverse[id] ?: added.entries.firstOrNull{it.value==id}?.key ?: error(tr("ID jeton inconnu", "Unknown token ID"))
             if(id in specialIds){flush();if(!skipSpecial)result.append(token)}
             else for(ch in token.replace("</w>"," ")){val b=charsToBytes[ch];if(b==null){flush();result.append(ch)}else bytes.write(b)}
         };flush();return result.toString()

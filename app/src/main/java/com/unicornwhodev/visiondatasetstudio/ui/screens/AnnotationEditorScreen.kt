@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.unicornwhodev.visiondatasetstudio.R
 
 import android.graphics.Paint
@@ -77,7 +78,16 @@ private fun EditorCommand(icon: ImageVector, description: String, onClick: () ->
 
 /** Selection and creation are separate tools: moving an existing target never creates another. */
 enum class EditorTool { SELECT, BOX, POINT, MASK, ERASE, POLYGON, LASSO, FILL, SAM_POINT, PAN_ZOOM }
-private enum class EditorTab(val title: String) { REGIONS("Régions"), CAPTION("Légendes"), TAGS("Tags"), GROUNDING("Texte ↔ région"), VQA("VQA"), COUNTING("Comptage"), QUALITY("Qualité") }
+private enum class EditorTab(private val titleText: () -> String) {
+    REGIONS({ tr("Régions", "Regions") }),
+    CAPTION({ tr("Légendes", "Captions") }),
+    TAGS({ "Tags" }),
+    GROUNDING({ tr("Texte ↔ région", "Text ↔ region") }),
+    VQA({ "VQA" }),
+    COUNTING({ tr("Comptage", "Counting") }),
+    QUALITY({ tr("Qualité", "Quality") });
+    val title get() = titleText()
+}
 private fun enabledTabs(tasks: Set<StudioTask>): List<EditorTab> = buildList {
     if (tasks.any { it in setOf(StudioTask.POINTING, StudioTask.POINTING_MULTI, StudioTask.DETECTION, StudioTask.SEGMENTATION, StudioTask.GROUNDING) }) add(EditorTab.REGIONS)
     if (StudioTask.CAPTIONING in tasks) add(EditorTab.CAPTION)
@@ -101,6 +111,8 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
     val a by viewModel.currentAnnotations.collectAsState()
     val project by viewModel.projectFlow.collectAsState()
     val prefs by viewModel.preferences.collectAsState()
+    val workflow by viewModel.workflow.collectAsState()
+    var showWorkflowInstructions by remember { mutableStateOf(false) }
     val samples by viewModel.batchSamples.collectAsState()
     val saving by viewModel.saveState.collectAsState()
     val canUndo by viewModel.undoAvailable.collectAsState()
@@ -138,7 +150,8 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
     val maskAllowed = StudioTask.SEGMENTATION in tasks
     val boxAllowed = StudioTask.DETECTION in tasks || StudioTask.GROUNDING in tasks
     val pointAllowed = StudioTask.POINTING in tasks || StudioTask.POINTING_MULTI in tasks || StudioTask.GROUNDING in tasks
-    val hasProposals = a.masks.any { !it.isHumanVerified } || a.boxes.any { !it.isHumanVerified } || a.points.any { !it.isHumanVerified } || a.tags.any { !it.isHumanVerified } || a.captions.any { !it.isHumanVerified } || a.vqaList.any { !it.isHumanVerified } || a.counts.any { !it.isHumanVerified } || a.groundings.any { !it.isHumanVerified }
+    val proposalCount=a.unreviewedCount
+    val hasProposals=proposalCount>0
     val hasModel = !project?.modelPath.isNullOrBlank() || project?.modelConfigJson?.contains("local_http") == true
     val modelAction=remember(project?.modelConfigJson,project?.activeTasksCsv) {
         project?.modelConfigJson?.let { json -> runCatching { StudioJson.moshi.adapter(ModelConfig::class.java).fromJson(json) }.getOrNull() }
@@ -151,13 +164,13 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
         Column(modifier.background(MaterialTheme.colorScheme.surface)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("Annotations", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-                EditorCommand(Icons.Default.Close, "Fermer les propriétés", onClick = { propertiesOpen = false })
+                EditorCommand(Icons.Default.Close, tr("Fermer les propriétés", "Close properties"), onClick = { propertiesOpen = false })
             }
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 8.dp)) {
                 tabs.forEach { t -> TextButton(onClick = { tab = t }, colors = ButtonDefaults.textButtonColors(contentColor = if (tab == t) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)) { Text(t.title, style = MaterialTheme.typography.labelMedium) } }
             }
             if (regionTab) Box(Modifier.padding(horizontal = 8.dp)) {
-                TextButton(onClick = { labelMenu = true }) { Text("Classe · $label", style = MaterialTheme.typography.labelMedium); Icon(Icons.Default.ArrowDropDown, null, Modifier.size(18.dp)) }
+                TextButton(onClick = { labelMenu = true }) { Text(tr("Classe · $label", "Class · $label"), style = MaterialTheme.typography.labelMedium); Icon(Icons.Default.ArrowDropDown, null, Modifier.size(18.dp)) }
                 DropdownMenu(expanded = labelMenu, onDismissRequest = { labelMenu = false }) {
                     classes.forEach { cls -> DropdownMenuItem(text = { Text(cls) }, onClick = { label = cls; labelMenu = false }) }
                 }
@@ -187,21 +200,21 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
     Scaffold(contentWindowInsets = WindowInsets(0), modifier = Modifier.imePadding(), topBar = {
         Column {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                EditorCommand(Icons.AutoMirrored.Filled.ArrowBack, "Revenir au lot après enregistrement", onClick = viewModel::back, enabled = !locked)
+                EditorCommand(Icons.AutoMirrored.Filled.ArrowBack, tr("Revenir au lot après enregistrement", "Return to batch after saving"), onClick = viewModel::back, enabled = !locked)
                 Column(Modifier.weight(1f)) {
-                    Text(sample?.assetId ?: "Image", maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelLarge)
-                    Text("$position / ${samples.size.coerceAtLeast(1)}  ·  " + if (saving == "Enregistré sur cet appareil") "Enregistré" else saving, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.labelSmall, color = if (saving.startsWith("Échec")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(sample?.assetId ?: tr("Image", "Image"), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelLarge)
+                    Text("$position / ${samples.size.coerceAtLeast(1)}  ·  " + if (saving == tr("Enregistré sur cet appareil", "Saved on this device")) tr("Enregistré", "Saved") else saving, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.labelSmall, color = if (saving.startsWith(tr("Échec", "Failed"))) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if(wideCommands) {
-                    EditorCommand(Icons.Default.ChevronLeft, "Image précédente", onClick = { viewModel.moveSample(-1) }, enabled = position > 1 && !locked)
-                    EditorCommand(Icons.Default.ChevronRight, "Image suivante", onClick = { viewModel.moveSample(1) }, enabled = position < samples.size && !locked)
+                    EditorCommand(Icons.Default.ChevronLeft, tr("Image précédente", "Previous image"), onClick = { viewModel.moveSample(-1) }, enabled = position > 1 && !locked)
+                    EditorCommand(Icons.Default.ChevronRight, tr("Image suivante", "Next image"), onClick = { viewModel.moveSample(1) }, enabled = position < samples.size && !locked)
                     VerticalDivider(Modifier.height(18.dp), color = MaterialTheme.colorScheme.outlineVariant)
                 }
-                EditorCommand(Icons.AutoMirrored.Filled.Undo, "Annuler la dernière modification", onClick = viewModel::undo, enabled = canUndo && !locked, modifier = Modifier.testTag("undo_button"))
-                EditorCommand(Icons.AutoMirrored.Filled.Redo, "Rétablir", onClick = viewModel::redo, enabled = canRedo && !locked, modifier = Modifier.testTag("redo_button"))
+                EditorCommand(Icons.AutoMirrored.Filled.Undo, tr("Annuler la dernière modification", "Undo last change"), onClick = viewModel::undo, enabled = canUndo && !locked, modifier = Modifier.testTag("undo_button"))
+                EditorCommand(Icons.AutoMirrored.Filled.Redo, tr("Rétablir", "Redo"), onClick = viewModel::redo, enabled = canRedo && !locked, modifier = Modifier.testTag("redo_button"))
                 Box {
-                    EditorCommand(Icons.Default.MoreVert, "Actions du cas", onClick = { more = true })
+                    EditorCommand(Icons.Default.MoreVert, tr("Actions du cas", "Sample actions"), onClick = { more = true })
                     DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
                         DropdownMenuItem(text = { Text(stringResource(R.string.editor_zoom_in)) }, onClick = { zoom = (zoom * 1.25f).coerceAtMost(12f); more = false })
                         DropdownMenuItem(text = { Text(stringResource(R.string.editor_zoom_out)) }, onClick = { zoom = (zoom / 1.25f).coerceAtLeast(1f); more = false })
@@ -235,8 +248,8 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                     val roomy = maxWidth >= 600.dp
                     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         val validate: @Composable () -> Unit = {
-                            EditorCommand(Icons.Default.Check, if (prefs.autoAdvance) "Valider et passer à l’image suivante" else "Valider l’image",
-                                onClick = viewModel::validateCurrentAndNext, enabled = !locked && !saving.startsWith("Échec"), accent = true, modifier = Modifier.testTag("validate_next_button"))
+                            EditorCommand(Icons.Default.Check, if (prefs.autoAdvance) tr("Valider et passer à l’image suivante", "Approve and move to the next image") else tr("Valider l’image", "Approve image"),
+                                onClick = viewModel::validateCurrentAndNext, enabled = !locked && !saving.startsWith(tr("Échec", "Failed")), accent = true, modifier = Modifier.testTag("validate_next_button"))
                         }
                         if (prefs.leftHanded) validate()
                         Row(Modifier.weight(1f).horizontalScroll(rememberScrollState())) {
@@ -244,7 +257,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                             .filter { (it != EditorTool.BOX || boxAllowed) && (it != EditorTool.POINT || pointAllowed) && (it !in setOf(EditorTool.MASK,EditorTool.ERASE,EditorTool.POLYGON,EditorTool.LASSO,EditorTool.FILL) || maskAllowed) && (it != EditorTool.SELECT || boxAllowed || pointAllowed || maskAllowed) }
                             .forEach { t ->
                                 val icon = when(t) { EditorTool.SELECT -> Icons.Default.NearMe; EditorTool.BOX -> Icons.Default.CropSquare; EditorTool.POINT, EditorTool.SAM_POINT -> Icons.Default.MyLocation; EditorTool.MASK -> Icons.Default.Brush; EditorTool.ERASE -> Icons.Default.AutoFixOff;EditorTool.POLYGON->Icons.Default.ChangeHistory;EditorTool.LASSO->Icons.Default.Gesture;EditorTool.FILL->Icons.Default.FormatColorFill; EditorTool.PAN_ZOOM -> Icons.Default.PanTool }
-                                val description = when(t) { EditorTool.SELECT -> "Sélectionner et déplacer"; EditorTool.BOX -> "Dessiner une boîte"; EditorTool.POINT -> "Placer un point"; EditorTool.SAM_POINT -> "Pointer pour SAM"; EditorTool.MASK -> "Peindre le masque"; EditorTool.ERASE -> "Effacer le masque";EditorTool.POLYGON->"Polygone · double-tap pour fermer";EditorTool.LASSO->"Lasso";EditorTool.FILL->"Remplir une zone"; EditorTool.PAN_ZOOM -> "Déplacer et zoomer l’image" }
+                                val description = when(t) { EditorTool.SELECT -> tr("Sélectionner et déplacer", "Select and move"); EditorTool.BOX -> tr("Dessiner une boîte", "Draw a box"); EditorTool.POINT -> tr("Placer un point", "Place a point"); EditorTool.SAM_POINT -> tr("Pointer pour SAM", "Point for SAM"); EditorTool.MASK -> tr("Peindre le masque", "Paint mask"); EditorTool.ERASE -> tr("Effacer le masque", "Erase mask");EditorTool.POLYGON->tr("Polygone · double-tap pour fermer", "Polygon · double-tap to close");EditorTool.LASSO->"Lasso";EditorTool.FILL->tr("Remplir une zone", "Fill an area"); EditorTool.PAN_ZOOM -> tr("Déplacer et zoomer l’image", "Pan and zoom the image") }
                                 EditorCommand(icon, description, selected = tool == t, enabled = !locked, onClick = {
                                     tool = t
                                     if (t != EditorTool.PAN_ZOOM && EditorTab.REGIONS in tabs) tab = EditorTab.REGIONS
@@ -252,17 +265,17 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                             }
                         }
                         if (roomy) {
-                            EditorCommand(Icons.Default.Remove, "Zoom arrière", onClick = { zoom = (zoom / 1.25f).coerceAtLeast(1f) })
+                            EditorCommand(Icons.Default.Remove, tr("Zoom arrière", "Zoom out"), onClick = { zoom = (zoom / 1.25f).coerceAtLeast(1f) })
                             TextButton(onClick = { zoom = 1f; pan = Offset.Zero }) { Text("${(zoom * 100).toInt()} %", style = MaterialTheme.typography.labelMedium) }
-                            EditorCommand(Icons.Default.Add, "Zoom avant", onClick = { zoom = (zoom * 1.25f).coerceAtMost(12f) })
+                            EditorCommand(Icons.Default.Add, tr("Zoom avant", "Zoom in"), onClick = { zoom = (zoom * 1.25f).coerceAtMost(12f) })
                             Spacer(Modifier.weight(1f))
                         }
-                        EditorCommand(Icons.Default.Tune, "Annotations et propriétés", onClick = { propertiesOpen = !propertiesOpen }, selected = propertiesOpen)
+                        EditorCommand(Icons.Default.Tune, tr("Annotations et propriétés", "Annotations and properties"), onClick = { propertiesOpen = !propertiesOpen }, selected = propertiesOpen)
                         if (!prefs.leftHanded) validate()
                     }
                 }
                 if(tool in setOf(EditorTool.MASK,EditorTool.ERASE)) Row(Modifier.fillMaxWidth().padding(horizontal=12.dp),verticalAlignment=Alignment.CenterVertically) {
-                    Text(if(tool==EditorTool.MASK)"Pinceau" else "Gomme",style=MaterialTheme.typography.labelMedium)
+                    Text(if(tool==EditorTool.MASK)tr("Pinceau", "Brush") else tr("Gomme", "Eraser"),style=MaterialTheme.typography.labelMedium)
                     Slider(value=if(tool==EditorTool.MASK)brushSize else eraserSize,onValueChange={if(tool==EditorTool.MASK)brushSize=it else eraserSize=it},valueRange=0.005f..0.1f,modifier=Modifier.weight(1f))
                     Text("${(((if(tool==EditorTool.MASK)brushSize else eraserSize)*100)).toInt()} %",style=MaterialTheme.typography.labelMedium)
                 }
@@ -276,11 +289,28 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
                     Box(Modifier.weight(1f).fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainerLowest).clipToBounds()) {
                         InteractiveAnnotationCanvas(sample, a, if (locked || (propertiesOpen && !regionTab)) EditorTool.PAN_ZOOM else tool,
                             label, selected, zoom, pan, { z, o -> zoom = z; pan = o }, { selected = it }, { next ->
-                                if (StudioTask.POINTING in tasks && next.points.size > 1 && next.points.size > a.points.size) viewModel.reportError("Mode Point unique : déplacez le point existant ou activez Points multiples.") else update(next)
+                                if (StudioTask.POINTING in tasks && next.points.size > 1 && next.points.size > a.points.size) viewModel.reportError(tr("Mode Point unique : déplacez le point existant ou activez Points multiples.", "Single-point mode: move the existing point or enable Multiple points.")) else update(next)
                             }, brushFraction=if(tool==EditorTool.ERASE)eraserSize else brushSize,showLabels = prefs.showCanvasLabels, promptPoint = samPoint, onPromptSelected = { samPoint = it })
                     }
+                    if(hasProposals || !workflow?.instructions.isNullOrBlank()) Row(Modifier.fillMaxWidth().padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically) {
+                        if(hasProposals) TextButton(onClick={
+                            tab=when {
+                                a.tags.any{!it.isHumanVerified} && EditorTab.TAGS in tabs->EditorTab.TAGS
+                                a.captions.any{!it.isHumanVerified} && EditorTab.CAPTION in tabs->EditorTab.CAPTION
+                                a.vqaList.any{!it.isHumanVerified} && EditorTab.VQA in tabs->EditorTab.VQA
+                                a.counts.any{!it.isHumanVerified} && EditorTab.COUNTING in tabs->EditorTab.COUNTING
+                                a.groundings.any{!it.isHumanVerified} && EditorTab.GROUNDING in tabs->EditorTab.GROUNDING
+                                else->tabs.first()
+                            };propertiesOpen=true
+                        },modifier=Modifier.testTag("annotation_proposals")) {
+                            Icon(Icons.Default.AutoAwesome,null,Modifier.size(16.dp));Spacer(Modifier.width(6.dp))
+                            Text(tr("$proposalCount proposition(s) à relire", "$proposalCount proposal(s) to review"),style=MaterialTheme.typography.labelMedium)
+                        }
+                        Spacer(Modifier.weight(1f))
+                        if(!workflow?.instructions.isNullOrBlank()) IconButton(onClick={showWorkflowInstructions=true}) { Icon(Icons.Default.Assignment,tr("Consignes du workflow", "Workflow instructions"),Modifier.size(18.dp)) }
+                    }
                     Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(horizontal = 12.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(if(tool==EditorTool.SAM_POINT) "SAM · pointez l’objet" else "$label · ${a.masks.size + a.boxes.size + a.points.size} régions", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        Text(if(tool==EditorTool.SAM_POINT) tr("SAM · pointez l’objet", "SAM · point to the object") else tr("$label · ${a.masks.size + a.boxes.size + a.points.size} régions", "$label · ${a.masks.size + a.boxes.size + a.points.size} regions"), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         if(wideCommands) Text("${sample?.imageWidth ?: 0} × ${sample?.imageHeight ?: 0}  ·  ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Text("${(zoom * 100).toInt()} %", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -298,6 +328,7 @@ fun AnnotationEditorScreen(sampleId: String, viewModel: MainViewModel) {
             }
         }
     }
+    if(showWorkflowInstructions) AlertDialog(onDismissRequest={showWorkflowInstructions=false},title={Text(tr("Consignes du workflow", "Workflow instructions"))},text={Text(workflow?.instructions.orEmpty())},confirmButton={TextButton(onClick={showWorkflowInstructions=false}){Text(stringResource(R.string.action_close))}})
     if (issues.isNotEmpty()) AlertDialog(onDismissRequest = viewModel::clearEditorIssues, title = { Text(stringResource(R.string.editor_review_before_validate)) }, text = {
         Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { issues.forEach { Text(it) } }
     }, confirmButton = { TextButton(onClick = viewModel::clearEditorIssues) { Text(stringResource(R.string.editor_return_corrections)) } })
@@ -367,7 +398,7 @@ fun InteractiveAnnotationCanvas(sample: SampleEntity?, annotations: SampleAnnota
     } }
     DisposableEffect(maskImages) { onDispose { maskImages.forEach { it.second.recycle() } } }
     Box(Modifier.fillMaxSize().clipToBounds().onSizeChanged { canvasSize = it }
-        .semantics { contentDescription = "Image à annoter. ${annotations.boxes.size} boîtes et ${annotations.points.size} points. Les régions sont aussi accessibles dans le panneau de correction." }
+        .semantics { contentDescription = tr("Image à annoter. ${annotations.boxes.size} boîtes et ${annotations.points.size} points. Les régions sont aussi accessibles dans le panneau de correction.", "Image to annotate. ${annotations.boxes.size} boxes and ${annotations.points.size} points. Regions are also accessible in the correction panel.") }
         .then(if(activeTool == EditorTool.PAN_ZOOM) Modifier.transformable(transformState) else Modifier)
         .pointerInput(sample?.sampleId, activeTool, selectedClass, viewport) {
             detectTapGestures(onDoubleTap = when(activeTool){EditorTool.PAN_ZOOM->{{_:Offset->transform(1f,Offset.Zero)}};EditorTool.POLYGON->{{_:Offset->if(polygonPoints.size>=3){val origin=latest;val old=origin.masks.firstOrNull{it.id==selectedId};val mask=old?:MaskCodec.empty(newId(),selectedClass,sample?.imageWidth?:512,sample?.imageHeight?:512);val next=MaskCodec.polygon(mask,polygonPoints);emit(origin.copy(masks=origin.masks.filterNot{it.id==next.id}+next));select(next.id);polygonPoints=emptyList()}}};else->null}, onTap = { at ->
@@ -499,13 +530,13 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if(mask!=null) {
             Row(verticalAlignment=Alignment.CenterVertically) {
-                Text("Masque · ${mask.width} × ${mask.height}",Modifier.weight(1f),style=MaterialTheme.typography.titleSmall)
-                IconButton(onClick={onUpdate(withoutTarget(a,mask.id));onSelect(null)}) { Icon(Icons.Default.DeleteOutline,"Supprimer le masque") }
+                Text(tr("Masque · ${mask.width} × ${mask.height}", "Mask · ${mask.width} × ${mask.height}"),Modifier.weight(1f),style=MaterialTheme.typography.titleSmall)
+                IconButton(onClick={onUpdate(withoutTarget(a,mask.id));onSelect(null)}) { Icon(Icons.Default.DeleteOutline,tr("Supprimer le masque", "Delete mask")) }
             }
             Row(Modifier.horizontalScroll(rememberScrollState())) { classes.forEach { cls ->
                 FilterChip(selected=mask.label==cls,onClick={onUpdate(a.copy(masks=a.masks.map { if(it.id==mask.id) it.copy(label=cls,isHumanVerified=true) else it }))},label={Text(cls)})
             } }
-            Text("Pinceau pour ajouter, gomme pour retirer. Annuler reste disponible.",style=MaterialTheme.typography.bodySmall)
+            Text(tr("Pinceau pour ajouter, gomme pour retirer. Annuler reste disponible.", "Brush to add, eraser to remove. Undo remains available."),style=MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
                 OutlinedButton(enabled=a.masks.count{it.label==mask.label&&it.width==mask.width&&it.height==mask.height}>=2,onClick={val chosen=a.masks.filter{it.label==mask.label&&it.width==mask.width&&it.height==mask.height};val merged=MaskCodec.merge(chosen,newId(),mask.label);onUpdate(a.copy(masks=a.masks-chosen.toSet()+merged));onSelect(merged.id)}){Text(stringResource(R.string.editor_merge))}
                 OutlinedButton(onClick={val pieces=MaskCodec.split(mask){newId()};if(pieces.size>1){onUpdate(a.copy(masks=a.masks.filterNot{it.id==mask.id}+pieces));onSelect(pieces.first().id)}}){Text(stringResource(R.string.editor_split_islands))}
@@ -515,8 +546,8 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
         }
         if(box==null && point==null && mask==null) {
             Row(verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.spacedBy(10.dp)) {
-                Text("${a.masks.size+a.boxes.size+a.points.size} régions", Modifier.weight(1f), style=MaterialTheme.typography.titleSmall)
-                val actionLabel=when(modelAction){
+                Text(tr("${a.masks.size+a.boxes.size+a.points.size} régions", "${a.masks.size+a.boxes.size+a.points.size} regions"), Modifier.weight(1f), style=MaterialTheme.typography.titleSmall)
+                val actionLabel=if(a.unreviewedCount>0 && modelAction in setOf(ModelAction.PREANNOTATE,ModelAction.PREANNOTATE_PARTIALLY)) tr("Relancer l’IA", "Rerun AI") else when(modelAction){
                     ModelAction.PREANNOTATE->stringResource(com.unicornwhodev.visiondatasetstudio.R.string.editor_action_preannotate)
                     ModelAction.PREANNOTATE_PARTIALLY->stringResource(com.unicornwhodev.visiondatasetstudio.R.string.editor_action_preannotate_partial)
                     ModelAction.COMPUTE_REPRESENTATION->stringResource(com.unicornwhodev.visiondatasetstudio.R.string.editor_action_embedding)
@@ -525,23 +556,23 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
                     ModelAction.NONE->stringResource(com.unicornwhodev.visiondatasetstudio.R.string.editor_action_model)
                 }
                 StudioAction(actionLabel, onInfer, icon=Icons.Default.Memory, enabled=!locked && modelAction!=ModelAction.INSPECT)
-                IconButton(onClick=onPaste,enabled=canPaste&&!locked){Icon(Icons.Default.ContentPaste,"Coller une boîte ou un point")}
+                IconButton(onClick=onPaste,enabled=canPaste&&!locked){Icon(Icons.Default.ContentPaste,tr("Coller une boîte ou un point", "Paste a box or point"))}
             }
-            if (a.masks.isEmpty() && a.boxes.isEmpty() && a.points.isEmpty()) Text("Choisissez un outil de dessin.", style=MaterialTheme.typography.bodySmall)
+            if (a.masks.isEmpty() && a.boxes.isEmpty() && a.points.isEmpty()) Text(tr("Choisissez un outil de dessin.", "Choose a drawing tool."), style=MaterialTheme.typography.bodySmall)
         } else if(mask==null) {
             Row(verticalAlignment=Alignment.CenterVertically) {
-                Text(if(box!=null) "Boîte sélectionnée" else "Point sélectionné",Modifier.weight(1f),style=MaterialTheme.typography.titleMedium)
-                IconButton(onClick={ onUpdate(withoutTarget(a, selected!!)); onSelect(null) }) { Icon(Icons.Default.DeleteOutline,"Supprimer la région sélectionnée") }
-                IconButton(onClick={onDuplicate(selected!!)},enabled=!locked){Icon(Icons.Default.CopyAll,"Dupliquer")}
-                IconButton(onClick={onCopy(selected!!)},enabled=!locked){Icon(Icons.Default.ContentCopy,"Copier")}
-                IconButton(onClick={onSelect(null)}) { Icon(Icons.Default.Close,"Désélectionner") }
+                Text(if(box!=null) tr("Boîte sélectionnée", "Selected box") else tr("Point sélectionné", "Selected point"),Modifier.weight(1f),style=MaterialTheme.typography.titleMedium)
+                IconButton(onClick={ onUpdate(withoutTarget(a, selected!!)); onSelect(null) }) { Icon(Icons.Default.DeleteOutline,tr("Supprimer la région sélectionnée", "Delete selected region")) }
+                IconButton(onClick={onDuplicate(selected!!)},enabled=!locked){Icon(Icons.Default.CopyAll,tr("Dupliquer", "Duplicate"))}
+                IconButton(onClick={onCopy(selected!!)},enabled=!locked){Icon(Icons.Default.ContentCopy,tr("Copier", "Copy"))}
+                IconButton(onClick={onSelect(null)}) { Icon(Icons.Default.Close,tr("Désélectionner", "Deselect")) }
             }
             Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
                 classes.forEach { label -> FilterChip(selected=(box?.label ?: point?.label)==label,onClick={
                     onUpdate(if(box!=null) a.copy(boxes=a.boxes.map { if(it.id==box.id) it.copy(label=label,isHumanVerified=true) else it }) else a.copy(points=a.points.map { if(it.id==point?.id) it.copy(label=label,isHumanVerified=true) else it }))
                 },label={Text(label)}) }
             }
-            Text(if(box!=null) "Glissez les coins pour redimensionner." else "Glissez ou utilisez les flèches.",style=MaterialTheme.typography.bodySmall)
+            Text(if(box!=null) tr("Glissez les coins pour redimensionner.", "Drag the corners to resize.") else tr("Glissez ou utilisez les flèches.", "Drag or use the arrows."),style=MaterialTheme.typography.bodySmall)
             if(point!=null) FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
                 fun state(value:PointLocalizationState) = onUpdate(a.copy(points=a.points.map{if(it.id==point.id)it.copy(
                     localizationState=value,isAbsent=value==PointLocalizationState.ABSENT,
@@ -556,7 +587,7 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
                     OutlinedIconButton(onClick={
                         if(point!=null) onUpdate(a.copy(points=a.points.map { if(it.id==point.id) it.copy(x=(it.x+d.first).coerceIn(0f,1f),y=(it.y+d.second).coerceIn(0f,1f),isHumanVerified=true) else it }))
                         if(box!=null) { val dx=d.first.coerceIn(-box.xmin,1f-box.xmax); val dy=d.second.coerceIn(-box.ymin,1f-box.ymax); onUpdate(a.copy(boxes=a.boxes.map { if(it.id==box.id) it.copy(xmin=it.xmin+dx,xmax=it.xmax+dx,ymin=it.ymin+dy,ymax=it.ymax+dy,isHumanVerified=true) else it })) }
-                    },modifier=Modifier.size(48.dp)) { Icon(icon,listOf("Déplacer à gauche","Déplacer vers le haut","Déplacer vers le bas","Déplacer à droite")[i]) }
+                    },modifier=Modifier.size(48.dp)) { Icon(icon,listOf(tr("Déplacer à gauche", "Move left"),tr("Déplacer vers le haut", "Move up"),tr("Déplacer vers le bas", "Move down"),tr("Déplacer à droite", "Move right"))[i]) }
                 }
                 Text("0,2 %",style=MaterialTheme.typography.labelSmall)
             }
@@ -567,8 +598,8 @@ private fun RegionInspector(a: SampleAnnotations, classes: List<String>, selecte
         selected?.takeIf{box!=null||point!=null||mask!=null}?.let { targetId ->
             InstanceLinkEditor(a,targetId,onUpdate,locked)
         }
-        a.masks.forEachIndexed { i,m -> RegionRow("Masque ${i+1}",m.label,m.id==selected,m.isHumanVerified,Icons.Default.Brush) { onSelect(m.id) } }
-        a.boxes.forEachIndexed { i,b -> RegionRow("Boîte ${i+1}",b.label,b.id==selected,b.isHumanVerified,Icons.Default.CropSquare) { onSelect(b.id) } }
+        a.masks.forEachIndexed { i,m -> RegionRow(tr("Masque ${i+1}", "Mask ${i+1}"),m.label,m.id==selected,m.isHumanVerified,Icons.Default.Brush) { onSelect(m.id) } }
+        a.boxes.forEachIndexed { i,b -> RegionRow(tr("Boîte ${i+1}", "Box ${i+1}"),b.label,b.id==selected,b.isHumanVerified,Icons.Default.CropSquare) { onSelect(b.id) } }
         a.points.forEachIndexed { i,p -> RegionRow("Point ${i+1}",p.label,p.id==selected,p.isHumanVerified,Icons.Default.MyLocation) { onSelect(p.id) } }
     }
 }
@@ -609,7 +640,7 @@ private fun RegionRow(title:String, label:String, selected:Boolean, verified:Boo
             Text(label,style=MaterialTheme.typography.labelMedium,maxLines=1,overflow=TextOverflow.Ellipsis)
             Text(title,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Icon(if(verified) Icons.Default.Check else Icons.Default.RadioButtonUnchecked,if(verified) "Revue humaine" else "Proposition à relire",Modifier.size(14.dp),tint=if(verified) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)
+        Icon(if(verified) Icons.Default.Check else Icons.Default.RadioButtonUnchecked,if(verified) tr("Revue humaine", "Human review") else tr("Proposition à relire", "Proposal to review"),Modifier.size(14.dp),tint=if(verified) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)
     }
 }
 
@@ -629,16 +660,17 @@ fun CaptionEditorTab(a: SampleAnnotations, defaultLanguage: String = "fr", onUpd
     val item=a.captions.getOrNull(index) ?: a.captions.firstOrNull()
     val currentIndex=if(index in a.captions.indices) index else 0
     fun write(c: CaptionTarget) { onUpdate(a.copy(captions=if(item==null) a.captions+c else a.captions.map { if(it.id==item.id) c else it })) }
-    EditorPanel("Légende de l’image", "Décrivez uniquement ce qui est visible. Plusieurs langues ou variantes peuvent coexister.") {
+    EditorPanel(tr("Légende de l’image", "Image caption"), tr("Décrivez uniquement ce qui est visible. Plusieurs langues ou variantes peuvent coexister.", "Describe only what is visible. Multiple languages or variants can coexist.")) {
         FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
             a.captions.forEachIndexed { i,c -> FilterChip(selected=i==currentIndex,onClick={index=i},label={Text("${i+1} · ${c.language}")}) }
             AssistChip(onClick={index=a.captions.size;onUpdate(a.copy(captions=a.captions+CaptionTarget(newId(),"",defaultLanguage,isHumanVerified=true)))},label={Text(stringResource(R.string.editor_add_variant))})
         }
         OutlinedTextField(value=item?.text ?: "",onValueChange={write((item ?: CaptionTarget(newId(),"",defaultLanguage,isHumanVerified=true)).copy(text=it,isHumanVerified=true))},label={Text(stringResource(R.string.editor_description))},minLines=3,maxLines=8,modifier=Modifier.fillMaxWidth())
         FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-            listOf("fr" to "Français","en" to "Anglais").forEach { (lang,title) -> FilterChip(selected=(item?.language ?: defaultLanguage)==lang,onClick={write((item ?: CaptionTarget(newId(),"",defaultLanguage,isHumanVerified=true)).copy(language=lang))},label={Text(title)}) }
+            listOf("fr" to tr("Français", "French"),"en" to tr("Anglais", "English")).forEach { (lang,title) -> FilterChip(selected=(item?.language ?: defaultLanguage)==lang,onClick={write((item ?: CaptionTarget(newId(),"",defaultLanguage,isHumanVerified=true)).copy(language=lang))},label={Text(title)}) }
             FilterChip(selected=item?.isDetailed==true,onClick={write((item ?: CaptionTarget(newId(),"",defaultLanguage,isHumanVerified=true)).copy(isDetailed=item?.isDetailed!=true))},label={Text(stringResource(R.string.editor_detailed))})
         }
+        if(item!=null && !item.isHumanVerified) Text(tr("Proposition à relire", "Proposal to review"),color=MaterialTheme.colorScheme.secondary)
         if(item!=null) TextButton(onClick={onUpdate(a.copy(captions=a.captions.filterNot { it.id==item.id }));index=0}) { Text(stringResource(R.string.editor_delete_variant)) }
     }
 }
@@ -647,30 +679,30 @@ fun CaptionEditorTab(a: SampleAnnotations, defaultLanguage: String = "fr", onUpd
 @Composable
 fun TagsEditorTab(a: SampleAnnotations, classes: List<String>, onUpdate: (SampleAnnotations) -> Unit) {
     var draft by rememberSaveable { mutableStateOf("") }
-    EditorPanel("Classes et tags", "Touchez pour ajouter ou retirer une étiquette. Aucune classe n’est déduite automatiquement.") {
+    EditorPanel(tr("Classes et tags", "Classes and tags"), tr("Touchez pour ajouter ou retirer une étiquette. Aucune classe n’est déduite automatiquement.", "Tap to add or remove a tag. Classes are never inferred automatically.")) {
         FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
             (classes+a.tags.map { it.label }).distinct().forEach { label ->
                 val selected=a.tags.any { it.label==label }
-                FilterChip(selected=selected,onClick={onUpdate(a.copy(tags=if(selected) a.tags.filterNot { it.label==label } else a.tags+TagTarget(newId(),label,isHumanVerified=true)))},label={Text(label)})
+                FilterChip(selected=selected,leadingIcon=if(a.tags.any { it.label==label && !it.isHumanVerified }){{Icon(Icons.Default.AutoAwesome,tr("Proposition à relire", "Proposal to review"),Modifier.size(16.dp))}}else null,onClick={onUpdate(a.copy(tags=if(selected) a.tags.filterNot { it.label==label } else a.tags+TagTarget(newId(),label,isHumanVerified=true)))},label={Text(label)})
             }
         }
         OutlinedTextField(draft,{draft=it},label={Text(stringResource(R.string.editor_other_tag))},singleLine=true,modifier=Modifier.fillMaxWidth())
         OutlinedButton(enabled=draft.isNotBlank(),onClick={val label=draft.trim();if(a.tags.none { it.label==label }) onUpdate(a.copy(tags=a.tags+TagTarget(newId(),label,isHumanVerified=true)));draft=""}) { Text(stringResource(R.string.editor_add_tag)) }
-        if(a.tags.any { !it.isHumanVerified }) Text("Des tags proposés par le modèle restent à relire via le menu du cas.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.error)
+        if(a.tags.any { !it.isHumanVerified }) Text(tr("Des tags proposés par le modèle restent à relire via le menu du cas.", "Model-proposed tags still need review in the sample menu."),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.error)
     }
 }
 
 @Composable
 fun VqaEditorTab(a: SampleAnnotations, onUpdate: (SampleAnnotations) -> Unit) {
-    EditorPanel("Questions et réponses", "L’image reste visible pendant la rédaction. Une abstention est différente d’une réponse vide.") {
+    EditorPanel(tr("Questions et réponses", "Questions and answers"), tr("L’image reste visible pendant la rédaction. Une abstention est différente d’une réponse vide.", "The image stays visible while writing. Abstaining differs from an empty answer.")) {
         a.vqaList.forEachIndexed { i,q ->
             fun write(v: VqaTarget) { onUpdate(a.copy(vqaList=a.vqaList.map { if(it.id==q.id) v else it })) }
             OutlinedCard {
                 Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                    Row(verticalAlignment=Alignment.CenterVertically) { Text("Question ${i+1}",Modifier.weight(1f));IconButton(onClick={onUpdate(a.copy(vqaList=a.vqaList.filterNot { it.id==q.id }))}){Icon(Icons.Default.DeleteOutline,"Supprimer la question ${i+1}")} }
+                    Row(verticalAlignment=Alignment.CenterVertically) { Text("Question ${i+1}",Modifier.weight(1f));IconButton(onClick={onUpdate(a.copy(vqaList=a.vqaList.filterNot { it.id==q.id }))}){Icon(Icons.Default.DeleteOutline,tr("Supprimer la question ${i+1}", "Delete question ${i+1}"))} }
                     OutlinedTextField(q.question,{write(q.copy(question=it,isHumanVerified=true))},label={Text(stringResource(R.string.editor_question))},modifier=Modifier.fillMaxWidth())
                     OutlinedTextField(q.answer,{write(q.copy(answer=it,isHumanVerified=true))},label={Text(stringResource(R.string.editor_answer))},enabled=!q.isAbstained,minLines=2,modifier=Modifier.fillMaxWidth())
-                    Row(verticalAlignment=Alignment.CenterVertically) { Checkbox(q.isAbstained,{write(q.copy(isAbstained=it,isHumanVerified=true))});Text("Indéterminable à partir de l’image",style=MaterialTheme.typography.bodySmall) }
+                    Row(verticalAlignment=Alignment.CenterVertically) { Checkbox(q.isAbstained,{write(q.copy(isAbstained=it,isHumanVerified=true))});Text(tr("Indéterminable à partir de l’image", "Cannot be determined from the image"),style=MaterialTheme.typography.bodySmall) }
                 }
             }
         }
@@ -681,12 +713,12 @@ fun VqaEditorTab(a: SampleAnnotations, onUpdate: (SampleAnnotations) -> Unit) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GroundingEditorTab(a: SampleAnnotations, onUpdate: (SampleAnnotations) -> Unit) {
-    EditorPanel("Relier le texte à l’image", "Dessinez d’abord les régions dans l’onglet Régions, puis associez-les à une expression.") {
+    EditorPanel(tr("Relier le texte à l’image", "Link text to the image"), tr("Dessinez d’abord les régions dans l’onglet Régions, puis associez-les à une expression.", "Draw regions in the Regions tab first, then link them to an expression.")) {
         a.groundings.forEach { g ->
             fun write(v: GroundingTarget) {onUpdate(a.copy(groundings=a.groundings.map {if(it.id==g.id) v else it}))}
             OutlinedTextField(g.phrase,{write(g.copy(phrase=it,isHumanVerified=true))},label={Text(stringResource(R.string.editor_grounding_phrase))},modifier=Modifier.fillMaxWidth())
             FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-                a.boxes.forEachIndexed { i,b -> FilterChip(selected=b.id in g.boxIds,onClick={write(g.copy(boxIds=if(b.id in g.boxIds) g.boxIds-b.id else g.boxIds+b.id,isHumanVerified=true))},label={Text("Boîte ${i+1} · ${b.label}")}) }
+                a.boxes.forEachIndexed { i,b -> FilterChip(selected=b.id in g.boxIds,onClick={write(g.copy(boxIds=if(b.id in g.boxIds) g.boxIds-b.id else g.boxIds+b.id,isHumanVerified=true))},label={Text(tr("Boîte ${i+1} · ${b.label}", "Box ${i+1} · ${b.label}"))}) }
                 a.points.filter{it.canProvideCoordinates}.forEachIndexed { i,p -> FilterChip(selected=p.id in g.pointIds,onClick={write(g.copy(pointIds=if(p.id in g.pointIds) g.pointIds-p.id else g.pointIds+p.id,isHumanVerified=true))},label={Text("Point ${i+1} · ${p.label}")}) }
             }
             TextButton(onClick={onUpdate(a.copy(groundings=a.groundings.filterNot{it.id==g.id}))}){Text(stringResource(R.string.editor_delete_expression))}
@@ -699,19 +731,19 @@ fun GroundingEditorTab(a: SampleAnnotations, onUpdate: (SampleAnnotations) -> Un
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CountingEditorTab(a: SampleAnnotations, classes: List<String>, onUpdate: (SampleAnnotations) -> Unit) {
-    EditorPanel("Compter les instances", "Zéro est une annotation valide. Indiquez si le comptage est exhaustif.") {
+    EditorPanel(tr("Compter les instances", "Count instances"), tr("Zéro est une annotation valide. Indiquez si le comptage est exhaustif.", "Zero is a valid annotation. Specify whether the count is exhaustive.")) {
         a.counts.forEach { c ->
             fun write(v: CountingTarget) {onUpdate(a.copy(counts=a.counts.map{if(it.id==c.id)v else it}))}
             OutlinedCard {
                 Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                     FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) { classes.forEach { label -> FilterChip(selected=c.label==label,onClick={write(c.copy(label=label,isHumanVerified=true))},label={Text(label)}) } }
                     Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
-                        OutlinedIconButton(onClick={write(c.copy(count=(c.count-1).coerceAtLeast(0),isHumanVerified=true))}){Icon(Icons.Default.Remove,"Diminuer le compte")}
+                        OutlinedIconButton(onClick={write(c.copy(count=(c.count-1).coerceAtLeast(0),isHumanVerified=true))}){Icon(Icons.Default.Remove,tr("Diminuer le compte", "Decrease count"))}
                         Text("${c.count}",style=MaterialTheme.typography.headlineMedium)
-                        OutlinedIconButton(onClick={write(c.copy(count=c.count+1,isHumanVerified=true))}){Icon(Icons.Default.Add,"Augmenter le compte")}
-                        Spacer(Modifier.weight(1f));IconButton(onClick={onUpdate(a.copy(counts=a.counts.filterNot{it.id==c.id}))}){Icon(Icons.Default.DeleteOutline,"Supprimer ce comptage")}
+                        OutlinedIconButton(onClick={write(c.copy(count=c.count+1,isHumanVerified=true))}){Icon(Icons.Default.Add,tr("Augmenter le compte", "Increase count"))}
+                        Spacer(Modifier.weight(1f));IconButton(onClick={onUpdate(a.copy(counts=a.counts.filterNot{it.id==c.id}))}){Icon(Icons.Default.DeleteOutline,tr("Supprimer ce comptage", "Delete this count"))}
                     }
-                    Row(verticalAlignment=Alignment.CenterVertically){Checkbox(c.isExhaustive,{write(c.copy(isExhaustive=it,isHumanVerified=true))});Text("Toutes les instances ont été comptées",style=MaterialTheme.typography.bodySmall)}
+                    Row(verticalAlignment=Alignment.CenterVertically){Checkbox(c.isExhaustive,{write(c.copy(isExhaustive=it,isHumanVerified=true))});Text(tr("Toutes les instances ont été comptées", "All instances have been counted"),style=MaterialTheme.typography.bodySmall)}
                     TextButton(onClick={val ids=a.boxes.filter{it.label==c.label}.map{it.id};write(c.copy(count=ids.size,linkedInstanceIds=ids,isHumanVerified=true))}){Text(stringResource(R.string.editor_count_boxes))}
                 }
             }
@@ -723,16 +755,16 @@ fun CountingEditorTab(a: SampleAnnotations, classes: List<String>, onUpdate: (Sa
 @Composable
 fun QualityEditorTab(a: SampleAnnotations, onUpdate: (SampleAnnotations) -> Unit) {
     fun write(q: QualityAuditTarget){onUpdate(a.copy(quality=q))}
-    EditorPanel("Décision qualité", "Non annoté, absent, présent mais non localisable et incertain sont des états distincts.") {
+    EditorPanel(tr("Décision qualité", "Quality decision"), tr("Non annoté, absent, présent mais non localisable et incertain sont des états distincts.", "Unannotated, absent, present but unlocatable, and uncertain are distinct states.")) {
         listOf(
-            Triple("Cible absente, après vérification",a.quality.verifiedNegativeQueries.isNotEmpty(),0),
-            Triple("Négatif difficile (hard negative)",a.quality.isHardNegative,1),
-            Triple("Cible présente, mais non localisable",a.quality.isUnlocalizablePresent,2),
-            Triple("Cas incertain / ambigu",a.quality.isUncertain,3)
+            Triple(tr("Cible absente, après vérification", "Target absent, after verification"),a.quality.verifiedNegativeQueries.isNotEmpty(),0),
+            Triple(tr("Négatif difficile (hard negative)", "Hard negative"),a.quality.isHardNegative,1),
+            Triple(tr("Cible présente, mais non localisable", "Target present but unlocatable"),a.quality.isUnlocalizablePresent,2),
+            Triple(tr("Cas incertain / ambigu", "Uncertain / ambiguous sample"),a.quality.isUncertain,3)
         ).forEach { (label,checked,id) ->
             Row(verticalAlignment=Alignment.CenterVertically) {
                 Checkbox(checked,{value->write(when(id){
-                    0->a.quality.copy(verifiedNegativeQueries=if(value) listOf("cible du projet") else emptyList())
+                    0->a.quality.copy(verifiedNegativeQueries=if(value) listOf(tr("cible du projet", "project target")) else emptyList())
                     1->a.quality.copy(isHardNegative=value)
                     2->a.quality.copy(isUnlocalizablePresent=value)
                     else->a.quality.copy(isUncertain=value)
@@ -741,6 +773,6 @@ fun QualityEditorTab(a: SampleAnnotations, onUpdate: (SampleAnnotations) -> Unit
         }
         if(a.quality.verifiedNegativeQueries.isNotEmpty()) OutlinedTextField(a.quality.verifiedNegativeQueries.joinToString(", "),{write(a.quality.copy(verifiedNegativeQueries=it.split(',').map(String::trim).filter(String::isNotBlank)))},label={Text(stringResource(R.string.editor_verified_absences))},modifier=Modifier.fillMaxWidth())
         OutlinedTextField(a.quality.auditNotes,{write(a.quality.copy(auditNotes=it))},label={Text(stringResource(R.string.editor_audit_notes))},minLines=3,modifier=Modifier.fillMaxWidth())
-        Text("Un résultat vide du modèle ne justifie pas à lui seul un négatif. Différez le cas lorsque vous ne pouvez pas conclure.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(tr("Un résultat vide du modèle ne justifie pas à lui seul un négatif. Différez le cas lorsque vous ne pouvez pas conclure.", "An empty model result alone does not justify a negative. Defer the sample if you cannot decide."),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

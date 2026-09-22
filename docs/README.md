@@ -6,6 +6,7 @@
 | Production par lots / Batch production | [Guide](BATCH_PRODUCTION.md) | [Guide](en/BATCH_PRODUCTION.md) |
 | Contrat des modèles entraînables / Trainable model contract | [Contrat](LITERT_TRAINING_CONTRACT.md) | [Contract](en/LITERT_TRAINING_CONTRACT.md) |
 | Résultats et limites / Results and limitations | [Tests](../TEST_REPORT.md) · [Limites](../KNOWN_LIMITATIONS.md) | [Validation](en/VALIDATION.md) |
+| Recette fonctionnelle / Functional audit | [FR](FUNCTIONAL_AUDIT_2026_09.md) | [EN](en/FUNCTIONAL_AUDIT_2026_09.md) |
 | Architecture | [FR](ARCHITECTURE.md) | [EN](en/ARCHITECTURE.md) |
 | Captures, diagrammes, graphiques / Visual evidence | [FR/EN](VISUALS.md) | [FR/EN](VISUALS.md) |
 | Workflows | [FR](WORKFLOWS.md) | [EN](en/WORKFLOWS.md) |
@@ -17,4 +18,6 @@
 
 Les preuves brutes et les audits historiques gardent leur langue d’origine. Les guides du poste de travail et de la recette visuelle restent des références techniques françaises.
 
-Raw evidence and historical audits retain their original language. Workstation and visual-QA guides remain French technical references. Bilingual product documentation does not imply that the app UI is fully localized into English.
+Raw evidence and historical audits retain their original language. Workstation and visual-QA guides remain French technical references. Application-language checks are described separately in the functional audit.
+
+- Limites courantes : [FR](../KNOWN_LIMITATIONS.md) · [EN](en/KNOWN_LIMITATIONS.md).

@@ -1,0 +1,484 @@
+{
+  "date": "2026-09-22",
+  "runtime": "Android API 28 x86_64, software CPU",
+  "physical_arm_device": false,
+  "accuracy_evaluated": false,
+  "optimizer_on_host": false,
+  "results": [
+    {
+      "case": "Charlbi-edgenext_xx_small_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 170.817,
+      "android": {
+        "case": "Charlbi-edgenext_xx_small_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 152392,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "72d87145acf5caf05095c1e4ab7c056ec0095b645d8a16b61c2dfbf9b0d0515d",
+        "threads": 2,
+        "adapter": "classification",
+        "training_scope": "pretrained_classification_head_only",
+        "output_shapes": [
+          [
+            1,
+            1000
+          ]
+        ],
+        "training_loss": 11.391106,
+        "output_max_change": 0.09351325,
+        "proposals": 0,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 11.297009,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-edgenext_x_small_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 302.988,
+      "android": {
+        "case": "Charlbi-edgenext_x_small_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 279447,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "e46e661555749e7402b495f45b304cececc368b360341438370b8ad0dd840276",
+        "threads": 2,
+        "adapter": "classification",
+        "training_scope": "pretrained_classification_head_only",
+        "output_shapes": [
+          [
+            1,
+            1000
+          ]
+        ],
+        "training_loss": 11.275679,
+        "output_max_change": 0.09805727,
+        "proposals": 0,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 11.176739,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-repvit_m1",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 83.794,
+      "android": {
+        "case": "Charlbi-repvit_m1",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 65461,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "4849906123f080d356a02733324fae7059a56531fdd9fee70065bcf7f3ef77bc",
+        "threads": 2,
+        "adapter": "embedding",
+        "proposals": 0,
+        "embedding_values": 384,
+        "training": "not_exposed_by_conversion",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-rtmdet_tiny",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T201906Z-8b8b1f4b8b2d",
+      "serial": "emulator-5554",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 198.728,
+      "android": {
+        "case": "Charlbi-rtmdet_tiny",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 179571,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "3530d743d01bca79d48e294fbf718ad75baf1b42e18a1f565f4abfc7f266596a",
+        "threads": 2,
+        "adapter": "rtmdet",
+        "input_shape": [
+          1,
+          3,
+          320,
+          320
+        ],
+        "output_shapes": [
+          [
+            1,
+            40,
+            40,
+            84
+          ],
+          [
+            1,
+            20,
+            20,
+            84
+          ],
+          [
+            1,
+            10,
+            10,
+            84
+          ]
+        ],
+        "proposals": 0,
+        "training": "not_exposed_by_conversion",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-rtmdet_tiny_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 909.785,
+      "android": {
+        "case": "Charlbi-rtmdet_tiny_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 889666,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "4f50d81ccaf2fea576522ee427f6fb9c04cc3dfcfdca4d534dbfb180afc3d458",
+        "threads": 2,
+        "adapter": "yolo",
+        "training_scope": "candidate_classification_and_box_adaptation_only",
+        "output_shapes": [
+          [
+            1,
+            84,
+            2100
+          ]
+        ],
+        "training_loss": 0.120895654,
+        "output_max_change": 0.15809631,
+        "proposals": 0,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 0.120224014,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-hgnetv2_b0",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 47.136,
+      "android": {
+        "case": "Charlbi-hgnetv2_b0",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 30194,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "0f9ac48fdb098eb2efc64e36279affa5ee3f039b8c602502f07c1d769f9047e7",
+        "threads": 2,
+        "adapter": "embedding",
+        "proposals": 0,
+        "embedding_values": 2048,
+        "training": "not_exposed_by_conversion",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-edgenext_small_usi_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 631.301,
+      "android": {
+        "case": "Charlbi-edgenext_small_usi_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 611984,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "3df246e01c4122909b00fe95db1555c549ce07e77985ec902574d30f1352f0f9",
+        "threads": 2,
+        "adapter": "classification",
+        "training_scope": "pretrained_classification_head_only",
+        "output_shapes": [
+          [
+            1,
+            1000
+          ]
+        ],
+        "training_loss": 10.552082,
+        "output_max_change": 0.07088137,
+        "proposals": 0,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 10.480469,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-repvit_m1_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 419.472,
+      "android": {
+        "case": "Charlbi-repvit_m1_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 397254,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "a4a3e3d95942672dcd670cc728d209155df263811dfcc02761646673188ddbf5",
+        "threads": 2,
+        "adapter": "classification",
+        "training_scope": "pretrained_classification_head_only",
+        "output_shapes": [
+          [
+            1,
+            1000
+          ]
+        ],
+        "training_loss": 11.297846,
+        "output_max_change": 4.5994983,
+        "proposals": 0,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 6.4805803,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-tinyclip_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T192944Z-f27bfcef901a",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 820.659,
+      "android": {
+        "case": "Charlbi-tinyclip_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 794503,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "ee0468efc2a324bf4fa670e36f5290ca1d490ea80769dca5553667ddcc3ad2cd",
+        "threads": 2,
+        "adapter": "classification",
+        "training_scope": "classification_head_only",
+        "output_shapes": [
+          [
+            1,
+            2
+          ]
+        ],
+        "training_loss": 1.4266567,
+        "output_max_change": 0.0015258789,
+        "proposals": 2,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 1.4243459,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-efficientformer_l1_learning",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T204312Z-40a01b844d03",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 615.777,
+      "android": {
+        "case": "Charlbi-efficientformer_l1_learning",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 596925,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "c0f62c0f1c8757acbf72f2e12d913bbf8a1ba303f470da4e09aeb2215c80ecbf",
+        "threads": 2,
+        "adapter": "classification",
+        "training_scope": "pretrained_classification_head_only",
+        "output_shapes": [
+          [
+            1,
+            1000
+          ]
+        ],
+        "training_loss": 12.448758,
+        "output_max_change": 0.1378746,
+        "proposals": 1,
+        "checkpoint_files": 1,
+        "restore_max_difference": 0.0,
+        "resumed_loss": 12.285783,
+        "optimizer_steps_on_android": 2,
+        "application_checkpoint_loaded": true,
+        "training": "passed",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-dinov2",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T204312Z-40a01b844d03",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 709.191,
+      "android": {
+        "case": "Charlbi-dinov2",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 686016,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "6ddd3341d44cc1f0ee3f1c4d468fae7075757231ebb8d642dd216b678143fb01",
+        "threads": 2,
+        "adapter": "embedding",
+        "input_shape": [
+          1,
+          3,
+          224,
+          224
+        ],
+        "output_shapes": [
+          [
+            1,
+            384
+          ],
+          [
+            1,
+            256,
+            384
+          ]
+        ],
+        "proposals": 0,
+        "embedding_values": 384,
+        "training": "not_exposed_by_conversion",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-tinyclip",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T204312Z-40a01b844d03",
+      "serial": "emulator-5556",
+      "passed": true,
+      "timed_out": false,
+      "controller_seconds": 210.692,
+      "android": {
+        "case": "Charlbi-tinyclip",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "complete",
+        "elapsed_ms": 187621,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "35728952fd34f89fc030a7cdaff1ac9b9ae7b6b1b3881b706dfacbb930d2eb30",
+        "threads": 2,
+        "adapter": "tinyclip",
+        "input_shape": [
+          1,
+          224,
+          224,
+          3
+        ],
+        "output_shapes": [],
+        "proposals": 2,
+        "embedding_values": 512,
+        "training": "not_exposed_by_conversion",
+        "success": true
+      }
+    },
+    {
+      "case": "Charlbi-rfdetr",
+      "revision": "1244117f490e36ce321d70baa672753caeaef028",
+      "build_id": "20260922T204312Z-40a01b844d03",
+      "serial": "emulator-5556",
+      "passed": false,
+      "timed_out": true,
+      "controller_seconds": 1802.266,
+      "android": {
+        "case": "Charlbi-rfdetr",
+        "runtime": "Android LiteRT Interpreter CPU",
+        "accuracy_evaluated": false,
+        "physical_arm_device": false,
+        "optimizer_on_host": false,
+        "phase": "inference",
+        "elapsed_ms": 21684,
+        "revision": "1244117f490e36ce321d70baa672753caeaef028",
+        "model_sha256": "17484d99f92103ee7149230a9a0c26458bd4a579c90004dd3be597bd0603d56f",
+        "threads": 2,
+        "adapter": "rfdetr"
+      }
+    }
+  ]
+}

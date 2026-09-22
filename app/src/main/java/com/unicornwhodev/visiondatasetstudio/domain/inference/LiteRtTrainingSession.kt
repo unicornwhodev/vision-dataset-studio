@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.graphics.Bitmap
 import org.tensorflow.lite.Interpreter
 import java.io.File
@@ -9,7 +10,7 @@ import com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils
 
 /** Executes the converter's real mutable-variable signatures on this Android device. */
 class LiteRtTrainingSession(private val file:File,private val config:ModelConfig):AutoCloseable {
-    private val contract=requireNotNull(config.training){"Ce modèle n’expose pas de contrat d’apprentissage"}
+    private val contract=requireNotNull(config.training){tr("Ce modèle n’expose pas de contrat d’apprentissage", "This model does not expose a training contract")}
     private val flex=org.tensorflow.lite.flex.FlexDelegate()
     private val interpreter=try { Interpreter(file,LiteRtOptions.forFile(file,config.threads).addDelegate(flex)) }
         catch(e:Throwable){flex.close();throw e}
@@ -17,19 +18,19 @@ class LiteRtTrainingSession(private val file:File,private val config:ModelConfig
         try {
         val signatures=interpreter.signatureKeys.toSet()
         require(listOf(contract.trainSignature,contract.inferSignature,contract.saveSignature,contract.restoreSignature).all{it in signatures}){
-            "Conversion limitée à l’inférence : signatures train/infer/save/restore manquantes"
+            tr("Conversion limitée à l’inférence : signatures train/infer/save/restore manquantes", "Inference-only conversion: train/infer/save/restore signatures missing")
         }
-        require(contract.inferOutputs.isNotEmpty()){"Ordre des sorties d’inférence absent du contrat"}
-        require(interpreter.getSignatureInputs(contract.trainSignature).toSet()==(setOf(contract.imageInput,contract.targetInput)+contract.auxiliaryTargets.keys+(if(contract.learningRateInput.isBlank())emptySet() else setOf(contract.learningRateInput)))) { "Entrées train différentes du contrat" }
-        require(interpreter.getSignatureInputs(contract.inferSignature).toSet()==setOf(contract.imageInput)) { "Entrées infer différentes du contrat" }
+        require(contract.inferOutputs.isNotEmpty()){tr("Ordre des sorties d’inférence absent du contrat", "Inference output order missing from the contract")}
+        require(interpreter.getSignatureInputs(contract.trainSignature).toSet()==(setOf(contract.imageInput,contract.targetInput)+contract.auxiliaryTargets.keys+(if(contract.learningRateInput.isBlank())emptySet() else setOf(contract.learningRateInput)))) { tr("Entrées train différentes du contrat", "Train inputs differ from the contract") }
+        require(interpreter.getSignatureInputs(contract.inferSignature).toSet()==setOf(contract.imageInput)) { tr("Entrées infer différentes du contrat", "Infer inputs differ from the contract") }
         require(interpreter.getSignatureInputs(contract.saveSignature).toSet()==setOf(contract.checkpointInput))
         require(interpreter.getSignatureInputs(contract.restoreSignature).toSet()==setOf(contract.checkpointInput))
         val target=interpreter.getInputTensorFromSignature(contract.targetInput,contract.trainSignature)
-        require(target.shape().toList()==contract.targetShape && target.dataType().name=="FLOAT32") { "Forme/type des cibles d’apprentissage différents du contrat" }
+        require(target.shape().toList()==contract.targetShape && target.dataType().name=="FLOAT32") { tr("Forme/type des cibles d’apprentissage différents du contrat", "Training target shape/type differs from the contract") }
         require(contract.targetShape.fold(1L){a,b->a*b} in 1..1_000_000)
         contract.auxiliaryTargets.forEach { (name,spec) ->
             val tensor=interpreter.getInputTensorFromSignature(name,contract.trainSignature)
-            require(tensor.shape().toList()==spec.shape && tensor.dataType().name=="FLOAT32") { "Cible auxiliaire incompatible : $name" }
+            require(tensor.shape().toList()==spec.shape && tensor.dataType().name=="FLOAT32") { tr("Cible auxiliaire incompatible : $name", "Incompatible auxiliary target: $name") }
         }
         } catch(e:Throwable) { try { interpreter.close() } finally { flex.close() }; throw e }
     }
@@ -40,7 +41,7 @@ class LiteRtTrainingSession(private val file:File,private val config:ModelConfig
         val input=signatureImage(image,contract.inferSignature)
         interpreter.runSignature(mapOf(contract.imageInput to input),contract.inferOutputs.associateWith { null as Any? }.toMutableMap(),contract.inferSignature)
         val bytes=contract.inferOutputs.sumOf { interpreter.getOutputTensorFromSignature(it,contract.inferSignature).numBytes().toLong() }
-        require(bytes in 1..64L*1024*1024) { "Sorties d’inférence au-delà du budget mémoire" }
+        require(bytes in 1..64L*1024*1024) { tr("Sorties d’inférence au-delà du budget mémoire", "Inference outputs exceed the memory budget") }
         return contract.inferOutputs.map{name->
             val t=interpreter.getOutputTensorFromSignature(name,contract.inferSignature)
             TensorValues(t.shape().toList(),TensorCodec.decode(t.asReadOnlyBuffer(),t.dataType().name,t.numElements(),t.quantizationParams().scale,t.quantizationParams().zeroPoint)).also{require(it.values.all(Float::isFinite))}
@@ -48,12 +49,12 @@ class LiteRtTrainingSession(private val file:File,private val config:ModelConfig
     }
     private fun signatureImage(image:LiteRtGraph.Input,signature:String):Any {
         val tensor=interpreter.getInputTensorFromSignature(contract.imageInput,signature)
-        require(tensor.dataType().name==image.type) { "Type image différent du contrat de signature" }
+        require(tensor.dataType().name==image.type) { tr("Type image différent du contrat de signature", "Image type differs from the signature contract") }
         image.bytes.rewind()
         if(tensor.shape().toList()==image.shape)return image.bytes
         val dynamic=tensor.shapeSignature()
         require(image.type=="FLOAT32" && dynamic.size==image.shape.size && dynamic.indices.all { dynamic[it]<0 || dynamic[it]==image.shape[it] }) {
-            "Dimensions image incompatibles avec la signature $signature"
+            tr("Dimensions image incompatibles avec la signature $signature", "Image dimensions incompatible with signature $signature")
         }
         val array=java.lang.reflect.Array.newInstance(java.lang.Float.TYPE,*image.shape.toIntArray())
         val values=image.bytes.order(ByteOrder.nativeOrder()).asFloatBuffer()
@@ -68,7 +69,7 @@ class LiteRtTrainingSession(private val file:File,private val config:ModelConfig
         require(targets.size.toLong()==contract.targetShape.fold(1L){a,b->a*b} && targets.all(Float::isFinite))
         val image=LiteRtGraph.image(bitmap,config)
         val inputs=mutableMapOf<String,Any>(contract.imageInput to signatureImage(image,contract.trainSignature),contract.targetInput to LiteRtGraph.floats(contract.targetShape,targets).bytes)
-        require(auxiliary.keys==contract.auxiliaryTargets.keys) { "Supervision auxiliaire absente" }
+        require(auxiliary.keys==contract.auxiliaryTargets.keys) { tr("Supervision auxiliaire absente", "Auxiliary supervision missing") }
         auxiliary.forEach { (name,values) ->
             val spec=contract.auxiliaryTargets.getValue(name)
             require(values.all(Float::isFinite) && values.size.toLong()==spec.shape.fold(1L){a,b->a*b})
@@ -78,14 +79,14 @@ class LiteRtTrainingSession(private val file:File,private val config:ModelConfig
         val loss=ByteBuffer.allocateDirect(4).order(ByteOrder.nativeOrder())
         require(interpreter.getOutputTensorFromSignature(contract.lossOutput,contract.trainSignature).numElements()==1)
         interpreter.runSignature(inputs,mutableMapOf<String,Any>(contract.lossOutput to loss),contract.trainSignature)
-        return loss.getFloat(0).also{require(it.isFinite()){"Perte d’apprentissage non finie"}}
+        return loss.getFloat(0).also{require(it.isFinite()){tr("Perte d’apprentissage non finie", "Non-finite training loss")}}
     }
     fun save(directory:File):CheckpointReceipt {
-        require(!directory.exists()){"Un checkpoint existant ne peut pas être écrasé"}
+        require(!directory.exists()){tr("Un checkpoint existant ne peut pas être écrasé", "An existing checkpoint cannot be overwritten")}
         directory.mkdirs();val prefix=File(directory,"weights")
         interpreter.runSignature(mapOf(contract.checkpointInput to prefix.absolutePath),mutableMapOf(),contract.saveSignature)
         val files=directory.walkTopDown().filter{it.isFile}.toList()
-        require(files.isNotEmpty() && files.all{it.length()>0} && files.sumOf{it.length()}<=2L*1024*1024*1024){"La signature save n’a pas produit de checkpoint valide"}
+        require(files.isNotEmpty() && files.all{it.length()>0} && files.sumOf{it.length()}<=2L*1024*1024*1024){tr("La signature save n’a pas produit de checkpoint valide", "The save signature did not produce a valid checkpoint")}
         return CheckpointReceipt(prefix.absolutePath,files.associate{it.relativeTo(directory).invariantSeparatorsPath to HashUtils.computeSha256(it)})
     }
     fun restore(receipt:CheckpointReceipt) {
@@ -93,7 +94,7 @@ class LiteRtTrainingSession(private val file:File,private val config:ModelConfig
         require(receipt.files.isNotEmpty())
         receipt.files.forEach{(path,sha)->
             val f=File(directory,path);require(f.canonicalPath.startsWith(directory.canonicalPath+File.separator))
-            require(f.isFile && HashUtils.computeSha256(f)==sha){"Checkpoint absent ou altéré"}
+            require(f.isFile && HashUtils.computeSha256(f)==sha){tr("Checkpoint absent ou altéré", "Checkpoint missing or modified")}
         }
         interpreter.runSignature(mapOf(contract.checkpointInput to receipt.prefix),mutableMapOf(),contract.restoreSignature)
     }

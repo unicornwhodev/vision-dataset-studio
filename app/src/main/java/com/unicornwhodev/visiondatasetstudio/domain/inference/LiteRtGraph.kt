@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.graphics.*
 import org.tensorflow.lite.Interpreter
 import java.io.File
@@ -17,13 +18,13 @@ class LiteRtGraph(file:File,threads:Int=2):AutoCloseable {
             require(tensor.dataType().name==value.type)
             if(!tensor.shape().contentEquals(value.shape.toIntArray()))interpreter.resizeInput(index,value.shape.toIntArray(),true)
         }
-        interpreter.allocateTensors()
+        // Let run allocate after all input resizes so dynamic output shapes refresh after invocation.
         inputs.forEachIndexed { i,input->require(interpreter.getInputTensor(i).numBytes()==input.bytes.capacity());input.bytes.rewind() }
         val size=(0 until interpreter.outputTensorCount).sumOf{interpreter.getOutputTensor(it).numBytes().toLong()}
-        require(size<=128L*1024*1024){"Sorties du bundle au-delà du budget mémoire"}
+        require(size<=128L*1024*1024){tr("Sorties du bundle au-delà du budget mémoire", "Bundle outputs exceed the memory budget")}
         val outputs=(0 until interpreter.outputTensorCount).associateWith { null as Any? }.toMutableMap()
         interpreter.runForMultipleInputsOutputs(inputs.map{it.bytes as Any}.toTypedArray(),outputs)
-        require((0 until interpreter.outputTensorCount).sumOf{interpreter.getOutputTensor(it).numBytes().toLong()}<=128L*1024*1024){"Sorties du bundle au-delà du budget mémoire"}
+        require((0 until interpreter.outputTensorCount).sumOf{interpreter.getOutputTensor(it).numBytes().toLong()}<=128L*1024*1024){tr("Sorties du bundle au-delà du budget mémoire", "Bundle outputs exceed the memory budget")}
         return outputs.keys.map{i->val t=interpreter.getOutputTensor(i);TensorValues(t.shape().toList(),TensorCodec.decode(t.asReadOnlyBuffer(),t.dataType().name,t.numElements(),t.quantizationParams().scale,t.quantizationParams().zeroPoint)).also{require(it.values.all(Float::isFinite))}}
     }
     override fun close()=interpreter.close()

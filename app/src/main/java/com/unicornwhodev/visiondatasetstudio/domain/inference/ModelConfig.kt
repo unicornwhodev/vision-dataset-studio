@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -70,7 +71,7 @@ data class ModelConfig(
         val names = training?.inferOutputs ?: return this
         fun index(original: Int): Int {
             val name = namedOutputIndices.entries.firstOrNull { it.value == original }?.key ?: return original
-            return names.indexOf(name).also { require(it >= 0) { "Sortie $name absente de infer" } }
+            return names.indexOf(name).also { require(it >= 0) { tr("Sortie $name absente de infer", "Output $name missing from infer") } }
         }
         return copy(outputIndex = index(outputIndex), outputIndexBoxes = if (ModelContract.adapter(this) in setOf("ssd", "rfdetr")) index(outputIndexBoxes) else outputIndexBoxes,
             outputIndexScores = if (ModelContract.adapter(this) in setOf("ssd", "rfdetr")) index(outputIndexScores) else outputIndexScores,

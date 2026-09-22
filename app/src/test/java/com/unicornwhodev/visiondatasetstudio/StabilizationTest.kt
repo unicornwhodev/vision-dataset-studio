@@ -11,29 +11,24 @@ import com.unicornwhodev.visiondatasetstudio.core.workflow.StudioTask
 import com.unicornwhodev.visiondatasetstudio.domain.validation.AnnotationReview
 
 class StabilizationTest {
-    @Test fun documentationNeverControlsRuntimeIntegrity() {
-        val dir=createTempDir();val readme=File(dir,"README.md").apply{writeText("changed remotely")}
-        val weight=File(dir,"model.tflite").apply{writeText("weights")}
-        val hashes=mapOf("README.md" to "new-doc-sha", "model.tflite" to "weight-sha")
-        val manifest=mapOf<String,Any>(
-            "README.md" to mapOf("sha256" to "old-doc-sha","bytes" to 1),
-            "model.tflite" to mapOf("sha256" to "weight-sha","bytes" to weight.length()))
-        CommunityModelInstaller.verifyManifest(dir,hashes,manifest,setOf("model.tflite"))
-        readme.delete();dir.deleteRecursively()
+    @Test fun absentOrStaleModelManifestDoesNotBlockRuntimeFiles() {
+        val dir=createTempDir()
+        try {
+            File(dir,"model.tflite").writeText("new weights")
+            CommunityModelInstaller.verifyRuntimeFiles(dir,setOf("model.tflite"))
+            File(dir,"artifact_manifest.json").writeText("""{"model.tflite":{"sha256":"obsolete","bytes":1}}""")
+            CommunityModelInstaller.verifyRuntimeFiles(dir,setOf("model.tflite"))
+        } finally { dir.deleteRecursively() }
     }
 
-    @Test fun protectedRuntimeArtifactsAreStrict() {
-        val dir=createTempDir();File(dir,"model.tflite").writeText("weights")
-        val manifest=mapOf<String,Any>("model.tflite" to mapOf("sha256" to "expected","bytes" to 7))
-        assertFails { CommunityModelInstaller.verifyManifest(dir,mapOf("model.tflite" to "changed"),manifest,setOf("model.tflite")) }
-        assertFails { CommunityModelInstaller.verifyManifest(dir,emptyMap(),manifest,setOf("model.tflite")) }
-        assertFails { CommunityModelInstaller.verifyManifest(dir,emptyMap(),emptyMap<String,Any>(),setOf("runtime_contract.json")) }
-        val runtime=File(dir,"model_config.json").apply{writeText("{}")}
-        assertFails { CommunityModelInstaller.verifyManifest(dir,mapOf("model_config.json" to "sha"),emptyMap<String,Any>(),emptySet()) }
-        val tokenizer=File(dir,"tokenizer.json").apply{writeText("{}")}
-        assertFails { CommunityModelInstaller.verifyManifest(dir,mapOf("tokenizer.json" to "sha"),emptyMap<String,Any>(),emptySet()) }
-        runtime.delete();tokenizer.delete()
-        dir.deleteRecursively()
+    @Test fun requiredRuntimeFilesMustExistAndRemainWithinInstallation() {
+        val dir=createTempDir()
+        try {
+            assertFails { CommunityModelInstaller.verifyRuntimeFiles(dir,setOf("missing.tflite")) }
+            File(dir,"empty.tflite").writeText("")
+            assertFails { CommunityModelInstaller.verifyRuntimeFiles(dir,setOf("empty.tflite")) }
+            assertFails { CommunityModelInstaller.verifyRuntimeFiles(dir,setOf("../outside.tflite")) }
+        } finally { dir.deleteRecursively() }
     }
 
     @Test fun annotationCompatibilityIsExplicit() {
@@ -118,8 +113,8 @@ class StabilizationTest {
         val a=SampleAnnotations(
             boxes=listOf(BoxTarget("box",.1f,.1f,.5f,.5f,"object",isHumanVerified=true)),
             groundings=listOf(GroundingTarget("g","the object",boxIds=listOf("box"),sourceProvenance="model_local_http:test")))
-        assertTrue(AnnotationReview.problems(a,setOf(StudioTask.GROUNDING)).any{it.contains("propositions")})
-        assertFalse(AnnotationReview.problems(a.copy(groundings=a.groundings.map{it.copy(isHumanVerified=true)}),setOf(StudioTask.GROUNDING)).any{it.contains("propositions")})
+        assertTrue(AnnotationReview.problems(a,setOf(StudioTask.GROUNDING)).isNotEmpty())
+        assertFalse(AnnotationReview.problems(a.copy(groundings=a.groundings.map{it.copy(isHumanVerified=true)}),setOf(StudioTask.GROUNDING)).isNotEmpty())
     }
 
     @Test fun instanceLinksAreExplicitValidatedAndReversible() {

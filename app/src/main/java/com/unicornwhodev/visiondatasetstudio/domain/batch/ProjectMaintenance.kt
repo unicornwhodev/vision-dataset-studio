@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.batch
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.content.Context
 import androidx.room.withTransaction
 import androidx.work.WorkManager
@@ -19,18 +20,42 @@ class ProjectMaintenance(private val context:Context,private val db:AppDatabase,
     private val receiptAdapter=StudioJson.moshi.adapter(MaintenanceReceipt::class.java)
     private fun receipt(value:MaintenanceReceipt){receiptFile.parentFile?.mkdirs();val tmp=File(receiptFile.path+".tmp");tmp.writeText(receiptAdapter.toJson(value));check(tmp.renameTo(receiptFile))}
     suspend fun resumePending() { val pending=receiptFile.takeIf{it.isFile}?.let{receiptAdapter.fromJson(it.readText())}?:return
-        val databaseDone=pending.stage=="database_committed" || when(pending.action){"batch"->db.batchDao().getBatchSync(pending.projectId,pending.batchNumber!!)==null;"delete"->db.projectDao().getProjectSync(pending.projectId)==null;else->db.sampleDao().getAllSamples(pending.projectId).isEmpty()&&db.batchDao().getLatestBatchSync(pending.projectId)==null}
-        if(!databaseDone)when(pending.action){"batch"->resetBatch(pending.projectId,pending.batchNumber!!);"project"->resetProject(pending.projectId);"delete"->deleteProject(pending.projectId)}
-        else { storage.purgeVerifiedBatchMedia(pending.sampleIds);if(pending.action=="batch")deleteBatchFiles(pending.projectId,pending.batchNumber!!)else deleteProjectFiles(pending.projectId,pending.action=="delete");receiptFile.delete() }
+        val databaseDone=pending.stage=="database_committed" || when(pending.action){"discard"->db.batchDao().getBatchSync(pending.projectId,pending.batchNumber!!)?.status=="DISCARDED";"batch"->db.batchDao().getBatchSync(pending.projectId,pending.batchNumber!!)==null;"delete"->db.projectDao().getProjectSync(pending.projectId)==null;else->db.sampleDao().getAllSamples(pending.projectId).isEmpty()&&db.batchDao().getLatestBatchSync(pending.projectId)==null}
+        if(!databaseDone)when(pending.action){"discard"->discardBatch(pending.projectId,pending.batchNumber!!);"batch"->resetBatch(pending.projectId,pending.batchNumber!!);"project"->resetProject(pending.projectId);"delete"->deleteProject(pending.projectId)}
+        else { storage.purgeVerifiedBatchMedia(pending.sampleIds);if(pending.action in setOf("batch","discard"))deleteBatchFiles(pending.projectId,pending.batchNumber!!)else deleteProjectFiles(pending.projectId,pending.action=="delete");receiptFile.delete() }
     }
+    /** Explicitly discard unexported work, retaining the cursor and image identities forever. */
+    suspend fun discardBatch(projectId:Long,batchNumber:Int) {
+        val training=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining(context).readBatch(projectId,batchNumber)
+        check(training?.phase !in setOf("queued","training","evaluating")) { tr("Interrompez l’apprentissage avant de supprimer le lot", "Stop training before deleting the batch") }
+        val samples=db.sampleDao().getSamplesForBatchSync(projectId,batchNumber)
+        val batch=db.batchDao().getBatchSync(projectId,batchNumber) ?: error(tr("Lot absent", "Batch not found"))
+        check(batch.status !in setOf("PUBLISHING","PUBLISHED","CONFLICT","VERIFIED","PURGING","PURGED")) {
+            tr("Terminez le transfert puis utilisez le nettoyage du lot vérifié", "Finish the transfer, then use verified batch cleanup")
+        }
+        receipt(MaintenanceReceipt("discard",projectId,batchNumber,samples.map{it.sampleId}))
+        db.withTransaction {
+            db.annotationDao().deleteBatchAnnotations(projectId,batchNumber)
+            db.auditDao().deleteBatchLogs(projectId,batchNumber)
+            db.sampleDao().deleteBatchSamples(projectId,batchNumber)
+            // A tombstone prevents reusing the batch number; the deduplication ledger stays intact.
+            db.batchDao().insertOrReplace(batch.copy(status="DISCARDED",archivePath=null,archiveSnapshot=null,
+                validatedCases=0,rejectedCases=0,deferredCases=0,updatedAt=System.currentTimeMillis()))
+        }
+        receipt(MaintenanceReceipt("discard",projectId,batchNumber,samples.map{it.sampleId},"database_committed"))
+        interruptionPoint("after_database")
+        storage.purgeVerifiedBatchMedia(samples.map{it.sampleId});deleteBatchFiles(projectId,batchNumber)
+        receiptFile.delete()
+    }
+
     suspend fun resetBatch(projectId:Long,batchNumber:Int) {
         val training=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining(context).readBatch(projectId,batchNumber)
-        check(training?.phase !in setOf("queued","training","evaluating")) { "Interrompez explicitement l’apprentissage avant de réinitialiser son lot" }
+        check(training?.phase !in setOf("queued","training","evaluating")) { tr("Interrompez explicitement l’apprentissage avant de réinitialiser son lot", "Explicitly stop training before resetting its batch") }
         val samples=db.sampleDao().getSamplesForBatchSync(projectId,batchNumber)
         receipt(MaintenanceReceipt("batch",projectId,batchNumber,samples.map{it.sampleId}))
         val rewind=samples.mapNotNull{it.sourceOrdinal}.minOrNull()
         db.withTransaction {
-            val project=db.projectDao().getProjectSync(projectId) ?: error("Projet absent")
+            val project=db.projectDao().getProjectSync(projectId) ?: error(tr("Projet absent", "Project not found"))
             db.annotationDao().deleteBatchAnnotations(projectId,batchNumber)
             db.auditDao().deleteBatchLogs(projectId,batchNumber)
             db.imageIdentityDao().deleteBatch(projectId,batchNumber)
@@ -49,7 +74,7 @@ class ProjectMaintenance(private val context:Context,private val db:AppDatabase,
         receipt(MaintenanceReceipt("project",projectId,sampleIds=samples.map{it.sampleId}))
         WorkManager.getInstance(context).cancelUniqueWork("vds-training-$projectId").result.get()
         db.withTransaction {
-            val project=db.projectDao().getProjectSync(projectId) ?: error("Projet absent")
+            val project=db.projectDao().getProjectSync(projectId) ?: error(tr("Projet absent", "Project not found"))
             db.annotationDao().deleteProjectAnnotations(projectId);db.auditDao().deleteProjectLogs(projectId)
             db.sampleDao().deleteProjectSamples(projectId);db.batchDao().deleteProjectBatches(projectId)
             db.sourceEntryDao().clear(projectId);db.imageIdentityDao().deleteProject(projectId)
@@ -81,12 +106,14 @@ class ProjectMaintenance(private val context:Context,private val db:AppDatabase,
     private fun deleteBatchFiles(projectId:Long,batchNumber:Int) {
         storage.batchExportDir(projectId,batchNumber).deleteRecursively();storage.batchArchiveFile(projectId,batchNumber).delete()
         File(context.filesDir,"training/$projectId-batch-$batchNumber.json").delete()
+        android.util.AtomicFile(File(context.filesDir,"workflows/$projectId-$batchNumber.json")).delete()
     }
     private fun deleteProjectFiles(projectId:Long,deleteReceipts:Boolean) {
         storage.exportsDir.listFiles()?.filter{it.name.startsWith("p-$projectId-batch-")}?.forEach{it.deleteRecursively()}
         File(context.filesDir,"embeddings/$projectId").deleteRecursively();File(context.filesDir,"corrections/$projectId.json").delete()
         if(deleteReceipts)com.unicornwhodev.visiondatasetstudio.domain.inference.InferenceReceiptStore(context.filesDir).deleteProject(projectId)
         File(context.filesDir,"training").listFiles()?.filter{it.name=="$projectId.json" || it.name.startsWith("$projectId-batch-")}?.forEach{it.delete()}
+        File(context.filesDir,"workflows").listFiles()?.filter{it.name.startsWith("$projectId-")}?.forEach{it.delete()}
         storage.clearTempFiles()
     }
 }

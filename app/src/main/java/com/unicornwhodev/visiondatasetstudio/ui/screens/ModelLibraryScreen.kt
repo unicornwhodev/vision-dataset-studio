@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
 import com.unicornwhodev.visiondatasetstudio.R
 
@@ -25,7 +26,6 @@ import com.unicornwhodev.visiondatasetstudio.domain.inference.QualificationStatu
 
 @Composable
 fun ModelLibraryScreen(vm: MainViewModel) {
-    val language=androidx.compose.ui.platform.LocalConfiguration.current.locales[0].language
     val source by vm.catalogSource.collectAsState()
     var editSource by remember { mutableStateOf(false) }
     val remote by vm.communityModels.collectAsState()
@@ -38,15 +38,16 @@ fun ModelLibraryScreen(vm: MainViewModel) {
     val weights = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { it?.let(vm::importModel) }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
         StudioTopBar(stringResource(R.string.screen_models), stringResource(R.string.models_summary,local.size), actions = {
-            IconButton(onClick = { vm.navigateTo(Screen.Training) }, enabled = !busy) { Icon(Icons.Default.ModelTraining, "Apprentissage sur cet appareil", Modifier.size(19.dp)) }
-            IconButton(onClick = { editSource = true }, enabled = !busy) { Icon(Icons.Default.Storage, "Dépôt du catalogue", Modifier.size(19.dp)) }
-            IconButton(onClick = vm::refreshCommunityModelCatalog, enabled = !busy) { Icon(Icons.Default.Refresh, "Actualiser le catalogue", Modifier.size(19.dp)) }
+            IconButton(onClick = { vm.navigateTo(Screen.Training) }, enabled = !busy) { Icon(Icons.Default.ModelTraining, tr("Apprentissage sur cet appareil", "Training on this device"), Modifier.size(19.dp)) }
+            IconButton(onClick = { editSource = true }, enabled = !busy) { Icon(Icons.Default.Storage, tr("Dépôt du catalogue", "Catalog repository"), Modifier.size(19.dp)) }
+            IconButton(onClick = vm::refreshCommunityModelCatalog, enabled = !busy) { Icon(Icons.Default.Refresh, tr("Actualiser le catalogue", "Refresh catalog"), Modifier.size(19.dp)) }
         })
     }) { inset ->
         Column(Modifier.fillMaxSize().padding(inset)) {
             StudioTabs(listOf(stringResource(R.string.models_tab_explore), stringResource(R.string.models_tab_installed), stringResource(R.string.models_tab_import)), tab, { tab = it }, Modifier.padding(horizontal = 16.dp))
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                 LazyColumn(Modifier.widthIn(max = 1000.dp).fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    project?.takeIf { it.modelConfigJson!=null }?.let { p -> item { ModelSettingsPanel(p,busy,vm::saveModelConfig) } }
                     if (tab == 0) {
                         item {
                             Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -87,7 +88,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                     Icon(Icons.Default.Memory, null, Modifier.size(18.dp), tint = if(item.installableNow) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
                                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                                         Text(item.entry.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        Text(if(language=="fr")item.entry.purpose else capabilityNames.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(item.entry.purpose, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text("$state  ·  ${item.entry.upstreamLicense}", style = MaterialTheme.typography.labelSmall, color = if(item.installableNow) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant)
                                         Text(capabilityText,style=MaterialTheme.typography.labelSmall,color=MaterialTheme.colorScheme.onSurfaceVariant,maxLines=2)
                                     }
@@ -99,7 +100,7 @@ fun ModelLibraryScreen(vm: MainViewModel) {
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
                             }
                             if(showInfo) AlertDialog(onDismissRequest = { showInfo = false }, title = { Text(item.entry.title) },
-                                text = { Text((if(language=="fr")item.entry.purpose else capabilityNames.joinToString(" · "))+"\n\n$capabilityText\n"+stringResource(R.string.model_files,item.entry.expectedFiles.size)+"\n\n"+(if(language=="fr")item.note else stringResource(R.string.model_test_required))) },
+                                text = { Text((item.entry.purpose)+"\n\n$capabilityText\n"+stringResource(R.string.model_files,item.entry.expectedFiles.size)+"\n\n"+(item.note)) },
                                 confirmButton = { TextButton(onClick = { showInfo = false }) { Text(stringResource(R.string.action_close)) } })
                         }
                     } else if(tab == 1) {

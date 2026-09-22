@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.squareup.moshi.JsonClass
 import java.security.MessageDigest
 import kotlin.math.abs
@@ -14,7 +15,7 @@ data class CorrectionExample(val key:String,val imageKey:String,val x:Double,val
 @JsonClass(generateAdapter=true)
 data class CorrectionHead(val weights:List<List<Double>>,val generation:Int,val kind:String="point")
 @JsonClass(generateAdapter=true)
-data class CorrectionGroup(val key:String,val examples:List<CorrectionExample> = emptyList(),val head:CorrectionHead?=null,val report:String="Aucune correction supervisée")
+data class CorrectionGroup(val key:String,val examples:List<CorrectionExample> = emptyList(),val head:CorrectionHead?=null,val report:String=tr("Aucune correction supervisée", "No supervised corrections"))
 @JsonClass(generateAdapter=true)
 data class CorrectionLedger(val schema:Int=1,val groups:List<CorrectionGroup> = emptyList())
 data class CorrectionEvaluation(val group:CorrectionGroup,val trainImages:Set<String>,val holdoutImages:Set<String>,val promoted:Boolean)
@@ -58,7 +59,7 @@ object AdaptiveCorrection {
     fun train(group:CorrectionGroup):CorrectionEvaluation {
         val clean=group.examples.filter(::eligible);val train=clean.filterNot{holdout(it.imageKey)};val test=clean.filter{holdout(it.imageKey)}
         val trainIds=train.map{it.imageKey}.toSet();val testIds=test.map{it.imageKey}.toSet()
-        if(trainIds.size<32 || testIds.size<8)return CorrectionEvaluation(group.copy(report="En attente : ${trainIds.size}/32 images d’apprentissage, ${testIds.size}/8 de contrôle"),trainIds,testIds,false)
+        if(trainIds.size<32 || testIds.size<8)return CorrectionEvaluation(group.copy(report=tr("En attente : ${trainIds.size}/32 images d’apprentissage, ${testIds.size}/8 de contrôle", "Waiting: ${trainIds.size}/32 training images, ${testIds.size}/8 validation images")),trainIds,testIds,false)
         val kind=train.first().kind
         require(train.all{it.kind==kind} && test.all{it.kind==kind})
         val axes=train.first().delta().size
@@ -69,7 +70,7 @@ object AdaptiveCorrection {
         val prior=errorByImage(test){predict(group.head,it.features()) ?: baseline}
         val score=errorByImage(test){predict(candidate,it.features())!!}
         val promoted=score+1e-12<minOf(raw,calibration,prior)*.95
-        val report="${if(promoted)"Activé" else "Précédent conservé"} · ${trainIds.size} images train / ${testIds.size} contrôle · MSE brute=$raw calibration=$calibration précédent=$prior candidat=$score. Contrôle réutilisé, pas une évaluation indépendante."
+        val report=tr("${if(promoted)"Activé" else "Précédent conservé"} · ${trainIds.size} images train / ${testIds.size} contrôle · MSE brute=$raw calibration=$calibration précédent=$prior candidat=$score. Contrôle réutilisé, pas une évaluation indépendante.", "${if(promoted)"Activated" else "Previous retained"} · ${trainIds.size} training / ${testIds.size} validation images · raw MSE=$raw calibration=$calibration previous=$prior candidate=$score. Reused validation set, not an independent evaluation.")
         return CorrectionEvaluation(group.copy(head=if(promoted)candidate else group.head,report=report),trainIds,testIds,promoted)
     }
     fun apply(proposals:List<ModelProposal>,ledger:CorrectionLedger):List<ModelProposal> {

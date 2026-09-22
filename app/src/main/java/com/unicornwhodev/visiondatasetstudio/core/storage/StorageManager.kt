@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.core.storage
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.StatFs
@@ -75,7 +76,7 @@ class StorageManager(val context: Context) {
             val file = getImageFile(sampleId, ext)
             for (suffix in listOf(".part", ".range", ".normalize")) {
                 val child = File(file.path + suffix)
-                check(!child.exists() || child.delete()) { "Nettoyage du transfert impossible" }
+                check(!child.exists() || child.delete()) { tr("Nettoyage du transfert impossible", "Transfer cleanup failed") }
             }
         }
     }

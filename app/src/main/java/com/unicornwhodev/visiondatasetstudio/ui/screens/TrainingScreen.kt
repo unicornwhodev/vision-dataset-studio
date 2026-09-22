@@ -29,7 +29,7 @@ fun TrainingScreen(vm:MainViewModel) {
     val config=remember(p.modelConfigJson){runCatching{p.modelConfigJson?.let{StudioJson.moshi.adapter(ModelConfig::class.java).fromJson(it)}}.getOrNull()}
     var epochs by rememberSaveable{mutableStateOf(3)}
     val active=run?.phase in setOf("queued","training","evaluating")
-    LaunchedEffect(p.id,number,run?.phase){vm.refreshTrainingPreflight()}
+    LaunchedEffect(p.id,p.modelConfigJson,number,run?.phase){vm.refreshTrainingPreflight()}
     Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_training),stringResource(R.string.subtitle_on_device),onBack={vm.navigateTo(Screen.Models)})}) { inset ->
         Box(Modifier.fillMaxSize().padding(inset),contentAlignment=Alignment.TopCenter) {
             Column(Modifier.widthIn(max=760.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp),verticalArrangement=Arrangement.spacedBy(20.dp)) {
@@ -45,8 +45,9 @@ fun TrainingScreen(vm:MainViewModel) {
                         else -> stringResource(R.string.training_scope_converter)
                     },style=MaterialTheme.typography.bodySmall)
                 }}
+                if(config?.training!=null) {
                 Text(stringResource(R.string.training_batch_only,number),style=MaterialTheme.typography.bodyMedium)
-                Row(verticalAlignment=Alignment.CenterVertically){Text(stringResource(R.string.training_epochs),Modifier.weight(1f));listOf(1,3,10).forEach{n->FilterChip(selected=epochs==n,onClick={epochs=n},enabled=!active,label={Text("$n")});Spacer(Modifier.width(6.dp))}}
+                Row(verticalAlignment=Alignment.CenterVertically){Text(stringResource(R.string.training_epochs),Modifier.weight(1f));listOf(1,3,10).forEach{n->FilterChip(selected=epochs==n,onClick={epochs=n},enabled=!active && config?.training!=null,label={Text("$n")});Spacer(Modifier.width(6.dp))}}
                 StudioAction(stringResource(R.string.training_start),{vm.startDeviceTraining(epochs)},icon=Icons.Default.ModelTraining,primary=true,enabled=!busy && !active && preflight?.canStart==true)
                 preflight?.let { state ->
                     Text(stringResource(if(state.canStart)R.string.training_ready else R.string.training_blocked),style=MaterialTheme.typography.titleSmall,color=if(state.canStart)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
@@ -56,7 +57,8 @@ fun TrainingScreen(vm:MainViewModel) {
                     } }
                     state.error?.let{Text(it,style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.error)}
                 }
-                Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(stringResource(R.string.training_continuous),style=MaterialTheme.typography.titleSmall);Text(stringResource(R.string.training_continuous_help),style=MaterialTheme.typography.bodySmall)};Switch(checked=ProjectSettings.read(p).continuousTraining,onCheckedChange=vm::setContinuousTraining,enabled=!busy && config?.training!=null)}
+                }
+                Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(stringResource(R.string.training_continuous),style=MaterialTheme.typography.titleSmall);Text(stringResource(R.string.training_continuous_help),style=MaterialTheme.typography.bodySmall)};Switch(checked=ProjectSettings.read(p).continuousTraining,onCheckedChange=vm::setContinuousTraining,enabled=!busy && (config?.training!=null || ProjectSettings.read(p).continuousTraining))}
                 run?.let { state ->
                     HorizontalDivider()
                     Text(stringResource(when(state.phase){"queued"->R.string.training_phase_queued;"training"->R.string.training_phase_training;"evaluating"->R.string.training_phase_evaluating;"completed"->R.string.training_phase_completed;"rejected"->R.string.training_phase_rejected;"cancelled"->R.string.training_phase_cancelled;else->R.string.training_phase_failed}),style=MaterialTheme.typography.titleMedium)

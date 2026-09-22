@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import kotlin.math.*
 import com.unicornwhodev.visiondatasetstudio.core.workflow.StudioTask
 
@@ -68,11 +69,14 @@ object ModelContract {
     fun requireTaskCompatibility(c:ModelConfig,tasksCsv:String) {
         check(compatibility(c,tasksCsv).canRun) {
             if(adapter(c) in setOf("embedding","inspect_only"))
-                "Ce modèle produit des représentations visuelles, pas des annotations pour les tâches actives."
-            else "Sorties modèle incompatibles avec les tâches actives : ${tasksCsv.ifBlank { "aucune tâche" }}."
+                tr("Ce modèle produit des représentations visuelles, pas des annotations pour les tâches actives.", "This model produces visual embeddings, not annotations for the active tasks.")
+            else tr("Sorties modèle incompatibles avec les tâches actives : ${tasksCsv.ifBlank { "aucune tâche" }}.", "Model outputs incompatible with the active tasks: ${tasksCsv.ifBlank { "no tasks" }}.")
         }
     }
     fun validate(c: ModelConfig) {
+        require(c.prompt.length<=16_000) { tr("Prompt trop long", "Prompt too long") }
+        require(c.prompt.isBlank() || ModelPrompts.supportsText(c)) { tr("Ce modèle ne consomme pas de prompt textuel", "This model does not consume text prompts") }
+        require(c.captionLanguage.matches(Regex("[a-z]{2,3}(-[A-Za-z0-9]{2,8})*"))) { tr("Code de langue invalide", "Invalid language code") }
         require(c.bundleKind in setOf("","tinyclip","efficientvit_sam","florence2"))
         require(c.cropFraction.isFinite() && c.cropFraction in .5f..1f)
         require(c.embeddingOutputIndex in -1..128 && c.patchOutputIndex in -1..128)
@@ -91,20 +95,20 @@ object ModelContract {
             require(target.shape.isNotEmpty() && target.shape.all { it in 1..4096 } && target.shape.fold(1L){a,b->a*b}<=1_000_000)
         }
         require(c.trainingCheckpoint.isBlank() || (c.training!=null && com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings.safeRelativePath(c.trainingCheckpoint)))
-        require(c.schemaVersion == 1) { "Version de contrat modèle non prise en charge" }
-        require(c.runtime in setOf("litert_interpreter", "local_http")) { "Runtime non implémenté" }
+        require(c.schemaVersion == 1) { tr("Version de contrat modèle non prise en charge", "Unsupported model contract version") }
+        require(c.runtime in setOf("litert_interpreter", "local_http")) { tr("Runtime non implémenté", "Runtime not implemented") }
         require(c.threshold.isFinite() && c.threshold in 0f..1f)
         require(c.nmsIou.isFinite() && c.nmsIou in 0f..1f)
         require(c.maxDetections in 1..1000 && c.topK in 1..1000)
         require(c.labels.none { it.isBlank() } && c.labels.distinct().size == c.labels.size)
         if (c.runtime == "local_http") { LocalCallContract.validate(c); return }
-        require(adapter(c) in adapters) { "Adaptateur inconnu : ${adapter(c)}. Un encodeur visuel seul ne définit pas une tête de pointing." }
+        require(adapter(c) in adapters) { tr("Adaptateur inconnu : ${adapter(c)}. Un encodeur visuel seul ne définit pas une tête de pointing.", "Unknown adapter: ${adapter(c)}. A visual encoder alone does not define a pointing head.") }
         require(c.inputWidth in 1..2048 && c.inputHeight in 1..2048 && c.inputChannels in setOf(1,3))
         require(c.inputType in setOf("FLOAT32", "UINT8", "INT8"))
         require(c.inputLayout in setOf("NHWC", "NCHW"))
         require(resize(c) in setOf("letterbox", "stretch", "center_crop"))
         require(c.quantizationMode in setOf("raw", "tensor"))
-        require(c.inputType != "INT8" || c.quantizationMode == "tensor") { "INT8 exige la quantification du tenseur" }
+        require(c.inputType != "INT8" || c.quantizationMode == "tensor") { tr("INT8 exige la quantification du tenseur", "INT8 requires tensor quantization") }
         require(c.mean.isFinite() && c.std.isFinite() && c.std > 0f)
         require(c.channelMean.isEmpty() || (c.channelMean.size == c.inputChannels && c.channelMean.all(Float::isFinite)))
         require(c.channelStd.isEmpty() || (c.channelStd.size == c.inputChannels && c.channelStd.all { it.isFinite() && it > 0f }))
@@ -113,7 +117,7 @@ object ModelContract {
         require(c.scoreActivation in setOf("none", "sigmoid", "softmax", "clamp"))
         require(c.outputMode in setOf("boxes", "points", "both"))
         require(c.pointAnchor in setOf("center", "bottom_center", "top_center"))
-        if (adapter(c) !in setOf("embedding", "inspect_only", "florence2")) require(c.labels.isNotEmpty()) { "Définissez les classes du contrat" }
+        if (adapter(c) !in setOf("embedding", "inspect_only", "florence2")) require(c.labels.isNotEmpty()) { tr("Définissez les classes du contrat", "Define the contract's classes") }
         require(listOf(c.outputIndex, c.outputIndexBoxes, c.outputIndexClasses, c.outputIndexScores).all { it in 0..128 })
         require(c.outputIndexCount in -1..128)
         if (adapter(c) == "yolo") require(c.outputLayout in setOf("BCN", "BNC"))
@@ -135,15 +139,15 @@ interface ModelAdapter {
 /** No shape guessing: every supported output layout is selected in the contract. */
 object ModelAdapters {
     private fun scores(values: FloatArray, activation: String): FloatArray {
-        require(values.all(Float::isFinite)) { "Scores non finis" }
+        require(values.all(Float::isFinite)) { tr("Scores non finis", "Non-finite scores") }
         return when(activation) {
             "softmax" -> { val max = values.maxOrNull() ?: 0f; val exp = values.map { exp((it-max).toDouble()) }; val total = exp.sum(); FloatArray(values.size) { (exp[it]/total).toFloat() } }
             "clamp" -> FloatArray(values.size) { values[it].coerceIn(0f,1f) }
             "sigmoid" -> FloatArray(values.size) { (1.0/(1.0 + exp(-values[it].toDouble()))).toFloat() }
-            else -> values.also { require(it.all { score -> score in 0f..1f }) { "Scores hors [0,1] : précisez leur activation" } }
+            else -> values.also { require(it.all { score -> score in 0f..1f }) { tr("Scores hors [0,1] : précisez leur activation", "Scores outside [0,1]: specify their activation") } }
         }
     }
-    private fun label(c: ModelConfig, raw: Int): String = c.labels.getOrNull(raw-c.classOffset) ?: error("Indice classe $raw absent du vocabulaire")
+    private fun label(c: ModelConfig, raw: Int): String = c.labels.getOrNull(raw-c.classOffset) ?: error(tr("Indice classe $raw absent du vocabulaire", "Class index $raw missing from vocabulary"))
     private fun box(c: ModelConfig, t: InputTransform, x1: Float, y1: Float, x2: Float, y2: Float, score: Float, label: String): ModelProposal? {
         if (!listOf(x1,y1,x2,y2,score).all(Float::isFinite) || x2<=x1 || y2<=y1 || score<c.threshold) return null
         val a=t.point(x1,y1,c.coordinates=="normalized"); val b=t.point(x2,y2,c.coordinates=="normalized")
@@ -167,13 +171,13 @@ object ModelAdapters {
         val result = when(a) {
             "classification" -> {
                 val out=outputs.getValue(c.outputIndex)
-                require(out.shape == listOf(c.labels.size) || out.shape == listOf(1,c.labels.size)) { "Sortie classification incompatible" }
+                require(out.shape == listOf(c.labels.size) || out.shape == listOf(1,c.labels.size)) { tr("Sortie classification incompatible", "Incompatible classification output") }
                 scores(out.values,c.scoreActivation).mapIndexed { i,s -> ModelProposal("tag",c.labels[i],s) }.filter { it.score>=c.threshold }.sortedByDescending { it.score }.take(c.topK)
             }
             "yolo" -> {
                 val out=outputs.getValue(c.outputIndex); val sh=out.shape
                 val channels=4+c.labels.size+if(c.yoloObjectness) 1 else 0
-                require(sh.size==3 && sh[0]==1 && (if(c.outputLayout=="BCN") sh[1] else sh[2])==channels) { "Tenseur YOLO incompatible avec classes/layout/objectness" }
+                require(sh.size==3 && sh[0]==1 && (if(c.outputLayout=="BCN") sh[1] else sh[2])==channels) { tr("Tenseur YOLO incompatible avec classes/layout/objectness", "YOLO tensor incompatible with classes/layout/objectness") }
                 val n=if(c.outputLayout=="BCN") sh[2] else sh[1]; require(n<=100_000)
                 fun v(i:Int,k:Int)=out.values[if(c.outputLayout=="BCN") k*n+i else i*channels+k]
                 val all=mutableListOf<ModelProposal>()
@@ -217,9 +221,14 @@ object ModelAdapters {
             }
             "rtmdet" -> {
                 val all=mutableListOf<ModelProposal>()
-                c.featureStrides.forEachIndexed { index,stride ->
-                    val out=outputs.getValue(index); val sh=out.shape; val channels=c.labels.size+4
-                    require(sh==listOf(1,c.inputHeight/stride,c.inputWidth/stride,channels)) { "Carte RTMDet incompatible avec le pas déclaré" }
+                c.featureStrides.forEach { stride ->
+                    val channels=c.labels.size+4
+                    val expected=listOf(1,c.inputHeight/stride,c.inputWidth/stride,channels)
+                    // LiteRT output indices need not preserve the converter's pyramid order.
+                    // Match each unique spatial shape, rather than silently decoding another scale.
+                    val out=outputs.values.singleOrNull { it.shape==expected }
+                        ?: error(tr("Carte RTMDet absente ou ambiguë pour le pas $stride : attendu $expected, reçu ${outputs.values.map{it.shape}}", "Missing or ambiguous RTMDet feature map for stride $stride: expected $expected, received ${outputs.values.map{it.shape}}"))
+                    val sh=out.shape
                     val w=sh[2]
                     for (cell in 0 until sh[1]*w) {
                         val base=cell*channels
@@ -274,7 +283,7 @@ object ModelAdapters {
             "points" -> {
                 val out=outputs.getValue(c.outputIndex);val sh=out.shape
                 require(sh.size==3 && sh[0]==1 && sh[2] in 2..3)
-                require(c.labels.size==1 || c.labels.size==sh[1]) { "Points : une classe globale ou une classe par point" }
+                require(c.labels.size==1 || c.labels.size==sh[1]) { tr("Points : une classe globale ou une classe par point", "Points: one global class or one class per point") }
                 (0 until sh[1]).mapNotNull { i ->
                     val base=i*sh[2];val p=t.point(out.values[base],out.values[base+1],c.coordinates=="normalized")
                     val score=if(sh[2]==3) scores(floatArrayOf(out.values[base+2]),c.scoreActivation)[0] else 1f
@@ -287,7 +296,7 @@ object ModelAdapters {
                 require(sh.size==4 && sh[0]==1)
                 val h=if(c.outputLayout=="NHWC") sh[1] else sh[2];val w=if(c.outputLayout=="NHWC") sh[2] else sh[3]
                 val classes=if(c.outputLayout=="NHWC") sh[3] else sh[1];require(classes==c.labels.size)
-                require(c.scoreActivation!="softmax") { "Heatmap : utilisez none ou sigmoid" }
+                require(c.scoreActivation!="softmax") { tr("Heatmap : utilisez none ou sigmoid", "Heatmap: use none or sigmoid") }
                 c.labels.mapIndexedNotNull { k,label ->
                     val vals=FloatArray(h*w) { i -> out.values[if(c.outputLayout=="NHWC") i*classes+k else k*h*w+i] }
                     val prob=scores(vals,c.scoreActivation);val i=prob.indices.maxByOrNull{prob[it]} ?: return@mapIndexedNotNull null
@@ -297,15 +306,15 @@ object ModelAdapters {
             }
             "embedding" -> {
                 val out=outputs.getValue(c.outputIndex)
-                require(out.values.isNotEmpty() && out.values.size<=4_000_000 && out.values.all(Float::isFinite)) { "Embedding invalide" }
+                require(out.values.isNotEmpty() && out.values.size<=4_000_000 && out.values.all(Float::isFinite)) { tr("Embedding invalide", "Invalid embedding") }
                 emptyList()
             }
             "inspect_only" -> {
                 val out=outputs.getValue(c.outputIndex)
-                require(out.values.isNotEmpty() && out.values.size<=4_000_000 && out.values.all(Float::isFinite)) { "Sortie inspectée invalide" }
+                require(out.values.isNotEmpty() && out.values.size<=4_000_000 && out.values.all(Float::isFinite)) { tr("Sortie inspectée invalide", "Invalid inspected output") }
                 emptyList()
             }
-            else -> error("Adaptateur absent")
+            else -> error(tr("Adaptateur absent", "Adapter missing"))
         }
         val boxes=result.filter { it.type=="box" }
         val converted=if(c.outputMode in setOf("points","both") && boxes.isNotEmpty()) {
@@ -329,15 +338,18 @@ object ModelAdapters {
 
 object LocalCallContract {
     fun validate(c: ModelConfig) {
+        require(c.prompt.length<=16_000) { tr("Prompt trop long", "Prompt too long") }
+        require(c.prompt.isBlank() || ModelPrompts.supportsText(c)) { tr("Ce modèle ne consomme pas de prompt textuel", "This model does not consume text prompts") }
+        require(c.captionLanguage.matches(Regex("[a-z]{2,3}(-[A-Za-z0-9]{2,8})*"))) { tr("Code de langue invalide", "Invalid language code") }
         val uri=java.net.URI(c.endpoint)
         require(uri.scheme=="http" && uri.host in setOf("127.0.0.1","localhost") && uri.userInfo==null && uri.fragment==null) {
-            "Le runtime local HTTP est limité au loopback de cet appareil. Aucun envoi Internet implicite."
+            tr("Le runtime local HTTP est limité au loopback de cet appareil. Aucun envoi Internet implicite.", "Local HTTP is restricted to this device's loopback. No implicit Internet upload.")
         }
         require(c.httpTimeoutSeconds in 5..300 && c.requestTemplate.length<=32_000 && c.prompt.length<=16_000)
         require(c.httpOutputMode in setOf("proposals","caption_text","grounding_proposals"))
-        require(c.task in setOf("object_detection","pointing","classification","captioning","vqa","counting","grounding","multitask")) { "Tâche locale non implémentée" }
+        require(c.task in setOf("object_detection","pointing","classification","captioning","vqa","counting","grounding","multitask")) { tr("Tâche locale non implémentée", "Local task not implemented") }
         require((c.task=="grounding") == (c.httpOutputMode=="grounding_proposals")) {
-            "Le grounding exige explicitement httpOutputMode=grounding_proposals"
+            tr("Le grounding exige explicitement httpOutputMode=grounding_proposals", "Grounding explicitly requires httpOutputMode=grounding_proposals")
         }
         require(c.responsePath.length<=500)
     }

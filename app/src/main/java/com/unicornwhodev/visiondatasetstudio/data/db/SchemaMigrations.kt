@@ -29,7 +29,7 @@ object SchemaMigrations {
         "CREATE INDEX IF NOT EXISTS index_samples_projectId_annotationStatus ON samples(projectId, annotationStatus)",
         "CREATE INDEX IF NOT EXISTS index_samples_projectId_sha256 ON samples(projectId, sha256)",
         "CREATE INDEX IF NOT EXISTS index_audit_logs_projectId_timestamp ON audit_logs(projectId, timestamp)",
-        "UPDATE batches SET status='CONFLICT', lastTransferError='Ancien transfert sans parent persistant : réconciliation manuelle requise' WHERE status='PUBLISHING' AND hfCommitSha IS NULL"
+        "UPDATE batches SET status='CONFLICT', lastTransferError='Old transfer without a persisted parent: manual reconciliation required' WHERE status='PUBLISHING' AND hfCommitSha IS NULL"
     )
     val from3to4=listOf(
         "CREATE TABLE IF NOT EXISTS image_identities (projectId INTEGER NOT NULL, kind TEXT NOT NULL, digest TEXT NOT NULL, firstSampleId TEXT NOT NULL, firstBatchNumber INTEGER NOT NULL, PRIMARY KEY(projectId, kind, digest))",

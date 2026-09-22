@@ -29,7 +29,7 @@
     <string name="training_start">Train exported batch</string><string name="training_ready">Ready to start</string><string name="training_blocked">Cannot start</string>
     <string name="training_continuous">Train after every export</string><string name="training_continuous_help">Disabled by default. New weights are activated manually.</string>
     <string name="training_stop">Stop</string><string name="training_resume">Resume</string><string name="training_activate">Activate trained weights</string><string name="training_details">Details</string><string name="training_contract">Model contract</string>
-    <string name="training_scope_classification">Classification head · frozen encoder</string><string name="training_scope_detection">Detection adaptation · frozen encoder</string><string name="training_scope_points">Point head · frozen encoder</string><string name="training_scope_multitask">Multitask outputs · frozen encoder</string><string name="training_scope_internal">Trainable visual and output layers</string><string name="training_scope_missing">Training signatures are not available yet.</string><string name="training_scope_converter">Scope defined by the conversion</string>
+    <string name="training_scope_classification">Classification head · frozen encoder</string><string name="training_scope_detection">Detection adaptation · frozen encoder</string><string name="training_scope_points">Point head · frozen encoder</string><string name="training_scope_multitask">Multitask outputs · frozen encoder</string><string name="training_scope_internal">Trainable visual and output layers</string><string name="training_scope_missing">Available for inference and preannotation. This model does not support training.</string><string name="training_scope_converter">Scope defined by the conversion</string>
     <string name="training_phase_queued">Queued</string><string name="training_phase_training">Training</string><string name="training_phase_evaluating">Evaluation</string><string name="training_phase_completed">Candidate ready</string><string name="training_phase_rejected">Previous model retained</string><string name="training_phase_cancelled">Interrupted</string><string name="training_phase_failed">Failed</string>
     <string name="training_progress">%1$d / %2$d steps · %3$d training / %4$d validation</string><string name="training_loss">Validation loss: %1$.5f → %2$.5f</string><string name="training_weights_changed">Internal weights changed</string><string name="training_weights_unchanged">Internal weights unchanged</string>
     <string name="training_details_dataset">At least 32 training images and 8 validation images are required. The split depends on file hashes; identical files cannot cross groups. All accepted images from the exported batch are used, with a private copy retained until training and cleanup finish.</string>
@@ -84,7 +84,7 @@
     <string name="controls_validate_contract">Validate and save contract</string>
     <string name="controls_dry_run">Test without changing annotations</string>
     <string name="controls_test_image">Test saved model on an image</string>
-    <string name="controls_preannotate_pending">Pre-annotate pending batch cases</string>
+    <string name="controls_preannotate_pending">Preannotate untouched images</string>
     <string name="controls_measure_device">Measure on this device</string>
     <string name="controls_adaptive_points">Adaptive point correction</string>
     <string name="common_download">Download</string>
@@ -92,7 +92,7 @@
     <string name="common_delete">Delete</string>
     <string name="controls_clear_corrector_title">Clear local corrector?</string>
     <string name="common_reset">Reset</string>
-    <string name="batch_preannotate_body">The model will process one pending image at a time. Existing corrections and decisions will be preserved. No proposal will be validated automatically. Keep the app open.</string>
+    <string name="batch_preannotate_body">Only images without annotations will be processed. Existing proposals stay unchanged. Keep the app open.</string>
     <string name="batch_reject_failures_body">Images that could not be retrieved will be excluded from the dataset with their failure reason. This action fixes no file and validates no image.</string>
     <string name="batch_bulk_body">The action only affects selected editable cases. No image will be validated automatically.</string>
     <string name="publication_isolate_body">The previous commit and paths will remain unchanged. A new publication will use a unique path; this can create a remote duplicate if the first response was lost. Nothing is deleted remotely.</string>

@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Debug
@@ -24,7 +25,7 @@ object DeviceBenchmark {
         repeat(repetitions) { index ->
             coroutineContext.ensureActive()
             val start=System.nanoTime();engine.runInference(bitmap,config).orThrow()
-            check(engine.lastError==null){engine.lastError ?: "Échec"}
+            check(engine.lastError==null){engine.lastError ?: tr("Échec", "Failed")}
             times+=(System.nanoTime()-start)/1e6
             engine.lastNativeDurationNanos?.let{native+=it/1e6}
             samples+=memory();progress(index+1,repetitions)

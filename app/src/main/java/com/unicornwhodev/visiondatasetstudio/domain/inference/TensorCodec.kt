@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.roundToInt
@@ -9,7 +10,7 @@ object TensorCodec {
     fun encode(pixels: IntArray, c: ModelConfig, scale: Float = 0f, zeroPoint: Int = 0): ByteBuffer {
         require(pixels.size == c.inputWidth*c.inputHeight)
         val channels=c.inputChannels
-        if(c.inputType!="FLOAT32" && c.quantizationMode=="tensor") require(scale.isFinite() && scale>0f) { "Échelle de quantification invalide" }
+        if(c.inputType!="FLOAT32" && c.quantizationMode=="tensor") require(scale.isFinite() && scale>0f) { tr("Échelle de quantification invalide", "Invalid quantization scale") }
         val out=ByteBuffer.allocateDirect(pixels.size*channels*if(c.inputType=="FLOAT32") 4 else 1).order(ByteOrder.nativeOrder())
         fun value(pixel:Int,channel:Int):Float {
             val r=(pixel shr 16) and 255;val g=(pixel shr 8) and 255;val b=pixel and 255
@@ -31,7 +32,7 @@ object TensorCodec {
     fun decode(buffer: ByteBuffer, type: String, count: Int, scale: Float=0f, zeroPoint: Int=0): FloatArray {
         buffer.order(ByteOrder.nativeOrder());buffer.rewind()
         return FloatArray(count) {
-            when(type){"FLOAT32"->buffer.float;"INT32"->buffer.int.toFloat();"UINT8","INT8"->{require(scale.isFinite() && scale>0f);val b=buffer.get().toInt();((if(type=="UINT8") b and 255 else b)-zeroPoint)*scale};else->error("Type de sortie non pris en charge : $type")}
+            when(type){"FLOAT32"->buffer.float;"INT32"->buffer.int.toFloat();"UINT8","INT8"->{require(scale.isFinite() && scale>0f);val b=buffer.get().toInt();((if(type=="UINT8") b and 255 else b)-zeroPoint)*scale};else->error(tr("Type de sortie non pris en charge : $type", "Unsupported output type: $type"))}
         }
     }
 }

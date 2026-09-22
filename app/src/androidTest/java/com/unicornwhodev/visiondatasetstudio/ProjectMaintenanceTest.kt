@@ -16,6 +16,30 @@ import org.junit.Test
 class ProjectMaintenanceTest {
     private val context=InstrumentationRegistry.getInstrumentation().targetContext
 
+    @Test fun discardedBatchRetainsCursorAndDeduplicationAfterInterruptedCleanup()=runBlocking {
+        val db=Room.inMemoryDatabaseBuilder(context,AppDatabase::class.java).build();val storage=StorageManager(context);val id=88775L
+        val sample=SampleEntity("discard-old",id,1,"same",0,sourceOrdinal=0,sourceFileUrl=null,localImagePath=null,sha256="discard-sha",acquisitionStatus="AVAILABLE",annotationStatus="PENDING",syncStatus="NOT_EXPORTED")
+        try {
+            db.projectDao().saveProject(ProjectEntity(id=id,lastRowCursor=2))
+            db.batchDao().insertOrReplace(BatchEntity(id,1,"READY"));db.sampleDao().insertSamples(listOf(sample))
+            assertNull(ImageIdentity.accept(db,sample,"discard-pixels"))
+            val workflow=java.io.File(context.filesDir,"workflows/$id-1.json").apply{parentFile!!.mkdirs();writeText("old workflow")}
+            try { ProjectMaintenance(context,db,storage){error("simulated process death")}.discardBatch(id,1);fail("interruption expected") } catch(_:IllegalStateException) {}
+            assertEquals("DISCARDED",db.batchDao().getBatchSync(id,1)!!.status)
+            assertEquals(2,db.projectDao().getProjectSync(id)!!.lastRowCursor)
+            assertNull(db.sampleDao().getSampleSync(sample.sampleId))
+            assertNotNull(db.imageIdentityDao().owner(id,"file_sha256","discard-sha"))
+            ProjectMaintenance(context,db,storage).resumePending()
+            assertFalse(workflow.exists());assertFalse(java.io.File(context.filesDir,"maintenance/pending.json").exists())
+            db.batchDao().insertOrReplace(BatchEntity(id,2,"READY"))
+            val duplicate=sample.copy(sampleId="discard-duplicate",batchNumber=2,sourceOrdinal=2)
+            db.sampleDao().insertSamples(listOf(duplicate))
+            assertNotNull(ImageIdentity.accept(db,duplicate,"discard-pixels"))
+            assertEquals("DUPLICATE",db.sampleDao().getSampleSync(duplicate.sampleId)!!.annotationStatus)
+            assertTrue(com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates.contains("DISCARDED"))
+        } finally { java.io.File(context.filesDir,"maintenance/pending.json").delete();db.close() }
+    }
+
     @Test fun resetBatchPreservesProjectConfigurationAndSharedModelProfile()=runBlocking {
         val db=Room.inMemoryDatabaseBuilder(context,AppDatabase::class.java).build();val storage=StorageManager(context)
         val project=ProjectEntity(id=88771,name="maintenance",classesCsv="cat,dog",activeTasksCsv="DETECTION",modelPath="/shared/model.tflite",lastRowCursor=12)

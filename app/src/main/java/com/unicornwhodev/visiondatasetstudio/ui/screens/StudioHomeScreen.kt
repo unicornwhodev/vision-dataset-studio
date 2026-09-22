@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
 import com.unicornwhodev.visiondatasetstudio.R
 
@@ -58,19 +59,19 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
         preview?.takeIf { previewEditable && !busy }?.let { viewModel.openSampleInEditor(it.sampleId) }
     }
     val primary: @Composable () -> Unit = {
-        StudioAction(if (!configured) "Importer" else if(samples.isEmpty()) "Préparer le lot" else if(previewEditable) "Annoter" else "Ouvrir le lot",
+        StudioAction(if (!configured) tr("Importer", "Import") else if(samples.isEmpty()) tr("Préparer le lot", "Prepare batch") else if(previewEditable) tr("Annoter", "Annotate") else tr("Ouvrir le lot", "Open batch"),
             onClick = { if(!configured) viewModel.navigateTo(Screen.Setup) else if(samples.isEmpty()) viewModel.fetchAndPrepareBatch(batch)
                 else if(previewEditable) openPreview() else viewModel.navigateTo(Screen.BatchGrid) },
             icon = if(samples.isEmpty()) Icons.Default.Add else Icons.Default.ArrowForward,
             primary = true, enabled = !busy && project != null, modifier = Modifier.testTag("home_primary"))
     }
     val details: @Composable () -> Unit = {
-        WorkspaceLink("Source", if(policy?.sourceMode == "LOCAL_INDEX") "Dossier local" else project?.hfSourceRepo?.ifBlank { "À configurer" } ?: "À configurer",
+        WorkspaceLink("Source", if(policy?.sourceMode == "LOCAL_INDEX") tr("Dossier local", "Local folder") else project?.hfSourceRepo?.ifBlank { tr("À configurer", "Configure") } ?: tr("À configurer", "Configure"),
             Icons.Default.FolderOpen, !busy) { viewModel.navigateTo(Screen.Setup) }
-        WorkspaceLink("Modèle", if(project?.modelPath != null || project?.modelConfigJson?.contains("local_http") == true) "Profil du projet"
-            else if(models.isEmpty()) "Aucun modèle actif" else "${models.size} disponible(s)", Icons.Default.Memory, !busy) { viewModel.navigateTo(Screen.Models) }
+        WorkspaceLink(tr("Modèle", "Model"), if(project?.modelPath != null || project?.modelConfigJson?.contains("local_http") == true) tr("Profil du projet", "Project profile")
+            else if(models.isEmpty()) tr("Aucun modèle actif", "No active model") else tr("${models.size} disponible(s)", "${models.size} available"), Icons.Default.Memory, !busy) { viewModel.navigateTo(Screen.Models) }
         Box {
-            WorkspaceLink(stringResource(R.string.prefs_tools), currentPreset?.title ?: "Personnalisés", Icons.Default.CropFree, !busy) { presetMenu = true }
+            WorkspaceLink(stringResource(R.string.prefs_tools), currentPreset?.title ?: tr("Personnalisés", "Custom"), Icons.Default.CropFree, !busy) { presetMenu = true }
             DropdownMenu(expanded = presetMenu, onDismissRequest = { presetMenu = false }) {
                 StudioWorkflow.presets.forEach { preset -> DropdownMenuItem(text = { Text(preset.title) }, onClick = { presetMenu = false; presetId = preset.id }) }
                 HorizontalDivider()
@@ -79,19 +80,19 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
         }
     }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
-        StudioTopBar(project?.name ?: "Atelier", "Atelier  /  Lot ${batch.toString().padStart(2, '0')}", actions = {
-            IconButton(onClick = { viewModel.navigateTo(Screen.Workflow) }, enabled = !busy) { Icon(Icons.Default.AccountTree, "Workflows et agent", Modifier.size(19.dp)) }
+        StudioTopBar(project?.name ?: tr("Atelier", "Studio"), tr("Atelier  /  Lot ${batch.toString().padStart(2, '0')}", "Studio  /  Batch ${batch.toString().padStart(2, '0')}"), actions = {
+            IconButton(onClick = { viewModel.navigateTo(Screen.Workflow) }, enabled = !busy) { Icon(Icons.Default.AccountTree, tr("Workflows et agent", "Workflows and agent"), Modifier.size(19.dp)) }
             IconButton(onClick = { viewModel.navigateTo(Screen.Controls) }, enabled = !busy, modifier = Modifier.testTag("controls_shortcut")) {
-                Icon(Icons.Default.FolderOpen, "Gérer les projets", Modifier.size(19.dp))
+                Icon(Icons.Default.FolderOpen, tr("Gérer les projets", "Manage projects"), Modifier.size(19.dp))
             }
-            IconButton(onClick = { viewModel.navigateTo(Screen.Preferences) }) { Icon(Icons.Default.Tune, "Réglages", Modifier.size(19.dp)) }
+            IconButton(onClick = { viewModel.navigateTo(Screen.Preferences) }) { Icon(Icons.Default.Tune, tr("Réglages", "Settings"), Modifier.size(19.dp)) }
         })
     }) { inset ->
         BoxWithConstraints(Modifier.fillMaxSize().padding(inset)) {
             if (maxWidth >= 760.dp) {
                 Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text("Espace d’annotation", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                        Text(tr("Espace d’annotation", "Annotation workspace"), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                         primary()
                     }
                     Spacer(Modifier.height(8.dp))
@@ -102,13 +103,13 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
                         }
                         Column(Modifier.width(236.dp).fillMaxHeight()) {
                             Row(Modifier.fillMaxWidth().height(28.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text("FILE DE TRAVAIL", Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(tr("FILE DE TRAVAIL", "WORK QUEUE"), Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text("${samples.size}", style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace)
                             }
                             LinearProgressIndicator(progress = { completion }, modifier = Modifier.fillMaxWidth().height(2.dp), trackColor = MaterialTheme.colorScheme.outlineVariant)
-                            Text("$reviewed / ${samples.size} traitées", Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(tr("$reviewed / ${samples.size} traitées", "$reviewed / ${samples.size} processed"), Modifier.padding(vertical = 8.dp), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                if(samples.isEmpty()) item { Text("Aucune image importée", Modifier.padding(vertical = 16.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                                if(samples.isEmpty()) item { Text(tr("Aucune image importée", "No images imported"), Modifier.padding(vertical = 16.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                                 itemsIndexed(samples, key = { _, s -> s.sampleId }) { index, sample ->
                                     QueueRow(sample, index, sample.sampleId == preview?.sampleId) { previewId = sample.sampleId }
                                 }
@@ -123,8 +124,8 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
                     item {
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text("Lot ${batch.toString().padStart(2, '0')}", style = MaterialTheme.typography.titleSmall)
-                                Text("$reviewed / ${samples.size} traitées", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(tr("Lot ${batch.toString().padStart(2, '0')}", "Batch ${batch.toString().padStart(2, '0')}"), style = MaterialTheme.typography.titleSmall)
+                                Text(tr("$reviewed / ${samples.size} traitées", "$reviewed / ${samples.size} processed"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             primary()
                         }
@@ -133,8 +134,8 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
                         PreviewCaption(preview)
                         LinearProgressIndicator(progress = { completion }, modifier = Modifier.fillMaxWidth().height(2.dp), trackColor = MaterialTheme.colorScheme.outlineVariant)
                         Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text("Images du lot", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-                            TextButton(onClick = { viewModel.navigateTo(Screen.BatchGrid) }) { Text("Tout voir", style = MaterialTheme.typography.labelMedium) }
+                            Text(tr("Images du lot", "Batch images"), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                            TextButton(onClick = { viewModel.navigateTo(Screen.BatchGrid) }) { Text(tr("Tout voir", "View all"), style = MaterialTheme.typography.labelMedium) }
                         }
                     }
                     itemsIndexed(samples.take(3), key = { _, s -> s.sampleId }) { index, sample ->
@@ -151,7 +152,7 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
     }
     presetId?.let { id -> StudioWorkflow.presets.firstOrNull { it.id == id }?.let { preset ->
         AlertDialog(onDismissRequest = { presetId = null }, title = { Text(preset.title) }, text = {
-            Text("Activer ${preset.tasks.joinToString { it.title }} ? Vos annotations sont conservées.")
+            Text(tr("Activer ${preset.tasks.joinToString { it.title }} ? Vos annotations sont conservées.", "Enable ${preset.tasks.joinToString { it.title }}? Your annotations are preserved."))
         }, confirmButton = { Button(onClick = { viewModel.updateTasks(preset.tasks); presetId = null }) { Text(stringResource(R.string.common_apply)) } },
             dismissButton = { TextButton(onClick = { presetId = null }) { Text(stringResource(R.string.common_cancel)) } })
     } }
@@ -161,12 +162,12 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
 private fun WorkspacePreview(sample: SampleEntity?, modifier: Modifier, editable: Boolean, onClick: () -> Unit) {
     Box(modifier.clip(RoundedCornerShape(5.dp)).background(MaterialTheme.colorScheme.surfaceContainerLowest)
         .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .6f), RoundedCornerShape(5.dp))
-        .clickable(enabled = editable, role = Role.Button, onClickLabel = "Annoter cette image", onClick = onClick), contentAlignment = Alignment.Center) {
-        if(sample?.localImagePath != null) AsyncImage(model = File(sample.localImagePath), contentDescription = "Aperçu ${sample.assetId}", contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().padding(8.dp))
+        .clickable(enabled = editable, role = Role.Button, onClickLabel = tr("Annoter cette image", "Annotate this image"), onClick = onClick), contentAlignment = Alignment.Center) {
+        if(sample?.localImagePath != null) AsyncImage(model = File(sample.localImagePath), contentDescription = tr("Aperçu ${sample.assetId}", "Preview ${sample.assetId}"), contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().padding(8.dp))
         else Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Icon(Icons.Default.CropFree, null, Modifier.size(30.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(if(sample == null) "Votre espace de travail" else "Aperçu indisponible", style = MaterialTheme.typography.titleSmall)
-            Text(if(sample == null) "Importez un dossier ou un dataset." else "Ouvrez le lot pour vérifier l’acquisition.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(if(sample == null) tr("Votre espace de travail", "Your workspace") else tr("Aperçu indisponible", "Preview unavailable"), style = MaterialTheme.typography.titleSmall)
+            Text(if(sample == null) tr("Importez un dossier ou un dataset.", "Import a folder or dataset.") else tr("Ouvrez le lot pour vérifier l’acquisition.", "Open the batch to check acquisition."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -174,7 +175,7 @@ private fun WorkspacePreview(sample: SampleEntity?, modifier: Modifier, editable
 @Composable
 private fun PreviewCaption(sample: SampleEntity?) {
     Row(Modifier.fillMaxWidth().heightIn(min = 36.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(sample?.assetId ?: "Aucune image sélectionnée", Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(sample?.assetId ?: tr("Aucune image sélectionnée", "No image selected"), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if(sample?.imageWidth != null && sample.imageHeight != null) Text("${sample.imageWidth} × ${sample.imageHeight}", style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
@@ -182,7 +183,7 @@ private fun PreviewCaption(sample: SampleEntity?) {
 @Composable
 private fun QueueRow(sample: SampleEntity, index: Int, selected: Boolean, onClick: () -> Unit) {
     val background by animateColorAsState(if(selected) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.background, label = "preview selection")
-    val status = when(sample.annotationStatus) { "VALIDATED" -> "Validée"; "REJECTED" -> "Rejetée"; "IN_PROGRESS" -> "En cours"; "DEFERRED" -> "À revoir"; "PROPOSALS_AVAILABLE" -> "Suggestions"; else -> "À traiter" }
+    val status = when(sample.annotationStatus) { "VALIDATED" -> tr("Validée", "Approved"); "REJECTED" -> tr("Rejetée", "Rejected"); "IN_PROGRESS" -> tr("En cours", "In progress"); "DEFERRED" -> tr("À revoir", "To review"); "PROPOSALS_AVAILABLE" -> "Suggestions"; else -> tr("À traiter", "To process") }
     Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(background).clickable(role = Role.Tab, onClick = onClick)
         .semantics { this.selected = selected }.padding(horizontal = 8.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Text((index+1).toString().padStart(2,'0'), style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)

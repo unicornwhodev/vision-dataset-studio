@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
 import com.unicornwhodev.visiondatasetstudio.R
 
@@ -38,32 +39,32 @@ fun StudioPreferencesScreen(viewModel: MainViewModel) {
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = { StudioTopBar(stringResource(R.string.screen_preferences), onBack = viewModel::back) }) { inset ->
         Box(Modifier.fillMaxSize().padding(inset), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = 800.dp).fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                StudioSection(stringResource(R.string.prefs_appearance), "Réglages enregistrés automatiquement sur cet appareil.", Icons.Default.Palette) {
+                StudioSection(stringResource(R.string.prefs_appearance), tr("Réglages enregistrés automatiquement sur cet appareil.", "Settings are saved automatically on this device."), Icons.Default.Palette) {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ThemeMode.entries.forEach { theme -> FilterChip(selected = prefs.theme == theme, onClick = { viewModel.updatePreferences(prefs.copy(theme = theme)) }, label = { Text(when(theme) { ThemeMode.SYSTEM -> "Système"; ThemeMode.LIGHT -> "Clair"; ThemeMode.DARK -> "Sombre" }) }) }
+                        ThemeMode.entries.forEach { theme -> FilterChip(selected = prefs.theme == theme, onClick = { viewModel.updatePreferences(prefs.copy(theme = theme)) }, label = { Text(when(theme) { ThemeMode.SYSTEM -> tr("Système", "System"); ThemeMode.LIGHT -> tr("Clair", "Light"); ThemeMode.DARK -> tr("Sombre", "Dark") }) }) }
                     }
-                    Text("Taille des miniatures", style = MaterialTheme.typography.titleMedium)
+                    Text(tr("Taille des miniatures", "Thumbnail size"), style = MaterialTheme.typography.titleMedium)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        GridDensity.entries.forEach { d -> FilterChip(selected = prefs.gridDensity == d, onClick = { viewModel.updatePreferences(prefs.copy(gridDensity = d)) }, label = { Text(if(d == GridDensity.COMPACT) "Compactes" else "Confortables") }) }
+                        GridDensity.entries.forEach { d -> FilterChip(selected = prefs.gridDensity == d, onClick = { viewModel.updatePreferences(prefs.copy(gridDensity = d)) }, label = { Text(if(d == GridDensity.COMPACT) tr("Compactes", "Compact") else tr("Confortables", "Comfortable")) }) }
                     }
-                    PreferenceToggle("Repères sur l’image", "Classes visibles.", prefs.showCanvasLabels) { viewModel.updatePreferences(prefs.copy(showCanvasLabels = it)) }
+                    PreferenceToggle(tr("Repères sur l’image", "Image labels"), tr("Classes visibles.", "Show classes."), prefs.showCanvasLabels) { viewModel.updatePreferences(prefs.copy(showCanvasLabels = it)) }
                 }
                 StudioSection(stringResource(R.string.prefs_gestures), icon = Icons.Default.TouchApp) {
-                    PreferenceToggle("Passer à l’image suivante", "Après validation.", prefs.autoAdvance) { viewModel.updatePreferences(prefs.copy(autoAdvance = it)) }
-                    PreferenceToggle("Mode gaucher", "Valider à gauche.", prefs.leftHanded) { viewModel.updatePreferences(prefs.copy(leftHanded = it)) }
-                    PreferenceToggle("Afficher les conseils", "Repères dans l’atelier.", prefs.showGuidance) { viewModel.updatePreferences(prefs.copy(showGuidance = it)) }
-                    Text("Langue des légendes", style = MaterialTheme.typography.titleMedium)
+                    PreferenceToggle(tr("Passer à l’image suivante", "Move to the next image"), tr("Après validation.", "After approval."), prefs.autoAdvance) { viewModel.updatePreferences(prefs.copy(autoAdvance = it)) }
+                    PreferenceToggle(tr("Mode gaucher", "Left-handed mode"), tr("Valider à gauche.", "Approve on the left."), prefs.leftHanded) { viewModel.updatePreferences(prefs.copy(leftHanded = it)) }
+                    PreferenceToggle(tr("Afficher les conseils", "Show guidance"), tr("Repères dans l’atelier.", "Guidance in the studio."), prefs.showGuidance) { viewModel.updatePreferences(prefs.copy(showGuidance = it)) }
+                    Text(tr("Langue des légendes", "Caption language"), style = MaterialTheme.typography.titleMedium)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf("fr" to "Français", "en" to "Anglais").forEach { (code, label) -> FilterChip(selected = prefs.captionLanguage == code, onClick = { viewModel.updatePreferences(prefs.copy(captionLanguage = code)) }, label = { Text(label) }) }
+                        listOf("fr" to tr("Français", "French"), "en" to tr("Anglais", "English")).forEach { (code, label) -> FilterChip(selected = prefs.captionLanguage == code, onClick = { viewModel.updatePreferences(prefs.copy(captionLanguage = code)) }, label = { Text(label) }) }
                     }
                 }
-                StudioSection(stringResource(R.string.prefs_tools), "Qualité reste toujours accessible. Masquer un outil n’efface rien.", Icons.Default.Widgets) {
+                StudioSection(stringResource(R.string.prefs_tools), tr("Qualité reste toujours accessible. Masquer un outil n’efface rien.", "Quality remains accessible. Hiding a tool does not erase data."), Icons.Default.Widgets) {
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         StudioTask.entries.forEach { task -> FilterChip(selected = task in chosenTasks, onClick = { chosenTasks = StudioWorkflow.toggleTask(chosenTasks, task) }, label = { Text(task.title) }) }
                     }
                     Button(onClick = { viewModel.updateTasks(chosenTasks) }, enabled = !busy && chosenTasks != StudioWorkflow.parseTasks(project?.activeTasksCsv ?: "DETECTION")) { Text(stringResource(R.string.common_apply)) }
                 }
-                StudioDetails("L’adaptation est explicite : aucun apprentissage caché de vos décisions, aucune modification automatique des classes ou des annotations.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                StudioDetails(tr("L’adaptation est explicite : aucun apprentissage caché de vos décisions, aucune modification automatique des classes ou des annotations.", "Adaptation is explicit: no hidden learning from decisions or automatic changes to classes or annotations."), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

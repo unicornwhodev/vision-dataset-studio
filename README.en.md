@@ -6,14 +6,14 @@
 
 An Android workspace for producing image datasets in batches: model proposals, human correction and export. A compact dark interface keeps the image at the centre of the work.
 
-**4.2.0-rc4 · Apache-2.0 · Under qualification**
+**4.2.0-rc5 · Apache-2.0 · Under qualification**
 Android application ID: `com.unicornwhodev.visiondatasetstudio`
 
 Latest validation **rc4 · 22 September 2026**: **54 JVM, 24 core Android, 2 LiteRT regressions and 52 Python tests passed**. [Build, evidence and limits](test-results/stabilization-rc4/README.md).
 
 ## Application screenshots
 
-| Current rc3 workspace | Annotation editor |
+| Historical rc3 workspace | Annotation editor |
 |---|---|
 | [![rc3 workspace](test-results/litert-rc3/final-device/app-ready.png)](test-results/litert-rc3/final-device/app-ready.png) | [![Annotation editor](docs/ui-refined/refined-editor-persisted.png)](docs/ui-refined/refined-editor-persisted.png) |
 
@@ -23,7 +23,9 @@ Real Android emulator captures. Left: final rc3 build after startup. Right: edit
 
 **Import → preannotate → correct/review → export and verify → optional learning → clean up → next batch.**
 
-Learning is **off by default**. When enabled, it uses only the corrected, exported batch, and cleanup waits until learning finishes. New weights require manual activation. Manual annotation and export work without a model.
+Learning is **off by default**. When enabled, it uses only the corrected, exported batch, and cleanup waits until learning finishes. New weights require manual activation. Manual annotation and export work without a model. A model without training signatures remains importable and usable for inference, with no SHA manifest required.
+
+Changing a prompt or setting never changes saved annotations. Reprocessing requires an explicit user action; human corrections remain protected.
 
 Persistent file and decoded-pixel fingerprints prevent identical copies from entering later batches of the same project. The ledger survives cache cleanup. Edited near-duplicates and lossy recompressions are outside this exact-identity guarantee.
 
@@ -39,18 +41,18 @@ All production state, inference and optional learning live on Android. The optio
 
 ## Features and status
 
-The September 2026 stabilization now separates runtime-artifact integrity from model documentation, exposes capabilities/qualification, and distinguishes an empty inference from a failure. See the [stabilization report](docs/STABILIZATION_2026_09.md). These fixes do not qualify a model that has not been executed.
+The functional audit adds applied model settings, visible workflow instructions, English application flows and preservation of existing annotations. See the [functional report](docs/en/FUNCTIONAL_AUDIT_2026_09.md).
 
 | Feature | Status |
 |---|---|
 | Local / HF import, configurable batches, correction and export | Implemented; local 2+1 cycle verified on Android |
 | Persistent identity, resume and protected cleanup | Android tests passed, including renamed copies and concurrent claims |
-| Android learning, checkpoints, cancel/resume | Four HF conversions passed train/save/restore/resume; their encoders remain frozen |
-| HF download, LiteRT contracts and preprocessing | Configurable catalogue, pinned revisions and SHA-256 verification; RepViT and four trainable conversions executed |
+| Android learning, checkpoints, cancel/resume | Seven HF conversions passed train/save/restore/resume; their encoders remain frozen |
+| HF download, LiteRT contracts and preprocessing | Configurable catalogue, optional SHA manifests, tensor-checked contracts; see the execution matrix |
 | Tokenizers and persistent similarity index | Android tests passed |
-| TinyCLIP / SAM / Florence-2 bundles | Adapters present; conversion tests remain pending |
+| TinyCLIP / SAM / Florence-2 bundles | TinyCLIP executed with visible proposals; SAM and Florence remain to be qualified |
 | Mask editor/export | Brush, eraser, separate instances, canonical and COCO export; gesture test passed |
-| Inference-only RTMDet | Decoder implemented; runtime shape incompatibility remains open |
+| Inference-only RTMDet | Inference and dynamic outputs verified after fixing the decoder |
 | Executable workflows | Three templates, journal/resume, review/export/cleanup gates; guard tests passed |
 | Agent | Optional local HTTP planner; separate user-provided server, real integration pending |
 

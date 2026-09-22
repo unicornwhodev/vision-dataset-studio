@@ -21,4 +21,18 @@ class TrainingPreflightTest {
         assertFalse(TrainingPreflight.evaluate(input().copy(modelFileAvailable=false)).canStart)
         assertFalse(TrainingPreflight.evaluate(input().copy(modelFileReadable=false)).canStart)
     }
+    @Test fun inferenceOnlyProfilesRemainRunnableAndIgnoreStaleTrainingPreferences() {
+        val config=ModelConfig.defaultClassifierPreset(listOf("a","b"))
+        val adapter=com.unicornwhodev.visiondatasetstudio.data.json.StudioJson.moshi.adapter(ModelConfig::class.java)
+        val project=com.unicornwhodev.visiondatasetstudio.data.model.ProjectEntity(modelConfigJson=adapter.toJson(config),
+            settingsJson=com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.write(com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings(continuousTraining=true)))
+        assertFalse(TrainingPolicy.enabled(project))
+        assertFalse(ModelCapabilities.fromConfig(config).trainable)
+        assertEquals(ModelAction.PREANNOTATE,ModelCapabilities.action(config,"CLASSIFICATION"))
+        val updated=project.copy(settingsJson=TrainingPolicy.settingsForModel(project,config))
+        assertFalse(com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.read(updated).continuousTraining)
+        val trainable=config.copy(training=training)
+        assertTrue(TrainingPolicy.enabled(project.copy(modelConfigJson=adapter.toJson(trainable))))
+    }
+
 }

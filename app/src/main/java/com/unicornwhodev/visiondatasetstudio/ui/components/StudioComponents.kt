@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.components
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
 import com.unicornwhodev.visiondatasetstudio.R
 
@@ -34,7 +35,7 @@ fun StudioTopBar(title: String, eyebrow: String? = null, onBack: (() -> Unit)? =
                  actions: @Composable RowScope.() -> Unit = {}) {
     Column {
         Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background).heightIn(min = 52.dp).padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour", Modifier.size(20.dp)) }
+            if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, tr("Retour", "Back"), Modifier.size(20.dp)) }
             else Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -80,7 +81,7 @@ fun StudioSection(title: String, subtitle: String? = null, icon: ImageVector? = 
             if (icon != null) Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
             Text(title, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
             if (subtitle != null) IconButton(onClick = { help = true }) {
-                Icon(Icons.Default.HelpOutline, "Aide : $title", Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(Icons.Default.HelpOutline, tr("Aide : $title", "Help: $title"), Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         content()
@@ -98,7 +99,7 @@ fun StudioDisclosure(title: String, icon: ImageVector = Icons.Default.Tune, init
     Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.surface, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .65f)), modifier = Modifier.fillMaxWidth()) {
         Column {
             Row(Modifier.fillMaxWidth().clickable(role = Role.Button) { expanded = !expanded }
-                .semantics { stateDescription = if (expanded) "Déplié" else "Replié" }.heightIn(min = 48.dp).padding(horizontal = 12.dp, vertical = 8.dp),
+                .semantics { stateDescription = if (expanded) tr("Déplié", "Expanded") else tr("Replié", "Collapsed") }.heightIn(min = 48.dp).padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
                 Text(title, Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
@@ -161,7 +162,7 @@ fun OperationBanner(progress: OperationProgress?, busy: Boolean, onDismiss: () -
                 Icon(if (progress.isError) Icons.Default.ErrorOutline else if (busy) Icons.Default.Sync else Icons.Default.CheckCircleOutline, null, Modifier.size(20.dp))
                 Text(progress.message, Modifier.weight(1f).clickable { expanded = !expanded }, maxLines = if (expanded) Int.MAX_VALUE else 2,
                     overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall)
-                if (!busy) IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, "Fermer le message") }
+                if (!busy) IconButton(onClick = onDismiss) { Icon(Icons.Default.Close, tr("Fermer le message", "Dismiss message")) }
             }
             if (busy) {
                 if (progress.total > 1) LinearProgressIndicator(progress = { (progress.current.toFloat() / progress.total).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth())
@@ -183,16 +184,19 @@ fun EmptyWorkspace(title: String, message: String, icon: ImageVector, action: St
     }
 }
 
-/** Long guidance stays available on demand without crowding the workspace. */
+val LocalStudioGuidance = staticCompositionLocalOf { true }
+
+/** Optional inline guidance; confirmations and section help remain accessible. */
 @Composable
 fun StudioDetails(text: String, modifier: Modifier = Modifier,
                   style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodySmall,
                   color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+    if (!LocalStudioGuidance.current) return
     var expanded by rememberSaveable(text) { mutableStateOf(false) }
     Column(modifier.animateContentSize()) {
         TextButton(onClick = { expanded = !expanded }, contentPadding = PaddingValues(horizontal = 0.dp)) {
             Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.Info, null, Modifier.size(16.dp))
-            Spacer(Modifier.width(6.dp)); Text(if (expanded) "Moins de détails" else "En savoir plus")
+            Spacer(Modifier.width(6.dp)); Text(if (expanded) tr("Moins de détails", "Less detail") else tr("En savoir plus", "Learn more"))
         }
         AnimatedVisibility(expanded) { Text(text, style = style, color = color) }
     }

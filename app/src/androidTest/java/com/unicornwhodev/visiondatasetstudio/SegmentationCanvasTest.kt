@@ -33,7 +33,7 @@ class SegmentationCanvasTest {
             } }
         }
         fun tap(x:Float,y:Float) {
-            val node=rule.onNodeWithContentDescription("Image à annoter.",substring=true)
+            val node=rule.onNodeWithContentDescription(com.unicornwhodev.visiondatasetstudio.core.i18n.tr("Image à annoter.","Image to annotate."),substring=true)
             val size=node.fetchSemanticsNode().boundsInRoot.size
             node.performTouchInput { click(Offset(size.width*x,size.height*y)) }
             rule.waitForIdle()

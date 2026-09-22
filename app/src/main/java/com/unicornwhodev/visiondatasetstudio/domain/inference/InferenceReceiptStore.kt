@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.squareup.moshi.JsonClass
 import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
 import java.io.File
@@ -18,8 +19,8 @@ class InferenceReceiptStore(filesDir:File) {
         val receipt=InferenceReceipt(projectId=projectId,sampleId=sampleId,batchNumber=batchNumber,outcome=outcome,diagnostics=result.diagnostics)
         val dir=File(root,projectId.toString()).apply{mkdirs()};val final=File(dir,"${receipt.timestamp}-${receipt.id}.json");val temp=File(dir,".${receipt.id}.tmp")
         temp.outputStream().use{out->out.write(adapter.toJson(receipt).toByteArray());out.fd.sync()}
-        check(temp.renameTo(final)){temp.delete();"Impossible d’écrire le reçu d’inférence"};return final
+        check(temp.renameTo(final)){temp.delete();tr("Impossible d’écrire le reçu d’inférence", "Cannot write inference receipt")};return final
     }
-    fun list(projectId:Long):List<InferenceReceipt> = File(root,projectId.toString()).listFiles{f->f.extension=="json"}?.sortedBy{it.name}?.map{adapter.fromJson(it.readText())?:error("Reçu invalide")}.orEmpty()
+    fun list(projectId:Long):List<InferenceReceipt> = File(root,projectId.toString()).listFiles{f->f.extension=="json"}?.sortedBy{it.name}?.map{adapter.fromJson(it.readText())?:error(tr("Reçu invalide", "Invalid receipt"))}.orEmpty()
     fun deleteProject(projectId:Long)=File(root,projectId.toString()).deleteRecursively()
 }

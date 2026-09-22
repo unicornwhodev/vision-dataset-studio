@@ -1,4 +1,30 @@
-# LiteRT qualification — 4.2.0-rc3
+# LiteRT qualification — 22 September 2026 audit
+
+**12 conversions passed**, including **7 with Android training**, out of 31 downloaded conversions. RF-DETR reached the 30-minute software-emulator limit: this run cannot determine compatibility. The other 18 conversions are under test, including six from the private source. The rc3 RTMDet defect is fixed and inference passes. No private identifier or weight is published.
+
+| Conversion | Inference | Train / save / restore / resume | Output delta | Restore delta | Build |
+|---|---|---|---:|---:|---|
+| edgenext_xx_small_learning | PASS | PASS | 0.09351325 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| edgenext_x_small_learning | PASS | PASS | 0.09805727 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| repvit_m1 | PASS | — | — | — | `20260922T192944Z-f27bfcef901a` |
+| rtmdet_tiny | PASS | — | — | — | `20260922T201906Z-8b8b1f4b8b2d` |
+| rtmdet_tiny_learning | PASS | PASS | 0.15809631 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| hgnetv2_b0 | PASS | — | — | — | `20260922T192944Z-f27bfcef901a` |
+| edgenext_small_usi_learning | PASS | PASS | 0.07088137 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| repvit_m1_learning | PASS | PASS | 4.5994983 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| tinyclip_learning | PASS | PASS | 0.0015258789 | 0.0 | `20260922T192944Z-f27bfcef901a` |
+| efficientformer_l1_learning | PASS | PASS | 0.1378746 | 0.0 | `20260922T204312Z-40a01b844d03` |
+| dinov2 | PASS | — | — | — | `20260922T204312Z-40a01b844d03` |
+| tinyclip | PASS | — | — | — | `20260922T204312Z-40a01b844d03` |
+| rfdetr | TIMEOUT | — | — | — | `20260922T204312Z-40a01b844d03` |
+
+[JSON evidence](../../test-results/functional-audit-20260922/public-model-results.json).
+
+Each receipt identifies the APK actually tested. SHA values identify tested artifacts in this evidence; **they no longer gate import or use in the application**. Models without training remain usable for inference. Current trainable signatures update a head or output adapter while freezing the encoder. No accuracy gain or ARM phone result is claimed.
+
+---
+
+# Historical snapshot — 4.2.0-rc3
 
 [Français](../LITERT_QUALIFICATION.md) · **English**
 

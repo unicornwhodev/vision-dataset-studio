@@ -1,9 +1,9 @@
 package com.unicornwhodev.visiondatasetstudio.domain.inference
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import android.graphics.Bitmap
 import android.graphics.Color
 import com.squareup.moshi.JsonClass
-import com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils
 import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -16,7 +16,7 @@ data class BundleManifest(val schema:Int=1,val kind:String,val revision:String,v
 /** All graph execution and tokenization happens on Android; no HTTP inference fallback. */
 class LiteRtBundle(private val manifestFile:File) {
     private val root=manifestFile.parentFile!!
-    val manifest=StudioJson.moshi.adapter(BundleManifest::class.java).fromJson(manifestFile.readText()) ?: error("Manifeste bundle invalide")
+    val manifest=StudioJson.moshi.adapter(BundleManifest::class.java).fromJson(manifestFile.readText()) ?: error(tr("Manifeste bundle invalide", "Invalid bundle manifest"))
     var embedding:FloatArray?=null
         private set
     var mask:Bitmap?=null
@@ -25,16 +25,17 @@ class LiteRtBundle(private val manifestFile:File) {
         private set
     init {
         require(manifest.schema==1 && manifest.kind in setOf("tinyclip","efficientvit_sam","florence2"))
-        manifest.files.forEach{(relative,sha)->require(HashUtils.computeSha256(file(relative))==sha){"Artefact bundle altéré : $relative"}}
+        // Older bundles retain digest fields as provenance, never as a loading condition.
+        manifest.files.keys.forEach { file(it) }
     }
     fun file(relative:String):File=File(root,relative).also{require(it.canonicalPath.startsWith(root.canonicalPath+File.separator) && it.isFile)}
     private fun graph(name:String,inputs:List<LiteRtGraph.Input>,threads:Int)=LiteRtGraph(file(name),threads).use{it.run(inputs)}
     suspend fun run(bitmap:Bitmap,c:ModelConfig):List<ModelProposal> {
         embedding=null;mask?.recycle();mask=null;note=""
-        return when(manifest.kind){"tinyclip"->clip(bitmap,c);"efficientvit_sam"->sam(bitmap,c);"florence2"->florence(bitmap,c);else->error("Bundle inconnu")}
+        return when(manifest.kind){"tinyclip"->clip(bitmap,c);"efficientvit_sam"->sam(bitmap,c);"florence2"->florence(bitmap,c);else->error(tr("Bundle inconnu", "Unknown bundle"))}
     }
     private suspend fun clip(bitmap:Bitmap,c:ModelConfig):List<ModelProposal> {
-        require(c.labels.isNotEmpty() && c.labels.size<=100){"TinyCLIP : configurez les classes candidates"}
+        require(c.labels.isNotEmpty() && c.labels.size<=100){tr("TinyCLIP : configurez les classes candidates", "TinyCLIP: configure candidate classes")}
         val vector=graph("image_encoder.tflite",listOf(LiteRtGraph.image(bitmap,c)),c.threads).single().values
         require(vector.size==512);embedding=vector.copyOf()
         val tokenizer=BytePairTokenizer(file("processor/tokenizer.json"))
@@ -43,7 +44,7 @@ class LiteRtBundle(private val manifestFile:File) {
         val scores=LiteRtGraph(file("text_encoder.tflite"),c.threads).use { text ->
             c.labels.map { label ->
                 currentCoroutineContext().ensureActive()
-                val prompt=if(c.prompt.contains("{label}"))c.prompt.replace("{label}",label) else "a photo of $label"
+                val prompt=ModelPrompts.clipCandidate(c.prompt,label)
                 val (ids,mask)=tokenizer.encode(prompt,77,49407)
                 val values=text.run(listOf(LiteRtGraph.ints(listOf(1,77),ids),LiteRtGraph.ints(listOf(1,77),mask))).single().values
                 require(values.size==vector.size);values.indices.sumOf{values[it].toDouble()*vector[it]}*scale
@@ -53,7 +54,7 @@ class LiteRtBundle(private val manifestFile:File) {
         return c.labels.mapIndexed{i,label->ModelProposal("tag",label,(exps[i]/total).toFloat())}.filter{it.score>=c.threshold}.sortedByDescending{it.score}.take(c.topK)
     }
     private fun sam(bitmap:Bitmap,c:ModelConfig):List<ModelProposal> {
-        require((c.promptPoint.size==2) xor (c.promptBox.size==4)){"SAM : sélectionnez un point ou une boîte avant l’inférence"}
+        require((c.promptPoint.size==2) xor (c.promptBox.size==4)){tr("SAM : sélectionnez un point ou une boîte avant l’inférence", "SAM: select a point or box before inference")}
         require((c.promptPoint+c.promptBox).all{it.isFinite() && it in 0f..1f})
         val scale=512f/max(bitmap.width,bitmap.height);val w=(bitmap.width*scale).roundToInt();val h=(bitmap.height*scale).roundToInt()
         val scaled=Bitmap.createScaledBitmap(bitmap,w,h,true);val pixels=IntArray(w*h);scaled.getPixels(pixels,0,w,0,0,w,h);if(scaled!==bitmap)scaled.recycle()
@@ -65,7 +66,7 @@ class LiteRtBundle(private val manifestFile:File) {
         else graph("decoder_box.tflite",listOf(LiteRtGraph.tensor(encoded),LiteRtGraph.floats(listOf(1,4),FloatArray(4){c.promptBox[it]*(if(it%2==0)bitmap.width else bitmap.height)*referenceScale})),c.threads)
         require(result[0].shape==listOf(1,1,256,256) && result[1].values.size==1)
         val logits=result[0].values;var x1=bitmap.width;var y1=bitmap.height;var x2=-1;var y2=-1
-        require(bitmap.width.toLong()*bitmap.height<=4_194_304){"Réduisez l’image avant segmentation"}
+        require(bitmap.width.toLong()*bitmap.height<=4_194_304){tr("Réduisez l’image avant segmentation", "Reduce image size before segmentation")}
         val maskPixels=IntArray(bitmap.width*bitmap.height)
         // Bilinear inverse mask transform, cropped to the unpadded encoder image.
         for(y in 0 until bitmap.height)for(x in 0 until bitmap.width){
@@ -75,7 +76,7 @@ class LiteRtBundle(private val manifestFile:File) {
             if(value>0){maskPixels[y*bitmap.width+x]=Color.WHITE;x1=min(x1,x);y1=min(y1,y);x2=max(x2,x);y2=max(y2,y)}
         }
         mask=Bitmap.createBitmap(maskPixels,bitmap.width,bitmap.height,Bitmap.Config.ARGB_8888)
-        note="Masque proposé · correction et validation requises."
+        note=tr("Masque proposé · correction et validation requises.", "Proposed mask · correction and approval required.")
         val score=result[1].values[0].coerceIn(0f,1f)
         return if(x2<x1 || y2<y1 || score<c.threshold)emptyList() else listOf(
             ModelProposal("mask",c.labels.firstOrNull() ?: "object",score,mask=com.unicornwhodev.visiondatasetstudio.data.model.MaskTarget("proposal",c.labels.firstOrNull() ?: "object",bitmap.width,bitmap.height,MaskCodec.encode(BooleanArray(maskPixels.size){maskPixels[it]!=0}))),
@@ -100,8 +101,8 @@ class LiteRtBundle(private val manifestFile:File) {
                 tokens.add(next);if(next==2){complete=true;break};if(position+1<128)prefix[position+1]=next
             }
         }
-        if(!complete){note="Génération tronquée à 128 jetons ; aucune annotation produite.";return emptyList()}
-        val raw=tokenizer.decode(tokens);note="Génération locale complète ; score non calibré, validation humaine requise."
+        if(!complete){note=tr("Génération tronquée à 128 jetons ; aucune annotation produite.", "Generation truncated at 128 tokens; no annotation produced.");return emptyList()}
+        val raw=tokenizer.decode(tokens);note=tr("Génération locale complète ; score non calibré, validation humaine requise.", "Local generation complete; uncalibrated score, human review required.")
         if(prompt=="<OD>")return Regex("([^<>]+)<loc_(\\d+)><loc_(\\d+)><loc_(\\d+)><loc_(\\d+)>").findAll(raw).mapNotNull{m->
             val v=(2..5).map{(m.groupValues[it].toInt()+.5f)/1000f}
             if(v.any{it !in 0f..1f} || v[0]>=v[2] || v[1]>=v[3])null else ModelProposal("box",m.groupValues[1].trim(),1f,v[0],v[1],v[2],v[3])

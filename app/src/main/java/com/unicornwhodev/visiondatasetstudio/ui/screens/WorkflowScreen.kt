@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.ui.screens
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
 import com.unicornwhodev.visiondatasetstudio.R
 
@@ -26,8 +27,9 @@ fun WorkflowScreen(vm:MainViewModel) {
     var selected by rememberSaveable { mutableStateOf("assisted") }
     var instructions by rememberSaveable { mutableStateOf("") }
     var endpoint by rememberSaveable { mutableStateOf("http://127.0.0.1:8080/plan") }
+    LaunchedEffect(run?.projectId,run?.batchNumber,run?.template) { run?.takeIf{it.projectId==project && it.batchNumber==batch}?.let{selected=it.template;instructions=it.instructions} }
     LaunchedEffect(project,batch) { vm.loadWorkflow() }
-    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_workflow),"Lot $batch",onBack={vm.back()})}) { inset ->
+    Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_workflow),tr("Lot $batch", "Batch $batch"),onBack={vm.back()})}) { inset ->
         Box(Modifier.fillMaxSize().padding(inset),contentAlignment=Alignment.TopCenter) {
             Column(Modifier.widthIn(max=760.dp).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 WorkflowTools.templates.forEach { template ->
@@ -37,9 +39,11 @@ fun WorkflowScreen(vm:MainViewModel) {
                     }
                 }
                 OutlinedTextField(instructions,{instructions=it.take(8000)},label={Text(stringResource(R.string.workflow_optional_instructions))},modifier=Modifier.fillMaxWidth(),minLines=2,maxLines=4)
-                StudioAction(if(run==null)stringResource(R.string.workflow_prepare) else "Repartir du template",{vm.startWorkflow(selected,instructions)},enabled=!busy,icon=Icons.Default.AccountTree)
+                Text(tr("Consignes pour la relecture et l’agent local. Prompt d’inférence dans Modèles.", "Instructions for review and the local agent. Set the inference prompt in Models."),style=MaterialTheme.typography.bodySmall)
+                StudioAction(if(run==null)stringResource(R.string.workflow_prepare) else tr("Repartir du template", "Restart from template"),{vm.startWorkflow(selected,instructions)},enabled=!busy,icon=Icons.Default.AccountTree)
                 run?.takeIf { it.projectId==project && it.batchNumber==batch }?.let { state ->
                     HorizontalDivider()
+                    if(state.instructions.isNotBlank()) Text(state.instructions,style=MaterialTheme.typography.bodyMedium)
                     val template=WorkflowTools.template(state.template)
                     template.steps.forEachIndexed { index,step ->
                         Row(Modifier.fillMaxWidth().padding(vertical=4.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {
@@ -61,7 +65,7 @@ fun WorkflowScreen(vm:MainViewModel) {
                     StudioAction(stringResource(R.string.workflow_propose),{vm.askLocalWorkflowAgent(endpoint,instructions)},enabled=!busy)
                     choice?.let { plan ->
                         Text(plan.reason,style=MaterialTheme.typography.bodySmall)
-                        TextButton(onClick={selected=plan.template;vm.startWorkflow(plan.template,instructions)},enabled=!busy) { Text("Utiliser ${WorkflowTools.template(plan.template).title}") }
+                        TextButton(onClick={selected=plan.template;vm.startWorkflow(plan.template,instructions)},enabled=!busy) { Text(tr("Utiliser ${WorkflowTools.template(plan.template).title}", "Use ${WorkflowTools.template(plan.template).title}")) }
                     }
                     Text("Prompt ${WorkflowTools.PROMPT_VERSION}",style=MaterialTheme.typography.labelSmall)
                     Text(WorkflowTools.systemPrompt,style=MaterialTheme.typography.bodySmall)

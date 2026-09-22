@@ -1,5 +1,6 @@
 package com.unicornwhodev.visiondatasetstudio.domain.training
 
+import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import com.unicornwhodev.visiondatasetstudio.data.model.SampleAnnotations
 import com.unicornwhodev.visiondatasetstudio.data.model.PointLocalizationState
 import com.unicornwhodev.visiondatasetstudio.domain.inference.*
@@ -13,21 +14,21 @@ object TrainingTargets {
         val out=FloatArray(shape.fold(1){x,y->Math.multiplyExact(x,y)})
         val transform=InputTransform.create(iw,ih,c.inputWidth,c.inputHeight,ModelContract.resize(c),c.cropFraction)
         fun xy(x:Float,y:Float)=((x*transform.fittedWidth+transform.left)/transform.width) to ((y*transform.fittedHeight+transform.top)/transform.height)
-        fun cls(label:String)=c.labels.indexOf(label).also{require(it>=0){"Classe corrigée absente du modèle : $label"}}
+        fun cls(label:String)=c.labels.indexOf(label).also{require(it>=0){tr("Classe corrigée absente du modèle : $label", "Corrected class missing from the model: $label")}}
         when(spec.targetEncoding) {
             "one_hot","multi_hot" -> {
                 require(shape==listOf(1,c.labels.size))
                 require(a.tags.all{it.isHumanVerified})
                 val tags=a.tags.map{cls(it.label)}.distinct()
-                if(spec.targetEncoding=="one_hot")require(tags.size==1){"Ce modèle exige exactement une classe validée par image"}
-                else require(c.labels.withIndex().all{(index,label)->index in tags || label in a.quality.verifiedNegativeQueries}){"Présence ou absence humaine requise pour chaque classe multilabel"}
+                if(spec.targetEncoding=="one_hot")require(tags.size==1){tr("Ce modèle exige exactement une classe validée par image", "This model requires exactly one approved class per image")}
+                else require(c.labels.withIndex().all{(index,label)->index in tags || label in a.quality.verifiedNegativeQueries}){tr("Présence ou absence humaine requise pour chaque classe multilabel", "Human presence or absence decisions required for every multilabel class")}
                 tags.forEach{out[it]=1f}
             }
             "points_xyv" -> {
                 require(shape==listOf(1,c.labels.size,3));require(a.points.all{it.isHumanVerified && it.effectiveLocalizationState in setOf(PointLocalizationState.LOCALIZED,PointLocalizationState.ABSENT)})
-                val present=a.points.filter{it.isLocalized};require(a.points.map{it.label}.distinct().size==a.points.size){"Une cible par classe attendue"}
-                present.forEach{p->val k=cls(p.label);val point=xy(p.x,p.y);require(point.first in 0f..1f && point.second in 0f..1f){"La cible est hors du recadrage du modèle"};out[k*3]=point.first;out[k*3+1]=point.second;out[k*3+2]=1f}
-                require(c.labels.all{label->a.points.any{it.label==label} || label in a.quality.verifiedNegativeQueries}){"Présence/absence à vérifier pour chaque classe"}
+                val present=a.points.filter{it.isLocalized};require(a.points.map{it.label}.distinct().size==a.points.size){tr("Une cible par classe attendue", "Expected one target per class")}
+                present.forEach{p->val k=cls(p.label);val point=xy(p.x,p.y);require(point.first in 0f..1f && point.second in 0f..1f){tr("La cible est hors du recadrage du modèle", "Target outside the model's crop")};out[k*3]=point.first;out[k*3+1]=point.second;out[k*3+2]=1f}
+                require(c.labels.all{label->a.points.any{it.label==label} || label in a.quality.verifiedNegativeQueries}){tr("Présence/absence à vérifier pour chaque classe", "Verify presence/absence for each class")}
             }
             "heatmap_nchw" -> {
                 require(shape.size==4 && shape[1]==c.labels.size);val h=shape[2];val w=shape[3]
@@ -56,16 +57,16 @@ object TrainingTargets {
                         val idx=plane+y*w+x;out[idx]=max(out[idx],exp(-((x-cx).pow(2)+(y-cy).pow(2))/8f))
                     }
                 }
-                require(auxiliary(a,c).getValue("supervision").any { it>0 }) { "Aucune tâche du modèle n’a de supervision humaine" }
+                require(auxiliary(a,c).getValue("supervision").any { it>0 }) { tr("Aucune tâche du modèle n’a de supervision humaine", "No model task has human supervision") }
             }
             "boxes_xyxy_class_mask" -> {
                 require(shape.size==3 && shape[2]==6 && a.boxes.size<=shape[1]);require(a.boxes.all{it.isHumanVerified})
                 require(a.boxes.isNotEmpty() || c.labels.all{it in a.quality.verifiedNegativeQueries})
-                a.boxes.forEachIndexed{index,b->val p=xy(b.xmin,b.ymin);val q=xy(b.xmax,b.ymax);require(listOf(p.first,p.second,q.first,q.second).all{it in 0f..1f}){"Boîte hors du recadrage"}
+                a.boxes.forEachIndexed{index,b->val p=xy(b.xmin,b.ymin);val q=xy(b.xmax,b.ymax);require(listOf(p.first,p.second,q.first,q.second).all{it in 0f..1f}){tr("Boîte hors du recadrage", "Box outside the crop")}
                     floatArrayOf(p.first,p.second,q.first,q.second,cls(b.label).toFloat(),1f).copyInto(out,index*6)
                 }
             }
-            else -> error("Encodage d’apprentissage non implémenté : ${spec.targetEncoding}")
+            else -> error(tr("Encodage d’apprentissage non implémenté : ${spec.targetEncoding}", "Training encoding not implemented: ${spec.targetEncoding}"))
         }
         return out
     }
@@ -130,7 +131,7 @@ object TrainingTargets {
                     } ?: 1.1
                 }.average()
             }
-            else -> error("Métrique de validation non implémentée")
+            else -> error(tr("Métrique de validation non implémentée", "Validation metric not implemented"))
         }.also{require(it.isFinite())}
     }
 }

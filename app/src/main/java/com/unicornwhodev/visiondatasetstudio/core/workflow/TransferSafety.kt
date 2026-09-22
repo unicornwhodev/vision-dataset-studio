@@ -29,7 +29,7 @@ object PublicationSafety {
             else -> ResumeDecision.CONFLICT
         }
     }
-    val lockedStates = setOf("PREPARED", "PUBLISHING", "PUBLISHED", "CONFLICT", "VERIFIED", "PURGING", "PURGED", "EMPTY")
+    val lockedStates = setOf("PREPARED", "PUBLISHING", "PUBLISHED", "CONFLICT", "VERIFIED", "PURGING", "PURGED", "EMPTY", "DISCARDED")
 }
 
 object PerformanceStats {
