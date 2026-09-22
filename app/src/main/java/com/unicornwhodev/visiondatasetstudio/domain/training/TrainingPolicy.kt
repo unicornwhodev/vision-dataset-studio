@@ -7,6 +7,7 @@ import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelConfig
 
 /** Training availability never gates inference, export or ordinary batch production. */
 object TrainingPolicy {
+    fun finished(phase:String?)=phase in setOf("completed","rejected","abandoned")
     fun supported(project:ProjectEntity)=runCatching {
         project.modelConfigJson?.let { StudioJson.moshi.adapter(ModelConfig::class.java).fromJson(it) }?.training!=null
     }.getOrDefault(false)

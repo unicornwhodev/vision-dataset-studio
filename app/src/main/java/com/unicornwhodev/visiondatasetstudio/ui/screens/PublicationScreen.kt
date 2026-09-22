@@ -44,8 +44,8 @@ fun PublicationScreen(viewModel: MainViewModel) {
     val validated = samples.count { it.annotationStatus == "VALIDATED" }
     val rejected = samples.count { it.annotationStatus == "REJECTED" }
     val unfinished = samples.size - validated - rejected
-    val learningDone=training?.let{it.sourceBatchNumber==number && it.phase in setOf("completed","rejected")}==true
-    val learningRequired=validated>0 && (project?.let(com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPolicy::enabled)==true || training?.let{it.sourceBatchNumber==number && it.phase !in setOf("completed","rejected")}==true)
+    val learningDone=training?.let{it.sourceBatchNumber==number && com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPolicy.finished(it.phase) && (it.phase=="abandoned" || it.exportSnapshot==batch?.archiveSnapshot)}==true
+    val learningRequired=validated>0 && (project?.let(com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPolicy::enabled)==true || training?.let{it.sourceBatchNumber==number && !com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPolicy.finished(it.phase)}==true)
     val available = samples.count { it.annotationStatus == "VALIDATED" && it.localImagePath != null }
     var tar by rememberSaveable { mutableStateOf(false) }
     var coco by rememberSaveable { mutableStateOf(false) }

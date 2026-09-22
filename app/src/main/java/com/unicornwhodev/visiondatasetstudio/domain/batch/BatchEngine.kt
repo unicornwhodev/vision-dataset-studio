@@ -562,7 +562,7 @@ class BatchEngine(
         check(batch.status in setOf("VERIFIED","PURGING")) { tr("Copie vérifiée requise", "A verified copy is required") }
         val project=db.projectDao().getProjectSync(projectId) ?: error(tr("Projet absent", "Project not found"))
         val learning=com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining(storageManager.context)
-        learning.requireCleanupAllowed(project,batchNumber,samples.any{it.annotationStatus=="VALIDATED"})
+        learning.requireCleanupAllowed(project,batchNumber,samples.any{it.annotationStatus=="VALIDATED"},batch.archiveSnapshot)
         check(batch.archiveSnapshot!=null && batch.archiveSnapshot==snapshot(projectId,batchNumber)) { tr("Copie obsolète; purge refusée", "Copy outdated; cleanup refused") }
         check(samples.all{(it.annotationStatus=="VALIDATED" && it.syncStatus in setOf("VERIFIED","PURGED")) || (it.annotationStatus=="REJECTED" && discardRejectedConfirmed) || it.annotationStatus=="DUPLICATE"}) { tr("Des cas restent à traiter", "Some samples remain unfinished") }
         // A corrupt/untrusted DB path must not delete any source, model or other project's file.

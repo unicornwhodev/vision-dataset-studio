@@ -61,14 +61,36 @@ class TrainingWorkflowTest {
         val other=accepted.first().copy(sampleId="other-batch-$projectId",batchNumber=2,localImagePath=otherFile.path,sha256=HashUtils.computeSha256(otherFile))
         db.sampleDao().insertNewSamples(listOf(other));db.annotationDao().insertOrReplace(AnnotationRecord(other.sampleId,db.annotationDao().getAnnotationSync(accepted.first().sampleId)!!.dataJson))
         val preflight=store.inspectPreparation(project,1)
+        val abandoned=store.prepare(project,1,epochs=3,learningRate=.05f)
+        assertTrue(runCatching{store.abandon(projectId,"stale-run-id")}.isFailure)
+        assertEquals("queued",store.read(projectId)!!.phase)
+        store.cancel(projectId)
+        assertEquals("cancelled",store.read(projectId)!!.phase)
+        assertTrue(runCatching{store.requireCleanupAllowed(project,1,true,db.batchDao().getBatchSync(projectId,1)!!.archiveSnapshot)}.isFailure)
+        assertTrue(runCatching{store.abandon(projectId,"stale-run-id")}.isFailure)
+        store.abandon(projectId,abandoned.id)
+        assertEquals("abandoned",store.readBatch(projectId,1)!!.phase)
+        val enabledProject=project.copy(settingsJson=com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings.write(
+            com.unicornwhodev.visiondatasetstudio.core.workflow.ProcessingSettings(continuousTraining=true)))
+        store.requireCleanupAllowed(enabledProject,1,true,db.batchDao().getBatchSync(projectId,1)!!.archiveSnapshot)
+        assertTrue(abandoned.samples.all{File(it.image).isFile})
+        assertTrue(accepted.all{File(it.localImagePath!!).isFile})
+        assertEquals(model.path,db.projectDao().getProjectSync(projectId)!!.modelPath)
+        assertTrue(runCatching{store.resume(projectId)}.isFailure)
+        // Discarding the private training snapshot is a separate cleanup action.
+        store.releaseBatchImages(projectId,1)
+        assertTrue(abandoned.samples.all{!File(it.image).exists()})
+        assertTrue(accepted.all{File(it.localImagePath!!).isFile})
+        // A new explicitly requested run can still train the same verified batch.
         val run=store.prepare(project,1,epochs=3,learningRate=.05f)
+        assertNotEquals(abandoned.id,run.id)
         assertEquals(preflight.samples.map{it.sha256},run.samples.map{it.sha256})
         assertEquals(preflight.trainCount,run.samples.count{!it.validation})
         assertEquals(preflight.validationCount,run.samples.count{it.validation})
         assertEquals(run.id,store.readBatch(projectId,1)!!.id)
         assertEquals(1,run.sourceBatchNumber);assertTrue(run.exportProof.isNotBlank())
         var cleanupRefused=false
-        try {store.requireCleanupAllowed(project,1,true)}catch(_:IllegalStateException){cleanupRefused=true}
+        try {store.requireCleanupAllowed(project,1,true,db.batchDao().getBatchSync(projectId,1)!!.archiveSnapshot)}catch(_:IllegalStateException){cleanupRefused=true}
         assertTrue("Cleanup waits for optional learning to finish",cleanupRefused)
         assertEquals(88,run.samples.size)
         assertTrue(run.samples.count{it.validation}>=8)
@@ -93,7 +115,8 @@ class TrainingWorkflowTest {
         assertTrue(done.validationLoss!!<done.initialLoss!!*.99)
         assertNotEquals(done.initialWeightProbe,done.finalWeightProbe)
         assertEquals("Training never silently activates a model",model.path,db.projectDao().getProjectSync(projectId)!!.modelPath)
-        store.requireCleanupAllowed(project,1,true)
+        store.requireCleanupAllowed(project,1,true,db.batchDao().getBatchSync(projectId,1)!!.archiveSnapshot)
+        assertTrue("A previous export cannot satisfy enabled training for a changed export",runCatching{store.requireCleanupAllowed(enabledProject,1,true,"changed-export")}.isFailure)
         val config=done.config.copy(trainingCheckpoint=OnDeviceTraining.saveCheckpointReceipt(File(done.modelFile),done.checkpoint!!))
         val image=Bitmap.createBitmap(32,32,Bitmap.Config.ARGB_8888).apply{eraseColor(Color.RED)}
         try{LiteRtEngine().use{engine->assertTrue(engine.loadModel(File(done.modelFile)));assertEquals("rouge",engine.runInference(image,config).orThrow().maxBy{it.score}.label)}}finally{image.recycle()}
@@ -102,6 +125,6 @@ class TrainingWorkflowTest {
         assertTrue("Training images are cleaned only after the run completes",done.samples.all{!File(it.image).exists()})
         assertTrue("The unrelated batch survives cleanup",otherFile.isFile)
         assertTrue("Learned checkpoint survives cleanup",File(done.checkpoint!!.prefix).parentFile!!.listFiles()!!.any{it.isFile})
-        File(fixture,"android-workflow-evidence.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf("project_id" to projectId,"validated_images" to run.samples.size,"excluded_rejected" to 8,"exported_batch_only" to true,"cleanup_waited" to true,"cleanup_after_training" to true,"steps_before_cancel" to stopped.completedSteps,"steps_after_resume" to done.completedSteps,"initial_loss" to done.initialLoss,"final_loss" to done.validationLoss,"internal_weights_changed" to (done.initialWeightProbe!=done.finalWeightProbe),"source_model_preserved" to true,"runtime" to "Android WorkManager / LiteRT CPU")))
+        File(fixture,"android-workflow-evidence.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf("project_id" to projectId,"validated_images" to run.samples.size,"excluded_rejected" to 8,"exported_batch_only" to true,"cleanup_waited" to true,"explicit_abandonment_unblocks_cleanup" to true,"abandonment_never_activates_weights" to true,"restart_after_abandonment" to true,"cleanup_after_training" to true,"steps_before_cancel" to stopped.completedSteps,"steps_after_resume" to done.completedSteps,"initial_loss" to done.initialLoss,"final_loss" to done.validationLoss,"internal_weights_changed" to (done.initialWeightProbe!=done.finalWeightProbe),"source_model_preserved" to true,"runtime" to "Android WorkManager / LiteRT CPU")))
     }
 }

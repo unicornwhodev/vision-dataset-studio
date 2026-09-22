@@ -139,16 +139,17 @@ class OnDeviceTraining(private val context:Context) {
         } catch(e:Exception){directory.deleteRecursively();throw e}
     } }
     /** Training never delays a disabled workflow; active/failed runs keep their source lot until explicitly resolved. */
-    fun requireCleanupAllowed(project:ProjectEntity,batchNumber:Int,hasAcceptedImages:Boolean) {
+    fun requireCleanupAllowed(project:ProjectEntity,batchNumber:Int,hasAcceptedImages:Boolean,exportSnapshot:String?) {
         val run=readBatch(project.id,batchNumber)
-        val finished=run?.phase in setOf("completed","rejected")
-        if(run!=null && !finished)error(tr("Apprentissage du lot non terminé. Reprenez-le avant le nettoyage.", "Batch training unfinished. Resume it before cleanup."))
-        if(hasAcceptedImages && TrainingPolicy.enabled(project) && !finished)
+        val finished=TrainingPolicy.finished(run?.phase)
+        if(run!=null && !finished)error(tr("Apprentissage du lot non terminé. Reprenez-le ou abandonnez-le explicitement avant le nettoyage.", "Batch training unfinished. Resume or explicitly abandon it before cleanup."))
+        val appliesToExport=run?.phase=="abandoned" || (exportSnapshot!=null && run?.exportSnapshot==exportSnapshot)
+        if(hasAcceptedImages && TrainingPolicy.enabled(project) && (!finished || !appliesToExport))
             error(tr("Apprentissage optionnel activé : entraînez ce lot exporté avant le nettoyage, ou désactivez l’option.", "Optional training enabled: train on this exported batch before cleanup, or disable the option."))
     }
     fun releaseBatchImages(projectId:Long,batchNumber:Int) {
         val run=readBatch(projectId,batchNumber) ?: return
-        check(run.phase in setOf("completed","rejected")){tr("Apprentissage non terminé", "Training unfinished")}
+        check(TrainingPolicy.finished(run.phase)){tr("Apprentissage non terminé", "Training unfinished")}
         val models=File(context.filesDir,"models").canonicalFile
         val root=File(run.modelFile).parentFile!!.canonicalFile
         check(root.parentFile==models && root.name=="training-${run.id}")
@@ -191,6 +192,18 @@ class OnDeviceTraining(private val context:Context) {
             }
         }
     }
+    /** Explicitly finish an interrupted run without activating or deleting its candidate. */
+    suspend fun abandon(projectId:Long,expectedRunId:String)=withContext(Dispatchers.IO) {
+        executionMutex.withLock {
+            val run=read(projectId) ?: error(tr("Aucun apprentissage", "No training run"))
+            require(run.id==expectedRunId && run.phase in setOf("cancelled","failed")) {
+                tr("L’état de l’apprentissage a changé. Actualisez avant de l’abandonner.", "Training state changed. Refresh before abandoning it.")
+            }
+            // Validate the displayed run before cancelling anything: stale UI must not stop a newer run.
+            WorkManager.getInstance(context).cancelUniqueWork("vds-training-$projectId").result.get()
+            write(run.copy(phase="abandoned",error=tr("Apprentissage abandonné par l’utilisateur ; données conservées jusqu’au nettoyage du lot.", "Training abandoned by the user; data retained until batch cleanup.")))
+        }
+    }
     suspend fun resume(projectId:Long)=withContext(Dispatchers.IO) { executionMutex.withLock {
         val run=read(projectId) ?: error(tr("Aucun apprentissage à reprendre", "No training run to resume"))
         require(run.phase in setOf("cancelled","failed"))
@@ -227,7 +240,7 @@ class DeviceTrainingWorker(context:Context,parameters:WorkerParameters):Coroutin
         val store=OnDeviceTraining(applicationContext);val projectId=inputData.getLong("projectId",-1)
         var run=store.read(projectId) ?: return@withLock Result.failure()
         if(run.id!=inputData.getString("runId"))return@withLock Result.success()
-        if(run.phase in setOf("completed","rejected","cancelled"))return@withLock Result.success()
+        if(TrainingPolicy.finished(run.phase) || run.phase=="cancelled")return@withLock Result.success()
         var durableSteps=run.completedSteps
         try {
             require(run.sourceBatchNumber>0 && run.exportSnapshot.isNotBlank() && run.exportProof.isNotBlank()) { tr("Ancienne préparation sans export vérifié; préparez le lot exporté", "Old preparation without a verified export; prepare the exported batch") }

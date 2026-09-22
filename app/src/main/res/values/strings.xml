@@ -249,4 +249,7 @@
     <string name="workflow_propose">Propose a workflow</string>
     <string name="workflow_review">Review</string>
     <string name="workflow_server">Server</string>
+    <string name="training_abandon">Abandon this training</string>
+    <string name="training_phase_abandoned">Training abandoned</string>
+    <string name="training_abandon_help">This training run will not resume. No weights will be activated. Images and the candidate remain stored until explicit batch cleanup.</string>
 </resources>

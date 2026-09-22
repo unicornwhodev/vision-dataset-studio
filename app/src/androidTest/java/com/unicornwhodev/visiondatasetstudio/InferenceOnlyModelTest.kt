@@ -27,11 +27,17 @@ class InferenceOnlyModelTest {
         val context=InstrumentationRegistry.getInstrumentation().targetContext
         val directory=File(context.cacheDir,"bundle-digest-"+System.nanoTime()).apply{mkdirs()}
         try {
-            File(directory,"image_encoder.tflite").writeText("graph presence fixture")
+            listOf("image_encoder.tflite","text_encoder.tflite","pipeline.json","processor/tokenizer.json").forEach { name ->
+                File(directory,name).apply{parentFile!!.mkdirs();writeText("runtime presence fixture")}
+            }
             val manifest=File(directory,"bundle.json")
             manifest.writeText(StudioJson.moshi.adapter(BundleManifest::class.java).toJson(
-                BundleManifest(kind="tinyclip",revision="main",files=mapOf("image_encoder.tflite" to "obsolete-digest"))))
+                BundleManifest(kind="tinyclip",revision="main",files=mapOf("image_encoder.tflite" to "obsolete-digest","README.md" to "obsolete-doc-digest"))))
             LiteRtBundle(manifest).close()
+            manifest.writeText("""{"kind":"tinyclip"}""")
+            LiteRtBundle(manifest).close()
+            File(directory,"text_encoder.tflite").delete()
+            assertTrue(runCatching{LiteRtBundle(manifest)}.isFailure)
         } finally { directory.deleteRecursively() }
     }
 
@@ -83,7 +89,7 @@ class InferenceOnlyModelTest {
             assertNull(vm.deviceTraining.readBatch(id,1))
             // Legacy stale preference must not gate cleanup when the active model cannot train.
             val stale=vm.db.projectDao().getProjectSync(id)!!.copy(settingsJson=project.settingsJson)
-            assertFalse(TrainingPolicy.enabled(stale));vm.deviceTraining.requireCleanupAllowed(stale,1,true)
+            assertFalse(TrainingPolicy.enabled(stale));vm.deviceTraining.requireCleanupAllowed(stale,1,true,null)
             val evidence=File(app.filesDir,"qa-evidence/inference-only/result.json").apply{parentFile!!.mkdirs()}
             evidence.writeText("""{"imported_via_content_uri":true,"profile_selected":true,"stale_digest_blocks_selection":false,"native_proposals":3,"has_train_signature":false,"training_started":false,"stale_training_option_blocks_cleanup":false,"accuracy_evaluated":false}""")
         } finally {

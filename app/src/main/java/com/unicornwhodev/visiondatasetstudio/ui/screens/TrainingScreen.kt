@@ -28,6 +28,7 @@ fun TrainingScreen(vm:MainViewModel) {
     val p=project ?: return
     val config=remember(p.modelConfigJson){runCatching{p.modelConfigJson?.let{StudioJson.moshi.adapter(ModelConfig::class.java).fromJson(it)}}.getOrNull()}
     var epochs by rememberSaveable{mutableStateOf(3)}
+    var abandonRunId by remember(p.id) { mutableStateOf<String?>(null) }
     val active=run?.phase in setOf("queued","training","evaluating")
     LaunchedEffect(p.id,p.modelConfigJson,number,run?.phase){vm.refreshTrainingPreflight()}
     Scaffold(contentWindowInsets=WindowInsets(0),topBar={StudioTopBar(stringResource(R.string.screen_training),stringResource(R.string.subtitle_on_device),onBack={vm.navigateTo(Screen.Models)})}) { inset ->
@@ -61,14 +62,17 @@ fun TrainingScreen(vm:MainViewModel) {
                 Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(stringResource(R.string.training_continuous),style=MaterialTheme.typography.titleSmall);Text(stringResource(R.string.training_continuous_help),style=MaterialTheme.typography.bodySmall)};Switch(checked=ProjectSettings.read(p).continuousTraining,onCheckedChange=vm::setContinuousTraining,enabled=!busy && (config?.training!=null || ProjectSettings.read(p).continuousTraining))}
                 run?.let { state ->
                     HorizontalDivider()
-                    Text(stringResource(when(state.phase){"queued"->R.string.training_phase_queued;"training"->R.string.training_phase_training;"evaluating"->R.string.training_phase_evaluating;"completed"->R.string.training_phase_completed;"rejected"->R.string.training_phase_rejected;"cancelled"->R.string.training_phase_cancelled;else->R.string.training_phase_failed}),style=MaterialTheme.typography.titleMedium)
+                    Text(stringResource(when(state.phase){"queued"->R.string.training_phase_queued;"training"->R.string.training_phase_training;"evaluating"->R.string.training_phase_evaluating;"completed"->R.string.training_phase_completed;"rejected"->R.string.training_phase_rejected;"cancelled"->R.string.training_phase_cancelled;"abandoned"->R.string.training_phase_abandoned;else->R.string.training_phase_failed}),style=MaterialTheme.typography.titleMedium)
                     LinearProgressIndicator(progress={if(state.totalSteps>0)state.completedSteps.toFloat()/state.totalSteps else 0f},modifier=Modifier.fillMaxWidth())
                     Text(stringResource(R.string.training_progress,state.completedSteps,state.totalSteps,state.samples.count{!it.validation},state.samples.count{it.validation}),style=MaterialTheme.typography.bodySmall)
                     if(state.validationLoss!=null)Text(stringResource(R.string.training_loss,state.initialLoss ?: 0.0,state.validationLoss),style=MaterialTheme.typography.bodySmall)
                     if(state.initialWeightProbe!=null && state.finalWeightProbe!=null)Text(stringResource(if(state.initialWeightProbe!=state.finalWeightProbe)R.string.training_weights_changed else R.string.training_weights_unchanged),style=MaterialTheme.typography.bodySmall)
                     state.error?.let{Text(it,color=MaterialTheme.colorScheme.error,style=MaterialTheme.typography.bodySmall)}
                     if(active)StudioAction(stringResource(R.string.training_stop),vm::cancelDeviceTraining,icon=Icons.Default.Stop)
-                    if(state.phase in setOf("failed","cancelled"))StudioAction(stringResource(R.string.training_resume),vm::resumeDeviceTraining,enabled=!busy)
+                    if(state.phase in setOf("failed","cancelled")) {
+                        StudioAction(stringResource(R.string.training_resume),vm::resumeDeviceTraining,enabled=!busy)
+                        StudioAction(stringResource(R.string.training_abandon),{abandonRunId=state.id},icon=Icons.Default.Close,enabled=!busy)
+                    }
                     if(state.phase=="completed")StudioAction(stringResource(R.string.training_activate),vm::activateTrainedModel,icon=Icons.Default.Check,primary=true,enabled=!busy)
                 }
                 StudioDisclosure(stringResource(R.string.training_details)) {
@@ -79,4 +83,11 @@ fun TrainingScreen(vm:MainViewModel) {
             }
         }
     }
+    abandonRunId?.let { selected ->
+        AlertDialog(onDismissRequest={abandonRunId=null},title={Text(stringResource(R.string.training_abandon))},
+            text={Text(stringResource(R.string.training_abandon_help))},
+            confirmButton={TextButton(onClick={vm.abandonDeviceTraining(selected);abandonRunId=null},enabled=!busy){Text(stringResource(R.string.training_abandon))}},
+            dismissButton={TextButton(onClick={abandonRunId=null}){Text(stringResource(R.string.action_cancel))}})
+    }
+
 }

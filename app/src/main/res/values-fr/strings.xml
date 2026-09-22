@@ -249,4 +249,7 @@
     <string name="workflow_propose">Proposer</string>
     <string name="workflow_review">Relire</string>
     <string name="workflow_server">Serveur</string>
+    <string name="training_abandon">Abandonner cet apprentissage</string>
+    <string name="training_phase_abandoned">Apprentissage abandonné</string>
+    <string name="training_abandon_help">Cet apprentissage ne sera pas repris. Aucun poids ne sera activé. Les images et le candidat restent conservés jusqu’au nettoyage explicite du lot.</string>
 </resources>

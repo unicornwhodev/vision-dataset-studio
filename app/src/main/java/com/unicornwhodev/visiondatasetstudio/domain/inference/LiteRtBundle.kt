@@ -11,7 +11,7 @@ import java.io.File
 import kotlin.math.*
 
 @JsonClass(generateAdapter=true)
-data class BundleManifest(val schema:Int=1,val kind:String,val revision:String,val files:Map<String,String>)
+data class BundleManifest(val schema:Int=1,val kind:String,val revision:String="",val files:Map<String,String> = emptyMap())
 
 /** All graph execution and tokenization happens on Android; no HTTP inference fallback. */
 class LiteRtBundle(private val manifestFile:File) {
@@ -25,8 +25,13 @@ class LiteRtBundle(private val manifestFile:File) {
         private set
     init {
         require(manifest.schema==1 && manifest.kind in setOf("tinyclip","efficientvit_sam","florence2"))
-        // Older bundles retain digest fields as provenance, never as a loading condition.
-        manifest.files.keys.forEach { file(it) }
+        // Check the pipeline's actual inputs, never an obsolete checksum inventory or documentation.
+        val required=when(manifest.kind) {
+            "tinyclip" -> listOf("image_encoder.tflite","text_encoder.tflite","pipeline.json","processor/tokenizer.json")
+            "efficientvit_sam" -> listOf("image_encoder.tflite","decoder_point.tflite","decoder_box.tflite")
+            else -> listOf("image_encoder.tflite","multimodal_encoder.tflite","decoder.tflite","processor/tokenizer.json")
+        }
+        required.forEach { file(it) }
     }
     fun file(relative:String):File=File(root,relative).also{require(it.canonicalPath.startsWith(root.canonicalPath+File.separator) && it.isFile)}
     private fun graph(name:String,inputs:List<LiteRtGraph.Input>,threads:Int)=LiteRtGraph(file(name),threads).use{it.run(inputs)}

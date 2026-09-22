@@ -327,7 +327,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val latest = db.batchDao().getLatestBatchSync(_activeProjectId.value)
         val policy = ProjectSettings.read(db.projectDao().getProjectSync(_activeProjectId.value) ?: error(tr("Projet absent", "Project not found")))
         check(latest == null || latest.status in setOf("PURGED","EMPTY","DISCARDED") || (latest.status == "VERIFIED" && policy.keepVerifiedBatches)) { tr("Vérifiez une copie locale ou HF, puis purgez le cache ou activez la conservation des lots vérifiés.", "Verify a local or HF copy, then clear the cache or enable keeping verified batches.") }
-        if(latest?.status=="VERIFIED")deviceTraining.requireCleanupAllowed(db.projectDao().getProjectSync(_activeProjectId.value)!!,latest.batchNumber,latest.validatedCases>0)
+        if(latest?.status=="VERIFIED")deviceTraining.requireCleanupAllowed(db.projectDao().getProjectSync(_activeProjectId.value)!!,latest.batchNumber,latest.validatedCases>0,latest.archiveSnapshot)
         prepareBatch(db.projectDao().getProjectSync(_activeProjectId.value) ?: error(tr("Atelier absent", "Studio not found")), (latest?.batchNumber ?: 0) + 1)
     }
     private suspend fun prepareBatch(project: ProjectEntity, batchNumber: Int) {
@@ -338,7 +338,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (existing == null) {
             val previous = db.batchDao().getLatestBatchSync(_activeProjectId.value)
             check(previous == null || previous.status in setOf("PURGED","EMPTY","DISCARDED") || (previous.status == "VERIFIED" && policy.keepVerifiedBatches)) { tr("Un autre lot n’a pas encore de copie vérifiée.", "Another batch does not yet have a verified copy.") }
-            if(previous?.status=="VERIFIED")deviceTraining.requireCleanupAllowed(project,previous.batchNumber,previous.validatedCases>0)
+            if(previous?.status=="VERIFIED")deviceTraining.requireCleanupAllowed(project,previous.batchNumber,previous.validatedCases>0,previous.archiveSnapshot)
         } else check(existing.status !in com.unicornwhodev.visiondatasetstudio.core.workflow.PublicationSafety.lockedStates) { tr("Ce lot est clôturé ou en transfert.", "This batch is closed or being transferred.") }
         val exhausted=batchEngine.prepareUniqueBatch(project.id,batchNumber,policy.batchSize) { done,total ->
             _operationProgress.value=OperationProgress(tr("Import et contrôle des doublons", "Import and duplicate checks"),done,total)
@@ -711,7 +711,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     "optional_train" -> if(TrainingPolicy.enabled(p) && rows.any { it.annotationStatus=="VALIDATED" }) {
                         val learned=deviceTraining.readBatch(p.id,run.batchNumber)
                         if(learned==null) { val prepared=deviceTraining.prepare(p,run.batchNumber);_trainingRun.value=prepared;deviceTraining.enqueue(p.id) }
-                        if(learned?.phase !in setOf("completed","rejected")) wait=tr("Attendez la fin de l’apprentissage, ou reprenez-le dans Modèles.", "Wait for training to finish, or resume it in Models.")
+                        if(!TrainingPolicy.finished(learned?.phase)) wait=tr("Attendez la fin de l’apprentissage, ou reprenez-le dans Modèles.", "Wait for training to finish, or resume it in Models.")
                     }
                     "cleanup" -> if(batch?.status!="PURGED") wait=tr("Confirmez le nettoyage dans Export après la fin de l’apprentissage.", "Confirm cleanup in Export after training finishes.")
                     else -> error(tr("Outil non autorisé", "Tool not allowed"))
@@ -1011,6 +1011,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun prepareOptionalExportTraining(projectId:Long,batchNumber:Int):String {
         val p=db.projectDao().getProjectSync(projectId) ?: return ""
         if(!TrainingPolicy.enabled(p))return tr("Nettoyage disponible.", "Cleanup available.")
+        val previous=deviceTraining.readBatch(projectId,batchNumber)
+        val batch=db.batchDao().getBatchSync(projectId,batchNumber)
+        if(previous?.phase=="abandoned" || (TrainingPolicy.finished(previous?.phase) && previous?.exportSnapshot==batch?.archiveSnapshot))
+            return tr("Apprentissage clôturé pour ce lot. Nettoyage disponible.", "Training closed for this batch. Cleanup available.")
         return try {
             val run=deviceTraining.prepare(p,batchNumber);_trainingRun.value=run;deviceTraining.enqueue(p.id)
             tr("Apprentissage du lot planifié. Nettoyage après sa fin.", "Batch training scheduled. Cleanup follows completion.")
@@ -1041,6 +1045,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 p.modelPath!=null,source?.isFile==true,source?.canRead()==true),inspected.exceptionOrNull()?.message)
     }
     fun cancelDeviceTraining()=operation {deviceTraining.cancel(_activeProjectId.value)}
+    fun abandonDeviceTraining(runId:String)=operation {
+        val projectId=_activeProjectId.value
+        deviceTraining.abandon(projectId,runId)
+        val run=deviceTraining.read(projectId)!!
+        _trainingRun.value=run
+        db.auditDao().insertLog(AuditLogEntity(sampleId=null,batchNumber=run.sourceBatchNumber,action="TRAINING_ABANDONED",details=tr("Abandon explicite ; aucun poids activé, aucune image supprimée.", "Explicit abandonment; no weights activated or images deleted."),projectId=projectId))
+        refreshTrainingPreflight()
+        _operationProgress.value=OperationProgress(tr("Apprentissage abandonné. Vous pouvez confirmer le nettoyage du lot.", "Training abandoned. You can now confirm batch cleanup."),1,1)
+    }
     fun resumeDeviceTraining()=operation {
         deviceTraining.resume(_activeProjectId.value)
     }

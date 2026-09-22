@@ -35,4 +35,9 @@ class TrainingPreflightTest {
         assertTrue(TrainingPolicy.enabled(project.copy(modelConfigJson=adapter.toJson(trainable))))
     }
 
+    @Test fun onlyFinishedOrExplicitlyAbandonedRunsPermitCleanup() {
+        listOf("completed","rejected","abandoned").forEach { assertTrue(com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPolicy.finished(it)) }
+        listOf(null,"queued","training","evaluating","cancelled","failed").forEach { assertFalse(com.unicornwhodev.visiondatasetstudio.domain.training.TrainingPolicy.finished(it)) }
+    }
+
 }
