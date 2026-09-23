@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "verified_at": "2026-09-23T11:22:05.810055+00:00",
+  "source_commit": "781f22bd1629f4a50433848f4b5ff102c59b7ca4",
+  "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5",
+  "tag": "v4.2.0-rc5",
+  "draft": false,
+  "prerelease": true,
+  "release_id": 394582501,
+  "published_at": "2026-09-23T11:21:52Z",
+  "remote_asset_sizes_and_sha256_verified": true,
+  "assets": [
+    {
+      "name": "OCI_DIGEST.txt",
+      "bytes": 143,
+      "sha256": "a5a2a63d90c60911394e4f62197711b72d6975fc45884cb434b63f4eaa1a4883",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/OCI_DIGEST.txt"
+    },
+    {
+      "name": "OCI_MANIFEST.json",
+      "bytes": 2112,
+      "sha256": "4ff073508e3639e40ea8e6f5a3051a1f9f183a7b2d111e9a2886caab0c36082c",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/OCI_MANIFEST.json"
+    },
+    {
+      "name": "PACKAGE.json",
+      "bytes": 2891,
+      "sha256": "28b84ae2456e3b6e7854f003cf07b73ad03d7ccf24df69b1d08e87d25684aaf0",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/PACKAGE.json"
+    },
+    {
+      "name": "PUBLICATION_CHECKS.json",
+      "bytes": 1171,
+      "sha256": "6d166cf49d718b39ab9372de761c34ed72b30b7ec0de9fa8d92f2cc84308f03e",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/PUBLICATION_CHECKS.json"
+    },
+    {
+      "name": "SHA256SUMS",
+      "bytes": 605,
+      "sha256": "afcf89304ea43b555c2520bc24573933cd844a18d28a11840191372c696d1054",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/SHA256SUMS"
+    },
+    {
+      "name": "vision-dataset-studio-4.2.0-rc5-qualification.zip",
+      "bytes": 140746484,
+      "sha256": "4c012d1a719bcb37413a5e2589aeb21796dfb4a14887c3d0486480587919e1ae",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/vision-dataset-studio-4.2.0-rc5-qualification.zip"
+    },
+    {
+      "name": "vision-dataset-studio-arm64-v8a-unsigned.apk",
+      "bytes": 100190260,
+      "sha256": "7d360b92f9245cf88af13c5805da538bcd9eede654c910bc69eed63015c2274f",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/vision-dataset-studio-arm64-v8a-unsigned.apk"
+    },
+    {
+      "name": "vision-dataset-studio-flex-2.16.1-vds16k1.zip",
+      "bytes": 97967553,
+      "sha256": "270d3d0cfe3676343040c4f9adf44bba3c0560e8111aacf5c25aa4893b53756a",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/vision-dataset-studio-flex-2.16.1-vds16k1.zip"
+    },
+    {
+      "name": "vision-dataset-studio.apk",
+      "bytes": 413877313,
+      "sha256": "5f5154809b0a79c2e8567c2da6d2479140406e65fac1d38008f1932a58738e98",
+      "url": "https://github.com/unicornwhodev/vision-dataset-studio/releases/download/v4.2.0-rc5/vision-dataset-studio.apk"
+    }
+  ],
+  "oci": {
+    "reference": "ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc5",
+    "manifest_digest": "sha256:4ff073508e3639e40ea8e6f5a3051a1f9f183a7b2d111e9a2886caab0c36082c",
+    "remote_manifest_verified": true,
+    "downloaded_layers_verified": [
+      "vision-dataset-studio-4.2.0-rc5-qualification.zip",
+      "vision-dataset-studio-flex-2.16.1-vds16k1.zip",
+      "vision-dataset-studio-arm64-v8a-unsigned.apk",
+      "PACKAGE.json",
+      "PUBLICATION_CHECKS.json",
+      "SHA256SUMS"
+    ],
+    "visibility": "private"
+  },
+  "secret_review": {
+    "schema": 1,
+    "date": "2026-09-23T11:19:33.072073+00:00",
+    "source_commit": "781f22bd1629f4a50433848f4b5ff102c59b7ca4",
+    "scanner": "Gitleaks 8.30.1",
+    "rules_disabled": false,
+    "reports_redacted": true,
+    "findings_reviewed_individually": true,
+    "history": {
+      "commits": 23,
+      "findings": 20,
+      "confirmed_secrets": 0
+    },
+    "candidate_tree": {
+      "files": 552,
+      "findings": 34,
+      "confirmed_secrets": 0
+    },
+    "staged_changes": {
+      "findings": 14,
+      "confirmed_secrets": 0
+    },
+    "packages": {
+      "findings": 14,
+      "confirmed_secrets": 0,
+      "archive_scan_depth": 4,
+      "archives_inventoried": 8
+    },
+    "findings_classification": "Verified source SHA digests and public signing-key digests only.",
+    "private_keys_credentials_weights_user_databases_excluded": true,
+    "original_build_receipts_unchanged": true,
+    "signing_compatible_with_rc4": false,
+    "durable_production_signature": false,
+    "scope": "Secret-pattern scan of history, source/evidence text and nested archives, plus file selection, binary archive inventories and source/artifact hash verification; no absolute guarantee of absence."
+  }
+}

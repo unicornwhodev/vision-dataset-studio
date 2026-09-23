@@ -2,7 +2,7 @@
 
 **Français** · [English](en/DEVELOPMENT_RESUME.md)
 
-Le code est sur `main`. La version en développement est **4.2.0-rc5**, code Android **10**. La dernière distribution publiée reste **rc4** ; pousser les sources ne remplace pas ses APK ni son package. Les résultats exacts et leurs builds sont dans [TEST_REPORT.md](../TEST_REPORT.md) et [les preuves](../test-results/functional-audit-20260922/README.md).
+Le code est sur `main`. La version en développement est **4.2.0-rc5**, code Android **10**. La prérelease **rc5** et son package sont publiés : [release](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5), [reçu vérifié](RC5_PUBLICATION_RECEIPT.json). Sa signature Windows diffère de rc4 ; elle ne peut pas mettre à jour rc4. Les assets rc4 sont conservés. Les résultats exacts et leurs builds sont dans [TEST_REPORT.md](../TEST_REPORT.md) et [les preuves Windows](../test-results/windows-rc5-release/README.md).
 
 ## Poste local
 
@@ -48,6 +48,6 @@ Les fixtures de conversions occupent du stockage dans l’installation de recett
 1. Exécuter les 15 conversions restantes et reprendre les trois délais dépassés sur matériel adapté. Les 13 succès existants, dont 8 avec apprentissage, ne qualifient pas tout le catalogue.
 2. Tester téléphone ARM, permissions SAF réelles, mémoire, latence et corpus représentatif. Le pod utilisait un émulateur logiciel sans KVM.
 3. Qualifier un serveur d’agent réel et les écritures HF sur un nouveau dépôt privé de QA explicitement autorisé. Aucun dépôt existant ne sert aux essais destructifs.
-4. Préparer la distribution rc5 après sa recette : une APK utilisateur, archive de qualification, release et package. La visibilité GHCR était encore privée au dernier contrôle.
+4. Préparer une signature durable et finir la qualification de distribution. rc5 est une prérelease Debug ; le candidat ARM64 optimisé est non signé. GHCR conserve sa visibilité privée.
 
 Les conversions HF entraînables fournies figent leur encodeur ; leurs succès concernent des têtes ou adaptateurs. L’entraînement de couches internes est démontré uniquement par la fixture synthétique. Aucun gain de précision n’est annoncé.

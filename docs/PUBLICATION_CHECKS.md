@@ -18,9 +18,13 @@ a analysé les **23 commits** de l’historique disponible et les fichiers desti
   diffère de rc4 : cette prérelease ne met pas à jour rc4. Voir le
   [plan de distribution](RELEASE_PLAN.md).
 
-Le contrôle du contenu indexé et des archives assemblées complète ces contrôles
-avant leur publication. Le reçu de publication donnera les digests distants
-et le résultat final ; les reçus de compilation originaux ne sont pas modifiés.
+Le contenu indexé et les archives assemblées ont également été contrôlés :
+**14 alertes dans chaque sélection**, toutes vérifiées comme SHA de sources ou
+empreintes publiques. Huit archives imbriquées ont été inventoriées et contrôlées
+par CRC ; aucun fichier privé interdit n’a été trouvé. Les neuf assets GitHub
+correspondent aux tailles/SHA-256 locaux, et les six couches OCI ont été
+retéléchargées et vérifiées. [Reçu final](RC5_PUBLICATION_RECEIPT.json).
+Les reçus de compilation originaux ne sont pas modifiés.
 Un scan et une revue réduisent le risque sans prouver une absence absolue de secrets.
 
 ---

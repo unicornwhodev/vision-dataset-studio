@@ -2,7 +2,7 @@
 
 [Français](../DEVELOPMENT_RESUME.md) · **English**
 
-Source is on `main`. The development version is **4.2.0-rc5**, Android code **10**. The latest published distribution remains **rc4**; pushing source does not replace its APKs or package. Exact results and build identities are in [validation](VALIDATION.md) and [the evidence](../../test-results/functional-audit-20260922/README.md).
+Source is on `main`. The development version is **4.2.0-rc5**, Android code **10**. The **rc5** prerelease and artifact package are published: [release](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5), [verified receipt](../RC5_PUBLICATION_RECEIPT.json). Its Windows certificate differs from rc4, so it cannot update rc4. Existing rc4 assets are preserved. Exact results and build identities are in [validation](VALIDATION.md) and [Windows evidence](../../test-results/windows-rc5-release/README.md).
 
 ## Local workstation
 
@@ -43,6 +43,6 @@ Conversion fixtures consume storage inside the QA installation and count toward 
 1. Execute the 15 remaining conversions and retry the three timed-out cases on suitable hardware. The existing 13 passes, including 8 with learning, do not qualify the entire catalogue.
 2. Test physical ARM devices, real SAF permissions, memory, latency and a representative corpus. The pod used software emulation without KVM.
 3. Qualify a real agent server and live HF writes on a newly created, explicitly authorized private QA repository. Existing repositories are never used for destructive QA.
-4. Prepare rc5 distribution after qualification: one user APK, qualification archive, release and package. GHCR visibility was still private at the last check.
+4. Establish durable signing and finish distribution qualification. rc5 is a Debug prerelease; the optimized ARM64 candidate is unsigned. GHCR retains its private visibility.
 
 The supplied trainable HF conversions freeze their encoders; their passes cover heads or adapters. Internal-layer training is demonstrated only by the synthetic fixture. No accuracy gain is claimed.

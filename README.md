@@ -112,7 +112,7 @@ Préparer les fixtures avec `tools/qa/prepare_core_fixtures.py` dans l’environ
 - [Roadmap](docs/ROADMAP.md), [plan de publication](docs/RELEASE_PLAN.md), [contribution](CONTRIBUTING.md).
 - [Poste de développement](docs/WORKSTATION.md), [interface](docs/UI_REFINEMENT.md).
 
-Destination autorisée : dépôt public [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). La [prérelease de qualification](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc4) distribue l’APK utilisateur et le paquet de recette. GHCR héberge ce paquet au format OCI ; le Dockerfile de build reste à éprouver, GitHub Actions étant bloqué par la facturation du compte. Voir le [plan de publication](docs/RELEASE_PLAN.md). Aucune release stable n’est annoncée.
+Destination autorisée : dépôt public [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). La [prérelease de qualification](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5) distribue l’APK utilisateur et le paquet de recette. GHCR héberge ce paquet au format OCI ; le Dockerfile de build reste à éprouver, la nouvelle CI restant non exécutée après le blocage historique de facturation. Voir le [plan de publication](docs/RELEASE_PLAN.md). Aucune release stable n’est annoncée.
 
 Le code relève d’[Apache-2.0](LICENSE), selon les droits des contributeurs. Les modèles, données et bibliothèques conservent leurs licences ; voir [NOTICE](NOTICE) et [l’état des droits](LICENSING_STATUS.md).
 

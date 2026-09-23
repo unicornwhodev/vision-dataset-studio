@@ -1,5 +1,7 @@
 # Publication — 4.2.0-rc5
 
+**Publication vérifiée :** [v4.2.0-rc5](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5) · [JSON](RC5_PUBLICATION_RECEIPT.json).
+
 La rc5 est une **prérelease Debug de qualification**. L’APK Windows a passé
 67 tests JVM et les deux suites Android 39/39 en 4 Ko et 16 Ko. Les preuves
 publiques sont sélectionnées dans [windows-rc5-release](../test-results/windows-rc5-release/README.md).
@@ -34,8 +36,8 @@ python -X utf8 tools/package_verified_release.py --build-dir dist/android/runs/2
 optimisé de 100,2 Mo est construit, sans signature de distribution ni qualification
 téléphone. Le crash Flex 16 Ko est corrigé ; trois autres bibliothèques gardent des signalements RELRO. La signature par certificat
 explicitement choisi et l’inventaire des 111 dépendances runtime sont préparés.
-[Reçus, commandes et blocages](WINDOWS_QUALIFICATION_2026_09.md). La distribution
-publiée reste rc4 ; le reste de ce document décrit cette publication historique.
+[Reçus, commandes et blocages](WINDOWS_QUALIFICATION_2026_09.md). Le reste de cette section décrit la publication historique rc4.
+La distribution actuelle rc5 est présentée plus haut.
 
 [English](en/RELEASE_PLAN.md). Dépôt public : [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). Licence Apache-2.0.
 

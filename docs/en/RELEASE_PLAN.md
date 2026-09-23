@@ -1,5 +1,7 @@
 # Windows qualification prerelease — 4.2.0-rc5
 
+**Verified publication :** [v4.2.0-rc5](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5) · [JSON](../RC5_PUBLICATION_RECEIPT.json).
+
 Build `20260923T104142Z-befce3e3596a` passed 67 JVM tests and 39/39 Android core
 tests on both 4 KB and 16 KB API 35 emulators. The Python suite passed 70 tests
 before packaging (63 at build time plus seven packaging checks). The original
