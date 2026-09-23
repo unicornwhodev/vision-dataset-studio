@@ -38,6 +38,10 @@ app/schemas/*.tmp
 id_rsa
 id_ed25519
 auth.json
+password.dpapi
+recovery-password.txt
+hf-token
+**/qa-private/
 *.tflite
 *.onnx
 *.safetensors

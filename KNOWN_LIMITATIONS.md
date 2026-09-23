@@ -1,6 +1,6 @@
-# Limites de qualification — audit rc5
+# Limites de qualification — campagne après rc5
 
-**23 septembre 2026 :** build Windows réel, **67 tests JVM, 63 tests Python, 39/39 tests Android en 4 Ko et 39/39 en 16 Ko**, aucun ignoré. Le crash Flex est corrigé. L’original est conservé et deux entraînements successifs reprennent la même version entraînée. APK ARM64 optimisée : **100,2 Mo**, non signée. Trois autres bibliothèques gardent des signalements RELRO ; la qualification 16 Ko globale et le téléphone ARM restent ouverts. [Preuves et limites](docs/WINDOWS_QUALIFICATION_2026_09.md).
+**23 septembre 2026, après rc5 :** build Windows réel, **70 tests JVM, 75 tests Python, 39/39 tests Debug sur Honor ARM64 4 Ko et 39/39 sur émulateur 16 Ko**. La clé durable et sa sauvegarde sont vérifiées ; la vraie Release de **100,2 Mo** conserve les données préparées sur le Honor. Le correctif de publication HF et cette APK signée sont postérieurs aux fichiers rc5 publiés. [Preuves et conditions exactes](docs/P1_QUALIFICATION_2026_09.md).
 
 [English](docs/en/KNOWN_LIMITATIONS.md) · [Recette fonctionnelle](docs/FUNCTIONAL_AUDIT_2026_09.md)
 
@@ -10,9 +10,9 @@ Le grounding modèle exige le contrat HTTP explicite `task=grounding` + `httpOut
 
 Le cycle local 2+1, l’exclusion des copies identiques/renommées, l’export, la purge et la réouverture Room ont passé un essai instrumenté API 28. Les empreintes persistent par projet. Les images modifiées avec pertes, recadrées ou retouchées ne sont pas couvertes par la garantie d’identité exacte ; les anciennes images déjà purgées ne disposent que des empreintes de fichiers conservées. Voir [BATCH_PRODUCTION.md](docs/BATCH_PRODUCTION.md).
 
-Le fournisseur SAF injecté passe ses quatre scénarios de lecture/écriture défaillante. Il ne remplace pas une recette DocumentsUI et fournisseurs cloud avec octroi/révocation réel de permissions persistantes. Les migrations 1/2/3 → 4 ont passé Room sur Android ; les bases v1/v2 restent des fixtures reconstruites. Une base issue d’une ancienne installation réelle reste à tester.
+DocumentsUI, révocation réelle d’un droit persistant, volume virtuel retiré et stockage plein ont passé la recette sur émulateur dédié. Les fournisseurs cloud restent à tester. La restauration d’une copie indépendante de la base et de l’image passe sur émulateur et Honor ; elle ne restaure pas les clés Android ou les droits SAF. Les migrations 1/2/3 → 4 ont passé Room ; les bases v1/v2 restent des fixtures reconstruites. Une base issue d’une ancienne installation réelle reste à tester.
 
-Les réservations HF, conflits de commits, réponse perdue, publication distante et nettoyage après perte de réseau ne sont pas qualifiés sur un dépôt de test autorisé. Aucun dépôt existant n’a reçu d’écritures de QA.
+Les réservations HF, conflits, réponse de commit perdue et publication/relecture passent sur un nouveau dépôt privé explicitement autorisé, avec des images synthétiques. La coupure réseau réelle d’un téléchargement reprend en HTTP 206 ; la purge interrompue reprend sans perdre les annotations ni le reçu. Les gros envois multipart et les pannes propres à d’autres fournisseurs restent à qualifier. Aucun dépôt de modèles existant n’a reçu d’écritures de QA.
 
 ## Apprentissage facultatif Android
 
@@ -34,14 +34,14 @@ Trois workflows exécutables disposent d’un journal et de pauses pour revue, e
 
 ## Interface et localisation
 
-Les textes applicatifs français et anglais sont implémentés. Le parcours anglais de création/changement de projets, réglages persistés et propositions visibles a passé Compose sur API 28. Les noms et contenus saisis par l’utilisateur restent dans leur langue. TalkBack, une grande police sur tous les écrans, les fournisseurs SAF réels et un téléphone ARM restent à qualifier.
+Les textes applicatifs français et anglais sont implémentés. Le parcours anglais de création/changement de projets, réglages persistés et propositions visibles a passé Compose sur API 28. Les noms et contenus saisis par l’utilisateur restent dans leur langue. L’accueil de la vraie Release est vérifié sur Honor ; TalkBack et une grande police sur tous les écrans restent à qualifier.
 
 ## Distribution
 
-Aucun poids n’est embarqué dans l’APK. Le build contrôle les extensions et signatures de poids et écrit `app-contents.json`. L’APK Debug universelle reste volumineuse à cause des bibliothèques natives de quatre architectures ; un candidat Release ARM64 optimisé de 100,2 Mo est construit, non signé et non qualifié sur téléphone.
+Aucun poids n’est embarqué dans l’APK. Le build contrôle les extensions et signatures de poids et écrit `app-contents.json`. L’APK Debug universelle reste volumineuse à cause des bibliothèques natives de quatre architectures. Le candidat local Release ARM64 signé de 100,2 Mo démarre et conserve les données sur Honor ; sa suite complète n’a pas été exécutée sous minification. Les 39 tests concernent la variante Debug.
 
-La CI API 28/35, un téléphone ARM, la RAM, la latence et les contraintes thermiques restent à qualifier. Le pod n’a pas KVM : l’émulateur logiciel sert à la vérification fonctionnelle, pas aux performances. Les sources sont publiées. La distribution est une prérelease Debug de qualification et un paquet OCI, sans image de build qualifiée. Le lancement GitHub Actions a été refusé pour un problème de facturation du compte ; aucun job CI n’a exécuté de tests.
+La suite Honor nécessite un écran de recette visible pendant les classes sans UI. L’exécution prolongée en arrière-plan, les mesures répétées RAM/latence et la thermique restent ouvertes. Le Honor utilise des pages de 4 Ko : aucun téléphone ARM 16 Ko n’est qualifié. Après mise à jour de DataStore, deux bibliothèques gardent des signalements RELRO expliqués structurellement, sans certification globale de l’APK. La CI distante reste sans nouvelle exécution attestée après le blocage historique de facturation. Le paquet OCI contient des artefacts de qualification, sans image de build qualifiée.
 
 La licence du code est Apache-2.0. Les licences des modèles/datasets et les notices transitives restent indépendantes. Le changement d’applicationId ne migre pas les données d’une autre application.
 
-La clé Debug utilisée sur l’ancienne VM n’est pas disponible sur le poste Windows. La signature rc5 diffère de rc4 et ne permet pas sa mise à jour ; conserver toute installation contenant des données. Le propriétaire confirme qu’aucune installation rc2 n’a été distribuée ; aucune migration rc2 n’est prévue. Une signature de distribution stable reste à définir.
+La clé Debug utilisée sur l’ancienne VM n’est pas disponible sur le poste Windows. La signature rc5 diffère de rc4 et ne permet pas sa mise à jour ; conserver toute installation contenant des données. La [clé durable](docs/SIGNING.md) est désormais fixée et sauvegardée sur un deuxième disque du même PC ; une copie hors machine reste à prévoir. Cette clé ne peut pas mettre à jour les anciennes APK Debug. Le propriétaire confirme qu’aucune installation rc2 n’a été distribuée ; aucune migration rc2 n’est prévue.

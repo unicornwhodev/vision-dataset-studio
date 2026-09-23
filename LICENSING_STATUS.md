@@ -15,7 +15,7 @@ utilisation et redistribution restent soumis à leurs propres conditions.
 Le choix de licence ne vaut pas qualification technique : les résultats de compilation,
 tests et recette sont consignés séparément dans les rapports de validation.
 
-Le 23 septembre 2026, les 111 artefacts du runtime Release résolu ont été inventoriés
+Le 23 septembre 2026, les 110 artefacts du runtime Release résolu ont été inventoriés
 dans [third_party](third_party/README.md), avec les métadonnées de licence et les
 notices embarquées. La revue des composants transitifs liés dans les bibliothèques
 natives reste ouverte ; cet inventaire ne constitue pas une validation juridique.

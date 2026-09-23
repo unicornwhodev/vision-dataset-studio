@@ -2,6 +2,7 @@ package com.unicornwhodev.visiondatasetstudio
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils
 import com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager
@@ -61,5 +62,21 @@ class InstalledDataPreservationTest {
         assertEquals("IN_PROGRESS",sample.annotationStatus)
         assertEquals("NOT_EXPORTED",sample.syncStatus)
         assertEquals(expected.getString("image_sha256"),HashUtils.computeSha256(File(sample.localImagePath!!)))
+    }
+
+    @Test fun verifyRestoredDatabaseCopy()=runBlocking {
+        val expected=JSONObject(marker().readText())
+        val case=marker().nameWithoutExtension
+        val restored=context.getDatabasePath("qa-restored-$case.db")
+        check(restored.isFile) { "Stage the database restored from the independently read backup" }
+        val db=Room.databaseBuilder(context,AppDatabase::class.java,restored.name).build()
+        try {
+            val id=expected.getLong("project_id");val sampleId=expected.getString("sample_id")
+            assertEquals(expected.getLong("cursor"),db.projectDao().getProjectSync(id)!!.lastRowCursor)
+            assertEquals(expected.getString("annotation_json"),db.annotationDao().getAnnotationSync(sampleId)!!.dataJson)
+            assertEquals("IN_PROGRESS",db.sampleDao().getSampleSync(sampleId)!!.annotationStatus)
+            val image=File(marker().parentFile,"restored-$case.png")
+            assertEquals(expected.getString("image_sha256"),HashUtils.computeSha256(image))
+        } finally {db.close()}
     }
 }

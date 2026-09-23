@@ -35,10 +35,17 @@ class HfLivePublicationTest {
         val token=credential.readText().trim();credential.delete()
         require(token.isNotEmpty())
         val hf=HfApiClient{token}
-        val identity=hf.verifyToken();assertTrue(identity.isValid);assertEquals(repo.substringBefore('/'),identity.username)
-        assertFalse("Never use a pre-existing repository for this test",hf.checkDatasetAccess(repo).exists)
-        assertTrue(hf.createDatasetRepo(repo,true));assertTrue(hf.checkDatasetAccess(repo).isPrivate)
-        val root=File(target.filesDir,"qa-evidence/hf-live").apply{mkdirs()}
+        val identity=hf.verifyToken();assertTrue(identity.isValid)
+        val owner=repo.substringBefore('/')
+        assertTrue("The authorized repository must belong to this account or one of its organizations",
+            owner==identity.username || owner in identity.orgs)
+        if(args.getString("hfReuseQa")!="true") {
+            assertFalse("Never use a pre-existing repository without explicit QA reuse",hf.checkDatasetAccess(repo).exists)
+            assertTrue(hf.createDatasetRepo(repo,true))
+        }
+        assertTrue(hf.checkDatasetAccess(repo).isPrivate)
+        val case=requireNotNull(args.getString("faultCase")).also{require(it.matches(Regex("[a-f0-9]{12}")))}
+        val root=File(target.filesDir,"qa-evidence/hf-live/$case");check(!root.exists());root.mkdirs()
         val context=object:ContextWrapper(target) {
             override fun getFilesDir()=File(root,"app-files").apply{mkdirs()}
             override fun getCacheDir()=File(root,"app-cache").apply{mkdirs()}
@@ -47,7 +54,7 @@ class HfLivePublicationTest {
         val db=Room.inMemoryDatabaseBuilder(target,AppDatabase::class.java).build()
         val storage=StorageManager(context);val inference=LiteRtEngine()
         try {
-            val base=ProjectEntity(id=910001,name="Synthetic publication QA",hfSourceRepo="qa/synthetic-source",hfDestRepo=repo,classesCsv="rectangle",activeTasksCsv="CLASSIFICATION",diskBudgetMb=1024)
+            val base=ProjectEntity(id=910001,name="Synthetic publication QA",hfSourceRepo="qa/synthetic-source-$case",hfDestRepo=repo,classesCsv="rectangle",activeTasksCsv="CLASSIFICATION",diskBudgetMb=1024)
             val a=ProcessingSettings(collaborationEnabled=true,collaborationWorkerId="qa-worker-a",hfWebDataset=false,hfCoco=false,hfYolo=false,hfVl=false)
             val b=a.copy(collaborationWorkerId="qa-worker-b")
             val entry=SourceEntryEntity(base.id,0,"synthetic-image","https://example.invalid/never-fetched.png")

@@ -1,8 +1,10 @@
 # Qualification Windows — 23 septembre 2026
 
-**23 septembre 2026 :** build Windows réel, **67 tests JVM, 70 tests Python (63 au build et 7 contrôles de packaging ajoutés), 39/39 tests Android en 4 Ko et 39/39 en 16 Ko**, aucun ignoré. Le crash Flex est corrigé. L’original est conservé et deux entraînements successifs reprennent la même version entraînée. APK ARM64 optimisée : **100,2 Mo**, non signée. Trois autres bibliothèques gardent des signalements RELRO ; la qualification 16 Ko globale et le téléphone ARM restent ouverts. [Preuves et limites](docs/WINDOWS_QUALIFICATION_2026_09.md).
+**Campagne P1 du 23 septembre 2026, après rc5 : 70 tests JVM et 75 Python réussis ; 39/39 tests Debug sur Honor ARM64 4 Ko et 39/39 sur émulateur 16 Ko**, aucun ignoré. Les pannes réelles de stockage, SAF, transfert HF et purge sont vérifiées ; un défaut d’accusé de réception LFS est corrigé. La clé durable, sa sauvegarde et le remplacement par la vraie Release signée de 100,2 Mo sont vérifiés. [Rapport, conditions et limites](docs/P1_QUALIFICATION_2026_09.md) · [Reçu public](docs/P1_QUALIFICATION_RECEIPT.json).
 
-Build `20260923T104142Z-befce3e3596a` : 99 fichiers KSP, lint 0 erreur / 88 avertissements. Les reçus incluent les empreintes des modèles, la reprise du deuxième entraînement et les fichiers conservés après arrêt/redémarrage du processus. La nouvelle CI distante reste à exécuter après le blocage historique de facturation ; les transferts HF et la qualité sur corpus représentatif restent à qualifier. Les paragraphes suivants sont historiques.
+La suite Honor réussie est visible au premier plan. Son reçu global conserve l’échec ultérieur du détecteur d’accueil ; la reprise séparée confirme l’UI, puis la vraie Release et ses données. Aucun résultat antérieur n’a été réécrit. L’arrière-plan prolongé, le téléphone ARM 16 Ko, les modèles sur corpus représentatif et la CI distante restent ouverts. Les fichiers rc5 publiés restent inchangés.
+
+**Historique rc5 :** build `20260923T104142Z-befce3e3596a`, 67 JVM, 70 Python, 99 fichiers KSP, lint 0 erreur / 88 avertissements, 39/39 sur les deux émulateurs 4/16 Ko. Le candidat ARM64 était non signé et trois bibliothèques conservaient des signalements RELRO. [Rapport historique](docs/WINDOWS_QUALIFICATION_2026_09.md). Les paragraphes suivants sont historiques.
 
 # Reprise sur le poste habituel — 23 septembre 2026 (avant correctifs Windows)
 

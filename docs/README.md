@@ -30,6 +30,8 @@ Catalogues publics / Public catalogues : [Charlbi — modèles génériques](htt
 
 | Preuve / Evidence | Accès / Read |
 |---|---|
+| Interruptions réelles et Honor, après rc5 / Post-rc5 real faults and Honor | [Rapport FR](P1_QUALIFICATION_2026_09.md) · [Reçu JSON](P1_QUALIFICATION_RECEIPT.json) |
+| Signature durable et restauration / Durable signing and recovery | [Procédure](SIGNING.md) |
 | Livraison rc5 / rc5 publication | [Plan FR](RELEASE_PLAN.md) · [Plan EN](en/RELEASE_PLAN.md) · [Reçu JSON](RC5_PUBLICATION_RECEIPT.json) |
 | Build Windows et Android 4/16 Ko / Windows and 4/16 KB Android | [Rapport](WINDOWS_QUALIFICATION_2026_09.md) · [Preuves brutes](../test-results/windows-rc5-release/README.md) |
 | Catalogue LiteRT / LiteRT model campaign | [Résultats FR](LITERT_QUALIFICATION.md) · [Results EN](en/LITERT_QUALIFICATION.md) |

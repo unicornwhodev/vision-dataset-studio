@@ -5,8 +5,10 @@ Dedicated synthetic installation only. Backups stay local and contain private ap
 data. This tests schema 4 -> 4 replacement, not an unavailable historical database.
 """
 import argparse
+from contextlib import closing
 from datetime import datetime, timezone
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -26,6 +28,7 @@ def digest(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--serial', default=os.environ.get('ANDROID_SERIAL'))
+    parser.add_argument('--signed-apks', type=Path)
     args = parser.parse_args()
     if not args.serial or os.environ.get('VDS_ALLOW_TEST_INSTALL') != '1':
         parser.error('Select a dedicated serial and set VDS_ALLOW_TEST_INSTALL=1.')
@@ -38,7 +41,7 @@ def main():
 
     def run(name, command):
         with (out / name).open('wb') as log:
-            subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True)
+            subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=240)
         return (out / name).read_text(encoding='utf-8', errors='replace')
 
     def instrument(method):
@@ -52,8 +55,14 @@ def main():
 
     code = 1
     try:
-        app, tests = resolve(ROOT / 'dist/android')
-        state['build'] = json.loads((app.parent / 'status.json').read_text(encoding='utf-8'))
+        if args.signed_apks:
+            from sign_qualification_apks import resolve_signed
+            app, tests, build = resolve_signed(args.signed_apks)
+            state['signing_receipt'] = str(args.signed_apks)
+        else:
+            app, tests = resolve(ROOT / 'dist/android')
+            build = json.loads((app.parent / 'status.json').read_text(encoding='utf-8'))
+        state['build'] = build
         if not state['build'].get('all_build_checks_passed'):
             raise RuntimeError('Build checks have not passed.')
         for name, apk in [('main', app), ('tests', tests)]:
@@ -81,6 +90,44 @@ def main():
             assert db.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
             assert db.execute('SELECT lastRowCursor FROM projects WHERE id=?', (expected['project_id'],)).fetchone()[0] == expected['cursor']
             assert db.execute('SELECT dataJson FROM annotations WHERE sampleId=?', (expected['sample_id'],)).fetchone()[0] == expected['annotation_json']
+            image_path = db.execute('SELECT localImagePath FROM samples WHERE sampleId=?', (expected['sample_id'],)).fetchone()[0]
+            restored = copied / f'qa-restored-{case}.db'
+            with closing(sqlite3.connect(restored)) as destination:
+                db.backup(destination)
+                destination.execute('PRAGMA wal_checkpoint(TRUNCATE)')
+        # Restore an independent database/image copy to Android without overwriting the live app database.
+        # Room must open this real backup and recover the original human annotation and cursor.
+        from pathlib import PurePosixPath
+        relative_image = None
+        for prefix in (f'/data/user/0/{APP_ID}', f'/data/data/{APP_ID}'):
+            try:
+                relative_image = PurePosixPath(image_path).relative_to(prefix).as_posix()
+                break
+            except ValueError:
+                pass
+        if not relative_image or not relative_image.startswith('files/images/') or '..' in PurePosixPath(relative_image).parts:
+            raise RuntimeError('Unexpected owned fixture image path in backup.')
+        with tarfile.open(backup) as archive:
+            image = archive.extractfile(relative_image).read()
+        if hashlib.sha256(image).hexdigest() != expected['image_sha256']:
+            raise RuntimeError('Image in backup differs from the live fixture receipt.')
+        uid = int(subprocess.check_output([*adb, 'shell', 'run-as', APP_ID, 'id', '-u'], timeout=15))
+        for path, payload in ((f'databases/qa-restored-{case}.db', restored.read_bytes()),
+                              (f'files/qa-evidence/preservation/restored-{case}.png', image)):
+            if subprocess.run([*adb, 'shell', 'run-as', APP_ID, 'test', '-e', path], capture_output=True, timeout=15).returncode != 1:
+                raise RuntimeError('Refusing to replace an existing restored copy.')
+            stream = io.BytesIO()
+            with tarfile.open(fileobj=stream, mode='w') as tar:
+                info = tarfile.TarInfo(path); info.size = len(payload); info.mode = 0o600; info.uid = info.gid = uid
+                tar.addfile(info, io.BytesIO(payload))
+            subprocess.run([*adb, 'exec-in', 'run-as', APP_ID, 'tar', '-x', '-f', '-'],
+                           input=stream.getvalue(), stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=True, timeout=30)
+            remote_hash = subprocess.check_output([*adb, 'shell', 'run-as', APP_ID, 'sha256sum', path], text=True, timeout=15).split()[0]
+            if remote_hash != hashlib.sha256(payload).hexdigest():
+                raise RuntimeError('Restored bytes changed in transit; the live database was not touched.')
+        instrument('verifyRestoredDatabaseCopy')
+        state['restored_copy_opened_by_room'] = True
+        state['restored_image_sha256_verified'] = True
         state['backup_readback_verified'] = True
         run('replace-package.txt', [*adb, 'install', '--no-streaming', '-r', str(app)])
         instrument('verifyAfterProcessDeathAndPackageReplacement')

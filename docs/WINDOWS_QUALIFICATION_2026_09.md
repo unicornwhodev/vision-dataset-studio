@@ -1,5 +1,9 @@
 # Qualification Windows du 23 septembre 2026
 
+**Rapport historique de la publication rc5.** La [campagne P1 suivante](P1_QUALIFICATION_2026_09.md)
+ajoute les pannes réelles, le Honor, le correctif HF, DataStore 1.2.1 et la signature
+durable. Les chiffres et artefacts ci-dessous restent ceux de rc5 publiée.
+
 Base Git : `23b038fb63af71cd7b9fb3fc6324081d883d1316`, après `git pull --ff-only origin main`.
 Le build précède le commit des correctifs. Les reçus identifient les octets du
 répertoire de travail ; le packageur les compare aux blobs du commit de release

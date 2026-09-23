@@ -24,6 +24,9 @@ def main():
     expected = args.certificate_sha256.replace(':', '').lower()
     if not re.fullmatch('[0-9a-f]{64}', expected):
         parser.error('An explicit SHA-256 certificate fingerprint is required.')
+    pin = json.loads((ROOT / 'config/release-signing.json').read_text(encoding='utf-8'))
+    if expected != pin['certificate_sha256']:
+        parser.error('Certificate differs from the pinned long-lived application identity.')
     variables = ['VDS_RELEASE_KEYSTORE', 'VDS_RELEASE_KEY_ALIAS', 'VDS_RELEASE_STORE_PASSWORD', 'VDS_RELEASE_KEY_PASSWORD']
     if any(not os.environ.get(name) for name in variables):
         parser.error('All four VDS_RELEASE_* signing variables are required.')

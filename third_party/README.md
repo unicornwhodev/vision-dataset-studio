@@ -1,6 +1,6 @@
 # Runtime dependency notices
 
-Generated on 2026-09-23 from the resolved `releaseRuntimeClasspath`: 111 artifacts.
+Generated on 2026-09-23 from the resolved `releaseRuntimeClasspath`: 110 artifacts, after the DataStore 1.2.1 update.
 `runtime-dependencies.json` records artifact hashes, license declarations and their
 POM provenance (including inherited metadata). `NOTICES.runtime.txt` retains the
 embedded LICENSE/NOTICE/COPYING/COPYRIGHT text found in the resolved JAR/AAR files.

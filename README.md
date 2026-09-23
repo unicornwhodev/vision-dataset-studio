@@ -14,7 +14,7 @@ Atelier Android pour importer des images, travailler par lots, corriger les prop
 |---|---|---|---|
 | **4.2.0-rc5** | Android 9+ · API 28+ | [Apache-2.0](LICENSE) | Prérelease de qualification |
 
-> **Installation :** rc5 utilise un certificat différent de rc4 et ne peut pas la mettre à jour. Conservez toute installation contenant des données. Le candidat ARM64 de 100,2 Mo est **non signé**. [Choisir le bon fichier](docs/GETTING_STARTED.md#installer-la-prerelease).
+> **Installation :** rc5 utilise un certificat différent de rc4 et ne peut pas la mettre à jour. Conservez toute installation contenant des données. Le candidat ARM64 publié avec rc5 est non signé ; le nouveau candidat local de **100,2 Mo** utilise une [clé durable sauvegardée](docs/SIGNING.md). [Choisir le bon fichier](docs/GETTING_STARTED.md#installer-la-prerelease).
 
 ## Un atelier, tout le cycle du lot
 
@@ -61,16 +61,18 @@ Le graphe **et** son checkpoint constituent la version entraînée. Un checkpoin
 
 | Périmètre | Résultat enregistré | Limite de la preuve |
 |---|---|---|
-| Build Windows rc5 | **67 JVM**, KSP généré, lint sans erreur | 88 avertissements de lint |
-| Outils Python | **70 tests réussis** | 63 au build, 7 contrôles de packaging ajoutés |
-| Android API 35, pages 4 Ko | **39/39**, aucun ignoré | Émulateur x86_64 |
-| Android API 35, pages 16 Ko | **39/39**, aucun ignoré ; crash Flex corrigé | Trois autres bibliothèques gardent des signalements RELRO |
+| Build Windows après rc5 | **70 JVM**, 99 fichiers KSP, lint sans erreur | Sources de la campagne P1, distinctes de rc5 publiée |
+| Outils Python | **75 tests réussis** | Contrôles hôte, sans preuve d’exécution Android |
+| Honor ARM64, API 36, pages 4 Ko | **39/39**, aucun ignoré | Suite Debug avec écran de recette visible ; arrière-plan prolongé non qualifié |
+| Android API 35, pages 16 Ko | **39/39**, aucun ignoré ; crash Flex corrigé | Émulateur x86_64 ; deux bibliothèques gardent des signalements RELRO expliqués |
+| Pannes réelles | Stockage plein, révocation SAF, volume perdu, coupure HF, réponse perdue, conflit et purge interrompue vérifiés | Émulateur dédié, données synthétiques, dépôt privé autorisé |
+| Signature et conservation | Clé sauvegardée, copie utilisée pour signer ; sauvegarde/restauration Room ; mise à jour vers la vraie Release sur Honor | Même certificat durable ; ne répare pas la rupture rc4/rc5 |
 | Entraînement et filiation | Original intact, deux lots en continuité, reprise et persistance après redémarrage | Données synthétiques |
 | Catalogue Charlbi, campagne du 22 septembre | **13/25 réussies**, dont **8 avec apprentissage** ; 1 délai dépassé, 11 non exécutées | API 28 x86_64, builds antérieurs à rc5 ; aucun benchmark ARM |
 
-[Preuves Windows](docs/WINDOWS_QUALIFICATION_2026_09.md) · [Résultats par modèle](docs/LITERT_QUALIFICATION.md).
+[Campagne P1 et preuves](docs/P1_QUALIFICATION_2026_09.md) · [Build rc5 historique](docs/WINDOWS_QUALIFICATION_2026_09.md) · [Résultats par modèle](docs/LITERT_QUALIFICATION.md).
 
-La recette complète du catalogue, le téléphone ARM, la qualité sur corpus indépendant, les transferts HF réels et la nouvelle CI restent à qualifier. Une suite réussie sur émulateur ne prouve ni la précision des modèles ni la compatibilité 16 Ko de toute l’APK.
+La recette complète du catalogue, la qualité sur corpus indépendant, l’arrière-plan prolongé et la nouvelle CI restent à qualifier. Le Honor utilise des pages de 4 Ko ; la preuve 16 Ko reste sur émulateur. Les essais réussis ne démontrent pas la précision des modèles ni une certification de toute l’APK.
 
 ## Construire sur votre poste
 
@@ -86,13 +88,13 @@ Définir `JAVA_HOME` et `ANDROID_HOME` pour votre poste. Chaque tentative écrit
 
 ## État du projet et prochaines étapes
 
-La prérelease distribue une APK Debug de **413,9 Mo**, une archive de qualification, le runtime Flex, un candidat ARM64 optimisé **non signé de 100,2 Mo** et leurs reçus. GHCR conserve le package d’artefacts en accès privé ; les fichiers de release GitHub sont publics.
+La prérelease rc5 distribuée contient une APK Debug de **413,9 Mo**, une archive de qualification, le runtime Flex, un candidat ARM64 optimisé **non signé de 100,2 Mo** et leurs reçus. Le correctif HF et le candidat signé de la campagne P1 sont postérieurs : les anciens fichiers publiés n’ont pas été remplacés. GHCR conserve le package d’artefacts en accès privé ; les fichiers de release GitHub sont publics.
 
-La [feuille de route](docs/ROADMAP.md) priorise la qualification des données et des appareils, les conversions et leur qualité, puis la signature durable et les notices transitives. L’agent HTTP local, SAM et Florence-2 ont encore des intégrations à qualifier.
+La [feuille de route](docs/ROADMAP.md) garde la qualification des conversions et leur qualité, les essais prolongés et les notices transitives. La signature durable est fixée ; sa copie hors machine reste à prévoir. L’agent HTTP local, SAM et Florence-2 ont encore des intégrations à qualifier.
 
 ## Droits et protection des données
 
-Le code est sous [Apache-2.0](LICENSE). Les modèles, corpus et composants tiers gardent leurs propres conditions et [attributions](NOTICE). Les 111 dépendances runtime sont inventoriées dans [third_party](third_party/README.md) ; la revue des notices natives transitives reste ouverte.
+Le code est sous [Apache-2.0](LICENSE). Les modèles, corpus et composants tiers gardent leurs propres conditions et [attributions](NOTICE). Les 110 dépendances runtime sont inventoriées dans [third_party](third_party/README.md) ; la revue des notices natives transitives reste ouverte.
 
 Les corrections humaines, reçus d’export et modèles originaux doivent être conservés. Aucun token, keystore, poids ou corpus utilisateur n’a sa place dans Git. [Contrôles de publication](docs/PUBLICATION_CHECKS.md) · [Limites connues](KNOWN_LIMITATIONS.md).
 

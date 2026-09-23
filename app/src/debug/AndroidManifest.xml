@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <application>
+        <activity android:name=".qa.QaPresenceActivity" android:exported="true" android:permission="android.permission.DUMP"
+            android:taskAffinity="com.unicornwhodev.visiondatasetstudio.qa" android:excludeFromRecents="true" />
+        <service android:name=".qa.QaKeepAliveService" android:exported="true" android:permission="android.permission.DUMP" android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Explicit ADB instrumentation on a dedicated QA installation" />
+        </service>
+        <!-- Instrumentation-only entry point; absent from release APKs and not exported. -->
+        <activity android:name=".qa.QaDocumentActivity" android:exported="false" />
+    </application>
+</manifest>

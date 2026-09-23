@@ -83,4 +83,26 @@ class HfTransferV4Test {
         var refused=false;try{api.requirePathsAbsent("user/test","a".repeat(40),listOf("data.bin"))}catch(_:IllegalStateException){refused=true}
         assertTrue(refused)
     }
+
+    private fun lfsAcknowledgement(body: String, status: Int)=exercise { server,api ->
+        val file=File(temp.root,"synthetic.png").apply{writeText("synthetic fixture bytes")}
+        val hash=HashUtils.computeSha256(file);val parent="a".repeat(40);val commit="b".repeat(40)
+        server.enqueue(MockResponse().setBody("""{"files":[{"path":"synthetic.png","uploadMode":"lfs"}]}"""))
+        server.enqueue(MockResponse().setBody("""{"objects":[{"oid":"$hash","actions":{"upload":{"href":"https://storage.googleapis.com/fixture-put"},"verify":{"href":"https://huggingface.co/fixture-verify"}}}]}"""))
+        server.enqueue(MockResponse().setResponseCode(200))
+        server.enqueue(MockResponse().setResponseCode(status).addHeader("Content-Type","text/plain").setBody(body))
+        if(status==200) server.enqueue(MockResponse().setBody("""{"commitOid":"$commit"}"""))
+        val result=api.uploadBatchFiles("user/test",commitMessage="fixture",files=listOf("synthetic.png" to file),expectedParentCommit=parent)
+        assertEquals(status==200,result.success)
+        assertEquals(if(status==200) commit else null,result.commitSha)
+        assertEquals(if(status==200) 5 else 4,server.requestCount)
+        server.takeRequest();server.takeRequest()
+        val upload=server.takeRequest();assertEquals("PUT",upload.method);assertNull(upload.getHeader("Authorization"))
+        val verify=server.takeRequest();assertEquals("POST",verify.method)
+        assertEquals("application/vnd.git-lfs+json; charset=utf-8",verify.getHeader("Content-Type"))
+        assertTrue(file.isFile)
+    }
+    @Test fun realHubPlainTextLfsAcknowledgementAllowsCommit()=lfsAcknowledgement("OK",200)
+    @Test fun emptyLfsAcknowledgementAllowsCommit()=lfsAcknowledgement("",200)
+    @Test fun failedLfsAcknowledgementForbidsCommit()=lfsAcknowledgement("Denied",403)
 }

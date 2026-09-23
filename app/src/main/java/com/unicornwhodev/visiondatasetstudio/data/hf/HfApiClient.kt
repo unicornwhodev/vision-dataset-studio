@@ -394,10 +394,13 @@ class HfApiClient(
     private fun json(value: Any): String = moshi.adapter(Any::class.java).toJson(value)
     @Suppress("UNCHECKED_CAST")
     private fun parseObject(value: String) = moshi.adapter(Map::class.java).fromJson(value) as? Map<String, Any?> ?: error(tr("JSON distant invalide", "Invalid remote JSON"))
-    private fun postJson(url: String, payload: Any, mediaType: String = "application/json", headers: Map<String, String> = emptyMap()): Map<String, Any?> {
+    private fun postJson(url: String, payload: Any, mediaType: String = "application/json", headers: Map<String, String> = emptyMap(), responseObject: Boolean = true): Map<String, Any?> {
         client.newCall(newRequestBuilder(url).apply { headers.forEach { (k,v) -> header(k,v) } }.header("Accept", mediaType).post(json(payload).toRequestBody(mediaType.toMediaType())).build()).execute().use { r ->
             check(r.isSuccessful) { tr("Transfert refusé (HTTP ${r.code}).", "Transfer refused (HTTP ${r.code}).") }
-            return parseObject(r.body?.let(::boundedJson)?.ifBlank { "{}" } ?: "{}")
+            val body = r.body?.let(::boundedJson) ?: ""
+            // LFS completion/verification acknowledges success through HTTP status.
+            // The real Hub returns text/plain "OK" for verification, not a JSON object.
+            return if (responseObject) parseObject(body.ifBlank { "{}" }) else emptyMap()
         }
     }
     private fun uploadLfs(repo: String, file: File, hash: String, branch: String) {
@@ -423,10 +426,11 @@ class HfApiClient(
                 check(!etag.isNullOrBlank()) { tr("ETag multipart absent", "Multipart ETag missing") }
                 mapOf("partNumber" to number, "etag" to etag)
             }
-            postJson(href, mapOf("oid" to hash, "parts" to parts), "application/vnd.git-lfs+json")
+            postJson(href, mapOf("oid" to hash, "parts" to parts), "application/vnd.git-lfs+json", responseObject = false)
         }
         (actions["verify"] as? Map<*, *>)?.let { verify ->
-            postJson(verify["href"] as String, mapOf("oid" to hash, "size" to file.length()), headers = safeActionHeaders(verify["header"] as? Map<*, *> ?: emptyMap<Any, Any>()))
+            postJson(verify["href"] as String, mapOf("oid" to hash, "size" to file.length()), "application/vnd.git-lfs+json",
+                headers = safeActionHeaders(verify["header"] as? Map<*, *> ?: emptyMap<Any, Any>()), responseObject = false)
         }
     }
     private fun safeActionHeaders(headers: Map<*, *>): Map<String, String> = headers.entries.mapNotNull { (k,v) ->

@@ -1,0 +1,459 @@
+{
+  "schema": 1,
+  "date": "2026-09-23",
+  "scope": "Post-rc5 local qualification; published rc5 assets unchanged",
+  "production_qualified": false,
+  "compiled_source_base_commit": "4f2061f4059cc089c8074ebc027a7105bdded7e0",
+  "source_manifest": {
+    "local_evidence": "dist/android/runs/20260923T134440Z-f7af2e8b429e/source-manifest.json",
+    "sha256": "0a234c7b4d80ad1038ede841be1180d121186f94c7a80360b1b9b0907c6ba070"
+  },
+  "source_file_hashes_sha256": "b09debd6d1b3443fb40b52bb26db425f17036b2f5d7c57ad37d61f89f0ee2200",
+  "build": {
+    "run_id": "20260923T134440Z-f7af2e8b429e",
+    "outcome": "build_checks_passed",
+    "jvm": {
+      "tests": 70,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "python": {
+      "tests": 75,
+      "failures": 0,
+      "errors": 0,
+      "evidence": {
+        "local_evidence": "test-results/p1-qualification-20260923/python-final.log",
+        "sha256": "5e7eb2b2b8fef1f66501c514504d40a7afceaa59eae76e37189abf26725db7c0"
+      }
+    },
+    "ksp_generated_files": 99,
+    "lint": {
+      "Error": 0,
+      "Warning": 90
+    },
+    "artifacts": {
+      "app": {
+        "file": "vision-dataset-studio-uwd-debug.apk",
+        "sha256": "ee30cf637950cf1490fd31f19e86bf0b9e07197ff859ecce9fd32d7a0bed238e",
+        "bytes": 414148347
+      },
+      "tests": {
+        "file": "vision-dataset-studio-uwd-test.apk",
+        "sha256": "1398173565add4635a1301f019132b0a96ae54205a856caf241130696519a8ee",
+        "bytes": 3122926
+      }
+    },
+    "evidence": {
+      "local_evidence": "dist/android/runs/20260923T134440Z-f7af2e8b429e/status.json",
+      "sha256": "9c896f2077151071548a19eb8253c6dd835ad019def7afcc721bc650c1fc41bc"
+    }
+  },
+  "release": {
+    "artifact": {
+      "file": "vision-dataset-studio.apk",
+      "sha256": "b30a60fbca96d40a90fa4c8ee23d38782fc0e51735458202051a98b7f6a71e94",
+      "bytes": 100219514
+    },
+    "certificate_sha256": "51ef3e4abf953c62c8427deaecf4349aefffc2270c593229315722457f126895",
+    "signing_evidence": {
+      "local_evidence": "dist/distribution/runs/20260923T134640Z-ced4d5d73b8a/signing-8ee1efce5017/status.json",
+      "sha256": "a1735f2081b4323ba74a132195e287bb2b1fbba07c24405d29700bb97fed530f"
+    },
+    "signed_with_verified_backup": true,
+    "version_name": "4.2.0-rc5",
+    "version_code": 10,
+    "published_as_new_release": false,
+    "actual_release_startup_on_honor": true,
+    "cold_start_single_observation_ms": 248,
+    "human_data_continuity_fixture_count": 2,
+    "full_release_suite_executed": false,
+    "startup_evidence": {
+      "local_evidence": "test-results/p1-qualification-20260923/honor-release-startup/status.json",
+      "sha256": "4b7c56d46e0a2a3dfce7332433c9706e7924b959b3ff801ee03c91da43564742"
+    },
+    "continuity_evidence": {
+      "local_evidence": "test-results/p1-qualification-20260923/honor-release-continuity/status.json",
+      "sha256": "ebe137569c7dc2f764210272daeb945ab839dd460c97201c798c2012df7ccac0"
+    }
+  },
+  "signing": {
+    "durable_identity_pinned": true,
+    "backup_bytes_and_recovery_credential_verified": true,
+    "backup_used_to_sign_real_apk": true,
+    "separate_physical_disks_same_pc": true,
+    "off_machine_backup_verified": false,
+    "can_update_historical_rc4_or_rc5_debug": false
+  },
+  "devices": {
+    "honor_arm64_4k": {
+      "core_variant": "Debug",
+      "api": "36",
+      "abi": "arm64-v8a",
+      "page_size": 4096,
+      "instrumentation": {
+        "declared": 39,
+        "passed": 39,
+        "skipped": 0,
+        "failed": 0,
+        "aborted": false,
+        "complete": true
+      },
+      "runner_outcome": "failed",
+      "evidence": {
+        "local_evidence": "test-results/p1-qualification-20260923/honor-core-visible/status.json",
+        "sha256": "45a1ee8c470f538dd05a0381f7d2dea4933f193368998dc27e665f6d1d8a7139"
+      },
+      "app_sha256_before_optional_resigning": "ee30cf637950cf1490fd31f19e86bf0b9e07197ff859ecce9fd32d7a0bed238e",
+      "synthetic_training": {
+        "source_model_preserved": true,
+        "original_sha256_before": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+        "original_sha256_after": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+        "first_final_weights": "04ed0c88a140209a85121350bfd144f83e112ea319cd1ada038e037dbadd2d42",
+        "second_initial_weights": "04ed0c88a140209a85121350bfd144f83e112ea319cd1ada038e037dbadd2d42",
+        "second_final_weights": "462c14f3c6918b133220185c8aab0af60bb402956dd22f21e2c5fc69941df960",
+        "steps_before_cancel": 27,
+        "steps_after_resume": 213,
+        "continued_without_activation": true,
+        "missing_checkpoint_refused": true
+      },
+      "visible_debug_qa_activity": true,
+      "test_process_freezing_prevented": true,
+      "background_execution_qualified": false,
+      "post_suite_startup_detector_failed": true,
+      "separate_startup_retry_evidence": {
+        "local_evidence": "test-results/p1-qualification-20260923/honor-startup-retry/status.json",
+        "sha256": "01bb40a73f362f666591d3992a97ed217f573fecf6562b5a9d5ec2919c12800c"
+      }
+    },
+    "emulator_x86_64_16k": {
+      "core_variant": "Debug",
+      "api": "35",
+      "abi": "x86_64",
+      "page_size": 16384,
+      "instrumentation": {
+        "declared": 39,
+        "passed": 39,
+        "skipped": 0,
+        "failed": 0,
+        "aborted": false,
+        "complete": true
+      },
+      "runner_outcome": "core_suite_passed",
+      "evidence": {
+        "local_evidence": "test-results/p1-qualification-20260923/emulator-16k-final/status.json",
+        "sha256": "d941aa8f10754c8b9abdc82aa64bf2c2d9e350f68abca57c637d3c06174239f7"
+      },
+      "app_sha256_before_optional_resigning": "152125fa8fb02572aa299ef712921556d9b4c744936f0b8e95bf14aa917826ee",
+      "synthetic_training": {
+        "source_model_preserved": true,
+        "original_sha256_before": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+        "original_sha256_after": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+        "first_final_weights": "28cb72074ba3d20255ae573e7655fca417946418ae0a74709620a1699e23969a",
+        "second_initial_weights": "28cb72074ba3d20255ae573e7655fca417946418ae0a74709620a1699e23969a",
+        "second_final_weights": "d6e251202182ecbe9ca7cea49edc32d81f02f8ebee202542f1091b79a407e86b",
+        "steps_before_cancel": 34,
+        "steps_after_resume": 213,
+        "continued_without_activation": true,
+        "missing_checkpoint_refused": true
+      },
+      "physical_arm_qualified": false
+    }
+  },
+  "real_faults": {
+    "enospc": {
+      "outcome": "passed",
+      "dedicated_emulator": true,
+      "cleanup_errors": [],
+      "phase_results": {
+        "realEnospcPreservesPreviousAtomicExport": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": false,
+          "complete": true
+        }
+      },
+      "evidence": {
+        "local_evidence": "test-results/real-fault-enospc-688b4a1b11b7/status.json",
+        "sha256": "a4d69a5650b860899733ed840d444bb403850f105e668b463b77908e2982fabf"
+      }
+    },
+    "download": {
+      "outcome": "passed",
+      "dedicated_emulator": true,
+      "cleanup_errors": [],
+      "phase_results": {
+        "downloadDuringRealPacketDropPreservesOriginalAndCheckpoint": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": false,
+          "complete": true
+        },
+        "resumeAfterNetworkRecoveryMatchesPublishedSha256": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": false,
+          "complete": true
+        }
+      },
+      "evidence": {
+        "local_evidence": "test-results/real-fault-download-f9922318ea7d/status.json",
+        "sha256": "f6e56eb960f80afa8d44da9af55f3eba1c64344fde3ecc4a12e6e68a02f5dba1"
+      }
+    },
+    "hf-live": {
+      "outcome": "passed",
+      "dedicated_emulator": true,
+      "cleanup_errors": [],
+      "phase_results": {
+        "privateQaPublicationConcurrentReservationsAndReadback": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": false,
+          "complete": true
+        }
+      },
+      "evidence": {
+        "local_evidence": "test-results/real-fault-hf-live-74faeeba57b5/status.json",
+        "sha256": "38c89ad03e7d585777a2d6599206c34c5dfca0348848779774fdb8602778f4ba"
+      }
+    },
+    "hf-lost-response": {
+      "outcome": "passed",
+      "dedicated_emulator": true,
+      "cleanup_errors": [],
+      "phase_results": {
+        "prepareAndPublishAwaitingRealProcessKill": {
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": true,
+          "complete": false
+        },
+        "reconcileLostResponseWithoutDuplicateCommit": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": false,
+          "complete": true
+        }
+      },
+      "evidence": {
+        "local_evidence": "test-results/real-fault-hf-lost-response-2df48269024b/status.json",
+        "sha256": "e449f0780639b45e435b037723e2b9bd5d0c1397ed5c23eff7069700c583331b"
+      }
+    },
+    "hf-conflict": {
+      "outcome": "passed",
+      "dedicated_emulator": true,
+      "cleanup_errors": [],
+      "phase_results": {
+        "staleParentIsRejectedByRealHub": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": false,
+          "complete": true
+        }
+      },
+      "evidence": {
+        "local_evidence": "test-results/real-fault-hf-conflict-2df48269024b/status.json",
+        "sha256": "4c37c232fd70d764f5ca3747b940c18586038d844b0a63e42d1a37bc3782316d"
+      }
+    },
+    "purge": {
+      "outcome": "passed",
+      "dedicated_emulator": true,
+      "cleanup_errors": [],
+      "phase_results": {
+        "prepareAndPurgeUntilHostKillsStoppedProcess": {
+          "passed": 0,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": true,
+          "complete": false
+        },
+        "resumePurgeRetainsHumanAnnotationsAndBackupReceipt": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "aborted": false,
+          "complete": true
+        }
+      },
+      "evidence": {
+        "local_evidence": "test-results/real-fault-purge-79e52c4f6a74/status.json",
+        "sha256": "db855711b2cc827f0e5cacc77ac1a34e307444c4f544af70a3af26a81553133e"
+      }
+    },
+    "saf_revoked": {
+      "outcome": "passed",
+      "real_documentsui": true,
+      "purge_refused": true,
+      "human_annotation_image_original_and_archive_retained": true,
+      "phases": [
+        {
+          "passed": 1,
+          "evidence": {
+            "local_evidence": "test-results/real-saf-ace1ef65c3b9/prepare.txt",
+            "sha256": "f711fbed5d6d8e8335a6b85efab2fc258151b86394100ecc82bfb6048d8f63e6"
+          }
+        },
+        {
+          "passed": 1,
+          "evidence": {
+            "local_evidence": "test-results/real-saf-ace1ef65c3b9/copy-revoke.txt",
+            "sha256": "c96efcc2af6fd98535ec84eb735acb387ee075a27d46863800284f8912b4729c"
+          }
+        },
+        {
+          "passed": 1,
+          "evidence": {
+            "local_evidence": "test-results/real-saf-ace1ef65c3b9/refused.txt",
+            "sha256": "a6e70721426174624b25121b2bd49824a87fb993f35c8c498d3d1a32acd7760f"
+          }
+        }
+      ],
+      "dedicated_emulator": true
+    },
+    "saf_volume_unmounted": {
+      "outcome": "passed",
+      "real_documentsui": true,
+      "purge_refused": true,
+      "human_annotation_image_original_and_archive_retained": true,
+      "phases": [
+        {
+          "passed": 1,
+          "evidence": {
+            "local_evidence": "test-results/real-saf-83cb9b82a1ad/prepare.txt",
+            "sha256": "bbfda2f63670bb78f31e3810ca35dbba91dd4d6ab8dbde39f9300dfb73060818"
+          }
+        },
+        {
+          "passed": 1,
+          "evidence": {
+            "local_evidence": "test-results/real-saf-83cb9b82a1ad/copy.txt",
+            "sha256": "c26641d4d0aa94f2caa1754577fa31a3f0f1189a46d7fba6831b5e3cefdf9b1f"
+          }
+        },
+        {
+          "passed": 1,
+          "evidence": {
+            "local_evidence": "test-results/real-saf-83cb9b82a1ad/refused.txt",
+            "sha256": "cfe54a7eb2510bf893af4119c11ca3389a0b50a5c7cd484a4d22f769ee08acc3"
+          }
+        }
+      ],
+      "dedicated_emulator": true
+    }
+  },
+  "restoration": [
+    {
+      "device": "Honor",
+      "schema_transition": "4 -> 4",
+      "backup_readback_verified": true,
+      "restored_copy_opened_by_room": true,
+      "restored_image_sha256_verified": true,
+      "same_signer_package_replacement_passed": true,
+      "historical_user_database_tested": false,
+      "android_system_restore_tested": false,
+      "evidence": {
+        "local_evidence": "test-results/data-preservation-29e167418aa4/status.json",
+        "sha256": "57a24474d1cbc494dbfcf2c2b4470786cb45456e218a14c8a20c4b03330789d5"
+      }
+    },
+    {
+      "device": "16 KB emulator",
+      "schema_transition": "4 -> 4",
+      "backup_readback_verified": true,
+      "restored_copy_opened_by_room": true,
+      "restored_image_sha256_verified": true,
+      "same_signer_package_replacement_passed": true,
+      "historical_user_database_tested": false,
+      "android_system_restore_tested": false,
+      "evidence": {
+        "local_evidence": "test-results/data-preservation-de4314281d02/status.json",
+        "sha256": "cefde43258e40f247a05480bf8d7cb04d587281498b70aaba275d07ae378b992"
+      }
+    }
+  ],
+  "native_16k": {
+    "strict_audit_relaxed": false,
+    "binary_headers_modified": false,
+    "runtime_emulator_core_passed": true,
+    "physical_arm_16k_tested": false,
+    "artifacts": {
+      "release": {
+        "apk_sha256": "b30a60fbca96d40a90fa4c8ee23d38782fc0e51735458202051a98b7f6a71e94",
+        "strictly_compatible": false,
+        "findings": [
+          "lib/arm64-v8a/libandroidx.graphics.path.so",
+          "lib/arm64-v8a/libtensorflowlite_jni.so"
+        ],
+        "rounded_relro_overlaps_writable_bytes_outside_relro": false,
+        "audit": {
+          "local_evidence": "test-results/p1-qualification-20260923/final-release-native-strict.json",
+          "sha256": "b4aa5d137581d18f88300ca2f224207b22a50c3c4db2b16ccfe30ddaeefbd4a9"
+        },
+        "explanation": {
+          "local_evidence": "test-results/p1-qualification-20260923/final-release-native-explanation.json",
+          "sha256": "271aba79fa85a331e183d8fcc19084b0cbc777d4485796f1802bc2c35d71367a"
+        }
+      },
+      "debug": {
+        "apk_sha256": "ee30cf637950cf1490fd31f19e86bf0b9e07197ff859ecce9fd32d7a0bed238e",
+        "strictly_compatible": false,
+        "findings": [
+          "lib/arm64-v8a/libandroidx.graphics.path.so",
+          "lib/arm64-v8a/libtensorflowlite_jni.so",
+          "lib/x86_64/libandroidx.graphics.path.so",
+          "lib/x86_64/libtensorflowlite_jni.so"
+        ],
+        "rounded_relro_overlaps_writable_bytes_outside_relro": false,
+        "audit": {
+          "local_evidence": "test-results/p1-qualification-20260923/final-debug-native-strict.json",
+          "sha256": "bf509850d972092f7bc57e32d3ff2de9f3bd8cab76bb7aca1b2930872e43a451"
+        },
+        "explanation": {
+          "local_evidence": "test-results/p1-qualification-20260923/final-debug-native-explanation.json",
+          "sha256": "0eee39f751d351d8733746b7f0101bdf5133bf9d933ee14aba7b93de9c618a80"
+        }
+      }
+    }
+  },
+  "boundaries": [
+    "No private dataset name, device connection identifier, token, key or raw app backup is included in this public receipt.",
+    "Raw local attempts are retained, including intentional process kills and failed earlier attempts.",
+    "Historical Room migrations use reconstructed fixtures; independent data quality, prolonged background/thermal operation, physical ARM 16 KB and remote CI remain open.",
+    "Release continuity uses a separately compiled platform-only instrumentation probe; the Debug AndroidX runner failed to initialize against minified Release."
+  ],
+  "secret_review": {
+    "tool": "Gitleaks",
+    "redacted": true,
+    "scope": "All tracked and new non-ignored source files, plus all 26 existing Git commits",
+    "results": {
+      "worktree": {
+        "findings": 34,
+        "classified_public_metadata": {
+          "public_key_fingerprint": 18,
+          "source_file_sha256": 16
+        },
+        "unclassified_findings": 0,
+        "confirmed_secrets": 0
+      },
+      "history": {
+        "findings": 34,
+        "classified_public_metadata": {
+          "public_key_fingerprint": 18,
+          "source_file_sha256": 16
+        },
+        "unclassified_findings": 0,
+        "confirmed_secrets": 0
+      }
+    }
+  }
+}

@@ -6,6 +6,11 @@ Des contrôles ont maintenant été exécutés sur le pod : consulter
 pour leurs résultats et limites. Utiliser une copie des données et un appareil dédié.
 Aucun push HF n’est lancé automatiquement par cette recette.
 
+État après rc5 : [campagne P1 du 23 septembre](P1_QUALIFICATION_2026_09.md),
+avec pannes réellement injectées, Honor ARM64, copie restaurée et signature
+durable. Le rapport distingue la suite Debug, les contrôles de la vraie Release
+et les scénarios encore ouverts. Les commandes d’écriture HF restent opt-in.
+
 ## P0 : assembler, résoudre et installer
 
 JDK 17+, Gradle 9.3.1, SDK/API et bibliothèques déclarés dans le projet. Exécuter `bash tools/build_android.sh`, ou le workflow manuel sur un dépôt que le propriétaire choisit. Corriger les erreurs réelles sans supprimer des tests, rétrograder silencieusement les formats ou ajouter un fallback destructif.

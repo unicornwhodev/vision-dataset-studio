@@ -1,6 +1,6 @@
 """A zero adb exit code or JUnit OK with skipped tests is not qualification."""
 import unittest
-from run_device_qualification import parse_instrumentation
+from run_device_qualification import APP_ID, home_ui_visible, parse_instrumentation
 
 
 def result(codes, summary='OK (2 tests)'):
@@ -10,6 +10,14 @@ def result(codes, summary='OK (2 tests)'):
 
 
 class DeviceReceiptTests(unittest.TestCase):
+    def test_compact_french_home_does_not_require_studio_label(self):
+        self.assertTrue(home_ui_visible(f'<hierarchy><node package="{APP_ID}" text="Modèle"/><node package="{APP_ID}" text="Outils"/></hierarchy>'))
+
+    def test_system_overlay_never_counts_as_app_startup(self):
+        self.assertFalse(home_ui_visible('<hierarchy><node package="com.android.systemui" text="Studio"/></hierarchy>'))
+
+    def test_debug_presence_is_not_product_startup(self):
+        self.assertFalse(home_ui_visible(f'<hierarchy><node package="{APP_ID}" text="Vision Dataset Studio Android QA in progress"/></hierarchy>'))
     def test_full_success(self):
         self.assertTrue(parse_instrumentation(result([0, 0]))['complete'])
 

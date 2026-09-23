@@ -1,5 +1,13 @@
 # Windows rc5 qualification — 23 September 2026
 
+**Post-rc5 update:** 70 JVM and 75 Python tests, Debug 39/39 on physical Honor
+ARM64/4 KB and 39/39 on the 16 KB emulator. Real storage/SAF/HF/purge fault tests,
+backup/restored copy and signed Release data continuity passed. Honor requires
+visible instrumentation; the later startup-detector failure and separate UI
+retry remain recorded. [P1 report (FR)](../P1_QUALIFICATION_2026_09.md) ·
+[Public receipt](../P1_QUALIFICATION_RECEIPT.json). The records below describe
+the unchanged published rc5 and older builds.
+
 [Documentation](../README.md) · [Français](../../TEST_REPORT.md)
 
 Build `20260923T104142Z-befce3e3596a`: **67 JVM**, **70 Python** (63 at build time plus 7 packaging guards), **39/39 Android core tests on API 35 with 4 KB pages and 39/39 with 16 KB pages**, no skips. Generated KSP: 99 files. Lint: 0 errors, 88 warnings.

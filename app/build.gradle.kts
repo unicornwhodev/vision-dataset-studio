@@ -17,7 +17,9 @@ android {
     versionCode = 10
     versionName = "4.2.0-rc5"
 
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner = providers.gradleProperty("vdsInstrumentationRunner").orElse("androidx.test.runner.AndroidJUnitRunner").get().also {
+      require(it in setOf("androidx.test.runner.AndroidJUnitRunner", "com.unicornwhodev.visiondatasetstudio.ReleaseContinuityInstrumentation"))
+    }
   }
 
   // Debug uses Android's standard locally generated debug key. No private keystore is shipped.

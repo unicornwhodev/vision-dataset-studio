@@ -1,5 +1,9 @@
 # TensorFlow Flex et pages Android de 16 Ko
 
+Après la publication rc5, la [campagne P1](P1_QUALIFICATION_2026_09.md#les-signalements-natifs)
+a corrigé le signalement DataStore et documenté les deux bibliothèques restantes.
+Le contrôle strict de l’APK reste inchangé ; la recette 16 Ko demeure sur émulateur.
+
 Le binaire Maven d'origine `tensorflow-lite-select-tf-ops:2.16.1` est compilé avec des segments
 de 4 Ko. Son chargement plantait sur l'émulateur API 35 / 16 Ko pendant
 `OnDeviceTrainingTest.internalVisualWeightsTrainPersistAndReloadOnAndroid`.
