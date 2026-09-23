@@ -1,5 +1,9 @@
 # Original conservé et entraînement continu
 
+[Documentation](README.md) · [English](en/MODEL_LINEAGE.md)
+
+![Original et générations entraînées](visuals/current/model-lineage.svg)
+
 Pour chaque projet et modèle de départ, l’application conserve deux versions
 logiques : **l’original** et **la version entraînée**.
 
@@ -41,4 +45,4 @@ Les deux lots successifs reprennent les mêmes poids : fin du premier = début d
 deuxième (`28cb72074ba3d20255ae573e7655fca417946418ae0a74709620a1699e23969a`).
 L’original conserve son SHA-256 et son profil importé. Les fichiers et reçus sont
 aussi identiques après arrêt/redémarrage réel du processus. Les preuves sont dans
-`test-results/model-lineage-20260923/final-api35-16k/` et `final-api35-4k/`.
+[la suite 16 Ko](../test-results/windows-rc5-release/api35-16k/status.json) et [la suite 4 Ko](../test-results/windows-rc5-release/api35-4k/status.json).

@@ -1,5 +1,9 @@
 # Qualification LiteRT — audit du 22 septembre 2026
 
+![Public model coverage / Couverture publique](visuals/current/qualification-20260922.png)
+
+**Charlbi public catalogue / Catalogue public : 13/25 PASS, 1 TIMEOUT, 11 not run / non exécutées ; 8 variantes entraînables réussies.** The overall 31-conversion campaign below includes six additional authorized variants. / La campagne globale ci-dessous compte six variantes autorisées supplémentaires. These are 22 September model results, not a rerun on the rc5 Flex runtime. / Ces résultats de modèles du 22 septembre ne constituent pas un nouveau test du runtime Flex rc5.
+
 **13 conversions réussies**, dont **8 avec apprentissage Android**, sur 31 conversions téléchargées. Trois conversions ont atteint la limite de temps de l’émulateur logiciel (RF-DETR et deux de la source privée) : ces essais ne permettent pas de conclure sur leur compatibilité. Les 15 autres conversions restent à exécuter. Le défaut RTMDet de rc3 est corrigé et son inférence passe. Aucun identifiant ni poids privé n’est publié.
 
 | Conversion | Inference | Train / save / restore / resume | Output delta | Restore delta | Build |

@@ -1,119 +1,99 @@
 ![Vision Dataset Studio — Unicorn Who Dev](docs/visuals/banner.png)
 
-# Vision Dataset Studio — Unicorn Who Dev
+# Vision Dataset Studio
+
+**From images to datasets, with AI proposals and human decisions.**
+
+An Android workspace for importing images, reviewing model proposals in batches and producing verified dataset exports. Optional local learning keeps the original model available while a separate learned version continues across approved batches.
 
 [Français](README.md) · **English**
 
-An Android workspace for producing image datasets in batches: model proposals, human correction and export. A compact dark interface keeps the image at the centre of the work.
+[Get started](docs/en/GETTING_STARTED.md) · [Download rc5](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5) · [Documentation](docs/README.md) · [LiteRT models](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder)
 
-**4.2.0-rc5 · Apache-2.0 · Under qualification**
-Android application ID: `com.unicornwhodev.visiondatasetstudio`
+| Version | Platform | Code licence | Status |
+|---|---|---|---|
+| **4.2.0-rc5** | Android 9+ · API 28+ | [Apache-2.0](LICENSE) | Qualification prerelease |
 
-**Installing rc5:** Debug prerelease with a different signing certificate from rc4.
-It cannot update an existing rc4 installation. Preserve its data and signing key;
-see the [release and package notes](docs/RELEASE_PLAN.md).
+> **Installation:** rc5 has a different certificate and cannot update rc4. Preserve existing installations containing data. The 100.2 MB ARM64 candidate is **unsigned**. [Choose an artifact](docs/en/GETTING_STARTED.md#install-the-prerelease).
 
-**23 September 2026:** real Windows build, **67 JVM tests, 70 Python tests (63 at build time plus 7 packaging checks), 39/39 Android core tests on both 4 KB and 16 KB emulators**, no skips. The Flex crash is fixed. The original model is preserved and later training continues the learned version. ARM64 candidate: **100.2 MB**, unsigned. Three other native libraries retain strict RELRO findings; whole-app 16 KB and physical ARM qualification remain open. [Evidence and limits](docs/WINDOWS_QUALIFICATION_2026_09.md).
+## The complete batch workflow
 
-## Application screenshots
+**Import → propose → review → export and verify → optionally learn → confirm cleanup.**
 
-| Historical rc3 workspace | Annotation editor |
+| Workspace | Your controls |
 |---|---|
-| [![rc3 workspace](test-results/litert-rc3/final-device/app-ready.png)](test-results/litert-rc3/final-device/app-ready.png) | [![Annotation editor](docs/ui-refined/refined-editor-persisted.png)](docs/ui-refined/refined-editor-persisted.png) |
+| **Sources and batches** | Local or HF source, batch size, resume and persistent image identity |
+| **Preannotation** | Explicit model/settings selection; existing annotations change only through an explicit rerun |
+| **Human review** | Boxes, points, masks, acceptance/rejection and protected saved corrections |
+| **Exports** | Canonical JSONL plus task-specific COCO, YOLO, WebDataset and vision-language projections |
+| **Android learning** | Reviewed exported batch, checkpoints, interruption/resume and explicit weight activation |
+| **Cleanup** | Confirmation and verified readback; receipts and exact-duplicate history survive cleanup |
 
-Real Android emulator captures. Left: final rc3 build after startup. Right: editor QA from 19 September, with a synthetic image and a persisted annotation; historical capture, not a new rc3 test. [Image provenance and full-size gallery](docs/VISUALS.md). The banner is a generated illustration.
+Manual annotation works without a model. **The APK contains no model weights**: import or download them separately. Learning is off by default.
 
-## Main workflow
+## See the application
 
-**Import → preannotate → correct/review → export and verify → optional learning → clean up → next batch.**
-
-Learning is **off by default**. When enabled, it uses only the corrected, exported batch, and cleanup waits until learning finishes. New weights require manual activation. Manual annotation and export work without a model. A model without training signatures remains importable and usable for inference, with no SHA manifest required.
-
-Changing a prompt or setting never changes saved annotations. Reprocessing requires an explicit user action; human corrections remain protected.
-
-Persistent file and decoded-pixel fingerprints prevent identical copies from entering later batches of the same project. The ledger survives cache cleanup. Edited near-duplicates and lossy recompressions are outside this exact-identity guarantee.
-
-**The APK contains no model weights.** It includes the runtime and integration tools; models are downloaded or imported after installation. Learning runs on Android. The pod is used for development and QA.
-
-![Batch lifecycle](docs/visuals/batch-flow.en.svg)
-
-## System architecture
-
-![Application architecture](docs/visuals/architecture.en.svg)
-
-All production state, inference and optional learning live on Android. The optional local planner proposes a workflow; it cannot approve annotations, publish, clean up or activate weights. [Architecture, data boundaries and source map](docs/en/ARCHITECTURE.md).
-
-## Features and status
-
-The functional audit adds applied model settings, visible workflow instructions, English application flows and preservation of existing annotations. See the [functional report](docs/en/FUNCTIONAL_AUDIT_2026_09.md).
-
-| Feature | Status |
+| rc5 studio · 23 September qualification | Editor · historical 19 September qualification |
 |---|---|
-| Local / HF import, configurable batches, correction and export | Implemented; local 2+1 cycle verified on Android |
-| Persistent identity, resume and protected cleanup | Android tests passed, including renamed copies and concurrent claims |
-| Android learning, checkpoints, cancel/resume | Eight HF conversions passed train/save/restore/resume; their encoders remain frozen |
-| HF download, LiteRT contracts and preprocessing | Configurable catalogue, optional SHA manifests, tensor-checked contracts; see the execution matrix |
-| Tokenizers and persistent similarity index | Android tests passed |
-| TinyCLIP / SAM / Florence-2 bundles | TinyCLIP executed with visible proposals; SAM and Florence remain to be qualified |
-| Mask editor/export | Brush, eraser, separate instances, canonical and COCO export; gesture test passed |
-| Inference-only RTMDet | Inference and dynamic outputs verified after fixing the decoder |
-| Executable workflows | Three templates, journal/resume, review/export/cleanup gates; guard tests passed |
-| Agent | Optional local HTTP planner; separate user-provided server, real integration pending |
+| <img src="test-results/windows-rc5-release/api35-16k/start.png" alt="Actual rc5 studio home on an Android emulator" width="205"> | <img src="docs/ui-refined/refined-editor-persisted.png" alt="Actual editor showing an annotation over a synthetic QA image" width="560"> |
 
-See [executed validation](docs/en/VALIDATION.md) and [the roadmap](docs/en/ROADMAP.md). This repository shares source code under qualification; the product is not yet complete or ready for a stable release.
+Unmodified emulator screenshots. The banner is a generated illustration. [Gallery and provenance](docs/VISUALS.md).
 
-## Using the workspace
+## Preserve the original, continue the learned version
 
-1. Create a project and choose its tasks, labels, source and batch size.
-2. Import a local folder/manifest or configure HF, then index the source.
-3. Download/import a model when preannotation is wanted. Check its contract and test one image.
-4. Prepare the batch, review proposals, correct annotations and accept or reject each image.
-5. Create an archive, choose its destination and verify readback, or publish and verify to an authorized HF destination.
-6. If learning is enabled, wait until it finishes. Confirm cleanup and prepare the next batch.
+![Original model preserved while a separate learned version progresses](docs/visuals/current/model-lineage.svg)
 
-Canonical annotations are retained. COCO, YOLO, WebDataset and vision-language outputs are optional projections with their own constraints; they do not replace canonical JSONL.
+The first training run creates a separate copy. Later runs restore its latest validated weights, even when the original is still selected for inference. Each attempt has its own checkpoint and receipt; activating learned weights for preannotation remains explicit.
 
-## LiteRT evidence
+The trained version consists of **both its graph and checkpoint**. Missing or changed checkpoints block continuation. Current supplied conversions train heads or output adapters with frozen visual backbones; a separate synthetic QA network demonstrates updates to internal visual layers. [Lifecycle and evidence](docs/en/MODEL_LINEAGE.md).
 
-![Public catalogue qualification](docs/visuals/benchmarks/android-coverage.png)
+## Choose your starting point
 
-This figure covers the **25 public Charlbi variants**. Four passed Android train/save/restore/resume; RepViT passed inference. The six additional authorized-source conversions are outside this public chart. [Executed results, checkpoint figures and timing limitations](docs/en/LITERT_QUALIFICATION.md) · [Full model documentation](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder). No phone speed or accuracy claim.
+| Goal | Start here |
+|---|---|
+| Produce your first dataset | [Getting started](docs/en/GETTING_STARTED.md) |
+| Choose and use a model | [Charlbi conversions](https://huggingface.co/Charlbi/Lite_rt_prepared_for_android_dataset_builder) · [LiteRT contract](docs/en/LITERT_TRAINING_CONTRACT.md) |
+| Explore fire/smoke models | [Public FireViewer catalogue](https://huggingface.co/fireviewer/litert-models) — separately qualified |
+| Build or contribute | [Developer setup](docs/en/DEVELOPMENT_RESUME.md) · [Architecture](docs/en/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md) |
+| Verify a release | [Validation](docs/en/VALIDATION.md) · [Known limits](docs/en/KNOWN_LIMITATIONS.md) · [rc5 receipt](docs/RC5_PUBLICATION_RECEIPT.json) |
 
-[Resume on your workstation](docs/en/DEVELOPMENT_RESUME.md): setup, commands, test status and remaining work.
+## Recorded validation
 
-## Build and test
+| Scope | Recorded result | Evidence boundary |
+|---|---|---|
+| rc5 Windows build | **67 JVM tests**, generated KSP, no lint errors | 88 lint warnings |
+| Python tooling | **70 passed** | 63 at build time plus 7 packaging checks |
+| API 35, 4 KB pages | **39/39**, no skips | x86_64 emulator |
+| API 35, 16 KB pages | **39/39**, no skips; Flex crash fixed | Three other libraries retain RELRO findings |
+| Training continuation | Original unchanged, two consecutive batches, interruption/resume and process-restart persistence | Synthetic data |
+| Charlbi model campaign, 22 September | **13/25 passed**, **8 with learning**; 1 timeout, 11 not run | API 28 x86_64, earlier application builds; no ARM benchmark |
 
-Validated build environment: JDK 21, Python 3.11+, Android SDK 36, build-tools 36.0.0 and Gradle 9.3.1. The Python Gradle bootstrap verifies the downloaded distribution; the original archive did not contain a wrapper JAR.
+[Windows evidence](docs/WINDOWS_QUALIFICATION_2026_09.md) · [Per-model evidence](docs/en/LITERT_QUALIFICATION.md).
 
-Before the first Android build, prepare the [16 KB Flex runtime](docs/FLEX_16K.md)
-on Linux/WSL. Its sources and tools are pinned; subsequent Windows builds reuse
-the verified local AAR. CI builds this runtime in a dedicated job.
+Full catalogue coverage, physical ARM, independent-dataset quality, real HF transfers and the new CI remain open. Emulator passes do not establish model accuracy or whole-APK 16 KB compatibility.
 
-```bash
-bash tools/build_android.sh
+## Build locally
+
+Use **JDK 21, Python 3.11+, Android SDK 36 and build-tools 36.0.0**. The bootstrap downloads and verifies Gradle 9.3.1. Prepare the [16 KB Flex runtime](docs/FLEX_16K.md) once, using the verified rc5 ZIP or a Linux/WSL source rebuild:
+
+```powershell
+git clone https://github.com/unicornwhodev/vision-dataset-studio.git
+cd vision-dataset-studio
+python -X utf8 tools/build_android.py
 ```
 
-Each attempt creates `dist/android/runs/<id>/status.json`. It records the signatures, identities and hashes of the two APKs actually built. `app-contents.json` checks for bundled weights. A failed attempt is not promoted to a qualified build.
+Set `JAVA_HOME` and `ANDROID_HOME` for your workstation. Every attempt writes an evidence receipt under `dist/android/runs/`, identifying the APKs actually built. [Setup and Android qualification](docs/en/DEVELOPMENT_RESUME.md).
 
-On a dedicated QA device:
+## Release and next steps
 
-```bash
-export ANDROID_SERIAL=emulator-5554
-export VDS_ALLOW_TEST_INSTALL=1
-bash tools/qa/run_device_qualification.sh
-```
+The prerelease contains a **413.9 MB Debug APK**, qualification archive, Flex runtime, an **unsigned 100.2 MB ARM64 candidate** and integrity receipts. GHCR retains private artifact access; GitHub release assets are public.
 
-Model tests need fixtures staged separately and may be skipped when those are absent. Physical ARM devices, performance, API 28/35 CI and real HF writes still require qualification. Emulator results are functional evidence, not device performance measurements.
+The [roadmap](docs/en/ROADMAP.md) prioritizes data/device qualification, model coverage and measured quality, then durable signing and transitive notices. The optional local HTTP agent, SAM and Florence-2 still need integration qualification.
 
-## Documentation and repository
+## Rights and data protection
 
-- [FR/EN documentation index](docs/README.md), [batch production](docs/en/BATCH_PRODUCTION.md), [training contract](docs/en/LITERT_TRAINING_CONTRACT.md).
-- [Workflows](docs/en/WORKFLOWS.md), [LiteRT qualification](docs/en/LITERT_QUALIFICATION.md).
-- [Roadmap](docs/en/ROADMAP.md), [release plan](docs/en/RELEASE_PLAN.md), [contributing](CONTRIBUTING.md).
-- [Workstation guide](docs/WORKSTATION.md) and [UI evidence](docs/UI_REFINEMENT.md) are currently French technical references.
+Project code is [Apache-2.0](LICENSE). Models, datasets and third-party components retain their own conditions and [attributions](NOTICE). [third_party](third_party/README.md) inventories 111 resolved runtime dependencies; native transitive notice review remains open.
 
-Authorized public destination: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). The [qualification prerelease](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5) distributes the user APK and QA package. GHCR stores that package as an OCI artifact; the build Dockerfile remains untested and the new CI remains unexecuted after the historical account billing failure. See the [publication plan](docs/en/RELEASE_PLAN.md). No stable release is claimed.
+Preserve human corrections, export receipts and original models. Keep credentials, signing keys, weights and user datasets outside Git. [Publication checks](docs/PUBLICATION_CHECKS.md) · [Known limits](docs/en/KNOWN_LIMITATIONS.md).
 
-Project code uses [Apache-2.0](LICENSE), subject to contributor rights. Models, datasets and dependencies keep their own licences; see [NOTICE](NOTICE) and [licensing status](LICENSING_STATUS.md).
-
-Changing the application ID does not migrate another app’s data. Room migrations 1/2/3 → 4 apply only to the same Android identity. Keep an older installation until its data has a verified backup.
+<sub>Unicorn Who Dev · Android identity: <code>com.unicornwhodev.visiondatasetstudio</code> · Documentation updated 23 September 2026.</sub>

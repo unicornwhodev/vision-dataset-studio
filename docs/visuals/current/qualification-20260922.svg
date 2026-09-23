@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="864pt" height="266.4pt" viewBox="0 0 864 266.4" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 266.4
+L 864 266.4
+L 864 0
+L 0 0
+z
+" style="fill: #0d131c"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 47.52 169.6635
+L 447.3792 169.6635
+L 447.3792 148.6845
+L 47.52 148.6845
+z
+" clip-path="url(#p8b9da997b0)" style="fill: #70d9d0"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 447.3792 169.6635
+L 478.1376 169.6635
+L 478.1376 148.6845
+L 447.3792 148.6845
+z
+" clip-path="url(#p8b9da997b0)" style="fill: #edb761"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 478.1376 169.6635
+L 816.48 169.6635
+L 816.48 148.6845
+L 478.1376 148.6845
+z
+" clip-path="url(#p8b9da997b0)" style="fill: #34445b"/>
+   </g>
+  </g>
+  <g id="text_1">
+   <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #8da4bc" x="47.52" y="37.296" transform="rotate(-0 47.52 37.296)">ANDROID MODEL QUALIFICATION</text>
+  </g>
+  <g id="text_2">
+   <text style="font-weight: 700; font-size: 36px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #eaf3ff" x="47.52" y="93.24" transform="rotate(-0 47.52 93.24)">13 / 25</text>
+  </g>
+  <g id="text_3">
+   <text style="font-size: 20px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #eaf3ff" x="241.92" y="87.912" transform="rotate(-0 241.92 87.912)">variants passed</text>
+  </g>
+  <g id="text_4">
+   <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #95dfda" x="241.92" y="117.216" transform="rotate(-0 241.92 117.216)">8 include train / save / restore / resume</text>
+  </g>
+  <g id="text_5">
+   <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #d9e4f4" x="47.52" y="202.464" transform="rotate(-0 47.52 202.464)">13 passed     1 timed out     11 not run     0 failed</text>
+  </g>
+  <g id="text_6">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #8da4bc" x="47.52" y="241.092" transform="rotate(-0 47.52 241.092)">Recorded 2026-09-22 · API 28 x86_64 emulator · functional checks, not phone speed or accuracy</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p8b9da997b0">
+   <rect x="47.52" y="145.188" width="768.96" height="27.972"/>
+  </clipPath>
+ </defs>
+</svg>

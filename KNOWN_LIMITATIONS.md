@@ -44,4 +44,4 @@ La CI API 28/35, un téléphone ARM, la RAM, la latence et les contraintes therm
 
 La licence du code est Apache-2.0. Les licences des modèles/datasets et les notices transitives restent indépendantes. Le changement d’applicationId ne migre pas les données d’une autre application.
 
-La clé Debug rc3 est sauvegardée hors Git pour les mises à jour suivantes. Le propriétaire confirme qu’aucune installation rc2 n’a été distribuée ; aucune migration rc2 n’est prévue. Une signature de distribution stable reste à définir.
+La clé Debug utilisée sur l’ancienne VM n’est pas disponible sur le poste Windows. La signature rc5 diffère de rc4 et ne permet pas sa mise à jour ; conserver toute installation contenant des données. Le propriétaire confirme qu’aucune installation rc2 n’a été distribuée ; aucune migration rc2 n’est prévue. Une signature de distribution stable reste à définir.

@@ -1,3 +1,13 @@
+# Current release boundaries — 23 September 2026
+
+rc5 is a Debug qualification prerelease. Its Windows certificate differs from rc4; an in-place rc4 update is not possible with this APK. Preserve existing data. The optimized 100.2 MB ARM64 candidate is unsigned and not device-qualified.
+
+Flex 16 KB crash: fixed in 2.16.1-vds16k1, with 39/39 core tests on both 4 KB and 16 KB emulators. Whole-APK compatibility remains open because three other native libraries retain RELRO findings. Physical ARM, remote CI, real HF transfers and independent-dataset quality are not qualified.
+
+Original model preservation and continued learned-version training pass synthetic tests; this does not extend the trainable scope of supplied frozen-backbone conversions. [Lifecycle](MODEL_LINEAGE.md) · [Windows evidence](../WINDOWS_QUALIFICATION_2026_09.md).
+
+---
+
 # Qualification limits — rc5 audit
 
 [Français](../../KNOWN_LIMITATIONS.md) · [Functional audit](FUNCTIONAL_AUDIT_2026_09.md)

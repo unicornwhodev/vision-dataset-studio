@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="864pt" height="288pt" viewBox="0 0 864 288" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 288
+L 864 288
+L 864 0
+L 0 0
+z
+" style="fill: #0d131c"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 33.336 197.2224
+L 252.072 197.2224
+Q 260.5392 197.2224 260.5392 188.928
+L 260.5392 112.896
+Q 260.5392 104.6016 252.072 104.6016
+L 33.336 104.6016
+Q 24.8688 104.6016 24.8688 112.896
+L 24.8688 188.928
+Q 24.8688 197.2224 33.336 197.2224
+z
+" clip-path="url(#pb20fdbb9ff)" style="fill: #162231; stroke: #70d9d0; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 319.104 197.2224
+L 537.84 197.2224
+Q 546.3072 197.2224 546.3072 188.928
+L 546.3072 112.896
+Q 546.3072 104.6016 537.84 104.6016
+L 319.104 104.6016
+Q 310.6368 104.6016 310.6368 112.896
+L 310.6368 188.928
+Q 310.6368 197.2224 319.104 197.2224
+z
+" clip-path="url(#pb20fdbb9ff)" style="fill: #162231; stroke: #ab96f5; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 604.872 197.2224
+L 823.608 197.2224
+Q 832.0752 197.2224 832.0752 188.928
+L 832.0752 112.896
+Q 832.0752 104.6016 823.608 104.6016
+L 604.872 104.6016
+Q 596.4048 104.6016 596.4048 112.896
+L 596.4048 188.928
+Q 596.4048 197.2224 604.872 197.2224
+z
+" clip-path="url(#pb20fdbb9ff)" style="fill: #162231; stroke: #ab96f5; stroke-width: 1.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #eaf3ff" x="29.808" y="36.864" transform="rotate(-0 29.808 36.864)">KEEP THE ORIGINAL. CONTINUE THE LEARNED VERSION.</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="47.448" y="138.4704" transform="rotate(-0 47.448 138.4704)">Original</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #a9bbd1" x="47.448" y="166.8096" transform="rotate(-0 47.448 166.8096)">Graph + profile preserved</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="333.216" y="138.4704" transform="rotate(-0 333.216 138.4704)">Learned · generation 1</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #a9bbd1" x="333.216" y="166.8096" transform="rotate(-0 333.216 166.8096)">Separate graph + checkpoint</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #edf5ff" x="618.984" y="138.4704" transform="rotate(-0 618.984 138.4704)">Learned · generation 2</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #a9bbd1" x="618.984" y="166.8096" transform="rotate(-0 618.984 166.8096)">Latest validated weights restored</text>
+   </g>
+   <g id="patch_5">
+    <path d="M 264.65342 150.2208
+Q 283.820647 150.2208 300.975413 150.2208
+" style="fill: none; stroke: #70d9d0; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 296.975413 148.2208
+L 300.975413 150.2208
+L 296.975413 152.2208
+" style="fill: none; stroke: #70d9d0; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #a9bbd1" x="283.824" y="88.704" transform="rotate(-0 283.824 88.704)">First training</text>
+   </g>
+   <g id="patch_6">
+    <path d="M 550.42142 150.2208
+Q 569.588647 150.2208 586.743413 150.2208
+" style="fill: none; stroke: #70d9d0; stroke-width: 1.8; stroke-linecap: round"/>
+    <path d="M 582.743413 148.2208
+L 586.743413 150.2208
+L 582.743413 152.2208
+" style="fill: none; stroke: #70d9d0; stroke-width: 1.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #a9bbd1" x="569.592" y="88.704" transform="rotate(-0 569.592 88.704)">Next batch</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #70d9d0" x="47.448" y="233.856" transform="rotate(-0 47.448 233.856)">The original remains available.</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #bbaafb" x="329.688" y="233.856" transform="rotate(-0 329.688 233.856)">Inference activation is an explicit choice.</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #8da4bc" x="47.448" y="271.872" transform="rotate(-0 47.448 271.872)">Vision Dataset Studio rc5 · conceptual flow; evaluation and checkpoint verification precede promotion</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pb20fdbb9ff">
+   <rect x="8.64" y="5.76" width="846.72" height="276.48"/>
+  </clipPath>
+ </defs>
+</svg>

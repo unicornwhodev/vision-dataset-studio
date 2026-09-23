@@ -16,14 +16,15 @@ Decorative illustration created using the built-in `image_gen` tool and saved in
 
 | Fichier / File | Provenance | Portée / Scope |
 |---|---|---|
-| [Atelier rc3](../test-results/litert-rc3/final-device/app-ready.png) | Build `20260920T215432Z-cdd13d7fbf98`, démarrage rendu après redémarrage à froid / rendered startup after cold boot | Capture actuelle rc3, projet de QA vide après recette / current rc3, empty QA project after tests |
+| [Studio rc5](../test-results/windows-rc5-release/api35-16k/start.png) | Build `20260923T104142Z-befce3e3596a`, API 35 x86_64, pages 16 Ko | Démarrage réel après la suite 39/39 ; projet de QA vide / actual startup after 39/39 core tests |
+| [Atelier rc3](../test-results/litert-rc3/final-device/app-ready.png) | Build `20260920T215432Z-cdd13d7fbf98`, démarrage rendu après redémarrage à froid / rendered startup after cold boot | Capture historique rc3, projet de QA vide après recette / historical rc3, empty QA project after tests |
 | [Éditeur](ui-refined/refined-editor-persisted.png) | Build `20260919T213548Z-f221e25ccc2f`, [recette historique](UI_REFINEMENT.md) | Image synthétique, annotation conservée ; antérieur à rc3 / synthetic image and persisted annotation; predates rc3 |
 
 Les captures sont intactes : aucun panneau, contrôle ou contenu n’a été inventé ou retouché. Elles viennent d’un émulateur x86_64, pas d’un téléphone ARM. Le build historique de l’éditeur avait des échecs globaux détaillés dans sa recette ; sa capture ne vaut pas validation de publication.
 
 Screenshots are unmodified: no panels, controls or content were synthesized. They come from an x86_64 emulator, not an ARM phone. The historical editor build had failures recorded in its QA report; its screenshot does not imply release qualification.
 
-![Atelier actuel](../test-results/litert-rc3/final-device/app-ready.png)
+![Studio rc5](../test-results/windows-rc5-release/api35-16k/start.png)
 
 ![Éditeur historique](ui-refined/refined-editor-persisted.png)
 
@@ -40,7 +41,19 @@ for source in docs/visuals/*.dot; do
 done
 ```
 
-## Graphiques de qualification / Qualification charts
+## Figures actuelles / Current figures
+
+`visuals/current/qualification-20260922.*` représente la campagne Charlbi du 22 septembre : **13/25 réussies, 1 délai dépassé, 11 non exécutées**, dont 8 succès entraînables. Source : [reçus publics](../test-results/functional-audit-20260922/public-model-results.json). Aucun nouveau test n’est exécuté pour tracer cette figure.
+
+`visuals/current/model-lineage.*` est un diagramme conceptuel du comportement rc5, pas un résultat de mesure. Les PNG et SVG sont générés avec Matplotlib :
+
+```bash
+python tools/docs/plot_qualification_snapshot.py test-results/functional-audit-20260922/public-model-results.json docs/visuals/current
+```
+
+The current coverage chart uses the dated public receipts. The lineage diagram describes application behavior. Historical charts below retain their original inputs and scope.
+
+## Graphiques historiques / Historical qualification charts
 
 Les figures de `docs/visuals/benchmarks/` utilisent les reçus publics listés dans [android-evidence.json](visuals/android-evidence.json). Elles concernent les 25 conversions personnelles publiques : 5 réussies, 1 en échec, 19 en attente. Les identifiants des modèles d’une source privée ne sont pas inclus. Les temps sont des durées de tests complets, pas des latences d’inférence. Les pertes synthétiques et deltas de sorties ne prouvent aucune précision métier.
 

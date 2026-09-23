@@ -1,3 +1,19 @@
+# Windows rc5 qualification — 23 September 2026
+
+[Documentation](../README.md) · [Français](../../TEST_REPORT.md)
+
+Build `20260923T104142Z-befce3e3596a`: **67 JVM**, **70 Python** (63 at build time plus 7 packaging guards), **39/39 Android core tests on API 35 with 4 KB pages and 39/39 with 16 KB pages**, no skips. Generated KSP: 99 files. Lint: 0 errors, 88 warnings.
+
+The Flex crash is fixed. Synthetic two-batch training preserves the original model and continues the learned version; checkpoints persist after process restart. Two translated ARM64 tests pass, which is not physical ARM qualification. Three other libraries retain RELRO findings.
+
+[Selected public evidence](../../test-results/windows-rc5-release/README.md) · [Windows report](../WINDOWS_QUALIFICATION_2026_09.md) · [Published rc5 receipt](../RC5_PUBLICATION_RECEIPT.json).
+
+The model campaign is separate: 13 successes, 8 with learning, 3 timeouts and 15 unexecuted conversions across 31 conversions. No quality or phone performance result is claimed. Remote CI remains unexecuted after the historical billing failure. The optimized ARM64 candidate is unsigned, and the Debug certificate cannot update rc4.
+
+---
+
+## Historical records before the Windows fixes
+
 # Workstation handoff — 23 September 2026
 
 Compiled source `a0d9737`, build `20260922T223550Z-3ee0d233110c`: **67 JVM and 52 Python tests passed**, lint **0 errors / 90 warnings**; 158 compiled files match the commit. The APK contains no model weights.
