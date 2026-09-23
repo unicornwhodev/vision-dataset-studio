@@ -1,0 +1,32 @@
+// Run with --no-configuration-cache; this is a reporting task, not an APK input.
+import groovy.json.JsonOutput
+import org.gradle.maven.MavenModule
+import org.gradle.maven.MavenPomArtifact
+
+gradle.projectsEvaluated {
+    def app = gradle.rootProject.project(':app')
+    app.tasks.register('exportRuntimeDependencyInventory') {
+        doLast {
+            def configuration = app.configurations.getByName('releaseRuntimeClasspath')
+            def artifacts = configuration.resolvedConfiguration.resolvedArtifacts
+            def ids = artifacts.collect { it.id.componentIdentifier }.unique()
+            def query = app.dependencies.createArtifactResolutionQuery().forComponents(ids)
+                .withArtifacts(MavenModule, MavenPomArtifact).execute()
+            def poms = [:]
+            query.resolvedComponents.each { component ->
+                component.getArtifacts(MavenPomArtifact).each { artifact ->
+                    if (artifact.hasProperty('file')) poms[component.id.displayName] = artifact.file.absolutePath
+                }
+            }
+            def rows = artifacts.collect { artifact ->
+                def id = artifact.moduleVersion.id
+                [coordinate: id.toString(), group: id.group, name: id.name, version: id.version,
+                 artifact: artifact.file.absolutePath, pom: poms[artifact.id.componentIdentifier.displayName]]
+            }.sort { it.coordinate }
+            def output = new File(app.rootDir, 'dist/runtime-dependencies.json')
+            output.parentFile.mkdirs()
+            output.setText(JsonOutput.prettyPrint(JsonOutput.toJson(rows)) + '\n', 'UTF-8')
+            println("Resolved runtime artifacts: ${rows.size()}")
+        }
+    }
+}

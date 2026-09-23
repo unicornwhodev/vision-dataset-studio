@@ -13,7 +13,7 @@ def finish(fig,out,name,title,subtitle,footer):
  fig.text(.06,.91,subtitle,ha='left',va='top',fontsize=11,color=MUTED)
  fig.text(.06,.025,footer,fontsize=9,color=MUTED,va='bottom')
  for suffix in ('png','svg'):fig.savefig(out/(name+'.'+suffix),dpi=160,metadata={'Date':None} if suffix=='svg' else None)
- svg=out/(name+'.svg');svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines())+'\n')
+ svg=out/(name+'.svg');svg.write_text('\n'.join(line.rstrip() for line in svg.read_text(encoding='utf-8').splitlines())+'\n')
  plt.close(fig)
 def loss_panels(rows,out,name,title,subtitle,footer,left='Initial',right='Last reported'):
  cols=min(3,len(rows));nr=math.ceil(len(rows)/cols)
@@ -67,5 +67,5 @@ def render(d,out):
  if d.get('sdk'):
   loss_panels(d['sdk']['rows'],out,'android-sdk','Standalone Android SDK · recorded loss endpoints',d['sdk']['subtitle'],foot+'\nSeparate from app integration. Exact restore and optimizer resume reported PASS; no accuracy claim.')
 def main():
- p=argparse.ArgumentParser();p.add_argument('data',type=Path);p.add_argument('output',type=Path);a=p.parse_args();render(json.loads(a.data.read_text()),a.output)
+ p=argparse.ArgumentParser();p.add_argument('data',type=Path);p.add_argument('output',type=Path);a=p.parse_args();render(json.loads(a.data.read_text(encoding='utf-8')),a.output)
 if __name__=='__main__':main()

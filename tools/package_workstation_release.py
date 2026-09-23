@@ -36,19 +36,19 @@ def main():
  if git('status','--porcelain').strip():raise RuntimeError('Commit the reviewed tree before packaging')
  evidence=a.evidence.resolve();folder=a.build_dir.resolve()
  evidence.relative_to(ROOT)
- source=json.loads((evidence/'source-manifest.json').read_text());head=git('rev-parse','HEAD').decode().strip()
+ source=json.loads((evidence/'source-manifest.json').read_text(encoding='utf-8'));head=git('rev-parse','HEAD').decode().strip()
  source['files']=source_hashes(source['files'])
  names=[n for n in git('ls-files','-z').decode().split('\0') if n]
  if set(source['files'])!={n for n in names if compiled(n)}:raise RuntimeError('Incomplete compiled-source manifest')
  for n,h in source['files'].items():
   if sha(ROOT/n)!=h or hashlib.sha256(git('show',source['source_commit']+':'+n)).hexdigest()!=h:raise RuntimeError('Compiled source differs: '+n)
- receipt=json.loads((folder/'status.json').read_text())
+ receipt=json.loads((folder/'status.json').read_text(encoding='utf-8'))
  if not receipt.get('all_build_checks_passed') or receipt.get('outcome')!='build_checks_passed':raise RuntimeError('Build checks failed')
- qualification=json.loads((evidence/'qualification.json').read_text())
+ qualification=json.loads((evidence/'qualification.json').read_text(encoding='utf-8'))
  if qualification['build_run']!=receipt['run_id']:raise RuntimeError('Device evidence belongs to another build')
- device=json.loads((evidence/'final-device/build-receipt.json').read_text())
+ device=json.loads((evidence/'final-device/build-receipt.json').read_text(encoding='utf-8'))
  if device['run_id']!=receipt['run_id'] or device['artifacts']!=receipt['artifacts']:raise RuntimeError('Device APKs differ')
- text=(evidence/'final-device/instrumentation.txt').read_text()
+ text=(evidence/'final-device/instrumentation.txt').read_text(encoding='utf-8')
  expected=qualification['android_tests_passed']
  if not re.search(rf'OK \({expected} tests?\)',text) or re.search(r'INSTRUMENTATION_STATUS_CODE: -[1234]|FAILURES!!!|INSTRUMENTATION_FAILED|shortMsg=',text):raise RuntimeError('Android suite did not pass without skips')
  apks=[]

@@ -1,0 +1,477 @@
+{
+  "schema": 1,
+  "serial": "emulator-5580",
+  "application_id": "com.unicornwhodev.visiondatasetstudio",
+  "started_at": "2026-09-23T10:44:37.946997+00:00",
+  "outcome": "core_suite_passed",
+  "suite": "core",
+  "excluded_classes": [
+    "HfModelRuntimeTest",
+    "ConvertedModelQualificationTest",
+    "NativePhotoInferenceUiTest",
+    "HfLivePublicationTest",
+    "InstalledDataPreservationTest"
+  ],
+  "production_qualified": false,
+  "physical_arm_qualified": false,
+  "live_hf_qualified": false,
+  "commands": {
+    "device-state.txt": 0,
+    "device-abi.txt": 0,
+    "device-api.txt": 0,
+    "device-model.txt": 0,
+    "device-emulator.txt": 0,
+    "page-size.txt": 0,
+    "install-main.txt": 0,
+    "install-test.txt": 0,
+    "package.txt": 0,
+    "stage-training-fixture.txt": 0,
+    "stage-hf-runtime-fixture.txt": 0,
+    "instrumentation.txt": 0,
+    "training-evidence.json": 0,
+    "workflow-training-evidence.json": 0,
+    "start.txt": 0,
+    "ui-dump-0.txt": 0,
+    "start-ui.xml": 0,
+    "start.png": 0,
+    "start-meminfo.txt": 0,
+    "start-gfxinfo.txt": 0,
+    "crash-buffer.txt": 0
+  },
+  "build": {
+    "schema": 1,
+    "run_id": "20260923T104142Z-befce3e3596a",
+    "application_id": "com.unicornwhodev.visiondatasetstudio",
+    "started_at": "2026-09-23T10:41:42.311799+00:00",
+    "phase": "complete",
+    "outcome": "build_checks_passed",
+    "apk_built": true,
+    "test_apk_built": true,
+    "artifacts": {
+      "app": {
+        "file": "vision-dataset-studio-uwd-debug.apk",
+        "sha256": "5f5154809b0a79c2e8567c2da6d2479140406e65fac1d38008f1932a58738e98",
+        "bytes": 413877313
+      },
+      "tests": {
+        "file": "vision-dataset-studio-uwd-test.apk",
+        "sha256": "0205d79b9609beeaa16b130d0504bfc2dab21ffb025aeb749cff64032a179633",
+        "bytes": 3263018
+      }
+    },
+    "all_build_checks_passed": true,
+    "installed": false,
+    "instrumented_tests_executed": false,
+    "production_qualified": false,
+    "debug_only": true,
+    "github_sha": null,
+    "github_run_id": null,
+    "flex_runtime": {
+      "scope": "Flex ELF alignment only",
+      "libraries": {
+        "arm64-v8a": {
+          "sha256": "4702626f330cc07f361c3cc384df4772de7e84bdc7daea0bf3f61b283233bc47",
+          "bytes": 90547344,
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 87462288,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 87474176,
+              "address": 87474176,
+              "memory_size": 3031568,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 90505744,
+              "address": 90522128,
+              "memory_size": 80064,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 87474176,
+              "address": 87474176,
+              "memory_size": 3047424,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ]
+        },
+        "x86_64": {
+          "sha256": "f1eb0a955ccb6d5b26563abebcffc607f5a2f670665b0a38cb1b1dcfb296777b",
+          "bytes": 105173608,
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 102198640,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 102203392,
+              "address": 102203392,
+              "memory_size": 2928600,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 105132000,
+              "address": 105148384,
+              "memory_size": 76832,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 102203392,
+              "address": 102203392,
+              "memory_size": 2932736,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ]
+        }
+      },
+      "runtime_tested": false
+    },
+    "commands": {
+      "java-version": 0,
+      "gradle-version": 0,
+      "assemble": 0,
+      "app-signature": 0,
+      "app-identity": 0,
+      "checks": 0,
+      "assemble-test": 0,
+      "tests-signature": 0,
+      "tests-identity": 0
+    },
+    "gradle_user_home": "D:\\Dev\\project\\vision-dataset-studio\\dist\\gradle-home",
+    "fresh_apk_packaging": true,
+    "jvm_tests": {
+      "tests": 67,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "Error": 0,
+      "Warning": 88
+    },
+    "ksp_generated_files": 99,
+    "exit_code": 0,
+    "finished_at": "2026-09-23T10:43:47.834495+00:00"
+  },
+  "abi": "x86_64",
+  "api": "35",
+  "model": "sdk_gphone64_x86_64",
+  "emulator": "1",
+  "page_size": "4096",
+  "expected_page_size": "4096",
+  "package_abi": "x86_64",
+  "instrumentation": {
+    "declared": 39,
+    "passed": 39,
+    "skipped": 0,
+    "failed": 0,
+    "aborted": false,
+    "complete": true,
+    "tests": [
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.AnnotationPreservationTest",
+        "numtests": "39",
+        "test": "automaticPreannotationNeverTouchesExistingRecordsEvenWithStalePendingStatus",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ApplicationIdentityTest",
+        "numtests": "39",
+        "test": "useAppContext",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.BatchProductionTest",
+        "numtests": "39",
+        "test": "uniqueTwoPlusOneSurvivesExportPurgeReopenAndRenamedCopies",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.BatchProductionTest",
+        "numtests": "39",
+        "test": "concurrentClaimsHaveOneOwnerAndDoNotMergeDifferentImages",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.EmbeddingIndexTest",
+        "numtests": "39",
+        "test": "cosineSearchPersistsAndIsolatesModelContracts",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.EnglishLocaleComposeTest",
+        "numtests": "39",
+        "test": "primaryWorkflowsUseEnglishResources",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "publicSsdDownloadInspectAndInfer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "promptIsTransportedToLocalFixtureAndResponseDecoded",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "localExportContainsCanonicalAndRequestedProjections",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "publicEfficientDetDownloadInspectAndInfer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "pointCorrectionStoreLearnsPersistsAndResets",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "realBatchInferencePreservesHumanAndSkipsFinalCases",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "publicClassifierDownloadInspectAndInfer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "39",
+        "test": "studioPackRetainsPromptAndRejectsUnknownFields",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FunctionalUiAuditTest",
+        "numtests": "39",
+        "test": "englishScreensPersistModelSettingsAndIsolateMultipleProjects",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.HfTokenizerTest",
+        "numtests": "39",
+        "test": "nativeEncodingMatchesPinnedHuggingFaceTokenizer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest",
+        "numtests": "39",
+        "test": "legacyBundleDigestsDoNotBlockLoading",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest",
+        "numtests": "39",
+        "test": "importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.LocalEndpointWorkflowTest",
+        "numtests": "39",
+        "test": "modelPromptThresholdAndAgentInstructionsReachTheLocalServer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.OnDeviceTrainingTest",
+        "numtests": "39",
+        "test": "internalVisualWeightsTrainPersistAndReloadOnAndroid",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "39",
+        "test": "discardedBatchRetainsCursorAndDeduplicationAfterInterruptedCleanup",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "39",
+        "test": "interruptedCleanupResumesFromDurableReceipt",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "39",
+        "test": "resetBatchPreservesProjectConfigurationAndSharedModelProfile",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "39",
+        "test": "resetProjectForgetsIdentityAndAllowsTheSameCorpusAgain",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "39",
+        "test": "orphanTrainingCleanupPreservesActiveAndSharedModels",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest",
+        "numtests": "39",
+        "test": "version1To4",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest",
+        "numtests": "39",
+        "test": "version2To4",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest",
+        "numtests": "39",
+        "test": "version3To4",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "39",
+        "test": "changedCopyDoesNotProduceReceipt",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "39",
+        "test": "failedWritePreservesPrivateSource",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "39",
+        "test": "lostReadGrantDoesNotProduceReceipt",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "39",
+        "test": "successfulCopyIsReopenedAndHashed",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SegmentationCanvasTest",
+        "numtests": "39",
+        "test": "separateMasksCanBePaintedAndSamPromptDoesNotBecomeAnAnnotation",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test",
+        "numtests": "39",
+        "test": "controlsAndCatalogueRenderWithoutDownloadingModels",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test",
+        "numtests": "39",
+        "test": "compactNavigationKeepsImportAndExportAccessible",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.TrainingWorkflowTest",
+        "numtests": "39",
+        "test": "validatedCorrectionsTrainThroughWorkManagerAndResume",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest",
+        "numtests": "39",
+        "test": "reviewGateRejectionAndFinishedBatchesSurviveResume",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest",
+        "numtests": "39",
+        "test": "journalAndPlannerRejectUnrecognizedToolsAndRemoteEndpoints",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest",
+        "numtests": "39",
+        "test": "manualAndAssistedTemplatesImportReviewExportCleanAndContinue",
+        "code": 0
+      }
+    ]
+  },
+  "training": {
+    "page_size": 4096,
+    "supported_abis": [
+      "x86_64",
+      "arm64-v8a"
+    ],
+    "runtime": "Android LiteRT Interpreter",
+    "optimizer_steps": 48,
+    "initial_loss": 0.6854044694986214,
+    "final_loss": 0.01837361347916884,
+    "internal_weights_before": "953589b2fe25ac8406555116cccc923749b6046d73212281a8a5c3cc8575d959",
+    "internal_weights_after": "d82d5ff0a7795eea532c02553cffb5d2a9e9d117bc90a5ecda53cffd5e234481",
+    "checkpoint_reload_matches": true,
+    "production_hf_models_trained": false,
+    "fixture": "synthetic red/blue images; untrained two-layer visual network"
+  },
+  "training_continuation": {
+    "project_id": 1790160335073,
+    "validated_images": 88,
+    "excluded_rejected": 8,
+    "exported_batch_only": true,
+    "cleanup_waited": true,
+    "explicit_abandonment_unblocks_cleanup": true,
+    "abandonment_never_activates_weights": true,
+    "restart_after_abandonment": true,
+    "cleanup_after_training": true,
+    "steps_before_cancel": 27,
+    "steps_after_resume": 213,
+    "initial_loss": 0.6891881078802196,
+    "final_loss": 0.0030195051496979095,
+    "internal_weights_changed": true,
+    "source_model_preserved": true,
+    "original_sha256_before": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+    "original_sha256_after": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+    "lineage_id": "ed0dd8f94b9be79e5fc6be1bdcc50928983833304c4d0d1b472941560dde8e36",
+    "first_final_weights": "28cb72074ba3d20255ae573e7655fca417946418ae0a74709620a1699e23969a",
+    "second_initial_weights": "28cb72074ba3d20255ae573e7655fca417946418ae0a74709620a1699e23969a",
+    "second_final_weights": "d6e251202182ecbe9ca7cea49edc32d81f02f8ebee202542f1091b79a407e86b",
+    "second_initial_loss": 0.0032974717957017638,
+    "second_final_loss": 0.002246924470688824,
+    "continued_without_activation": true,
+    "learned_profile_id": "trained-ed0dd8f94b9be79e5fc6be1bdcc50928983833304c4d0d1b472941560dde8e36",
+    "missing_checkpoint_refused": true,
+    "runtime": "Android WorkManager / LiteRT CPU"
+  },
+  "startup_ui_ready": true,
+  "exit_code": 0,
+  "finished_at": "2026-09-23T10:45:57.446682+00:00"
+}

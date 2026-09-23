@@ -29,7 +29,7 @@ class BuildEvidenceTests(unittest.TestCase):
         self.assertEqual([],build.weight_inventory(apk)['weight_files'])
     def test_gradle_checksum_is_pinned_consistently(self):
         bootstrap=load('gradle_bootstrap',ROOT/'tools/gradle_bootstrap.py')
-        properties=(ROOT/'gradle/wrapper/gradle-wrapper.properties').read_text()
+        properties=(ROOT/'gradle/wrapper/gradle-wrapper.properties').read_text(encoding='utf-8')
         self.assertEqual(64,len(bootstrap.DISTRIBUTION_SHA256))
         self.assertIn('distributionSha256Sum='+bootstrap.DISTRIBUTION_SHA256,properties)
     def test_java_version_17(self):self.assertEqual(17,build.parse_java_major('openjdk version "17.0.1"'))
@@ -40,21 +40,29 @@ class BuildEvidenceTests(unittest.TestCase):
     def test_absent_sdk_is_blocking(self):
         with self.assertRaises(build.Blocked):build.sdk_dir(self.root,{})
     def test_local_sdk_properties_win(self):
-        (self.root/'local.properties').write_text('sdk.dir=/a\\ b/sdk\n')
-        self.assertEqual(Path('/a b/sdk'),build.sdk_dir(self.root,{'ANDROID_HOME':'/other'}))
+        sdk = (self.root / 'sdk with spaces').resolve()
+        escaped = sdk.as_posix().replace(':', '\\:').replace(' ', '\\ ')
+        (self.root/'local.properties').write_text('sdk.dir='+escaped+'\n',encoding='utf-8')
+        self.assertEqual(sdk,build.sdk_dir(self.root,{'ANDROID_HOME':str(self.root/'other')}))
+    def test_windows_sdk_tool_names(self):
+        self.assertEqual(self.root/'apksigner.bat',build.sdk_tool(self.root,'apksigner','nt'))
+        self.assertEqual(self.root/'aapt.exe',build.sdk_tool(self.root,'aapt','nt'))
+    def test_unix_sdk_tool_names(self):
+        self.assertEqual(self.root/'apksigner',build.sdk_tool(self.root,'apksigner','posix'))
+        self.assertEqual(self.root/'aapt',build.sdk_tool(self.root,'aapt','posix'))
     def test_badging_identity_correct(self):build.verify_badging("package: name='"+build.APP_ID+"' versionCode='5'",build.APP_ID)
     def test_badging_wrong_identity_refused(self):
         with self.assertRaises(RuntimeError):build.verify_badging("package: name='org.invalid.app'",build.APP_ID)
     def test_attempt_does_not_reuse_prior_success(self):
         previous=build.Attempt(self.root);previous.state.update(outcome='build_checks_passed',apk_built=True);previous.save()
         current=build.Attempt(self.root)
-        latest=json.loads((current.base/'latest.json').read_text())
+        latest=json.loads((current.base/'latest.json').read_text(encoding='utf-8'))
         self.assertFalse(latest['apk_built']);self.assertEqual({},latest['artifacts'])
         self.assertNotEqual(previous.id,current.id)
         self.assertTrue((previous.out/'status.json').exists())
     def test_preflight_block_writes_truthful_receipt(self):
         with mock.patch.object(build.shutil,'which',return_value=None):self.assertEqual(2,build.main(self.root))
-        status=json.loads((self.root/'dist/android/latest.json').read_text())
+        status=json.loads((self.root/'dist/android/latest.json').read_text(encoding='utf-8'))
         self.assertEqual('blocked',status['outcome']);self.assertFalse(status['apk_built'])
         self.assertFalse(status['production_qualified'])
         self.assertEqual([],list(self.root.rglob('*.apk')))
@@ -68,7 +76,7 @@ class BuildEvidenceTests(unittest.TestCase):
     def test_atomic_json_replaces_and_cleans_temp(self):
         path=self.root/'status.json';path.write_text('{"old":true}')
         build.atomic_json(path,{'new':True})
-        self.assertEqual({'new':True},json.loads(path.read_text()));self.assertEqual([],list(self.root.glob('*.tmp')))
+        self.assertEqual({'new':True},json.loads(path.read_text(encoding='utf-8')));self.assertEqual([],list(self.root.glob('*.tmp')))
     def test_missing_apk_never_promoted(self):
         attempt=build.Attempt(self.root)
         with self.assertRaises(RuntimeError):attempt.store_apk(self.root/'absent.apk','output.apk','app',build.APP_ID,self.root)

@@ -16,7 +16,10 @@ import subprocess
 import sys
 import uuid
 import zipfile
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from qa.check_flex_runtime import AAR_NAME, LOCAL_MAVEN, MACHINES, verify_flex
 
 APP_ID = 'com.unicornwhodev.visiondatasetstudio'
 GRADLE_VERSION = '9.3.1'
@@ -82,6 +85,37 @@ def verify_badging(text: str, app_id: str) -> None:
     if not match or match[1] != app_id:
         raise RuntimeError('Compiled APK application ID does not match the required identity.')
 
+def sdk_tool(directory: Path, name: str, platform: str | None = None) -> Path:
+    """Resolve the installed platform's SDK tools without accepting a different SDK."""
+    platform = platform or os.name
+    suffix = ('.bat' if name == 'apksigner' else '.exe') if platform == 'nt' else ''
+    return directory / (name + suffix)
+
+
+def source_manifest(root: Path) -> dict:
+    names = subprocess.check_output(['git', 'ls-files', '-c', '-o', '--exclude-standard', '-z'], cwd=root).decode('utf-8').split('\0')
+    compiled = lambda name: (name.startswith(('app/', 'gradle/')) and name != 'app/.gitignore') or name in ('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'tools/build_android.py', 'tools/gradle_bootstrap.py', 'tools/build_flex_runtime.py', 'tools/qa/check_flex_runtime.py', 'tools/qa/check_apk_page_sizes.py')
+    native = root / LOCAL_MAVEN / AAR_NAME
+    return {
+        'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root).decode().strip(),
+        'files': {name: digest(root / name) for name in sorted(set(names)) if name and compiled(name)},
+        'native_runtime': {'file': native.relative_to(root).as_posix(), 'sha256': digest(native)} if native.is_file() else None,
+    }
+
+
+def verify_local_flex(root: Path) -> dict:
+    directory = root / LOCAL_MAVEN
+    aar = directory / AAR_NAME
+    receipt = directory / 'build-receipt.json'
+    if not aar.is_file() or not receipt.is_file():
+        raise Blocked('The 16 KB Flex runtime is missing. Build it with tools/build_flex_runtime.py; see docs/FLEX_16K.md.')
+    state = json.loads(receipt.read_text(encoding='utf-8'))
+    if state.get('outcome') != 'native_build_passed' or digest(aar) != state.get('artifact_sha256'):
+        raise Blocked('Flex native build receipt does not match the local AAR.')
+    if state.get('builder_sha256') != digest(root / 'tools/build_flex_runtime.py'):
+        raise Blocked('Flex was produced by a different build recipe; rebuild the native runtime.')
+    return verify_flex(aar, MACHINES)
+
 class Attempt:
     def __init__(self, root: Path):
         self.root = root
@@ -122,10 +156,15 @@ class Attempt:
     def store_apk(self, source: Path, name: str, key: str, app_id: str, tools: Path) -> None:
         if not source.is_file() or source.stat().st_size == 0:
             raise RuntimeError(f'{key}: assembly returned without an APK.')
-        self.fail_on_command(key + '-signature', [str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs', str(source)])
-        self.fail_on_command(key + '-identity', [str(tools / 'aapt'), 'dump', 'badging', str(source)])
-        verify_badging((self.out / (key + '-identity.log')).read_text(), app_id)
+        self.fail_on_command(key + '-signature', [str(sdk_tool(tools, 'apksigner')), 'verify', '--verbose', '--print-certs', str(source)])
+        self.fail_on_command(key + '-identity', [str(sdk_tool(tools, 'aapt')), 'dump', 'badging', str(source)])
+        verify_badging((self.out / (key + '-identity.log')).read_text(encoding='utf-8'), app_id)
         if key == 'app':
+            alignment = verify_flex(source)
+            expected = self.state['flex_runtime']['libraries']
+            if any(row['sha256'] != expected[abi]['sha256'] for abi, row in alignment['libraries'].items()):
+                raise RuntimeError('Packaged Flex differs from its native build receipt; refresh the Gradle dependency cache.')
+            atomic_json(self.out / 'flex-16k.json', alignment)
             inventory = weight_inventory(source)
             (self.out / 'app-contents.json').write_text(json.dumps(inventory, indent=2) + '\n')
             if inventory['weight_files']:
@@ -142,23 +181,39 @@ def main(root: Path = ROOT) -> int:
     attempt = Attempt(root)
     exit_code = 1
     try:
+        attempt.state['flex_runtime'] = verify_local_flex(root)
+        attempt.save()
         java = shutil.which('java')
         if not java: raise Blocked('JDK 17+ missing.')
         attempt.fail_on_command('java-version', [java, '-version'])
-        if parse_java_major((attempt.out / 'java-version.log').read_text()) < 17:
+        if parse_java_major((attempt.out / 'java-version.log').read_text(encoding='utf-8')) < 17:
             raise Blocked('JDK 17+ required.')
         sdk = sdk_dir(root, os.environ)
         tools = sdk / 'build-tools/36.0.0'
-        required = [sdk / 'platforms/android-36/android.jar', tools / 'apksigner', tools / 'aapt']
+        required = [sdk / 'platforms/android-36/android.jar', sdk_tool(tools, 'apksigner'), sdk_tool(tools, 'aapt')]
         absent = [str(p) for p in required if not p.is_file()]
         if absent: raise Blocked('SDK components absent: ' + ', '.join(absent))
         override = os.environ.get('VDS_GRADLE_BIN')
-        gradle = [override] if override else [sys.executable, str(root / 'tools/gradle_bootstrap.py')]
+        gradle = [shutil.which(override) or override] if override else [sys.executable, str(root / 'tools/gradle_bootstrap.py')]
+        # A shared Windows cache may be a junction and contain unrelated init scripts.
+        # Use the same isolated home for bootstrap and overridden Gradle executables.
+        gradle_home = Path(os.environ.get('GRADLE_USER_HOME', root / 'dist/gradle-home')).resolve()
+        gradle += ['--gradle-user-home', str(gradle_home)]
+        attempt.state['gradle_user_home'] = str(gradle_home)
         attempt.fail_on_command('gradle-version', [*gradle, '--version'])
-        version_log = (attempt.out / 'gradle-version.log').read_text()
+        version_log = (attempt.out / 'gradle-version.log').read_text(encoding='utf-8')
         if not re.search(r'^Gradle ' + re.escape(GRADLE_VERSION) + r'\s*$', version_log, re.M):
             raise Blocked('Gradle 9.3.1 required, no silent substitution.')
         attempt.state['phase'] = 'assemble'; attempt.save()
+        source_before = source_manifest(root)
+        atomic_json(attempt.out / 'source-manifest.json', source_before)
+        # Incremental ZIP packaging can retain the replaced native payload as
+        # unused space. Prior APKs are already retained in immutable attempt dirs;
+        # regenerate only these two disposable Gradle output files.
+        for relative in ('app/build/outputs/apk/debug/app-debug.apk',
+                         'app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'):
+            (root / relative).unlink(missing_ok=True)
+        attempt.state['fresh_apk_packaging'] = True
         attempt.fail_on_command('assemble', [*gradle, ':app:assembleDebug', '--console=plain', '--stacktrace'])
         attempt.state['phase'] = 'verify-app'; attempt.save()
         attempt.store_apk(root / 'app/build/outputs/apk/debug/app-debug.apk',
@@ -174,6 +229,26 @@ def main(root: Path = ROOT) -> int:
             attempt.store_apk(test_apk, 'vision-dataset-studio-uwd-test.apk', 'tests', APP_ID + '.test', tools)
         if checks or test_code:
             raise RuntimeError('APK evidence retained, but dependency tests/lint/test APK checks did not all pass.')
+        if source_manifest(root) != source_before:
+            raise RuntimeError('Compiled sources changed during the build; APKs retained without qualification.')
+        reports = attempt.out / 'reports'
+        reports.mkdir()
+        junit = root / 'app/build/test-results/testDebugUnitTest'
+        suites = [ET.parse(path).getroot() for path in junit.glob('TEST-*.xml')]
+        if not suites:
+            raise RuntimeError('No JVM test report was produced.')
+        attempt.state['jvm_tests'] = {key: sum(int(s.get(key, 0)) for s in suites) for key in ('tests', 'failures', 'errors', 'skipped')}
+        for path in junit.glob('TEST-*.xml'):
+            shutil.copyfile(path, reports / path.name)
+        for name in ('lint-results-debug.xml', 'lint-results-debug.txt', 'lint-results-debug.html'):
+            shutil.copyfile(root / 'app/build/reports' / name, reports / name)
+        lint = ET.parse(reports / 'lint-results-debug.xml').getroot()
+        attempt.state['lint'] = {severity: sum(issue.get('severity') == severity for issue in lint.findall('issue')) for severity in ('Error', 'Warning')}
+        shutil.copytree(root / 'app/schemas', reports / 'schemas')
+        generated = root / 'app/build/generated/ksp/debug'
+        attempt.state['ksp_generated_files'] = sum(p.is_file() for p in generated.rglob('*'))
+        if not list(generated.rglob('AppDatabase_Impl.*')):
+            raise RuntimeError('KSP Room implementation absent.')
         attempt.state.update(phase='complete', outcome='build_checks_passed', all_build_checks_passed=True)
         exit_code = 0
     except Blocked as exc:

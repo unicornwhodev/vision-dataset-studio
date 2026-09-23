@@ -1,0 +1,319 @@
+{
+  "apk_sha256": "5f5154809b0a79c2e8567c2da6d2479140406e65fac1d38008f1932a58738e98",
+  "native_64bit_libraries": [
+    {
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "sha256": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 7232,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 7232,
+          "address": 23616,
+          "memory_size": 912,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 8144,
+          "address": 40912,
+          "memory_size": 16,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 7232,
+          "address": 23616,
+          "memory_size": 960,
+          "alignment": 1,
+          "aligned_16k": false
+        }
+      ],
+      "elf_aligned_16k": false,
+      "zip_aligned_16k": true
+    },
+    {
+      "path": "lib/arm64-v8a/libdatastore_shared_counter.so",
+      "sha256": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 4544,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 4544,
+          "address": 20928,
+          "memory_size": 616,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 5160,
+          "address": 37928,
+          "memory_size": 1,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 4544,
+          "address": 20928,
+          "memory_size": 3648,
+          "alignment": 1,
+          "aligned_16k": false
+        }
+      ],
+      "elf_aligned_16k": false,
+      "zip_aligned_16k": true
+    },
+    {
+      "path": "lib/arm64-v8a/libtensorflowlite_flex_jni.so",
+      "sha256": "4702626f330cc07f361c3cc384df4772de7e84bdc7daea0bf3f61b283233bc47",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 87462288,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 87474176,
+          "address": 87474176,
+          "memory_size": 3031568,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 90505744,
+          "address": 90522128,
+          "memory_size": 80064,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 87474176,
+          "address": 87474176,
+          "memory_size": 3047424,
+          "alignment": 1,
+          "aligned_16k": true
+        }
+      ],
+      "elf_aligned_16k": true,
+      "zip_aligned_16k": true
+    },
+    {
+      "path": "lib/arm64-v8a/libtensorflowlite_jni.so",
+      "sha256": "e2328caf39606382a13dc08f06ed03eb0119a490208d375e3f42b80e4dabc465",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 4399632,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 4407296,
+          "address": 4407296,
+          "memory_size": 42280,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 4449576,
+          "address": 4465960,
+          "memory_size": 192728,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 4407296,
+          "address": 4407296,
+          "memory_size": 45056,
+          "alignment": 1,
+          "aligned_16k": false
+        }
+      ],
+      "elf_aligned_16k": false,
+      "zip_aligned_16k": true
+    },
+    {
+      "path": "lib/x86_64/libandroidx.graphics.path.so",
+      "sha256": "4e56c996f13670e70082658de7880c4020eabf4f25e43387f88ed78a713fc9f0",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 7872,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 7872,
+          "address": 24256,
+          "memory_size": 936,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 8808,
+          "address": 41576,
+          "memory_size": 16,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 7872,
+          "address": 24256,
+          "memory_size": 4416,
+          "alignment": 1,
+          "aligned_16k": false
+        }
+      ],
+      "elf_aligned_16k": false,
+      "zip_aligned_16k": true
+    },
+    {
+      "path": "lib/x86_64/libdatastore_shared_counter.so",
+      "sha256": "fb6c9208988c49ae94943bc3236fa763ba584722e044fa4ea9a12d2941027105",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 3872,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 3872,
+          "address": 20256,
+          "memory_size": 552,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 3872,
+          "address": 20256,
+          "memory_size": 4320,
+          "alignment": 1,
+          "aligned_16k": false
+        }
+      ],
+      "elf_aligned_16k": false,
+      "zip_aligned_16k": true
+    },
+    {
+      "path": "lib/x86_64/libtensorflowlite_flex_jni.so",
+      "sha256": "f1eb0a955ccb6d5b26563abebcffc607f5a2f670665b0a38cb1b1dcfb296777b",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 102198640,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 102203392,
+          "address": 102203392,
+          "memory_size": 2928600,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 105132000,
+          "address": 105148384,
+          "memory_size": 76832,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 102203392,
+          "address": 102203392,
+          "memory_size": 2932736,
+          "alignment": 1,
+          "aligned_16k": true
+        }
+      ],
+      "elf_aligned_16k": true,
+      "zip_aligned_16k": true
+    },
+    {
+      "path": "lib/x86_64/libtensorflowlite_jni.so",
+      "sha256": "59fb31cc5aae55fd764ef74b0855db7549e981427e7debe31ef3a3f2792dc0d5",
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 6203168,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 6209536,
+          "address": 6209536,
+          "memory_size": 37632,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 6247168,
+          "address": 6263552,
+          "memory_size": 69856,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 6209536,
+          "address": 6209536,
+          "memory_size": 40960,
+          "alignment": 1,
+          "aligned_16k": false
+        }
+      ],
+      "elf_aligned_16k": false,
+      "zip_aligned_16k": true
+    }
+  ],
+  "runtime_tested": false,
+  "statically_compatible": false
+}

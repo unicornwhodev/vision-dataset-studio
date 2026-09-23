@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.StabilizationTest" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-09-23T10:42:47.397Z" hostname="UNICORN-PC" time="0.15">
+  <properties/>
+  <testcase name="explicitGroundingLinksResolveToCanonicalTargets" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.004"/>
+  <testcase name="modelContractSupportsHumanOnlyAndPartialProjects" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.001"/>
+  <testcase name="inferenceReceiptIsDurableAndDistinguishesEmpty" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.047"/>
+  <testcase name="actionsAndExtendedCapabilitiesFollowTheContract" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.002"/>
+  <testcase name="navigationUsesHistoryWithoutDuplicates" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.002"/>
+  <testcase name="capabilitiesComeFromContractWithoutInventingQualification" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.0"/>
+  <testcase name="trainingStorageEstimateIncludesPrimaryAndAuxiliaryTargets" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.007"/>
+  <testcase name="instanceLinksAreExplicitValidatedAndReversible" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.002"/>
+  <testcase name="groundingProposalRequiresExplicitHumanReview" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.002"/>
+  <testcase name="maskTopologyDoesNotDuplicateAnInstance" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.001"/>
+  <testcase name="advancedMaskOperationsAreComplete" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.002"/>
+  <testcase name="requiredRuntimeFilesMustExistAndRemainWithinInstallation" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.01"/>
+  <testcase name="cocoMaskProjectionIsColumnMajorAndMatchesAreaAndBox" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.001"/>
+  <testcase name="absentOrStaleModelManifestDoesNotBlockRuntimeFiles" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.008"/>
+  <testcase name="annotationCompatibilityIsExplicit" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.0"/>
+  <testcase name="brushSizeChangesPaintedAreaAndEraserRemovesPixels" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.001"/>
+  <testcase name="groundingWireContractIsExplicitReferentialAndThresholdSafe" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.001"/>
+  <testcase name="everyMaskToolStartsFromTheSameAspectPreservingRaster" classname="com.unicornwhodev.visiondatasetstudio.StabilizationTest" time="0.058"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

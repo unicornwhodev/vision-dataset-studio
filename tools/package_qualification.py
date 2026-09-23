@@ -13,11 +13,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main() -> None:
     base = ROOT / 'dist/android'
-    receipt = json.loads((base / 'latest.json').read_text())
+    receipt = json.loads((base / 'latest.json').read_text(encoding='utf-8'))
     if not receipt.get('all_build_checks_passed') or receipt.get('outcome') != 'build_checks_passed':
         raise RuntimeError('Packaging blocked: the latest Android build checks did not all pass.')
     apks = resolve(base)
-    version = re.search(r'versionName\s*=\s*"([^"]+)"', (ROOT / 'app/build.gradle.kts').read_text())[1]
+    version = re.search(r'versionName\s*=\s*"([^"]+)"', (ROOT / 'app/build.gradle.kts').read_text(encoding='utf-8'))[1]
     if not re.fullmatch(r'[0-9A-Za-z.+-]+', version):
         raise RuntimeError('Unsafe version name')
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()

@@ -1,0 +1,20 @@
+{
+  "outcome": "passed",
+  "serial": "emulator-5582",
+  "lineage_id": "84013319425878f715b35ceb060e393aa189661ca62ebf7c1f78fd3ea7032388",
+  "generation": 2,
+  "scope": "Actual process stop/start; persisted lineage and model/checkpoint byte integrity. Native reload is covered by the core training test.",
+  "hashes_before": {
+    "files/training/lineages/84013319425878f715b35ceb060e393aa189661ca62ebf7c1f78fd3ea7032388.json": "256dc2fbadf4caf4d241f77cf2c1549e3b0405409f0c6cc2d9466ae67c41029f",
+    "/data/data/com.unicornwhodev.visiondatasetstudio/files/models/original-qa-1790160338353/model.tflite": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+    "/data/user/0/com.unicornwhodev.visiondatasetstudio/files/models/training-5653dc85-ded0-43a9-ae91-7ee6fd9488df/model.tflite": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+    "/data/user/0/com.unicornwhodev.visiondatasetstudio/files/models/training-5653dc85-ded0-43a9-ae91-7ee6fd9488df/checkpoint-98701f2b-3ac9-4e90-87b5-182ba23c05d8/weights": "85767628518437b984075ac984bee80a38f61ca12064d42604444ca5c30dc227"
+  },
+  "hashes_after": {
+    "files/training/lineages/84013319425878f715b35ceb060e393aa189661ca62ebf7c1f78fd3ea7032388.json": "256dc2fbadf4caf4d241f77cf2c1549e3b0405409f0c6cc2d9466ae67c41029f",
+    "/data/data/com.unicornwhodev.visiondatasetstudio/files/models/original-qa-1790160338353/model.tflite": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+    "/data/user/0/com.unicornwhodev.visiondatasetstudio/files/models/training-5653dc85-ded0-43a9-ae91-7ee6fd9488df/model.tflite": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+    "/data/user/0/com.unicornwhodev.visiondatasetstudio/files/models/training-5653dc85-ded0-43a9-ae91-7ee6fd9488df/checkpoint-98701f2b-3ac9-4e90-87b5-182ba23c05d8/weights": "85767628518437b984075ac984bee80a38f61ca12064d42604444ca5c30dc227"
+  },
+  "start_output": "Starting: Intent { cmp=com.unicornwhodev.visiondatasetstudio/.MainActivity }\nStatus: ok\nLaunchState: COLD\nActivity: com.unicornwhodev.visiondatasetstudio/.MainActivity\nTotalTime: 2087\nWaitTime: 2089\nComplete\n"
+}

@@ -25,7 +25,7 @@ def ownership(info):
     info.mode=0o700 if info.isdir() else 0o600
     return info
 files=[f for f in sorted(a.source.rglob('*')) if not f.is_symlink() and 'saved-model' not in f.relative_to(a.source).parts]
-with subprocess.Popen([*adb,'shell','-T','run-as',package,'tar','-x','-C',target],stdin=subprocess.PIPE) as proc:
+with subprocess.Popen([*adb,'exec-in','run-as',package,'tar','-x','-f','-','-C',target],stdin=subprocess.PIPE) as proc:
     with tarfile.open(fileobj=proc.stdin,mode='w|') as archive:
         for f in files:
             if f.is_file() or f.is_dir():archive.add(f,arcname=f.relative_to(a.source).as_posix(),recursive=False,filter=ownership)

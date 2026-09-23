@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Real host SQLite only. Executes production migration SQL; does not substitute for Room."""
 from pathlib import Path
-import hashlib, json, re, resource, sqlite3, tempfile, time, unittest
+import hashlib, json, re, sqlite3, tempfile, time, unittest
 ROOT=Path(__file__).resolve().parents[2]
 SQL_SOURCE=ROOT/'app/src/main/java/com/unicornwhodev/visiondatasetstudio/data/db/SchemaMigrations.kt'
 
 def migration(name):
-    text=SQL_SOURCE.read_text();part=text.split('val '+name+'=listOf(',1)[1].split('\n    )',1)[0]
+    text=SQL_SOURCE.read_text(encoding='utf-8');part=text.split('val '+name+'=listOf(',1)[1].split('\n    )',1)[0]
     return [json.loads(line.strip().rstrip(',')) for line in part.splitlines() if line.strip()]
 
 def old(db, version):
-    db.executescript((ROOT/f'app/src/test/resources/legacy-v{version}.sql').read_text())
+    db.executescript((ROOT/f'app/src/test/resources/legacy-v{version}.sql').read_text(encoding='utf-8'))
     db.execute('PRAGMA user_version='+str(version))
 
 def insert(db,table,**overrides):
@@ -95,7 +95,16 @@ def stress():
         assert db.execute('PRAGMA integrity_check').fetchone()[0]=='ok'
         db.close();reopened=sqlite3.connect(path);assert reopened.execute('SELECT COUNT(*) FROM source_entries').fetchone()[0]==n;reopened.close()
         report['database_bytes']=path.stat().st_size
-    report['process_max_rss_kib']=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    try:
+        import resource
+    except ImportError:
+        report['process_max_rss_kib']=None
+        report['process_max_rss_source']='Unavailable: this platform does not provide getrusage'
+    else:
+        import sys
+        rss=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        report['process_max_rss_kib']=rss/1024 if sys.platform=='darwin' else rss
+        report['process_max_rss_source']='getrusage(RUSAGE_SELF)'
     report['migration_source_sha256']=hashlib.sha256(SQL_SOURCE.read_bytes()).hexdigest()
     dest=ROOT/'test-results/v4.2/sqlite-stress.json';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 

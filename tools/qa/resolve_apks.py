@@ -8,7 +8,7 @@ APP_ID = 'com.unicornwhodev.visiondatasetstudio'
 
 def resolve(base: Path) -> tuple[Path, Path]:
     base = base.resolve()
-    latest = json.loads((base / 'latest.json').read_text())
+    latest = json.loads((base / 'latest.json').read_text(encoding='utf-8'))
     if latest.get('application_id') != APP_ID:
         raise ValueError('Wrong application identity in receipt.')
     if not latest.get('apk_built') or not latest.get('test_apk_built'):
@@ -18,7 +18,7 @@ def resolve(base: Path) -> tuple[Path, Path]:
         raise ValueError('Invalid run path in receipt.')
     folder = (base / run).resolve()
     if not folder.is_relative_to(base): raise ValueError('Run path outside evidence folder.')
-    stored = json.loads((folder / 'status.json').read_text())
+    stored = json.loads((folder / 'status.json').read_text(encoding='utf-8'))
     if any(stored.get(k) != v for k, v in latest.items() if k != 'run'):
         raise ValueError('Latest pointer and saved run status differ.')
     result = []

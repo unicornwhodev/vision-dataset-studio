@@ -12,6 +12,7 @@ import com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager
 import com.unicornwhodev.visiondatasetstudio.data.db.AppDatabase
 import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
 import com.unicornwhodev.visiondatasetstudio.data.model.ProjectEntity
+import com.unicornwhodev.visiondatasetstudio.data.model.ModelProfileEntity
 import com.unicornwhodev.visiondatasetstudio.data.model.SampleAnnotations
 import com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings
 import com.unicornwhodev.visiondatasetstudio.domain.inference.*
@@ -40,18 +41,20 @@ data class DeviceTrainingRun(
     val initialLoss:Double?=null,val validationLoss:Double?=null,
     val initialWeightProbe:String?=null,val finalWeightProbe:String?=null,
     val sourceBatchNumber:Int=0,val exportSnapshot:String="",val exportProof:String="",
-    val checkpoint:CheckpointReceipt?=null,val error:String?=null,val createdAt:Long=System.currentTimeMillis()
+    val checkpoint:CheckpointReceipt?=null,val error:String?=null,val createdAt:Long=System.currentTimeMillis(),
+    val lineageId:String="",val generation:Int=0,val parentRunId:String?=null
 )
 
 data class PreparedTrainingSample(val image:File,val sha256:String,val annotationJson:String,val width:Int,val height:Int)
 data class TrainingInspection(val batch:com.unicornwhodev.visiondatasetstudio.data.model.BatchEntity,val config:ModelConfig,
     val source:File,val samples:List<PreparedTrainingSample>,val trainCount:Int,val validationCount:Int,val requiredBytes:Long,
-    val previousCompleted:Boolean,val checkpoint:CheckpointReceipt?)
+    val previousCompleted:Boolean,val checkpoint:CheckpointReceipt?,val lineage:TrainingLineage)
 
 class OnDeviceTraining(private val context:Context) {
     private val adapter=StudioJson.moshi.adapter(DeviceTrainingRun::class.java)
     private val configAdapter=StudioJson.moshi.adapter(ModelConfig::class.java)
     private val annotationsAdapter=StudioJson.moshi.adapter(SampleAnnotations::class.java)
+    private val lineages=TrainingLineageStore(context)
     private fun index(projectId:Long)=File(context.filesDir,"training/$projectId.json").apply{parentFile?.mkdirs()}
     private fun readRecord(file:File):DeviceTrainingRun? {
         if(!file.exists() && !File(file.path+".bak").exists())return null
@@ -79,7 +82,9 @@ class OnDeviceTraining(private val context:Context) {
         val config=configAdapter.failOnUnknown().fromJson(project.modelConfigJson ?: error(tr("Contrat modèle absent", "Model contract missing"))) ?: error(tr("Contrat absent", "Missing contract"))
         ModelContract.validate(config);require(config.training!=null){tr("La conversion active ne fournit pas encore train/infer/save/restore", "The active conversion does not yet provide train/infer/save/restore")}
         require(config.bundleKind.isBlank()){tr("Le contrat d’apprentissage doit désigner un graphe entraînable unique", "The training contract must identify a single trainable graph")}
-        val source=File(project.modelPath ?: error(tr("Poids absents", "Weights missing")));require(source.isFile&&source.canRead()){tr("Poids absents ou illisibles", "Weights missing or unreadable")}
+        val activeSource=File(project.modelPath ?: error(tr("Poids absents", "Weights missing")));require(activeSource.isFile&&activeSource.canRead()){tr("Poids absents ou illisibles", "Weights missing or unreadable")}
+        val lineage=lineages.resolve(project.id,activeSource,config)
+        val source=File(lineage.learned?.modelFile ?: lineage.originalModelFile)
         val db=AppDatabase.getInstance(context)
         val (batch,rows)=db.withTransaction {
             val batch=db.batchDao().getBatchSync(project.id,batchNumber) ?: error(tr("Lot absent", "Batch not found"))
@@ -104,9 +109,9 @@ class OnDeviceTraining(private val context:Context) {
         if(requireReady)require(train>=32&&validation>=8){tr("Il faut 32 images d’apprentissage et 8 de contrôle ; disponibles : $train / $validation", "32 training and 8 validation images are required; available: $train / $validation")}
         val previous=readBatch(project.id,batchNumber);val completed=previous!=null&&previous.exportSnapshot==batch.archiveSnapshot&&previous.phase in setOf("completed","rejected")
         if(requireReady)check(!completed){tr("L’apprentissage de cet export est déjà terminé", "Training on this export has already completed")}
-        val inherited=if(config.trainingCheckpoint.isBlank())null else readCheckpoint(source,config.trainingCheckpoint)
+        val inherited=lineage.learned?.checkpoint ?: if(config.trainingCheckpoint.isBlank())null else readCheckpoint(source,config.trainingCheckpoint)
         LiteRtTrainingSession(source,config.copy(trainingCheckpoint="")).use{session->inherited?.let(session::restore)}
-        TrainingInspection(batch,config,source,unique,train,validation,estimateRequiredBytes(source.length(),unique.map{it.image.length()},config),completed,inherited)
+        TrainingInspection(batch,config,source,unique,train,validation,estimateRequiredBytes(source.length(),unique.map{it.image.length()},config),completed,inherited,lineage)
     }
     suspend fun prepare(project:ProjectEntity,batchNumber:Int,epochs:Int=3,learningRate:Float=.001f):DeviceTrainingRun = withContext(Dispatchers.IO) { executionMutex.withLock {
         require(epochs in 1..30 && learningRate in .000001f..1f)
@@ -116,9 +121,19 @@ class OnDeviceTraining(private val context:Context) {
         val needed=inspection.requiredBytes
         val policy=ProjectSettings.read(project)
         require(StorageManager(context).hasAvailableBudget(needed,project.diskBudgetMb,policy.reserveFreeMb)){tr("Budget disque insuffisant pour conserver les checkpoints et images d’apprentissage", "Insufficient storage budget to keep checkpoints and training images")}
+        lineages.preserve(inspection.lineage)
+        val original=inspection.lineage
+        val profiles=AppDatabase.getInstance(context).modelProfileDao()
+        if(profiles.getAllSync().none{it.modelPath.isNotBlank() && File(it.modelPath).canonicalPath==original.originalModelFile})profiles.save(ModelProfileEntity(
+            "original-${original.id}",tr("Original · ${project.name}", "Original · ${project.name}"),
+            original.originalModelFile,original.originalModelSha256,configAdapter.toJson(original.originalConfig),
+            tr("Modèle original conservé ; l’apprentissage utilise une copie distincte.", "Original model preserved; training uses a separate copy.")))
         val id=UUID.randomUUID().toString();val directory=File(context.filesDir,"models/training-$id").apply{mkdirs()}
         try {
             val model=File(directory,"model.tflite");source.copyTo(model)
+            require(HashUtils.computeSha256(model)==(original.learned?.modelSha256 ?: original.originalModelSha256)) {
+                tr("Le modèle a changé pendant sa copie ; apprentissage refusé", "Model changed while copying; training refused")
+            }
             // Delegate requirements belong to the conversion and survive each learned generation.
             File(source.parentFile,"runtime_contract.json").takeIf { it.isFile }?.copyTo(File(directory,"runtime_contract.json"))
             val samples=unique.map { prepared ->
@@ -131,12 +146,47 @@ class OnDeviceTraining(private val context:Context) {
                 java.io.DataOutputStream(targetFile.outputStream().buffered()).use { out -> target.forEach(out::writeFloat) }
                 TrainingSample(copy.path,sha,emptyList(),holdout(sha),targetFile.relativeTo(directory).invariantSeparatorsPath,HashUtils.computeSha256(targetFile),auxiliary)
             }
-            // A resumed generation starts from the active checkpoint; the original profile is never modified.
+            // Continue the last validated learned version, even when inference still uses the original.
             val inherited=inspection.checkpoint
             val baseConfig=config.copy(trainingCheckpoint="")
             val checkpoint=if(inherited!=null)LiteRtTrainingSession(model,baseConfig).use{session->session.restore(inherited);session.save(File(directory,"inherited"))}else null
-            DeviceTrainingRun(id,project.id,model.path,HashUtils.computeSha256(model),baseConfig,samples,epochs,learningRate,totalSteps=train*epochs,sourceBatchNumber=batchNumber,exportSnapshot=batch.archiveSnapshot!!,exportProof=batch.verifiedArchiveSha256 ?: batch.preparedManifestSha256 ?: error(tr("Preuve d’export absente", "Export evidence missing")),checkpoint=checkpoint).also(::write)
+            DeviceTrainingRun(id,project.id,model.path,HashUtils.computeSha256(model),baseConfig,samples,epochs,learningRate,totalSteps=train*epochs,sourceBatchNumber=batchNumber,exportSnapshot=batch.archiveSnapshot!!,exportProof=batch.verifiedArchiveSha256 ?: batch.preparedManifestSha256 ?: error(tr("Preuve d’export absente", "Export evidence missing")),checkpoint=checkpoint,
+                lineageId=original.id,generation=(original.learned?.generation ?: 0)+1,parentRunId=original.learned?.runId).also(::write)
         } catch(e:Exception){directory.deleteRecursively();throw e}
+    } }
+    /** Advances the learned version only after evaluation and an independent save/restore check. */
+    suspend fun finish(run:DeviceTrainingRun) {
+        if(run.phase=="completed") {
+            lineages.complete(run)
+            val file=File(run.modelFile)
+            val config=run.config.copy(trainingCheckpoint=saveCheckpointReceipt(file,requireNotNull(run.checkpoint)))
+            val id=if(run.lineageId.isBlank())"trained-${run.id}" else "trained-${run.lineageId}"
+            val project=AppDatabase.getInstance(context).projectDao().getProjectSync(run.projectId)
+            AppDatabase.getInstance(context).modelProfileDao().save(ModelProfileEntity(id,
+                tr("Version entraînée · ${project?.name ?: run.projectId}", "Learned version · ${project?.name ?: run.projectId}"),
+                file.path,run.modelSha256,configAdapter.toJson(config),
+                tr("Génération ${run.generation} · ${run.completedSteps} étapes. Original conservé. Activation manuelle.", "Generation ${run.generation} · ${run.completedSteps} steps. Original preserved. Manual activation.")))
+        }
+        write(run)
+    }
+    /** Activation changes the project's inference choice, never the original or the learned lineage. */
+    suspend fun activate(projectId:Long,batchNumber:Int):DeviceTrainingRun = withContext(Dispatchers.IO) { executionMutex.withLock {
+        val run=readBatch(projectId,batchNumber) ?: error(tr("Aucun apprentissage", "No training run"))
+        require(run.phase=="completed" && run.checkpoint!=null){tr("Le candidat doit réussir le contrôle avant activation", "The candidate must pass validation before activation")}
+        val file=File(run.modelFile)
+        require(HashUtils.computeSha256(file)==run.modelSha256)
+        LiteRtTrainingSession(file,run.config).use{it.restore(run.checkpoint)}
+        val json=configAdapter.toJson(run.config.copy(trainingCheckpoint=saveCheckpointReceipt(file,run.checkpoint)))
+        val db=AppDatabase.getInstance(context)
+        db.withTransaction {
+            // Legacy completed runs acquire a profile without changing their saved receipts.
+            if(run.lineageId.isBlank())db.modelProfileDao().save(ModelProfileEntity("trained-${run.id}",
+                tr("Version entraînée · ${run.id.take(8)}", "Learned version · ${run.id.take(8)}"),file.path,run.modelSha256,json,
+                tr("Apprentissage Android · ${run.completedSteps} étapes", "Android training · ${run.completedSteps} steps")))
+            val project=db.projectDao().getProjectSync(projectId) ?: error(tr("Projet absent", "Project not found"))
+            db.projectDao().saveProject(project.copy(modelPath=file.path,modelConfigJson=json,updatedAt=System.currentTimeMillis()))
+        }
+        run
     } }
     /** Training never delays a disabled workflow; active/failed runs keep their source lot until explicitly resolved. */
     fun requireCleanupAllowed(project:ProjectEntity,batchNumber:Int,hasAcceptedImages:Boolean,exportSnapshot:String?) {
@@ -164,6 +214,10 @@ class OnDeviceTraining(private val context:Context) {
         val referenced=mutableSetOf<String>()
         db.projectDao().getProjectsSync().mapNotNullTo(referenced){it.modelPath?.let(::File)?.canonicalPath}
         db.modelProfileDao().getAllSync().mapTo(referenced){File(it.modelPath).canonicalPath}
+        lineages.all().forEach { lineage ->
+            referenced+=File(lineage.originalModelFile).canonicalPath
+            lineage.learned?.let{referenced+=File(it.modelFile).canonicalPath}
+        }
         File(context.filesDir,"training").listFiles()?.filter{it.isFile&&it.extension=="json"}?.forEach { record ->
             runCatching{readRecord(record)}.getOrNull()?.let { run ->
                 referenced+=File(run.modelFile).canonicalPath
@@ -245,6 +299,7 @@ class DeviceTrainingWorker(context:Context,parameters:WorkerParameters):Coroutin
         try {
             require(run.sourceBatchNumber>0 && run.exportSnapshot.isNotBlank() && run.exportProof.isNotBlank()) { tr("Ancienne préparation sans export vérifié; préparez le lot exporté", "Old preparation without a verified export; prepare the exported batch") }
             val model=File(run.modelFile);require(model.isFile && model.canRead()) { tr("Poids absents ou illisibles", "Weights missing or unreadable") }
+            require(HashUtils.computeSha256(model)==run.modelSha256){tr("Copie du modèle altérée", "Working model copy modified")}
             run.samples.forEach{require(File(it.image).isFile && HashUtils.computeSha256(File(it.image))==it.sha256){tr("Snapshot d’apprentissage altéré", "Training snapshot modified")}}
             val training=run.samples.filterNot{it.validation};val validation=run.samples.filter{it.validation}
             require(training.size>=32 && validation.size>=8)
@@ -290,7 +345,7 @@ class DeviceTrainingWorker(context:Context,parameters:WorkerParameters):Coroutin
                         val after=try{fresh.infer(reload).flatMap{it.values.toList()}}finally{reload.recycle()}
                         require(before.size==after.size && before.indices.all{kotlin.math.abs(before[it]-after[it])<=1e-5f}){tr("Checkpoint non reproductible après rechargement", "Checkpoint not reproducible after reloading")}
                     }
-                    store.write(run)
+                    store.finish(run)
                 } catch(e:CancellationException) {
                     // Persist a complete checkpoint before yielding, even when WorkManager cancels execution.
                     withContext(NonCancellable){

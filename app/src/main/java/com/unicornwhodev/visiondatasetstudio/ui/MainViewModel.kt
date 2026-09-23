@@ -1063,20 +1063,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         db.projectDao().saveProject(p.copy(settingsJson=ProjectSettings.write(ProjectSettings.read(p).copy(continuousTraining=enabled))))
     }
     fun activateTrainedModel()=operation {
-        val run=withContext(Dispatchers.IO){deviceTraining.readBatch(_activeProjectId.value,_activeBatchNumber.value)} ?: error(tr("Aucun apprentissage", "No training run"))
-        require(run.phase=="completed" && run.checkpoint!=null){tr("Le candidat doit réussir le contrôle avant activation", "The candidate must pass validation before activation")}
-        val file=File(run.modelFile)
-        require(withContext(Dispatchers.IO){com.unicornwhodev.visiondatasetstudio.core.geometry.HashUtils.computeSha256(file)}==run.modelSha256)
-        val checkpoint=withContext(Dispatchers.IO){com.unicornwhodev.visiondatasetstudio.domain.training.OnDeviceTraining.saveCheckpointReceipt(file,run.checkpoint)}
-        val config=run.config.copy(trainingCheckpoint=checkpoint)
-        val json=moshi.adapter(ModelConfig::class.java).toJson(config)
+        val run=deviceTraining.activate(_activeProjectId.value,_activeBatchNumber.value)
         val report=tr("Apprentissage Android · ${run.completedSteps} étapes · contrôle ${run.initialLoss} → ${run.validationLoss}. Contrôle réutilisé ; précision métier à évaluer.", "Android training · ${run.completedSteps} steps · validation ${run.initialLoss} → ${run.validationLoss}. Validation set reused; task accuracy needs evaluation.")
-        val id="trained-${run.id}"
-        db.modelProfileDao().save(ModelProfileEntity(id,tr("Appris sur cet appareil · ${run.id.take(8)}", "Learned on this device · ${run.id.take(8)}"),file.path,run.modelSha256,json,report))
-        val project=db.projectDao().getProjectSync(run.projectId) ?: error(tr("Projet absent", "Project not found"))
-        db.projectDao().saveProject(project.copy(modelPath=file.path,modelConfigJson=json,updatedAt=System.currentTimeMillis()))
         liteRtEngine.close();_modelDiagnostics.value=report
-        _operationProgress.value=OperationProgress(tr("Poids appris activés. Le profil précédent reste disponible dans la bibliothèque.", "Learned weights activated. The previous profile remains available in the library."),1,1)
+        _operationProgress.value=OperationProgress(tr("Version entraînée activée. Le modèle original reste dans la bibliothèque.", "Learned version activated. The original model remains in the library."),1,1)
     }
     fun inspectCorrections()=operation {
         _correctionReport.value=withContext(Dispatchers.IO){correctionStore.report(_activeProjectId.value)}

@@ -33,6 +33,11 @@ app/schemas/*.tmp
 *.aab
 *.jks
 *.keystore
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+auth.json
 *.tflite
 *.onnx
 *.safetensors

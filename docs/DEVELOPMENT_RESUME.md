@@ -8,6 +8,10 @@ Le code est sur `main`. La version en développement est **4.2.0-rc5**, code And
 
 Prévoir JDK 21, Python 3.11+, Android SDK 36, build-tools 36.0.0 et `adb`. Définir `ANDROID_HOME` vers le SDK et ajouter ses `platform-tools` au `PATH`. Les poids et corpus restent hors Git et hors APK.
 
+Le premier build nécessite également le [runtime Flex reconstruit pour 16 Ko](FLEX_16K.md).
+Le préparer une fois sous Linux/WSL selon cette procédure ; le build Android
+vérifie ensuite son reçu et ses empreintes sous Windows comme sous Linux.
+
 ```bash
 git clone https://github.com/unicornwhodev/vision-dataset-studio.git
 cd vision-dataset-studio
@@ -36,6 +40,7 @@ Les fixtures de conversions occupent du stockage dans l’installation de recett
 - Production par lots : import, préannotation, revue, export vérifié, apprentissage facultatif, nettoyage, lot suivant. L’historique anti-doublons survit au nettoyage.
 - Changer prompt, réglages ou modèle ne réécrit aucune annotation enregistrée. Une relance explicite est nécessaire et protège toujours les corrections humaines.
 - Un modèle sans entraînement reste utilisable en inférence. L’apprentissage est désactivé par défaut et tourne dans Android, sur le lot exporté.
+- L’original reste intact et accessible ; le premier entraînement crée une version séparée et les suivants poursuivent ses derniers poids validés, même avant activation pour l’inférence. Voir [la filiation des modèles](MODEL_LINEAGE.md).
 - Une tentative interrompue peut être reprise ou abandonnée explicitement. L’abandon n’active aucun poids et ne supprime aucune image ; le nettoyage se confirme séparément.
 
 ## Prochaine recette

@@ -16,10 +16,10 @@ Récupérer APK Debug, SHA, logs assemble/test/lint et APK instrumentée. Vérif
 adb devices
 export ANDROID_SERIAL='SERIAL_DU_DISPOSITIF_DE_TEST'
 export VDS_ALLOW_TEST_INSTALL=1
-bash tools/qa/run_device_qualification.sh
+python -X utf8 tools/qa/run_device_qualification.py --training-fixture dist/fixtures/training-fixture --tokenizer-fixture dist/fixtures/hf-runtime-fixture
 ```
 
-Cette commande installe les deux APK déjà construites, exécute les tests instrumentés fournis et capture le démarrage. Elle n’efface pas les données utilisateur et n’utilise pas HF. Les tests sur fournisseur SAF injecté ne remplacent pas les suivants.
+Préparer les fixtures via `tools/qa/prepare_core_fixtures.py` dans un venv contenant `tools/qa/requirements-core.txt`. Cette commande installe les deux APK vérifiées, exécute la suite de base sans ignorer de tests et capture le démarrage réel de l’UI. Elle autorise les téléchargements de modèles publics prévus par cette suite, sans écriture HF ni effacement des données. Les suites externes sont distinctes. Voir [la qualification Windows actuelle](WINDOWS_QUALIFICATION_2026_09.md), le [correctif Flex 16 Ko](FLEX_16K.md) et la [conservation de l’original avec reprise de la version entraînée](MODEL_LINEAGE.md). Les tests sur fournisseur SAF injecté ne remplacent pas les suivants.
 
 ## Matrice P1
 

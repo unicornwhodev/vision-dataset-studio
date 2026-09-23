@@ -1,4 +1,10 @@
-# Reprise sur le poste habituel — 23 septembre 2026
+# Qualification Windows — 23 septembre 2026
+
+**23 septembre 2026 :** build Windows réel, **67 tests JVM, 70 tests Python (63 au build et 7 contrôles de packaging ajoutés), 39/39 tests Android en 4 Ko et 39/39 en 16 Ko**, aucun ignoré. Le crash Flex est corrigé. L’original est conservé et deux entraînements successifs reprennent la même version entraînée. APK ARM64 optimisée : **100,2 Mo**, non signée. Trois autres bibliothèques gardent des signalements RELRO ; la qualification 16 Ko globale et le téléphone ARM restent ouverts. [Preuves et limites](docs/WINDOWS_QUALIFICATION_2026_09.md).
+
+Build `20260923T104142Z-befce3e3596a` : 99 fichiers KSP, lint 0 erreur / 88 avertissements. Les reçus incluent les empreintes des modèles, la reprise du deuxième entraînement et les fichiers conservés après arrêt/redémarrage du processus. La CI distante reste bloquée par la facturation ; les transferts HF et la qualité sur corpus représentatif restent à qualifier. Les paragraphes suivants sont historiques.
+
+# Reprise sur le poste habituel — 23 septembre 2026 (avant correctifs Windows)
 
 Sources compilées `a0d9737`, build `20260922T223550Z-3ee0d233110c` : **67 tests JVM et 52 tests Python réussis**, lint **0 erreur / 90 avertissements** ; les 158 fichiers compilés correspondent au commit. L’APK ne contient aucun poids.
 

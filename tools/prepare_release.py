@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main() -> None:
-    receipt = json.loads((ROOT / 'dist/android/latest.json').read_text())
+    receipt = json.loads((ROOT / 'dist/android/latest.json').read_text(encoding='utf-8'))
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     if receipt.get('github_sha') != commit or os.environ.get('GITHUB_SHA') != commit:
         raise RuntimeError('Release assets require a CI build of this exact commit.')

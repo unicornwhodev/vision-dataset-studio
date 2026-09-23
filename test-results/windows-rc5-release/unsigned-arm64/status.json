@@ -1,0 +1,104 @@
+{
+  "run_id": "20260923T104437Z-7e7f388b5ee0",
+  "abi": "arm64-v8a",
+  "application_id": "com.unicornwhodev.visiondatasetstudio",
+  "outcome": "unsigned_candidate_built",
+  "signed": false,
+  "device_qualified": false,
+  "production_qualified": false,
+  "flex_runtime": {
+    "scope": "Flex ELF alignment only",
+    "libraries": {
+      "arm64-v8a": {
+        "sha256": "4702626f330cc07f361c3cc384df4772de7e84bdc7daea0bf3f61b283233bc47",
+        "bytes": 90547344,
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 87462288,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 87474176,
+            "address": 87474176,
+            "memory_size": 3031568,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 90505744,
+            "address": 90522128,
+            "memory_size": 80064,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 87474176,
+            "address": 87474176,
+            "memory_size": 3047424,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      },
+      "x86_64": {
+        "sha256": "f1eb0a955ccb6d5b26563abebcffc607f5a2f670665b0a38cb1b1dcfb296777b",
+        "bytes": 105173608,
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 102198640,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 102203392,
+            "address": 102203392,
+            "memory_size": 2928600,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 105132000,
+            "address": 105148384,
+            "memory_size": 76832,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 102203392,
+            "address": 102203392,
+            "memory_size": 2932736,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      }
+    },
+    "runtime_tested": false
+  },
+  "gradle_exit_code": 0,
+  "artifact": {
+    "file": "vision-dataset-studio-arm64-v8a-unsigned.apk",
+    "sha256": "7d360b92f9245cf88af13c5805da538bcd9eede654c910bc69eed63015c2274f",
+    "bytes": 100190260
+  },
+  "contents": {
+    "weight_files": [],
+    "native_library_bytes_uncompressed": 95039808,
+    "apk_bytes": 100190260
+  },
+  "exit_code": 0,
+  "finished_at": "2026-09-23T10:46:50.605356+00:00"
+}

@@ -36,7 +36,7 @@ def main():
         result["shipped_validator"] = {"passed": process.returncode == 0, "exit_code": process.returncode,
                                        "output": (process.stdout + process.stderr).strip()}
         manifest_path, = root.glob("batches/*/manifest.json")
-        manifest = json.loads(manifest_path.read_text())
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
         assert manifest["schema_version"] == 2 and manifest["sample_count"] == 1
         expected = set()
         for item in manifest["files"]:
@@ -48,7 +48,7 @@ def main():
             expected.add(item["path"])
         assert expected == set(names) - {manifest_path.relative_to(root).as_posix()}
         batch = manifest_path.parent
-        canonical = json.loads((batch / "annotations.jsonl").read_text())
+        canonical = json.loads((batch / "annotations.jsonl").read_text(encoding='utf-8'))
         assert canonical["sample_id"] == "audit-export" and canonical["review_status"] == "VALIDATED"
         media = canonical["media"]
         pixels = (batch / "images" / media["filename"]).read_bytes()
@@ -56,14 +56,14 @@ def main():
         assert hashlib.sha256(pixels).hexdigest() == media["sha256"]
         box, = canonical["annotations"]["boxes"]
         assert box["isHumanVerified"] and box["label"] == "object"
-        coco = json.loads((batch / "coco.json").read_text())
+        coco = json.loads((batch / "coco.json").read_text(encoding='utf-8'))
         assert (batch / coco["images"][0]["file_name"]).read_bytes() == pixels
         actual = coco["annotations"][0]["bbox"]
         assert all(abs(a - b) < .001 for a, b in zip(actual, [16, 24, 96, 72]))
-        yolo = list(map(float, (batch / "labels/audit-export.txt").read_text().split()))
+        yolo = list(map(float, (batch / "labels/audit-export.txt").read_text(encoding='utf-8').split()))
         assert len(yolo) == 5 and all(abs(a-b) < .0001 for a,b in zip(yolo, [0, .4, .5, .6, .6]))
         for filename in ["vqa.jsonl", "captions-tags.jsonl"]:
-            rows = [json.loads(line) for line in (batch / filename).read_text().splitlines()]
+            rows = [json.loads(line) for line in (batch / filename).read_text(encoding='utf-8').splitlines()]
             assert len(rows) == 1
         tar_path, = root.glob("data/train/*.tar")
         with tarfile.open(tar_path) as tar:

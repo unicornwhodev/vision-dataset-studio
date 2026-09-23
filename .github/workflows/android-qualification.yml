@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       run_device_tests:
-        description: 'Install and run instrumented tests on dedicated API 28 and 35 emulators'
+        description: 'Run core tests on API 28, API 35 and API 35 with 16 KB pages'
         required: true
         default: true
         type: boolean
@@ -14,11 +14,56 @@ concurrency:
   group: android-qualification-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  flex-runtime:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+      - uses: android-actions/setup-android@v4
+        with:
+          accept-android-sdk-licenses: true
+          packages: 'platform-tools'
+      - uses: actions/cache@v4
+        id: flex-cache
+        with:
+          path: dist/native-flex/maven
+          key: flex-16k-v1-${{ runner.os }}-${{ hashFiles('tools/build_flex_runtime.py', 'tools/qa/check_flex_runtime.py', 'tools/qa/check_apk_page_sizes.py') }}
+      - name: Build the pinned full Flex runtime for both 64-bit Android ABIs
+        if: steps.flex-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential python3-dev python3-numpy unzip zip curl git ca-certificates
+          python3 tools/build_flex_runtime.py --work-dir "$RUNNER_TEMP/vds-flex" --android-sdk-licenses "$ANDROID_HOME/licenses" --jobs 4
+      - name: Verify cached or freshly built Flex ELF segments
+        run: python3 tools/qa/check_flex_runtime.py dist/native-flex/maven/org/tensorflow/tensorflow-lite-select-tf-ops/2.16.1-vds16k1/tensorflow-lite-select-tf-ops-2.16.1-vds16k1.aar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uwd-flex-16k-runtime
+          path: dist/native-flex/maven/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: uwd-flex-16k-build-evidence
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            dist/native-flex/runs/**/status.json
+            dist/native-flex/runs/**/*.log
   build:
-    runs-on: ubuntu-latest
+    needs: flex-runtime
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: uwd-flex-16k-runtime
+          path: dist/native-flex/maven/
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
@@ -37,8 +82,7 @@ jobs:
           cache-provider: basic
       - name: Verify source identity and build tooling policies
         run: |
-          python3 tools/qa/test_identity.py
-          python3 tools/qa/test_build_evidence.py
+          python -X utf8 -m unittest discover -s tools/qa -p "test_*.py"
       - name: Install exact compile platform and build tools
         run: |
           sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
@@ -46,12 +90,12 @@ jobs:
       - name: Build APKs, run dependency tests, lint and verify signatures
         env:
           VDS_GRADLE_BIN: gradle
-        run: bash tools/build_android.sh
+        run: python -X utf8 tools/build_android.py
       - name: Retain build evidence even after a failed check
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uwd-android-build
+          name: uwd-android-build-${{ matrix.os }}
           if-no-files-found: warn
           retention-days: 14
           path: dist/android/
@@ -59,7 +103,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uwd-android-reports
+          name: uwd-android-reports-${{ matrix.os }}
           if-no-files-found: warn
           retention-days: 14
           path: |
@@ -73,8 +117,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [28, 35]
-    runs-on: ubuntu-latest
+        include:
+          - { api: 28, target: google_apis, pages: 4096, name: api28 }
+          - { api: 35, target: google_apis, pages: 4096, name: api35 }
+          - { api: 35, target: google_apis_ps16k, pages: 16384, name: api35-16k }
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v6
@@ -87,31 +134,35 @@ jobs:
           java-version: '17'
       - uses: actions/download-artifact@v4
         with:
-          name: uwd-android-build
+          name: uwd-android-build-ubuntu-24.04
           path: dist/android/
+      - name: Prepare pinned public QA fixtures without host training
+        run: |
+          python -m pip install -r tools/qa/requirements-core.txt
+          python -X utf8 tools/qa/prepare_core_fixtures.py
       - name: Enable emulator hardware acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Install the exact built APKs and run all instrumented tests
+      - name: Install the exact built APKs and run the complete core suite without skips
         uses: reactivecircus/android-emulator-runner@v2
         env:
           ANDROID_SERIAL: emulator-5554
           VDS_ALLOW_TEST_INSTALL: '1'
-          VDS_EVIDENCE_DIR: test-results/device-${{ matrix.api }}
+          VDS_EVIDENCE_DIR: test-results/device-${{ matrix.name }}
         with:
           api-level: ${{ matrix.api }}
-          target: google_apis
+          target: ${{ matrix.target }}
           arch: x86_64
           emulator-port: 5554
           disable-animations: true
-          script: bash tools/qa/run_device_qualification.sh
+          script: python -X utf8 tools/qa/run_device_qualification.py --training-fixture dist/fixtures/training-fixture --tokenizer-fixture dist/fixtures/hf-runtime-fixture --expected-page-size ${{ matrix.pages }}
       - name: Retain installation logs, screenshots and device results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uwd-android-device-${{ matrix.api }}
+          name: uwd-android-device-${{ matrix.name }}
           retention-days: 14
           if-no-files-found: warn
-          path: test-results/device-${{ matrix.api }}/
+          path: test-results/device-${{ matrix.name }}/

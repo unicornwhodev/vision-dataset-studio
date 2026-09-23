@@ -1,5 +1,7 @@
 # Limites de qualification — audit rc5
 
+**23 septembre 2026 :** build Windows réel, **67 tests JVM, 63 tests Python, 39/39 tests Android en 4 Ko et 39/39 en 16 Ko**, aucun ignoré. Le crash Flex est corrigé. L’original est conservé et deux entraînements successifs reprennent la même version entraînée. APK ARM64 optimisée : **100,2 Mo**, non signée. Trois autres bibliothèques gardent des signalements RELRO ; la qualification 16 Ko globale et le téléphone ARM restent ouverts. [Preuves et limites](docs/WINDOWS_QUALIFICATION_2026_09.md).
+
 [English](docs/en/KNOWN_LIMITATIONS.md) · [Recette fonctionnelle](docs/FUNCTIONAL_AUDIT_2026_09.md)
 
 Le grounding modèle exige le contrat HTTP explicite `task=grounding` + `httpOutputMode=grounding_proposals`, des identifiants de régions uniques et des liens phrase-région contrôlés. Les tests de contrat et de revue humaine passent ; aucun serveur grounding réel n’a été qualifié. Les bundles Florence-2 et les couples caption+box ne sont pas déclarés grounding. Les imports et modèles ne reçoivent aucun lien d’instance inventé.
@@ -14,11 +16,11 @@ Les réservations HF, conflits de commits, réponse perdue, publication distante
 
 ## Apprentissage facultatif Android
 
-L’apprentissage est désactivé par défaut. Il utilise uniquement le lot terminé dont l’export a été vérifié. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; annulation et erreur conservent les images. L’activation des nouveaux poids reste manuelle. En cas d’erreur ou d’annulation, **Modèles → Apprentissage → Abandonner** clôt explicitement la tentative après confirmation, sans activer de poids ni supprimer d’images. Le nettoyage du lot reste une action distincte après vérification de l’export. Une nouvelle tentative peut être lancée explicitement ; un ancien apprentissage terminé ne satisfait pas la condition de nettoyage si l’export du lot a changé.
+L’apprentissage est désactivé par défaut. Il utilise uniquement le lot terminé dont l’export a été vérifié. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; annulation et erreur conservent les images. L’original reste intact ; les entraînements suivants reprennent les derniers poids validés de la version entraînée, même avant activation. Le profil entraîné conserve son identifiant. L’activation pour l’inférence reste manuelle. Voir [la filiation](docs/MODEL_LINEAGE.md). En cas d’erreur ou d’annulation, **Modèles → Apprentissage → Abandonner** clôt explicitement la tentative après confirmation, sans activer de poids ni supprimer d’images. Le nettoyage du lot reste une action distincte après vérification de l’export. Une nouvelle tentative peut être lancée explicitement ; un ancien apprentissage terminé ne satisfait pas la condition de nettoyage si l’export du lot a changé.
 
 Huit conversions HF ont passé inférence, apprentissage, sauvegarde/restauration et reprise Android ; cinq autres ont passé l’inférence. Les encodeurs des conversions HF fournies restent figés. Le réseau de contrôle synthétique modifie séparément ses couches visuelles internes. Voir la [matrice par conversion](docs/LITERT_QUALIFICATION.md) : 13 succès, trois délais dépassés sur émulateur (RF-DETR et deux conversions privées), 15 conversions non exécutées. Aucun gain de précision n’est démontré.
 
-Le chemin Interpreter/Flex emploie LiteRT 1.4.2 et Select TF Ops 2.16.1. L’intégration LiteRT 2.2 essayée n’expose pas l’API Java Delegate requise ; sa sauvegarde FlexSave a échoué. Les opérateurs des conversions HF récentes doivent être vérifiés sous le runtime retenu. GPU/NPU et apprentissage distribué ne sont pas intégrés.
+Le chemin Interpreter/Flex emploie LiteRT 1.4.2 et Select TF Ops 2.16.1-vds16k1, reconstruit pour corriger le crash Flex 16 Ko. Voir [le runtime](docs/FLEX_16K.md). L’intégration LiteRT 2.2 essayée n’expose pas l’API Java Delegate requise ; sa sauvegarde FlexSave a échoué. Les opérateurs des conversions HF récentes doivent être vérifiés sous le runtime retenu. GPU/NPU et apprentissage distribué ne sont pas intégrés.
 
 Le lot doit contenir au moins 32 images d’apprentissage et 8 de contrôle selon le partage déterministe par hash. Les cibles sont limitées à un million de valeurs par image et stockées sur disque avec empreinte. Les masques et cibles auxiliaires de présence/abstention/supervision sont pris en charge selon le contrat ; les entrées d’apprentissage texte ne le sont pas. Un contrôle réutilisé n’est pas une mesure sur corpus indépendant.
 
@@ -36,7 +38,7 @@ Les textes applicatifs français et anglais sont implémentés. Le parcours angl
 
 ## Distribution
 
-Aucun poids n’est embarqué dans l’APK. Le build contrôle les extensions et signatures de poids et écrit `app-contents.json`. L’APK Debug universelle reste volumineuse à cause des bibliothèques natives de quatre architectures ; des APK par ABI et une release optimisée sont à préparer.
+Aucun poids n’est embarqué dans l’APK. Le build contrôle les extensions et signatures de poids et écrit `app-contents.json`. L’APK Debug universelle reste volumineuse à cause des bibliothèques natives de quatre architectures ; un candidat Release ARM64 optimisé de 100,2 Mo est construit, non signé et non qualifié sur téléphone.
 
 La CI API 28/35, un téléphone ARM, la RAM, la latence et les contraintes thermiques restent à qualifier. Le pod n’a pas KVM : l’émulateur logiciel sert à la vérification fonctionnelle, pas aux performances. Les sources sont publiées. La distribution est une prérelease Debug de qualification et un paquet OCI, sans image de build qualifiée. Le lancement GitHub Actions a été refusé pour un problème de facturation du compte ; aucun job CI n’a exécuté de tests.
 

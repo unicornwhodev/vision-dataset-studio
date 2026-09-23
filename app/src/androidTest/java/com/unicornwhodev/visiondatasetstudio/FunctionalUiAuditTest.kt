@@ -46,10 +46,16 @@ class FunctionalUiAuditTest {
             withTimeout(30_000){while(vm.isBusy.value || vm.editorBusy.value)delay(25)}
             withTimeout(10_000){while(vm.projectFlow.value?.id!=vm.activeProjectId.value)delay(25)}
         }
+        // Dialogs/popups can have a second Compose root, especially on API 35.
+        // Inspect every root so localization checks also cover those surfaces.
+        fun screenTree():String {
+            val roots=rule.onAllNodes(isRoot(),useUnmergedTree=true)
+            return roots.fetchSemanticsNodes().indices.joinToString("\n") { roots[it].printToString() }
+        }
         fun englishScreen(title:String) {
             rule.waitForIdle()
             rule.onAllNodesWithText(title,useUnmergedTree=true).onFirst().assertExists()
-            val tree=rule.onRoot(useUnmergedTree=true).printToString()
+            val tree=screenTree()
             assertFalse("French application text on $title",Regex("Réglages|Réinitialiser|Télécharger|Apprentissage|Supprimer|Données locales|Légendes|Modèles").containsMatchIn(tree))
             val folder=File(app.filesDir,"qa-evidence/english").apply{mkdirs()}
             InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()?.let { image ->
@@ -107,7 +113,7 @@ class FunctionalUiAuditTest {
             assertNull(vm.db.projectDao().getProjectSync(second));assertNotNull(vm.db.projectDao().getProjectSync(first))
         } catch(failure:Throwable) {
             val folder=File(app.filesDir,"qa-evidence/english").apply{mkdirs()}
-            File(folder,"failure.txt").writeText(failure.toString()+"\noperation="+vm.operationProgress.value+"\nactive="+vm.activeProjectId.value+"\n"+runCatching{rule.onRoot(useUnmergedTree=true).printToString()}.getOrDefault("no tree"))
+            File(folder,"failure.txt").writeText(failure.toString()+"\noperation="+vm.operationProgress.value+"\nactive="+vm.activeProjectId.value+"\n"+runCatching{screenTree()}.getOrDefault("no tree"))
             InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()?.let{bitmap->File(folder,"failure.png").outputStream().use{bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()}
             throw failure
         } finally {

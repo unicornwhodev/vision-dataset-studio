@@ -22,7 +22,7 @@ class UiLocalizationTest(unittest.TestCase):
         available = set(self.strings("values"))
         missing = {}
         for source in (ROOT / "app" / "src").rglob("*.kt"):
-            references = set(re.findall(r"(?<!android\.)R\.string\.(\w+)", source.read_text()))
+            references = set(re.findall(r"(?<!android\.)R\.string\.(\w+)", source.read_text(encoding='utf-8')))
             if references - available:
                 missing[str(source.relative_to(ROOT))] = sorted(references - available)
         self.assertEqual({}, missing, "Kotlin references strings that Android cannot generate")

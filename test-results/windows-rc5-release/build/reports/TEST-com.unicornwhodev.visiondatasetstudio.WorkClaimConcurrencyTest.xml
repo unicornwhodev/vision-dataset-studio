@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.WorkClaimConcurrencyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-23T10:42:55.204Z" hostname="UNICORN-PC" time="0.103">
+  <properties/>
+  <testcase name="concurrentReservationCannotBeOverwrittenWithANewerParent" classname="com.unicornwhodev.visiondatasetstudio.WorkClaimConcurrencyTest" time="0.056"/>
+  <testcase name="completionCannotStealAnotherWorkersLeaseAndDoneIsIdempotent" classname="com.unicornwhodev.visiondatasetstudio.WorkClaimConcurrencyTest" time="0.032"/>
+  <testcase name="corruptClaimIsNeverTreatedAsUnreserved" classname="com.unicornwhodev.visiondatasetstudio.WorkClaimConcurrencyTest" time="0.015"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

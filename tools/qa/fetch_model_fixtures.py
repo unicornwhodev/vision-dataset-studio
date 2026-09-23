@@ -28,7 +28,7 @@ inventory=[]
 for name in sorted(paths):
     if not re.fullmatch(r'models/[^/]+/artifact_manifest\.json',name):continue
     manifest=root/name
-    entries=json.loads(manifest.read_text())
+    entries=json.loads(manifest.read_text(encoding='utf-8'))
     if not isinstance(entries,dict) or not entries:raise ValueError('Empty or invalid artifact manifest')
     for name,meta in entries.items():
         if not isinstance(meta,dict) or not isinstance(meta.get('bytes'),int) or not re.fullmatch(r'[0-9a-f]{64}',str(meta.get('sha256',''))):

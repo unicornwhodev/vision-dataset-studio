@@ -24,7 +24,12 @@ android {
   buildTypes {
     release {
       isCrunchPngs = false
-      isMinifyEnabled = false
+      isMinifyEnabled = true
+      isShrinkResources = true
+      // Distribution targets ARM64; an explicit x86_64 build is available for emulator QA.
+      val releaseAbis = providers.gradleProperty("vdsReleaseAbis").orElse("arm64-v8a").get().split(",")
+      require(releaseAbis.isNotEmpty() && releaseAbis.all { it in setOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64") })
+      ndk { abiFilters.addAll(releaseAbis) }
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
 
@@ -42,6 +47,8 @@ android {
     includeInApk = false
     includeInBundle = true
   }
+  // Flex is already stripped by its pinned native build; preserve its verified SHA.
+  packaging { jniLibs.keepDebugSymbols += "**/libtensorflowlite_flex_jni.so" }
 }
 
 dependencies {
@@ -65,7 +72,8 @@ dependencies {
   implementation(libs.converter.moshi)
   implementation(libs.tensorflow.lite)
   // Save/Restore and gradient operators used by on-device training signatures.
-  implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1") {
+  // Built from pinned upstream sources with LOAD + RELRO alignment; see tools/build_flex_runtime.py.
+  implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1-vds16k1") {
     exclude(group = "org.tensorflow", module = "tensorflow-lite")
     exclude(group = "org.tensorflow", module = "tensorflow-lite-api")
   }

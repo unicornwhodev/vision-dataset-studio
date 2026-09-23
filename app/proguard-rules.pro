@@ -1,4 +1,7 @@
 # Add project specific ProGuard rules here.
+# Moshi's enum adapter reflects on persisted constant names (for example LOCALIZED).
+# Keep application enum constants stable across minification and app upgrades.
+-keep enum com.unicornwhodev.visiondatasetstudio.** { *; }
 # You can control the set of applied configuration files using the
 # proguardFiles setting in build.gradle.
 #

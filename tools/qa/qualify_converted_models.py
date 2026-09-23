@@ -38,7 +38,7 @@ def main() -> int:
     if os.environ.get('VDS_ALLOW_TEST_INSTALL') != '1':
         parser.error('Set VDS_ALLOW_TEST_INSTALL=1 for a dedicated test device')
     args.evidence.mkdir(parents=True, exist_ok=True)
-    build = json.loads(args.build_receipt.read_text())
+    build = json.loads(args.build_receipt.read_text(encoding='utf-8'))
     if not build.get('all_build_checks_passed'):
         parser.error('Use the verified APKs from a build with all checks passed')
     (args.evidence / 'build-receipt.json').write_text(json.dumps(build, indent=2) + '\n')
@@ -46,7 +46,7 @@ def main() -> int:
     cases = []
     for inventory in sorted(args.model_root.glob('*/verified-inventory.json')):
         group = inventory.parent.name
-        for row in json.loads(inventory.read_text()):
+        for row in json.loads(inventory.read_text(encoding='utf-8')):
             if not row['verified']:
                 raise ValueError('Unverified model inventory')
             path = inventory.parent / 'models' / row['id']
@@ -112,7 +112,7 @@ def main() -> int:
             android = json.loads(raw.stdout)
         except ValueError:
             android = {'success': False, 'phase': 'no_android_receipt'}
-        text = (out / 'instrumentation.txt').read_text()
+        text = (out / 'instrumentation.txt').read_text(encoding='utf-8')
         passed = (code == 0 and not timed_out and android.get('success') is True
                   and bool(re.search(r'OK \(1 test\)', text))
                   and not re.search(r'INSTRUMENTATION_STATUS_CODE: -[1234]|FAILURES!!!|INSTRUMENTATION_FAILED|shortMsg=', text))

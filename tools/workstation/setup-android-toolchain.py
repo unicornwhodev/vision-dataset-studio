@@ -88,6 +88,6 @@ if not kotlin.exists():
     manifest['kotlin'] = {'version': '2.2.10', 'sha256': checksum}
 
 existing = BASE / 'android-toolchain-manifest.json'
-previous = json.loads(existing.read_text()) if existing.exists() else {}
+previous = json.loads(existing.read_text(encoding='utf-8')) if existing.exists() else {}
 existing.write_text(json.dumps(previous | manifest, indent=2) + '\n')
 print('Persistent JDK, Android command-line tools and Kotlin installed.', flush=True)

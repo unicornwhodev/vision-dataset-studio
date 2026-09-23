@@ -1,3 +1,32 @@
+# Contrôles Windows rc5 — 23 septembre 2026
+
+Gitleaks **8.30.1**, téléchargé depuis sa release officielle et vérifié par SHA-256,
+a analysé les **23 commits** de l’historique disponible et les fichiers destinés
+à cette publication, avec les règles actives et les rapports expurgés.
+
+- Historique : **20 alertes**, toutes relues et vérifiées contre les blobs Git
+  ou les certificats publics des APK déjà publiées.
+- Arbre candidat : **34 alertes**, toutes des SHA de sources ou empreintes de
+  clés publiques. Les empreintes de sources courantes correspondent aux fichiers
+  réellement compilés ; aucun secret n’a été identifié.
+- Les preuves publiques sont sélectionnées dans
+  [`test-results/windows-rc5-release/`](../test-results/windows-rc5-release/).
+  Les poids, corpus utilisateur, bases privées, tokens, keystores et fichiers
+  d’authentification restent exclus. Les rapports détaillés du scanner restent
+  dans `dist/publication-review/`, hors Git.
+- La clé Debug Windows reste hors Git et des packages. Le certificat public
+  diffère de rc4 : cette prérelease ne met pas à jour rc4. Voir le
+  [plan de distribution](RELEASE_PLAN.md).
+
+Le contrôle du contenu indexé et des archives assemblées complète ces contrôles
+avant leur publication. Le reçu de publication donnera les digests distants
+et le résultat final ; les reçus de compilation originaux ne sont pas modifiés.
+Un scan et une revue réduisent le risque sans prouver une absence absolue de secrets.
+
+---
+
+## Historique de la publication des sources rc5 sur VM
+
 # Publication des sources rc5 · rc5 source publication
 
 23 septembre 2026. Sources Android `a0d9737`, build `20260922T223550Z-3ee0d233110c` ; 158 fichiers compilés comparés au commit sans différence. Cette mise à jour publie les sources et la documentation de reprise ; les artefacts rc4 existants ne sont pas remplacés.

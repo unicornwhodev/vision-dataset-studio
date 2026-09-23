@@ -9,7 +9,11 @@ Atelier Android pour produire des datasets d’images par lots : préannotation,
 **4.2.0-rc5 · Apache-2.0 · En qualification**
 Identifiant Android : `com.unicornwhodev.visiondatasetstudio`
 
-Dernière validation **rc5 · 23 septembre 2026** : **67 JVM, 52 Python ; 38 tests Android réussis puis le dernier réussi à la reprise après archivage des fixtures de QA**. [Build, preuves et limites](test-results/functional-audit-20260922/README.md).
+**Installation rc5 :** prérelease Debug, signature différente de rc4. Une installation
+rc4 ne peut pas être mise à jour avec cette APK. Conserver ses données et sa clé de
+signature ; [détails et packages](docs/RELEASE_PLAN.md).
+
+**23 septembre 2026 :** build Windows réel, **67 tests JVM, 70 tests Python (63 au build et 7 contrôles de packaging ajoutés), 39/39 tests Android en 4 Ko et 39/39 en 16 Ko**, aucun ignoré. Le crash Flex est corrigé. L’original est conservé et deux entraînements successifs reprennent la même version entraînée. APK ARM64 optimisée : **100,2 Mo**, non signée. Trois autres bibliothèques gardent des signalements RELRO ; la qualification 16 Ko globale et le téléphone ARM restent ouverts. [Preuves et limites](docs/WINDOWS_QUALIFICATION_2026_09.md).
 
 ## L’application en images
 
@@ -81,8 +85,12 @@ Ce graphique couvre les **25 variantes publiques Charlbi**. Quatre ont passé tr
 
 Environnement utilisé : JDK 21, Python 3.11+, SDK Android 36, build-tools 36.0.0, Gradle 9.3.1. Le bootstrap Gradle Python vérifie la distribution ; ce n’est pas un wrapper JAR livré dans l’archive initiale.
 
+Avant le premier build, préparer le [runtime Flex pour pages de 16 Ko](docs/FLEX_16K.md)
+sous Linux/WSL. Ses sources et outils sont épinglés ; les builds Android Windows
+réutilisent ensuite l'AAR local vérifié. La CI le prépare dans un job dédié.
+
 ```bash
-bash tools/build_android.sh
+python -X utf8 tools/build_android.py
 ```
 
 Chaque tentative produit `dist/android/runs/<id>/status.json`. Le reçu contient les signatures, identités et empreintes des deux APK réellement assemblées ; `app-contents.json` vérifie l’absence de poids. Un échec n’est jamais promu en qualification.
@@ -92,10 +100,10 @@ Pour un appareil de recette dédié :
 ```bash
 export ANDROID_SERIAL=emulator-5554
 export VDS_ALLOW_TEST_INSTALL=1
-bash tools/qa/run_device_qualification.sh
+python -X utf8 tools/qa/run_device_qualification.py --training-fixture dist/fixtures/training-fixture --tokenizer-fixture dist/fixtures/hf-runtime-fixture
 ```
 
-Les tests de modèles nécessitent des fixtures injectées séparément et peuvent être ignorés en leur absence. Le téléphone ARM, les performances, la CI API 28/35 et les écritures HF réelles ne sont pas encore qualifiés. Voir [la recette](docs/ANDROID_QUALIFICATION.md).
+Préparer les fixtures avec `tools/qa/prepare_core_fixtures.py` dans l’environnement `requirements-core.txt`. La suite de base refuse les tests ignorés ; les suites de modèles et HF externes restent séparées. Le téléphone ARM, les performances, la CI API 28/35 et les écritures HF réelles ne sont pas encore qualifiés. Voir [les commandes Windows et preuves du 23 septembre](docs/WINDOWS_QUALIFICATION_2026_09.md) et [la recette complète](docs/ANDROID_QUALIFICATION.md).
 
 ## Documentation et dépôt
 

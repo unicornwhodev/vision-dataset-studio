@@ -9,7 +9,11 @@ An Android workspace for producing image datasets in batches: model proposals, h
 **4.2.0-rc5 · Apache-2.0 · Under qualification**
 Android application ID: `com.unicornwhodev.visiondatasetstudio`
 
-Latest validation **rc5 · 23 September 2026**: **67 JVM, 52 Python; 38 Android tests passed, then the final test passed after archiving QA fixtures**. [Build, evidence and limits](test-results/functional-audit-20260922/README.md).
+**Installing rc5:** Debug prerelease with a different signing certificate from rc4.
+It cannot update an existing rc4 installation. Preserve its data and signing key;
+see the [release and package notes](docs/RELEASE_PLAN.md).
+
+**23 September 2026:** real Windows build, **67 JVM tests, 70 Python tests (63 at build time plus 7 packaging checks), 39/39 Android core tests on both 4 KB and 16 KB emulators**, no skips. The Flex crash is fixed. The original model is preserved and later training continues the learned version. ARM64 candidate: **100.2 MB**, unsigned. Three other native libraries retain strict RELRO findings; whole-app 16 KB and physical ARM qualification remain open. [Evidence and limits](docs/WINDOWS_QUALIFICATION_2026_09.md).
 
 ## Application screenshots
 
@@ -80,6 +84,10 @@ This figure covers the **25 public Charlbi variants**. Four passed Android train
 ## Build and test
 
 Validated build environment: JDK 21, Python 3.11+, Android SDK 36, build-tools 36.0.0 and Gradle 9.3.1. The Python Gradle bootstrap verifies the downloaded distribution; the original archive did not contain a wrapper JAR.
+
+Before the first Android build, prepare the [16 KB Flex runtime](docs/FLEX_16K.md)
+on Linux/WSL. Its sources and tools are pinned; subsequent Windows builds reuse
+the verified local AAR. CI builds this runtime in a dedicated job.
 
 ```bash
 bash tools/build_android.sh

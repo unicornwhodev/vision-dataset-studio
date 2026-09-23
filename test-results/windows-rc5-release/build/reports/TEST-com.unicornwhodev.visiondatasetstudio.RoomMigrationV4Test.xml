@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.RoomMigrationV4Test" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-23T10:42:37.690Z" hostname="UNICORN-PC" time="4.95">
+  <properties/>
+  <testcase name="version1To4" classname="com.unicornwhodev.visiondatasetstudio.RoomMigrationV4Test" time="4.631"/>
+  <testcase name="version2To4" classname="com.unicornwhodev.visiondatasetstudio.RoomMigrationV4Test" time="0.107"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,8 @@
+............BLOCKED: The 16 KB Flex runtime is missing. Build it with tools/build_flex_runtime.py; see docs/FLEX_16K.md.
+...................................................
+----------------------------------------------------------------------
+Ran 63 tests in 23.511s
+
+OK
+Evidence: C:\Users\charl\AppData\Local\Temp\tmp8adfjmhv\dist\android\runs\20260923T104833Z-1d5d4b1867de
+No APK was built or promoted by this attempt.

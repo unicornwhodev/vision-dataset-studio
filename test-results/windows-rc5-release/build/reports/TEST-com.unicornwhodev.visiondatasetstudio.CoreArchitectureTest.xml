@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-23T10:42:36.413Z" hostname="UNICORN-PC" time="0.112">
+  <properties/>
+  <testcase name="testLetterboxCalculations" classname="com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest" time="0.001"/>
+  <testcase name="testCanonicalSampleJsonSerialization" classname="com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest" time="0.104"/>
+  <testcase name="testNormalizedPointClamp" classname="com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest" time="0.002"/>
+  <testcase name="testSha256Checksum" classname="com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest" time="0.001"/>
+  <testcase name="testNormalizedRectConversions" classname="com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest" time="0.002"/>
+  <testcase name="testWebDatasetTarArchiveCreation" classname="com.unicornwhodev.visiondatasetstudio.CoreArchitectureTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

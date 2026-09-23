@@ -4,6 +4,10 @@ L’apprentissage s’exécute **dans l’application Android** avec `Interprete
 Le pod est un poste de compilation et de recette. Aucun serveur d’entraînement,
 transfert de corpus ou envoi de gradients n’est intégré à l’application.
 
+L’original est conservé. Le premier entraînement crée une version séparée ;
+les suivants poursuivent cette version depuis ses derniers poids validés,
+même avant activation pour l’inférence. Voir [la conservation et la reprise des modèles](MODEL_LINEAGE.md).
+
 Les graphes d’inférence existants ne deviennent pas entraînables en ajoutant du
 JSON. Le convertisseur doit exporter des variables mutables et les fonctions
 qui calculent les gradients, mettent à jour les variables et les persistent.

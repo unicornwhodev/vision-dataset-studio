@@ -1,0 +1,16 @@
+{
+  "page_size": 16384,
+  "supported_abis": [
+    "x86_64",
+    "arm64-v8a"
+  ],
+  "runtime": "Android LiteRT Interpreter",
+  "optimizer_steps": 48,
+  "initial_loss": 0.6854044694986214,
+  "final_loss": 0.01837361347916884,
+  "internal_weights_before": "953589b2fe25ac8406555116cccc923749b6046d73212281a8a5c3cc8575d959",
+  "internal_weights_after": "61caf46ba62d8ebec30dcc62ed8e77b1efddea3aead736e1e3c1b03c2231d305",
+  "checkpoint_reload_matches": true,
+  "production_hf_models_trained": false,
+  "fixture": "synthetic red/blue images; untrained two-layer visual network"
+}

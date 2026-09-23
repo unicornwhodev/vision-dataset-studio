@@ -53,7 +53,11 @@ def main() -> int:
             shutil.move(str(staging / f'gradle-{VERSION}'), str(DIST))
         if os.name != 'nt':
             EXE.chmod(0o755)
-    return subprocess.call([str(EXE), *sys.argv[1:]], cwd=ROOT)
+    env = os.environ.copy()
+    # Keep project execution independent of the user's global caches/init scripts.
+    # Explicit GRADLE_USER_HOME or Gradle -g/--gradle-user-home still takes precedence.
+    env.setdefault('GRADLE_USER_HOME', str(ROOT / 'dist/gradle-home'))
+    return subprocess.call([str(EXE), *sys.argv[1:]], cwd=ROOT, env=env)
 
 if __name__ == '__main__':
     try:

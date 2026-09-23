@@ -5,6 +5,8 @@
 | Présentation / Overview | [README](../README.md) | [README](../README.en.md) |
 | Production par lots / Batch production | [Guide](BATCH_PRODUCTION.md) | [Guide](en/BATCH_PRODUCTION.md) |
 | Contrat des modèles entraînables / Trainable model contract | [Contrat](LITERT_TRAINING_CONTRACT.md) | [Contract](en/LITERT_TRAINING_CONTRACT.md) |
+| Original et version entraînée / Original and learned version | [Filiation](MODEL_LINEAGE.md) | [Contract](en/LITERT_TRAINING_CONTRACT.md) |
+| Flex 16 Ko et qualification Windows / Flex 16 KB and Windows qualification | [Runtime](FLEX_16K.md) · [Preuves](WINDOWS_QUALIFICATION_2026_09.md) | [Runtime and evidence](FLEX_16K.md) |
 | Résultats et limites / Results and limitations | [Tests](../TEST_REPORT.md) · [Limites](../KNOWN_LIMITATIONS.md) | [Validation](en/VALIDATION.md) |
 | Recette fonctionnelle / Functional audit | [FR](FUNCTIONAL_AUDIT_2026_09.md) | [EN](en/FUNCTIONAL_AUDIT_2026_09.md) |
 | Reprise sur poste local / Local workstation | [FR](DEVELOPMENT_RESUME.md) | [EN](en/DEVELOPMENT_RESUME.md) |

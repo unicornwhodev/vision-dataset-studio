@@ -1,0 +1,44 @@
+{
+  "scope": "Flex ELF alignment only",
+  "libraries": {
+    "arm64-v8a": {
+      "sha256": "4702626f330cc07f361c3cc384df4772de7e84bdc7daea0bf3f61b283233bc47",
+      "bytes": 90547344,
+      "segments": [
+        {
+          "type": "LOAD",
+          "offset": 0,
+          "address": 0,
+          "memory_size": 87462288,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 87474176,
+          "address": 87474176,
+          "memory_size": 3031568,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "LOAD",
+          "offset": 90505744,
+          "address": 90522128,
+          "memory_size": 80064,
+          "alignment": 16384,
+          "aligned_16k": true
+        },
+        {
+          "type": "GNU_RELRO",
+          "offset": 87474176,
+          "address": 87474176,
+          "memory_size": 3047424,
+          "alignment": 1,
+          "aligned_16k": true
+        }
+      ]
+    }
+  },
+  "runtime_tested": false
+}

@@ -33,5 +33,5 @@ for family in ('tinyclip', 'florence2'):
         ids = tokenizer.encode(text, add_special_tokens=True).ids
         assert len(ids) <= 77
         result[family].append({'text': text, 'ids': ids, 'decoded': tokenizer.decode(ids, skip_special_tokens=False)})
-(a.output / 'tokenizer-reference.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+(a.output / 'tokenizer-reference.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 print('Generated 16 encoding references and 8 Florence decoding references.')

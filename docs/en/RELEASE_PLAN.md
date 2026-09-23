@@ -1,3 +1,34 @@
+# Windows qualification prerelease — 4.2.0-rc5
+
+Build `20260923T104142Z-befce3e3596a` passed 67 JVM tests and 39/39 Android core
+tests on both 4 KB and 16 KB API 35 emulators. The Python suite passed 70 tests
+before packaging (63 at build time plus seven packaging checks). The original
+model stays intact; later training continues its separate learned version.
+
+**rc5 cannot update rc4:** the Windows Debug certificate differs from the one
+used on the previous VM, whose private key is unavailable on this workstation.
+Keep existing installations and their data. Do not uninstall an installation
+containing data to work around the signature mismatch. Private signing keys
+are excluded from Git and packages.
+
+Assets: Debug user APK, qualification ZIP with instrumentation APK and selected
+evidence, rebuilt Flex local Maven runtime, unsigned 100.2 MB ARM64 Release
+candidate, `PACKAGE.json` and `SHA256SUMS`. The unsigned candidate is not directly
+installable. GHCR distributes an artifact package and retains its existing
+private visibility; GitHub release assets are public.
+
+`tools/package_verified_release.py` verifies 162 of 163 recorded files byte for
+byte against Git blobs. The only difference is CRLF-to-LF normalization of the
+host Python bootstrap script; both hashes are recorded. Android source bytes
+are identical. `PACKAGE.json` binds the tested bytes to that commit;
+the original receipts retain their earlier base commit. Physical ARM, whole-app
+16 KB qualification, real HF writes, model quality, durable signing and the
+remaining native transitive notices are still open. Remote CI has not run for
+this build. See the [Windows evidence](../WINDOWS_QUALIFICATION_2026_09.md),
+[publication checks](../PUBLICATION_CHECKS.md) and [packaging command](../RELEASE_PLAN.md).
+
+## Historical rc4 distribution
+
 # Publication — 4.2.0-rc4
 
 [Français](../RELEASE_PLAN.md). Public repository: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). Apache-2.0 licence.

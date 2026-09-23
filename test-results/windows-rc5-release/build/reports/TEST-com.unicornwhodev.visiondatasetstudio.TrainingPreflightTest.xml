@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-23T10:42:55.186Z" hostname="UNICORN-PC" time="0.015">
+  <properties/>
+  <testcase name="insufficientDataset" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.004"/>
+  <testcase name="completePreflight" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.0"/>
+  <testcase name="onlyFinishedOrExplicitlyAbandonedRunsPermitCleanup" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.001"/>
+  <testcase name="modelPathAndFileAreCheckedSeparately" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.001"/>
+  <testcase name="unverifiedBatch" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.0"/>
+  <testcase name="insufficientStorage" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.0"/>
+  <testcase name="modelWithoutSignatures" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.0"/>
+  <testcase name="alreadyTrainedExport" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.0"/>
+  <testcase name="configuredCheckpointMustBeAvailable" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.0"/>
+  <testcase name="inferenceOnlyProfilesRemainRunnableAndIgnoreStaleTrainingPreferences" classname="com.unicornwhodev.visiondatasetstudio.TrainingPreflightTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

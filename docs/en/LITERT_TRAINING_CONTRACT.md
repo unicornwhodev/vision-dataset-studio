@@ -4,6 +4,8 @@
 
 Learning executes inside Android through `Interpreter.runSignature`. The pod only builds the app and runs QA. The app has no remote training server or corpus/gradient upload path.
 
+The original stays intact. The first training creates a separate learned version; later training restores its latest validated weights, even before inference activation. A missing learned checkpoint blocks continuation instead of silently resetting to the original. Each candidate is saved separately, and only a validated candidate advances the stable learned profile. See the [model preservation and continuation report](../MODEL_LINEAGE.md).
+
 Adding JSON cannot make an inference graph trainable. The converter must export mutable variables, gradient/update operations and persistence signatures. Internal-layer learning requires actual gradients for those layers; a `scope` string alone is not proof.
 
 ## Expected files

@@ -112,7 +112,7 @@ def convert_to_coco(batch_dir: str | Path, output_path: str | Path) -> None:
     images, boxes = [], []
     for index, (directory, record) in enumerate(records, 1):
         media = record['media']; w, h = media['width'], media['height']
-        images.append({'id': index, 'file_name': str((directory / 'images' / media['filename']).relative_to(root)), 'width': w, 'height': h})
+        images.append({'id': index, 'file_name': (directory / 'images' / media['filename']).relative_to(root).as_posix(), 'width': w, 'height': h})
         for box in record.get('annotations', {}).get('boxes', []):
             x,y,bw,bh = box['xmin']*w, box['ymin']*h, (box['xmax']-box['xmin'])*w, (box['ymax']-box['ymin'])*h
             boxes.append({'id': len(boxes)+1, 'image_id': index, 'category_id': categories[box['label']], 'bbox': [x,y,bw,bh], 'area': bw*bh, 'iscrowd': 0})

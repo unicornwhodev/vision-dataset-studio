@@ -47,6 +47,7 @@ fun TrainingScreen(vm:MainViewModel) {
                     },style=MaterialTheme.typography.bodySmall)
                 }}
                 if(config?.training!=null) {
+                Text(stringResource(R.string.training_model_versions),style=MaterialTheme.typography.bodyMedium)
                 Text(stringResource(R.string.training_batch_only,number),style=MaterialTheme.typography.bodyMedium)
                 Row(verticalAlignment=Alignment.CenterVertically){Text(stringResource(R.string.training_epochs),Modifier.weight(1f));listOf(1,3,10).forEach{n->FilterChip(selected=epochs==n,onClick={epochs=n},enabled=!active && config?.training!=null,label={Text("$n")});Spacer(Modifier.width(6.dp))}}
                 StudioAction(stringResource(R.string.training_start),{vm.startDeviceTraining(epochs)},icon=Icons.Default.ModelTraining,primary=true,enabled=!busy && !active && preflight?.canStart==true)

@@ -58,6 +58,8 @@ class OnDeviceTrainingTest {
                 }
             }
             File(root,"android-training-evidence.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf(
+                "page_size" to android.system.Os.sysconf(android.system.OsConstants._SC_PAGESIZE),
+                "supported_abis" to android.os.Build.SUPPORTED_ABIS.toList(),
                 "runtime" to "Android LiteRT Interpreter", "optimizer_steps" to 48,"initial_loss" to initial,"final_loss" to finalLoss,
                 "internal_weights_before" to beforeWeights,"internal_weights_after" to afterWeights,"checkpoint_reload_matches" to true,
                 "production_hf_models_trained" to false,"fixture" to "synthetic red/blue images; untrained two-layer visual network")))

@@ -34,7 +34,7 @@ class ValidatorTests(unittest.TestCase):
         self.image.write_bytes(b'changed')
         with self.assertRaises(ValueError):validator.validate_batch(self.root)
     def test_traversal_manifest(self):
-        m=json.loads((self.dir/'manifest.json').read_text());m['files'][0]['path']='../../private';(self.dir/'manifest.json').write_text(json.dumps(m))
+        m=json.loads((self.dir/'manifest.json').read_text(encoding='utf-8'));m['files'][0]['path']='../../private';(self.dir/'manifest.json').write_text(json.dumps(m))
         with self.assertRaises(ValueError):validator.validate_batch(self.root)
     def test_duplicate_ids(self):
         with (self.dir/'annotations.jsonl').open('a') as f:f.write(json.dumps(self.record)+'\n')
@@ -43,7 +43,7 @@ class ValidatorTests(unittest.TestCase):
         self.record['annotations']['boxes'][0]['xmax']=1.2;self.write_record();self.manifest()
         with self.assertRaises(ValueError):validator.validate_batch(self.root)
     def test_coco_preserves_pixels_and_path(self):
-        target=self.root/'coco.json';validator.convert_to_coco(self.root,target);r=json.loads(target.read_text())
+        target=self.root/'coco.json';validator.convert_to_coco(self.root,target);r=json.loads(target.read_text(encoding='utf-8'))
         self.assertEqual(r['images'][0]['file_name'],'batches/batch-000001/images/a.png')
         self.assertAlmostEqual(r['annotations'][0]['bbox'][2],.6)
         self.assertEqual(r['categories'][0]['name'],'object')

@@ -20,13 +20,19 @@ class TrainingWorkflowTest {
     @Test fun validatedCorrectionsTrainThroughWorkManagerAndResume()= runBlocking {
         val context=InstrumentationRegistry.getInstrumentation().targetContext
         val fixture=File(context.filesDir,"training-fixture")
-        val model=File(fixture,"trainable-vision-fixture.tflite")
-        assumeTrue("Stage the untrained fixture",model.isFile)
+        val fixtureModel=File(fixture,"trainable-vision-fixture.tflite")
+        assumeTrue("Stage the untrained fixture",fixtureModel.isFile)
         val json=File(fixture,"model_config.json").readText()
         val projectId=System.currentTimeMillis()
+        val model=File(context.filesDir,"models/original-qa-$projectId/model.tflite").apply{parentFile!!.mkdirs()}
+        fixtureModel.copyTo(model)
+        File(fixture,"runtime_contract.json").takeIf{it.isFile}?.copyTo(File(model.parentFile,"runtime_contract.json"))
+        val originalSha=HashUtils.computeSha256(model)
         val storage=com.unicornwhodev.visiondatasetstudio.core.storage.StorageManager(context)
         val project=ProjectEntity(id=projectId,name="QA apprentissage Android",classesCsv="rouge,bleu",activeTasksCsv="CLASSIFICATION",modelPath=model.path,modelConfigJson=json,diskBudgetMb=8192)
         val db=AppDatabase.getInstance(context);db.projectDao().saveProject(project)
+        val importedProfile=ModelProfileEntity("original-qa-$projectId","Original QA",model.path,originalSha,json,"Synthetic imported model")
+        db.modelProfileDao().save(importedProfile)
         db.batchDao().insertOrReplace(BatchEntity(projectId=projectId,batchNumber=1,status="IN_PROGRESS",totalCases=96))
         repeat(96) { n ->
             val image=Bitmap.createBitmap(32,32,Bitmap.Config.ARGB_8888)
@@ -115,6 +121,15 @@ class TrainingWorkflowTest {
         assertTrue(done.validationLoss!!<done.initialLoss!!*.99)
         assertNotEquals(done.initialWeightProbe,done.finalWeightProbe)
         assertEquals("Training never silently activates a model",model.path,db.projectDao().getProjectSync(projectId)!!.modelPath)
+        assertEquals(originalSha,HashUtils.computeSha256(model))
+        assertNotEquals(model.canonicalPath,File(done.modelFile).canonicalPath)
+        val learnedProfileId="trained-${done.lineageId}"
+        val originalProfile=db.modelProfileDao().get(importedProfile.id)!!
+        assertEquals("Existing original profile is retained unchanged",importedProfile,originalProfile)
+        assertEquals("Android /data/data and /data/user aliases must not duplicate the original profile",1,
+            db.modelProfileDao().getAllSync().count{it.modelPath.isNotBlank() && File(it.modelPath).canonicalFile==model.canonicalFile})
+        assertEquals(originalSha,originalProfile.sha256)
+        assertEquals(done.modelFile,db.modelProfileDao().get(learnedProfileId)!!.modelPath)
         store.requireCleanupAllowed(project,1,true,db.batchDao().getBatchSync(projectId,1)!!.archiveSnapshot)
         assertTrue("A previous export cannot satisfy enabled training for a changed export",runCatching{store.requireCleanupAllowed(enabledProject,1,true,"changed-export")}.isFailure)
         val config=done.config.copy(trainingCheckpoint=OnDeviceTraining.saveCheckpointReceipt(File(done.modelFile),done.checkpoint!!))
@@ -125,6 +140,58 @@ class TrainingWorkflowTest {
         assertTrue("Training images are cleaned only after the run completes",done.samples.all{!File(it.image).exists()})
         assertTrue("The unrelated batch survives cleanup",otherFile.isFile)
         assertTrue("Learned checkpoint survives cleanup",File(done.checkpoint!!.prefix).parentFile!!.listFiles()!!.any{it.isFile})
-        File(fixture,"android-workflow-evidence.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf("project_id" to projectId,"validated_images" to run.samples.size,"excluded_rejected" to 8,"exported_batch_only" to true,"cleanup_waited" to true,"explicit_abandonment_unblocks_cleanup" to true,"abandonment_never_activates_weights" to true,"restart_after_abandonment" to true,"cleanup_after_training" to true,"steps_before_cancel" to stopped.completedSteps,"steps_after_resume" to done.completedSteps,"initial_loss" to done.initialLoss,"final_loss" to done.validationLoss,"internal_weights_changed" to (done.initialWeightProbe!=done.finalWeightProbe),"source_model_preserved" to true,"runtime" to "Android WorkManager / LiteRT CPU")))
+        // A distinct exported batch must continue the learned copy while inference still uses the original.
+        db.batchDao().insertOrReplace(BatchEntity(projectId=projectId,batchNumber=3,status="IN_PROGRESS",totalCases=96))
+        repeat(96) { n ->
+            val image=Bitmap.createBitmap(32,32,Bitmap.Config.ARGB_8888)
+            image.eraseColor(if(n%2==0)Color.rgb(160+n,15,25)else Color.rgb(15,25,160+n))
+            image.setPixel(0,0,Color.rgb(n,80,90))
+            val id="continued-qa-$projectId-$n";val file=storage.getImageFile(id,"png")
+            try{file.outputStream().use{image.compress(Bitmap.CompressFormat.PNG,100,it)}}finally{image.recycle()}
+            val row=SampleEntity(sampleId=id,projectId=projectId,batchNumber=3,assetId=id,sourceRowIndex=n.toLong(),sourceFileUrl=null,localImagePath=file.path,imageWidth=32,imageHeight=32,sha256=HashUtils.computeSha256(file),acquisitionStatus="AVAILABLE",annotationStatus="VALIDATED",syncStatus="NOT_EXPORTED")
+            db.sampleDao().insertNewSamples(listOf(row))
+            db.annotationDao().insertOrReplace(AnnotationRecord(id,StudioJson.moshi.adapter(SampleAnnotations::class.java).toJson(SampleAnnotations(tags=listOf(TagTarget("continued-tag-$n",if(n%2==0)"rouge" else "bleu",isHumanVerified=true))))))
+            com.unicornwhodev.visiondatasetstudio.domain.batch.ImageIdentity.accept(db,row,com.unicornwhodev.visiondatasetstudio.domain.batch.ImageIdentity.pixelSha256(file))
+        }
+        val nextRows=db.sampleDao().getSamplesForBatchSync(projectId,3)
+        val nextArchive=exporter.packageBatchToLocalZip(project,3,nextRows.map{it to engine.getSampleAnnotations(it.sampleId)},false,true,false,false,false)
+        assertTrue(nextArchive.error,nextArchive.success)
+        engine.recordLocalArchive(projectId,3,nextArchive.zipFile!!)
+        val nextUri=android.net.Uri.parse("content://${InstrumentationRegistry.getInstrumentation().context.packageName}.documents/continued-training-archive")
+        com.unicornwhodev.visiondatasetstudio.core.storage.SafArchives.copyVerified(context.contentResolver,nextArchive.zipFile!!,nextUri)
+        engine.verifyLocalArchive(projectId,3,nextUri.toString())
+        val reopened=OnDeviceTraining(context)
+        // Missing learned bytes must fail closed, never start again from the original.
+        val checkpointFile=File(File(done.checkpoint!!.prefix).parentFile,done.checkpoint.files.keys.first())
+        val held=File(checkpointFile.path+".qa-held")
+        assertTrue(checkpointFile.renameTo(held))
+        try{assertTrue(runCatching{reopened.inspectPreparation(project,3)}.isFailure)}finally{assertTrue(held.renameTo(checkpointFile))}
+        val continued=reopened.prepare(project,3,epochs=1,learningRate=.05f)
+        assertEquals(done.lineageId,continued.lineageId)
+        assertEquals(done.id,continued.parentRunId)
+        assertEquals(2,continued.generation)
+        LiteRtTrainingSession(File(continued.modelFile),continued.config).use { session ->
+            session.restore(continued.checkpoint!!)
+            assertEquals("The next run starts from learned internal weights",done.finalWeightProbe,session.weightProbe())
+        }
+        reopened.enqueue(projectId)
+        val second=terminal()
+        assertEquals(second.error,"completed",second.phase)
+        assertEquals(done.finalWeightProbe,second.initialWeightProbe)
+        assertNotEquals(second.initialWeightProbe,second.finalWeightProbe)
+        assertEquals("Inference activation remains explicit",model.path,db.projectDao().getProjectSync(projectId)!!.modelPath)
+        assertEquals("One learned profile advances across generations",second.modelFile,db.modelProfileDao().get(learnedProfileId)!!.modelPath)
+        assertEquals(originalProfile,db.modelProfileDao().get(originalProfile.id))
+        val activated=reopened.activate(projectId,3)
+        assertEquals(second.id,activated.id)
+        assertEquals(second.modelFile,db.projectDao().getProjectSync(projectId)!!.modelPath)
+        assertEquals(second.id,TrainingLineageStore(context).resolve(projectId,model,StudioJson.moshi.adapter(ModelConfig::class.java).fromJson(json)!!).learned!!.runId)
+        assertEquals(originalSha,HashUtils.computeSha256(model))
+        withTimeout(10000){while(work.getWorkInfosForUniqueWork("vds-training-$projectId").get().any{!it.state.isFinished})delay(100)}
+        assertEquals(96,engine.purgeReviewedBatch(projectId,3,true))
+        reopened.cleanupOrphanedCandidates(db)
+        assertTrue(model.isFile)
+        assertTrue(File(second.checkpoint!!.prefix).parentFile!!.listFiles()!!.any{it.isFile})
+        File(fixture,"android-workflow-evidence.json").writeText(StudioJson.moshi.adapter(Any::class.java).indent("  ").toJson(mapOf("project_id" to projectId,"validated_images" to run.samples.size,"excluded_rejected" to 8,"exported_batch_only" to true,"cleanup_waited" to true,"explicit_abandonment_unblocks_cleanup" to true,"abandonment_never_activates_weights" to true,"restart_after_abandonment" to true,"cleanup_after_training" to true,"steps_before_cancel" to stopped.completedSteps,"steps_after_resume" to done.completedSteps,"initial_loss" to done.initialLoss,"final_loss" to done.validationLoss,"internal_weights_changed" to (done.initialWeightProbe!=done.finalWeightProbe),"source_model_preserved" to true,"original_sha256_before" to originalSha,"original_sha256_after" to HashUtils.computeSha256(model),"lineage_id" to done.lineageId,"first_final_weights" to done.finalWeightProbe,"second_initial_weights" to second.initialWeightProbe,"second_final_weights" to second.finalWeightProbe,"second_initial_loss" to second.initialLoss,"second_final_loss" to second.validationLoss,"continued_without_activation" to true,"learned_profile_id" to learnedProfileId,"missing_checkpoint_refused" to true,"runtime" to "Android WorkManager / LiteRT CPU")))
     }
 }

@@ -28,7 +28,7 @@ def main() -> None:
     if git('status', '--porcelain').strip():
         raise RuntimeError('Commit the reviewed changes before packaging.')
     commit = git('rev-parse', 'HEAD').decode().strip()
-    manifest = json.loads((EVIDENCE / 'source-manifest.json').read_text())
+    manifest = json.loads((EVIDENCE / 'source-manifest.json').read_text(encoding='utf-8'))
     for name, expected in manifest.items():
         if hashlib.sha256(git('show', f'{TESTED_SOURCE}:{name}')).hexdigest() != expected:
             raise RuntimeError(f'Tested source manifest mismatch: {name}')
@@ -36,13 +36,13 @@ def main() -> None:
                       'gradle', 'tools/build_android.py', 'tools/gradle_bootstrap.py']
     if git('diff', '--name-only', TESTED_SOURCE, commit, '--', *compiled_paths).strip():
         raise RuntimeError('Android sources or build settings changed after the tested pod build.')
-    receipt = json.loads((folder / 'status.json').read_text())
-    if receipt != json.loads((EVIDENCE / 'final-build-8/status.json').read_text()):
+    receipt = json.loads((folder / 'status.json').read_text(encoding='utf-8'))
+    if receipt != json.loads((EVIDENCE / 'final-build-8/status.json').read_text(encoding='utf-8')):
         raise RuntimeError('Build receipt differs from committed qualification evidence.')
     if receipt.get('outcome') != 'build_checks_passed' or not receipt.get('all_build_checks_passed'):
         raise RuntimeError('The pod build did not pass.')
     for name, expected in [('android-batch-8.log', 'OK (14 tests)'), ('android-ui-8.log', 'OK (2 tests)')]:
-        if expected not in (EVIDENCE / name).read_text():
+        if expected not in (EVIDENCE / name).read_text(encoding='utf-8'):
             raise RuntimeError(f'Missing executed Android evidence: {name}')
     apks = []
     for key in ('app', 'tests'):
