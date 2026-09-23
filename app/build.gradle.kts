@@ -8,6 +8,11 @@ plugins {
 android {
   namespace = "com.unicornwhodev.visiondatasetstudio"
   compileSdk = 36
+  // Build the instrumentation against the selected variant, including R8's mapping.
+  // A Debug test APK must not be reused against the minified Release.
+  testBuildType = providers.gradleProperty("vdsTestBuildType").orElse("debug").get().also {
+    require(it in setOf("debug", "release"))
+  }
 
   defaultConfig {
     applicationId = "com.unicornwhodev.visiondatasetstudio"
@@ -20,6 +25,7 @@ android {
     testInstrumentationRunner = providers.gradleProperty("vdsInstrumentationRunner").orElse("androidx.test.runner.AndroidJUnitRunner").get().also {
       require(it in setOf("androidx.test.runner.AndroidJUnitRunner", "com.unicornwhodev.visiondatasetstudio.ReleaseContinuityInstrumentation"))
     }
+    testProguardFiles("test-proguard-rules.pro")
   }
 
   // Debug uses Android's standard locally generated debug key. No private keystore is shipped.
