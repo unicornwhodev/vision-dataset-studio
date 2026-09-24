@@ -1,0 +1,332 @@
+{
+  "outcome": "release_test_apks_built",
+  "abi": "x86_64",
+  "tests_executed": false,
+  "production_qualified": false,
+  "recipe_sha256": "64caae1162f8c2e7c05f014928617aca68887926cad98bf94e43e307b3873e17",
+  "flex_runtime": {
+    "scope": "Flex ELF alignment only",
+    "libraries": {
+      "arm64-v8a": {
+        "sha256": "4702626f330cc07f361c3cc384df4772de7e84bdc7daea0bf3f61b283233bc47",
+        "bytes": 90547344,
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 87462288,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 87474176,
+            "address": 87474176,
+            "memory_size": 3031568,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 90505744,
+            "address": 90522128,
+            "memory_size": 80064,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 87474176,
+            "address": 87474176,
+            "memory_size": 3047424,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      },
+      "x86_64": {
+        "sha256": "f1eb0a955ccb6d5b26563abebcffc607f5a2f670665b0a38cb1b1dcfb296777b",
+        "bytes": 105173608,
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 102198640,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 102203392,
+            "address": 102203392,
+            "memory_size": 2928600,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 105132000,
+            "address": 105148384,
+            "memory_size": 76832,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 102203392,
+            "address": 102203392,
+            "memory_size": 2932736,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      }
+    },
+    "runtime_tested": false
+  },
+  "graphics_runtime": {
+    "artifact_sha256": "a8ddf03d4761acd62f10cea9b89de6b535b898e86d78cc3c5dc438c15de7ed15",
+    "libraries": {
+      "arm64-v8a": {
+        "sha256": "323615d67f483b3f3b6875dc8921ca8a1698a596fa36ceea9b5a847deefa2117",
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 4020,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 4020,
+            "address": 20404,
+            "memory_size": 4044,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 8064,
+            "address": 40832,
+            "memory_size": 912,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 8976,
+            "address": 58128,
+            "memory_size": 16,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 8064,
+            "address": 40832,
+            "memory_size": 8320,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      },
+      "x86_64": {
+        "sha256": "7b0a8d127854f71b882298343d133f31cd5eb22c876e81a6cabff95340230196",
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 4332,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 4336,
+            "address": 20720,
+            "memory_size": 4256,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 8592,
+            "address": 41360,
+            "memory_size": 936,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 9528,
+            "address": 58680,
+            "memory_size": 16,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 8592,
+            "address": 41360,
+            "memory_size": 7792,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      }
+    },
+    "runtime_tested": false
+  },
+  "litert_runtime": {
+    "artifact_sha256": "c1644503243c3c78092f949e2fb3cd47eafaf252bb87e18535eb29da916810ae",
+    "source_commit": "145c7523ff08d5e57ab5c582141775eea47da9c7",
+    "libraries": {
+      "arm64-v8a": {
+        "sha256": "01b2d4eeb74e19c06586ce880032efb24958bd5b55fe4f8549c2366065c99954",
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 4838256,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 4849664,
+            "address": 4849664,
+            "memory_size": 43376,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 4893040,
+            "address": 4909424,
+            "memory_size": 219568,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 4849664,
+            "address": 4849664,
+            "memory_size": 49152,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      },
+      "x86_64": {
+        "sha256": "84b06e5aa3a3e3de82dc138abc85a195ef815e537e10f36202f537254723c1c0",
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 6542016,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 6553600,
+            "address": 6553600,
+            "memory_size": 40480,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 6594080,
+            "address": 6610464,
+            "memory_size": 81152,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 6553600,
+            "address": 6553600,
+            "memory_size": 49152,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      },
+      "armeabi-v7a": {
+        "sha256": "a401f014cc5fc21ebb3e4bb123532037f580cc8c92c5da2069b1fde355fcccee",
+        "segments": null
+      },
+      "x86": {
+        "sha256": "990256dc126f28e9dc7d02b03653965711dc24766eec4882a613c2b1e98bd81d",
+        "segments": null
+      }
+    },
+    "runtime_tested": false
+  },
+  "gradle_exit_code": 0,
+  "artifacts": {
+    "app": {
+      "file": "app.apk",
+      "sha256": "cb5c2eb40109c4877823d70edaeaef83131ba4adfc2d95d005b908b56d3118f7",
+      "bytes": 117873711
+    },
+    "tests": {
+      "file": "tests.apk",
+      "sha256": "0a1c14d5aa9006a9c14b7ef1010f1567fa28a3a3da2885855618e67b484f9e9a",
+      "bytes": 2402429
+    }
+  },
+  "packaged_litert": {
+    "artifact_sha256": "c1644503243c3c78092f949e2fb3cd47eafaf252bb87e18535eb29da916810ae",
+    "source_commit": "145c7523ff08d5e57ab5c582141775eea47da9c7",
+    "libraries": {
+      "x86_64": {
+        "sha256": "84b06e5aa3a3e3de82dc138abc85a195ef815e537e10f36202f537254723c1c0",
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 6542016,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 6553600,
+            "address": 6553600,
+            "memory_size": 40480,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 6594080,
+            "address": 6610464,
+            "memory_size": 81152,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 6553600,
+            "address": 6553600,
+            "memory_size": 49152,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      }
+    },
+    "runtime_tested": false
+  },
+  "finished_at": "2026-09-24T01:27:04.441138+00:00"
+}

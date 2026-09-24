@@ -1,0 +1,55 @@
+{
+  "tag": "v2.2.0",
+  "commit": "145c7523ff08d5e57ab5c582141775eea47da9c7",
+  "source_url": "https://github.com/google-ai-edge/LiteRT/tree/145c7523ff08d5e57ab5c582141775eea47da9c7",
+  "version": "2.2.0-vds16k2",
+  "source_archive": "litert-145c7523ff08d5e57ab5c582141775eea47da9c7.tar.gz",
+  "ndk_archive": "android-ndk-r26d-linux.zip",
+  "jdk_archive": "OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz",
+  "tensorflow_dependency": {
+    "commit": "bcdab1a62e138c8f8784a7477c0be8af6dd0bd0a",
+    "sha256": "c3c552414ab2e59e72511a21c1df566346a7c8f160909325edec6d1ff403d69d"
+  },
+  "inputs": {
+    "litert-145c7523ff08d5e57ab5c582141775eea47da9c7.tar.gz": {
+      "url": "https://github.com/google-ai-edge/LiteRT/archive/145c7523ff08d5e57ab5c582141775eea47da9c7.tar.gz",
+      "sha256": "2c14ef39cadd5f5e1ad6e896ff3925ccfdf2aa41590649bf46dce149217bce20",
+      "bytes": 124451706
+    },
+    "bazel-7.7.0-linux-x86_64": {
+      "url": "https://github.com/bazelbuild/bazel/releases/download/7.7.0/bazel-7.7.0-linux-x86_64",
+      "sha256": "fe7e799cbc9140f986b063e06800a3d4c790525075c877d00a7112669824acbf",
+      "bytes": 57594289
+    },
+    "android-ndk-r26d-linux.zip": {
+      "url": "https://dl.google.com/android/repository/android-ndk-r26d-linux.zip",
+      "sha1": "fcdad75a765a46a9cf6560353f480db251d14765",
+      "sha256": "eefeafe7ccf177de7cc57158da585e7af119bb7504a63604ad719e4b2a328b54",
+      "bytes": 668556491
+    },
+    "OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz": {
+      "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%2B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz",
+      "sha256": "166774efcf0f722f2ee18eba0039de2d685b350ee14d7b69e6f83437dafd2af1",
+      "bytes": 192062472
+    },
+    "checker-qual-3.43.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/3.43.0/checker-qual-3.43.0.jar",
+      "sha256": "3fbc2e98f05854c3df16df9abaa955b91b15b3ecac33623208ed6424640ef0f6",
+      "bytes": 231525
+    },
+    "cpuinfo-ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d.zip": {
+      "url": "https://github.com/pytorch/cpuinfo/archive/ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d.zip",
+      "sha256": "9213f6f81784eb8679f0621ad1c20eac711e063cb9c7712738720609cbdf1c33",
+      "bytes": 3856017
+    }
+  },
+  "cpuinfo": {
+    "commit": "ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d",
+    "archive": "cpuinfo-ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d.zip",
+    "source_url": "https://github.com/pytorch/cpuinfo/tree/ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d",
+    "patch": "third_party/patches/cpuinfo-l2-count.patch",
+    "patch_sha256": "83bb7eabb5a0f422ad59c50fa5096c711293c67bfdd90f0e34701a93bf6dbb20",
+    "original_init_sha256": "8ca11e1894f62e77e2421dc228c16d8d573f541900e4525ccf64209aa5d9220a",
+    "patched_init_sha256": "efcbd71f4d20dc0eff0ec73dfd5ee882c0ff847ca079a109043ad463495b6b21"
+  }
+}

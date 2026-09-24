@@ -1,4 +1,4 @@
-# Vision Dataset Studio architecture
+# Cadryl architecture
 
 [Français](../ARCHITECTURE.md) · **English**
 
@@ -37,8 +37,6 @@ Persistent identities reject exact copies between batches of the same project. T
 
 The optional HTTP planner receives counts, instructions and templates on `localhost`/`127.0.0.1`. It receives no corpus or HF credentials. Its structured response selects a template; it cannot approve annotations, publish, purge, switch sources or activate weights. Filenames, images and model outputs are data, not instructions. Integration with a real agent server is still pending.
 
-## Qualification status
+## Where the evidence lives
 
-The rc3 tests cover batch/deduplication, export/cleanup guards, migrations, tokenization, checkpoints and mask gestures. Public conversions have a [per-model matrix](LITERT_QUALIFICATION.md). Physical ARM, performance, HF QA destinations and some bundles remain pending. The conversion SDK and integrated app tests are separate campaigns.
-
-Figure sources: [Architecture DOT](../visuals/architecture.en.dot), [Workflow DOT](../visuals/batch-flow.en.dot). [Screenshot provenance and reproduction](../VISUALS.md).
+The [current report](VALIDATION.md) identifies the exact rc6 APKs and separates them from earlier phone and interruption campaigns. The [model matrix](LITERT_QUALIFICATION.md) records individual conversion results. This architecture describes responsibilities; it does not claim every integration has been qualified.

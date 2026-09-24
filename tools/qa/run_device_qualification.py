@@ -18,11 +18,12 @@ import time
 import xml.etree.ElementTree as ET
 
 from resolve_apks import APP_ID, ROOT, resolve
+from art_environment import art_crashes
 
 EXCLUDED = ('HfModelRuntimeTest', 'ConvertedModelQualificationTest',
             'NativePhotoInferenceUiTest', 'HfLivePublicationTest', 'InstalledDataPreservationTest',
             'ExternalFaultQualificationTest', 'HfInterruptedDownloadTest', 'HfFaultPublicationTest', 'PurgeProcessDeathTest',
-            'ReleaseUpdateContinuityTest')
+            'ReleaseUpdateContinuityTest', 'BackgroundTrainingPreparationTest')
 
 
 def parse_instrumentation(text: str) -> dict:
@@ -124,8 +125,13 @@ def main() -> int:
                                 classes = re.findall(r'INSTRUMENTATION_STATUS: class=(.*)', progress)
                                 tests = re.findall(r'INSTRUMENTATION_STATUS: test=(.*)', progress)
                                 active = (classes[-1], tests[-1]) if classes and tests else None
-                                foreground_classes = ('FeatureImplementationAuditTest', 'ProjectMaintenanceTest', 'TrainingWorkflowTest', 'WorkflowExecutionTest')
-                                if active and active != foreground_test and active[0].split('.')[-1] in foreground_classes:
+                                # UI tests own their ActivityScenario. Every other
+                                # class needs the same explicit foreground QA
+                                # conditions, including after a UI test closes it.
+                                ui_classes = ('EnglishLocaleComposeTest', 'FunctionalUiAuditTest',
+                                              'NativePhotoInferenceUiTest', 'SegmentationCanvasTest',
+                                              'StudioComposeV4Test')
+                                if active and active != foreground_test and active[0].split('.')[-1] not in ui_classes:
                                     info = subprocess.run([*adb, 'shell', 'am', 'start', '-f', '0x20000000', '-n', APP_ID + '/.qa.QaPresenceActivity'], capture_output=True, text=True, timeout=15)
                                     if info.returncode or 'Error' in info.stdout + info.stderr:
                                         raise RuntimeError('Could not establish visible foreground QA conditions.')
@@ -169,6 +175,10 @@ def main() -> int:
             state[key] = run(f'device-{key}.txt', [*adb, 'shell', 'getprop', prop]).strip()
         state['page_size'] = run('page-size.txt', [*adb, 'shell', 'getconf', 'PAGE_SIZE']).strip()
         state['expected_page_size'] = args.expected_page_size
+        state['build_fingerprint'] = run('build-fingerprint.txt', [*adb, 'shell', 'getprop', 'ro.build.fingerprint']).strip()
+        state['art_crashes_before'] = art_crashes(run('crash-before.txt', [*adb, 'logcat', '-d', '-b', 'crash']))
+        if state['art_crashes_before']:
+            raise RuntimeError('ART already crashed in this boot; retain the evidence and use a healthy QA environment.')
         if args.expected_page_size and state['page_size'] != args.expected_page_size:
             raise RuntimeError('Device page size does not match the requested qualification target.')
         # Preserve existing data. A signing conflict deliberately fails; never uninstall.
@@ -220,6 +230,9 @@ def main() -> int:
         run('start.png', [*adb, 'exec-out', 'screencap', '-p'], binary=True)
         run('start-meminfo.txt', [*adb, 'shell', 'dumpsys', 'meminfo', APP_ID])
         run('start-gfxinfo.txt', [*adb, 'shell', 'dumpsys', 'gfxinfo', APP_ID])
+        state['art_crashes_after'] = art_crashes(run('crash-after.txt', [*adb, 'logcat', '-d', '-b', 'crash']))
+        if state['art_crashes_after']:
+            raise RuntimeError('ART crashed during qualification; passing app tests cannot qualify this environment.')
         state['outcome'] = 'core_suite_passed'
         state['core_on_physical_arm_passed'] = state['emulator'] != '1' and state['package_abi'] == 'arm64-v8a'
         exit_code = 0

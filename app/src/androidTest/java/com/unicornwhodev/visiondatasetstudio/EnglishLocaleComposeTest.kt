@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.platform.app.InstrumentationRegistry
 import java.util.Locale
@@ -15,13 +15,13 @@ import org.junit.Rule
 import org.junit.Test
 
 class EnglishLocaleComposeTest {
-    @get:Rule val rule=createComposeRule()
+    @get:Rule val rule=createAndroidComposeRule<MainActivity>()
 
     @Test fun primaryWorkflowsUseEnglishResources() {
         val base=InstrumentationRegistry.getInstrumentation().targetContext
         val configuration=Configuration(base.resources.configuration).apply{setLocale(Locale.ENGLISH)}
         val english=base.createConfigurationContext(configuration)
-        rule.setContent {
+        rule.setStudioTestContent {
             CompositionLocalProvider(LocalContext provides english,LocalConfiguration provides configuration) {
                 Text(listOf(
                     stringResource(R.string.models_tab_explore),

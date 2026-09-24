@@ -1,19 +1,14 @@
-# UWD 4.2 — recette de qualification bloquante
+# Qualifier Cadryl sur Android
 
-Cette matrice définit les critères de sortie ; elle n’est pas un journal de succès.
-Des contrôles ont maintenant été exécutés sur le pod : consulter
-[POD_VALIDATION.md](POD_VALIDATION.md) et [IMPLEMENTATION_AUDIT.md](IMPLEMENTATION_AUDIT.md)
-pour leurs résultats et limites. Utiliser une copie des données et un appareil dédié.
-Aucun push HF n’est lancé automatiquement par cette recette.
+[Documentation](README.md) · [Résultats actuels](../TEST_REPORT.md) · [Tester la Release](RELEASE_TESTING.md)
 
-État après rc5 : [campagne P1 du 23 septembre](P1_QUALIFICATION_2026_09.md),
-avec pannes réellement injectées, Honor ARM64, copie restaurée et signature
-durable. Le rapport distingue la suite Debug, les contrôles de la vraie Release
-et les scénarios encore ouverts. Les commandes d’écriture HF restent opt-in.
+Cette page décrit les essais à faire et leurs critères de réussite. Les résultats exécutés sont dans le rapport, avec les builds et appareils concernés. Utilise un appareil dédié et des données de test autorisées.
+
+rc6 passe ses suites Release et l’audit strict sur émulateur API 36/16 Ko. La recette du candidat final sur Honor et sur ARM 16 Ko physique reste ouverte. Les anciennes campagnes [P1](P1_QUALIFICATION_2026_09.md), [Honor](RELEASE_CLOSURE_2026_09.md) et [arrière-plan](RELEASE_HARDENING_2026_09.md) conservent leur propre portée. La CI est préparée mais n’a pas été exécutée. Aucune écriture HF n’est déclenchée automatiquement par ce guide.
 
 ## P0 : assembler, résoudre et installer
 
-JDK 17+, Gradle 9.3.1, SDK/API et bibliothèques déclarés dans le projet. Exécuter `bash tools/build_android.sh`, ou le workflow manuel sur un dépôt que le propriétaire choisit. Corriger les erreurs réelles sans supprimer des tests, rétrograder silencieusement les formats ou ajouter un fallback destructif.
+JDK 21, Gradle 9.3.1, SDK 36 et bibliothèques déclarées dans le projet. Préparer [Flex](FLEX_16K.md), [Graphics Path](GRAPHICS_PATH_16K.md) et [LiteRT](LITERT_16K_STATUS.md), puis exécuter `python -X utf8 tools/build_android.py` sous Windows ou `bash tools/build_android.sh` sous Linux. Corriger les erreurs réelles sans supprimer des tests, rétrograder silencieusement les formats ou ajouter un fallback destructif.
 
 Récupérer APK Debug, SHA, logs assemble/test/lint et APK instrumentée. Vérifier la signature avec `apksigner verify --verbose`, installer sur appareil dédié. Une APK assemblée n’est pas encore qualifiée. Ne pas désinstaller une installation porteuse de données en cas de signature différente.
 

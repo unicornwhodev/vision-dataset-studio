@@ -1,0 +1,297 @@
+{
+  "schema": 1,
+  "created_at_utc": "2026-09-23T20:57:57.779454+00:00",
+  "scope": "Follow-up of isolated ART crash and strict LiteRT RELRO finding; no application or runtime fix claimed",
+  "outcome": "investigated_not_resolved",
+  "production_qualified": false,
+  "commit": "bedd1a262063e345e3c741827d5765c9b2936f78",
+  "worktree_dirty": true,
+  "compiled_inputs_match_both_previous_builds": true,
+  "previous_campaign": {
+    "path": "docs/RELEASE_CLOSURE_RECEIPT.json",
+    "sha256": "81da5cd1c1ca5e5ce5bd919485a7a90c14052bf765defa624cba6e2c76429080",
+    "bytes": 60960
+  },
+  "art": {
+    "status": "unresolved_not_reproduced_in_bounded_repeat",
+    "device": {
+      "kind": "emulator",
+      "abi": "x86_64",
+      "api": 35,
+      "page_size": 16384,
+      "image_build": "AE3A.240806.043/12960925",
+      "image_revision": 5,
+      "art_build_id": "e4a3c6c284a8b17d09fd84d661cf181b"
+    },
+    "application": {
+      "path": "dist/release-tests/runs/20260923T201756Z-eff89323/app-emulator-signed.apk",
+      "sha256": "6bb0f732d82b03608a0ab18d56b6594419d4bfdb9eea7b463e8aea4d37100a9f",
+      "bytes": 117510442
+    },
+    "instrumentation": {
+      "path": "dist/release-tests/runs/20260923T201756Z-eff89323/tests-emulator-signed.apk",
+      "sha256": "c656fb4de0f7b9256ef5abca4b0967729d3c449c6cc864712c1336ea8bb41692",
+      "bytes": 2414457
+    },
+    "new_attempts": [
+      {
+        "attempt": 1,
+        "wall_seconds": 23.172,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-01.txt",
+          "sha256": "d52b28d077225d4bd57eb20314631537eb686f01d12469f499d989bbfe14e4b5",
+          "bytes": 29562
+        }
+      },
+      {
+        "attempt": 2,
+        "wall_seconds": 23.578,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-02.txt",
+          "sha256": "97300083e0a9c2a43439e3f7d70fd8ab45e76b37847e72704594c10f93cbbee4",
+          "bytes": 29563
+        }
+      },
+      {
+        "attempt": 3,
+        "wall_seconds": 22.641,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-03.txt",
+          "sha256": "f81c6d0f67139c32336fed13fea490ba4f624693c4e6b479093581cd7c4288bf",
+          "bytes": 29563
+        }
+      },
+      {
+        "attempt": 4,
+        "wall_seconds": 23.422,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-04.txt",
+          "sha256": "aa937d8deb933f6b48a8e632d12c232a87eacf8df5c80085387e0704788a3fb5",
+          "bytes": 29562
+        }
+      },
+      {
+        "attempt": 5,
+        "wall_seconds": 27.11,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-05.txt",
+          "sha256": "88b829fccd666e8f353ab4f103356899c4a8e1429ae58083d38aa286dbc2b672",
+          "bytes": 29563
+        }
+      },
+      {
+        "attempt": 6,
+        "wall_seconds": 26.922,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-06.txt",
+          "sha256": "e7642303be541efa58a77222dd9dba658b013adc76e0b5de88fa9ab7360f802f",
+          "bytes": 29563
+        }
+      },
+      {
+        "attempt": 7,
+        "wall_seconds": 24.453,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-07.txt",
+          "sha256": "9c74004f279e462551c13b7ebe2f3e608a18f10e22b7d715d86e531788b6b4d3",
+          "bytes": 29563
+        }
+      },
+      {
+        "attempt": 8,
+        "wall_seconds": 24.687,
+        "passed": 40,
+        "declared": 40,
+        "failed": 0,
+        "skipped": 0,
+        "complete": true,
+        "log": {
+          "path": "test-results/native-followup-20260923/art-baseline/run-08.txt",
+          "sha256": "7e9b7bd731b22ff360f78618f80778f1df99f43a944948d2ea8c25289222e1ae",
+          "bytes": 29563
+        }
+      }
+    ],
+    "new_passed_executions": 320,
+    "exclusions_unchanged": [
+      "HfModelRuntimeTest",
+      "ConvertedModelQualificationTest",
+      "NativePhotoInferenceUiTest",
+      "HfLivePublicationTest",
+      "InstalledDataPreservationTest",
+      "ExternalFaultQualificationTest",
+      "HfInterruptedDownloadTest",
+      "HfFaultPublicationTest",
+      "PurgeProcessDeathTest",
+      "ReleaseUpdateContinuityTest",
+      "BackgroundTrainingPreparationTest"
+    ],
+    "runtime_helpers": "none; no foreground driver or process-freezing exemption",
+    "application_crash": {
+      "timestamp_utc": "2026-09-23T20:19:49.749932300Z",
+      "completed_tests_before_crash": 36,
+      "thread": "WM.task-2",
+      "signal": "SIGSEGV/SEGV_MAPERR",
+      "fault_address": "0x40",
+      "location": "libart.so ClassLinker::ResolveMethod +1057",
+      "mapped_call": "WorkForegroundUpdater.lambda$setForegroundAsync$0, line 96: WorkSpecKt.generationalId(WorkSpec)",
+      "instruction": "movl 64(%rbx), %eax with rbx=0; ArtMethod referenced by r15 is zeroed in the captured memory",
+      "root_cause_confirmed": false,
+      "private_tombstone": {
+        "path": "test-results/native-followup-20260923/art-tombstone.txt",
+        "sha256": "fca8641e98099d7dc971fbdbf8fb87474578766e9520b34648ab939a278285e9",
+        "bytes": 628751
+      },
+      "art_binary": {
+        "path": "test-results/native-followup-20260923/libart-emulator.so",
+        "sha256": "6ac4d052d0cf6f7d69ff817444f610afa25e583bb032d2a0e310346c0f8b7133",
+        "bytes": 14967936
+      },
+      "art_disassembly": {
+        "path": "test-results/native-followup-20260923/art-resolve-method.asm",
+        "sha256": "9c6d9b3b0dca9dcbb883deab3009ce3641ebd0d5a34fb071153a1f5ed4cee4d2",
+        "bytes": 38853
+      },
+      "dex_callsite": {
+        "path": "test-results/native-followup-20260923/art-dex-callsite.json",
+        "sha256": "b9f2d926fda09dc1658aa629c2c46600d17cf6891e16ee9208e3169deb761f8f",
+        "bytes": 404
+      },
+      "dex_disassembly": {
+        "path": "test-results/native-followup-20260923/ne-class.txt",
+        "sha256": "452cd8cb7decbbf50f21dce376363bcd2e2658983eded30d2cad36b06574024a",
+        "bytes": 55416
+      },
+      "mapping": {
+        "path": "dist/release-tests/runs/20260923T201756Z-eff89323/release-mapping.txt",
+        "sha256": "19691c0e60d2c3bb3d7caeb2d129aafde4f73102215e26d326ce34a6b122391b",
+        "bytes": 60006327
+      }
+    },
+    "earlier_platform_crashes": [
+      {
+        "timestamp_utc": "2026-09-23T18:50:27.228598500Z",
+        "process": "system_server",
+        "location": "libart.so NterpGetShorty+2",
+        "same_art_build_id": true,
+        "header": {
+          "path": "test-results/native-followup-20260923/platform-tombstone-04-header.txt",
+          "sha256": "95ffb64c94823e64e023355249aa6026a8c30dbac7de416f4ad0ca40e0100173",
+          "bytes": 3981
+        }
+      },
+      {
+        "timestamp_utc": "2026-09-23T18:50:52.215532400Z",
+        "process": "com.google.android.gms",
+        "location": "libart.so ClassTable::Lookup+472 / ResolveMethod / NterpGetMethod",
+        "same_art_build_id": true,
+        "header": {
+          "path": "test-results/native-followup-20260923/platform-tombstone-05-header.txt",
+          "sha256": "37a4d0084d18a8a51960339da117e1b3e42c339f505dc024b2659dbd691731c6",
+          "bytes": 4158
+        }
+      }
+    ],
+    "platform_inference": "Broader emulator/runtime instability is plausible; a common cause is not established.",
+    "system_image_catalogue": {
+      "path": "test-results/native-followup-20260923/system-image-catalogue.json",
+      "sha256": "2571c45a17c0185a83ee5b34b39a16b81254f60d82fdf153f924a2905d12dc01",
+      "bytes": 2348
+    }
+  },
+  "litert": {
+    "status": "strict_finding_confirmed_no_binary_fix",
+    "maven_coordinate": "com.google.ai.edge.litert:litert:1.4.2",
+    "upstream_aar": {
+      "path": "dist/release-hardening-20260923/litert-1.4.2.aar",
+      "sha256": "9b02cdf9db0a698b341b59e75c54ab8221d6304577cc43830d01024caf1fca74",
+      "bytes": 8305790
+    },
+    "runtime_version_string": "2.22.0-dev0+selfbuilt",
+    "runtime_version_is_not_a_source_commit": true,
+    "version_inspection": {
+      "path": "test-results/native-followup-20260923/litert-version-strings.json",
+      "sha256": "7f9c4c49c7aaa2a9919a1b44187ae6b743fc28287a94ab2bdecdce7532a69464",
+      "bytes": 344
+    },
+    "upstream_ref_check": {
+      "path": "test-results/native-followup-20260923/litert-upstream-refs.json",
+      "sha256": "858da287bd9adb0cdccb768ceeb648e1c4c1b4bf5c3bcd3fc93608c9d705d81a",
+      "bytes": 377
+    },
+    "source_revision_for_1_4_2_verified": false,
+    "strict_audits": {
+      "arm64-v8a": {
+        "exit_code": 2,
+        "statically_compatible": false,
+        "finding": [
+          "lib/arm64-v8a/libtensorflowlite_jni.so"
+        ],
+        "evidence": {
+          "path": "test-results/native-followup-20260923/arm64-v8a-strict.json",
+          "sha256": "3b6909f1d241f8759f6d8ecd7710728f85f3238fec0691a8b85d03c3dfd72b6a",
+          "bytes": 4832
+        }
+      },
+      "x86_64": {
+        "exit_code": 2,
+        "statically_compatible": false,
+        "finding": [
+          "lib/x86_64/libtensorflowlite_jni.so"
+        ],
+        "evidence": {
+          "path": "test-results/native-followup-20260923/x86_64-strict.json",
+          "sha256": "ef0d648c5fb34b9a69b9d72a60818e6c02db9dc09e474788d329abf564751594",
+          "bytes": 4826
+        }
+      }
+    },
+    "binary_modified": false,
+    "strict_rule_modified": false,
+    "physical_arm_16k_tested": false
+  },
+  "safety": {
+    "model_or_human_data_deleted": false,
+    "honor_modified_in_this_followup": false,
+    "new_apk_built": false,
+    "commit_or_push": false,
+    "github_actions": false,
+    "publication": false,
+    "raw_memory_committed": false
+  }
+}

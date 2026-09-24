@@ -15,9 +15,7 @@ les mises à jour ; ne pas en recréer une à chaque build.**
 
 La clé principale est hors Git, sous le profil Windows, dans
 `.android/signing/vision-dataset-studio`. Son mot de passe est protégé par DPAPI
-pour le compte Windows qui l’a créée. La sauvegarde demandée est dans
-`D:\coffre\secure\vision-dataset-studio-signing`, avec accès limité au propriétaire
-et à SYSTEM. Elle contient la clé et son secret de récupération portable.
+pour le compte Windows qui l’a créée. La copie de sauvegarde est stockée hors dépôt, sur un second disque, avec accès limité au propriétaire et à SYSTEM. Elle contient la clé et son secret de récupération portable.
 
 Les deux copies ont été comparées par SHA-256. Le mot de passe de récupération
 a permis de relire le certificat **et de signer une vraie APK**. Les disques C:

@@ -1,48 +1,65 @@
-# Resume development
+# Develop Cadryl
 
-[Français](../DEVELOPMENT_RESUME.md) · **English**
+[Documentation](README.md) · [Français](../DEVELOPMENT_RESUME.md)
 
-Source is on `main`. The development version is **4.2.0-rc5**, Android code **10**. The **rc5** prerelease and artifact package are published: [release](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5), [verified receipt](../RC5_PUBLICATION_RECEIPT.json). Its Windows certificate differs from rc4, so it cannot update rc4. Existing rc4 assets are preserved. Exact results and build identities are in [validation](VALIDATION.md) and [Windows evidence](../../test-results/windows-rc5-release/README.md).
+Development is on `main`. Current version: **4.2.0-rc6**, Android version code **11**. Cadryl is the display name; keep `com.unicornwhodev.visiondatasetstudio` as the application ID for updates and data continuity.
 
-## Local workstation
+## Set up the machine
 
-Use JDK 21, Python 3.11+, Android SDK 36, build-tools 36.0.0 and `adb`. Set `ANDROID_HOME` to the SDK and add its `platform-tools` to `PATH`. Keep weights and datasets outside Git and the APK.
+Install JDK 21, Python 3.11+, Android SDK 36 and build-tools 36.0.0. The repository bootstrap uses its pinned Gradle version. Point `JAVA_HOME` and `ANDROID_HOME` at your own installations.
 
-```bash
+```powershell
 git clone https://github.com/unicornwhodev/vision-dataset-studio.git
 cd vision-dataset-studio
 git switch main
 git pull --ff-only
-python3 -m unittest discover -s tools/qa -p 'test_*.py'
-bash tools/build_android.sh
+$env:JAVA_HOME='C:/Program Files/Microsoft/jdk-21'
+$env:ANDROID_HOME='D:/Android/Sdk'
+$env:PATH=$env:JAVA_HOME+'/bin;'+$env:ANDROID_HOME+'/platform-tools;'+$env:PATH
 ```
 
-The build produces one user APK and one instrumentation APK, with receipts under `dist/android/`. Preserve the signing key when updating an existing installation; never uninstall or clear data to bypass a signature mismatch. The remote workstation's Debug key is retained outside Git and is not included in a clone.
+Those two paths are examples; adjust them to your machine.
 
-Use a **dedicated QA device or emulator**, select its identifier using `adb devices`, then run:
+## Prepare the native dependencies
 
-```bash
-export ANDROID_SERIAL=emulator-5554  # replace with the selected QA device
-export VDS_ALLOW_TEST_INSTALL=1
-bash tools/qa/run_device_qualification.sh
+Gradle uses three verified local AARs: Flex `2.16.1-vds16k1`, Graphics Path `1.0.1-vds16k1` and LiteRT `2.2.0-vds16k2`. They are not stored in Git.
+
+Download their ZIPs from [rc6](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc6), verify `SHA256SUMS` and extract the `dist/native-*/maven/...` paths into the clone root. Keep each AAR, POM and receipt together. Android build scripts check their hashes and recipe before use.
+
+Source rebuilds require Linux or WSL with the pinned tools. See [Flex](../FLEX_16K.md), [Graphics Path](../GRAPHICS_PATH_16K.md) and [LiteRT](../LITERT_16K_STATUS.md). Later Android builds can run directly on Windows.
+
+## Build and test
+
+```powershell
+python -m unittest discover -s tools/qa -p 'test_*.py'
+python -X utf8 tools/build_android.py
 ```
 
-Tests requiring external fixtures or authorization are separate. A run with skipped tests does not reproduce the documented 39-test selection. `stage_android_fixture.py` injects fixtures outside the APK; `qualify_converted_models.py --help` describes per-conversion qualification. QA receipts identify tested artifacts; the application requires no SHA manifest to import or use models.
+The real build resolves dependencies, generates Room/KSP code, runs its checks and produces Debug app/test APKs. Every attempt writes logs, hashes and results under `dist/android/runs/`. An APK left behind by a failed attempt does not mean qualification passed.
 
-Conversion fixtures consume storage inside the QA installation and count toward its budget. Use a QA device separate from production and archive completed campaign fixtures before the core suite. A storage-budget refusal does not establish model incompatibility.
+For the minified Release:
 
-## Behavior to preserve
+```powershell
+python -X utf8 tools/qa/build_release_test_apks.py --abi arm64-v8a
+python -X utf8 tools/qa/build_release_test_apks.py --abi x86_64
+```
 
-- Batch production: import, preannotation, review, verified export, optional learning, cleanup, next batch. Deduplication history survives cleanup.
-- Changing prompts, settings or models never rewrites saved annotations. Explicit rerun is required and still protects human corrections.
-- Inference-only models remain usable. Training is off by default and runs inside Android on the exported batch.
-- Interrupted training can be resumed or explicitly abandoned. Abandonment neither activates weights nor deletes images; cleanup requires a separate confirmation.
+Run these sequentially. [Release testing](../RELEASE_TESTING.md) explains app/test signing, R8 mappings and the 40 core tests. The independent `release-qa` driver covers four UI scenarios. Private keys stay outside the repository.
 
-## Next qualification
+On Linux, use `python3` and your shell’s environment syntax. `tools/build_android.sh` wraps the same Python build.
 
-1. Execute the 15 remaining conversions and retry the three timed-out cases on suitable hardware. The existing 13 passes, including 8 with learning, do not qualify the entire catalogue.
-2. Test physical ARM devices, real SAF permissions, memory, latency and a representative corpus. The pod used software emulation without KVM.
-3. Qualify a real agent server and live HF writes on a newly created, explicitly authorized private QA repository. Existing repositories are never used for destructive QA.
-4. Establish durable signing and finish distribution qualification. rc5 is a Debug prerelease; the optimized ARM64 candidate is unsigned. GHCR retains its private visibility.
+## Test on Android
 
-The supplied trainable HF conversions freeze their encoders; their passes cover heads or adapters. Internal-layer training is demonstrated only by the synthetic fixture. No accuracy gain is claimed.
+Select a dedicated device from `adb devices` and prepare the fixtures in the [Android acceptance guide](../ANDROID_QUALIFICATION.md). Use the runners that verify APK hashes. They do not uninstall an app to bypass a certificate conflict.
+
+Model fixtures are staged separately and use device storage. HF writes, fault injection and model conversions have separate requirements and permissions. Skipped tests are unexecuted tests. Do not clear crash logs to turn a campaign green.
+
+## Find your way around
+
+Start with [architecture](ARCHITECTURE.md), the [data schema](../../DATA_SCHEMA.md), [model contract](LITERT_TRAINING_CONTRACT.md) and [brand resources](../BRAND.md).
+
+Preserve human corrections, read back copies before cleanup and keep the original model intact. Later training runs continue the validated copy. Interrupted work must never be labelled successful.
+
+## Current next steps
+
+rc6 includes the native fixes and Release test suite. Phone acceptance, physical ARM 16 KB, longer sessions, catalogue quality, remote CI and native notice review remain open. See [results](VALIDATION.md) and the [roadmap](ROADMAP.md).

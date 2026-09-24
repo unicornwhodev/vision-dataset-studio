@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.VisionDatasetStudio" parent="android:Theme.DeviceDefault.NoActionBar" />
+    <style name="Theme.VisionDatasetStudio" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">#0B101B</item>
+    </style>
+    <style name="Theme.Cadryl.Starting" parent="Theme.VisionDatasetStudio">
+        <item name="android:windowBackground">@drawable/cadryl_launch</item>
+        <item name="android:statusBarColor">#0B101B</item>
+        <item name="android:navigationBarColor">#0B101B</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
 </resources>

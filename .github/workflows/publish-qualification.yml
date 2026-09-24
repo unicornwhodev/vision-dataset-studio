@@ -5,7 +5,7 @@ on:
     inputs:
       tag:
         description: 'New qualification tag matching the Android version (never overwrite an existing release)'
-        default: v4.2.0-rc4
+        default: v4.2.0-rc6
         required: true
         type: string
 

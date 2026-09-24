@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): false
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Vision Dataset Studio, O=Unicorn Who Dev
+Signer #1 certificate SHA-256 digest: 51ef3e4abf953c62c8427deaecf4349aefffc2270c593229315722457f126895
+Signer #1 certificate SHA-1 digest: eddeaa89f6a01978f05343749839e2b07146778a
+Signer #1 certificate MD5 digest: 1203b9303186187bccad6c2ba7eda88b
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 4096
+Signer #1 public key SHA-256 digest: 84fc092584a5a5d9ae65df3b8b83e8767e01e2205e84d3714a20c7923d9dace4
+Signer #1 public key SHA-1 digest: 091cbe35a854b98d6c33f251392c4c4e5d566316
+Signer #1 public key MD5 digest: 12ec5f2219640ce0e1dcb6b2fba89b9a

@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
@@ -31,7 +30,7 @@ import java.util.Locale
 
 /** Opt-in public photo smoke test. Small examples do not establish dataset accuracy. */
 class NativePhotoInferenceUiTest {
-    @get:Rule val rule=createAndroidComposeRule<ComponentActivity>()
+    @get:Rule val rule=createAndroidComposeRule<MainActivity>()
     @Test fun realTinyclipPromptsChangeNativeOutputsAndProposalsAppearInTheEditor()=runBlocking {
         assumeTrue(InstrumentationRegistry.getArguments().getString("realPhotoAudit")=="true")
         val app=InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
@@ -61,7 +60,7 @@ class NativePhotoInferenceUiTest {
             val englishConfig=Configuration(app.resources.configuration).apply{setLocale(Locale.ENGLISH)}
             withContext(Dispatchers.Main){rule.activity.resources.updateConfiguration(englishConfig,rule.activity.resources.displayMetrics)}
             val english=app.createConfigurationContext(englishConfig)
-            rule.setContent{val registry=requireNotNull(LocalActivityResultRegistryOwner.current);CompositionLocalProvider(LocalActivityResultRegistryOwner provides registry,LocalContext provides english,LocalConfiguration provides englishConfig){VisionDatasetStudioTheme(darkTheme=true){StudioRoot(vm)}}}
+            rule.setStudioTestContent{val registry=requireNotNull(LocalActivityResultRegistryOwner.current);CompositionLocalProvider(LocalActivityResultRegistryOwner provides registry,LocalContext provides english,LocalConfiguration provides englishConfig){VisionDatasetStudioTheme(darkTheme=true){StudioRoot(vm)}}}
             act{openSampleInEditor(sample.sampleId)};act{runLiteRtOnCurrentSample()}
             val first=vm.liteRtEngine.lastResult!!.orThrow()
             assertEquals(3,first.size);assertEquals("cats",first.maxBy{it.score}.label)

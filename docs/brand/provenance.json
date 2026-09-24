@@ -1,0 +1,25 @@
+{
+  "product": "Cadryl",
+  "date": "2026-09-24",
+  "hero_origin": "OpenAI built-in Image Gen",
+  "vector_origin": "SVG and Android VectorDrawable authored from selected mark",
+  "is_screenshot": false,
+  "assets": [
+    {
+      "file": "cadryl-hero.png",
+      "sha256": "57a8fe70a00a3ecb714e5ee80bf13c5eff9e260adfbf0b428147cca3afa3054a"
+    },
+    {
+      "file": "cadryl-mark.svg",
+      "sha256": "3d30770f682a4601b832319b65e54371bfe2f87e1eacdc80c3a2e839a8b2bb2a"
+    },
+    {
+      "file": "cadryl-icon.svg",
+      "sha256": "ccb0f5b222a681afda1911f73e7fe90342df8364aa452b57a22ab8abdbcd510c"
+    },
+    {
+      "file": "cadryl-lockup.svg",
+      "sha256": "5ed892eb7e4721609ae1746acd6cee597b7518c6a1a120b2f53f391ef709ef02"
+    }
+  ]
+}

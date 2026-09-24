@@ -1,47 +1,33 @@
-# Limites de qualification — campagne après rc5
+# Ce qui reste à améliorer
 
-**23 septembre 2026, après rc5 :** build Windows réel, **70 tests JVM, 75 tests Python, 39/39 tests Debug sur Honor ARM64 4 Ko et 39/39 sur émulateur 16 Ko**. La clé durable et sa sauvegarde sont vérifiées ; la vraie Release de **100,2 Mo** conserve les données préparées sur le Honor. Le correctif de publication HF et cette APK signée sont postérieurs aux fichiers rc5 publiés. [Preuves et conditions exactes](docs/P1_QUALIFICATION_2026_09.md).
+[Le projet](README.md) · [English](docs/en/KNOWN_LIMITATIONS.md)
 
-[English](docs/en/KNOWN_LIMITATIONS.md) · [Recette fonctionnelle](docs/FUNCTIONAL_AUDIT_2026_09.md)
+Cadryl **4.2.0-rc6** reste une préversion. Voici les limites utiles à connaître avant de lui confier du travail. Les détails de chaque campagne sont dans le [rapport de tests](TEST_REPORT.md).
 
-Le grounding modèle exige le contrat HTTP explicite `task=grounding` + `httpOutputMode=grounding_proposals`, des identifiants de régions uniques et des liens phrase-région contrôlés. Les tests de contrat et de revue humaine passent ; aucun serveur grounding réel n’a été qualifié. Les bundles Florence-2 et les couples caption+box ne sont pas déclarés grounding. Les imports et modèles ne reçoivent aucun lien d’instance inventé.
+## Appareils et stabilité
 
-## Production par lots
+Les deux Release signées passent sur l’émulateur Android 16 en pages de 16 Ko. L’audit strict de LiteRT, Flex, Graphics Path et DataStore est vert. **Le candidat actuel n’a pas encore sa recette complète sur téléphone**, et aucun appareil ARM 16 Ko physique n’a été testé. L’ARM64 traduit par l’émulateur ne remplace pas cette vérification.
 
-Le cycle local 2+1, l’exclusion des copies identiques/renommées, l’export, la purge et la réouverture Room ont passé un essai instrumenté API 28. Les empreintes persistent par projet. Les images modifiées avec pertes, recadrées ou retouchées ne sont pas couvertes par la garantie d’identité exacte ; les anciennes images déjà purgées ne disposent que des empreintes de fichiers conservées. Voir [BATCH_PRODUCTION.md](docs/BATCH_PRODUCTION.md).
+Le Honor disponible fonctionne en 4 Ko. Les essais précédents sur ce téléphone sont conservés, mais une coupure ADB a interrompu la dernière campagne sur un runtime intermédiaire. Ils ne valident pas automatiquement rc6.
 
-DocumentsUI, révocation réelle d’un droit persistant, volume virtuel retiré et stockage plein ont passé la recette sur émulateur dédié. Les fournisseurs cloud restent à tester. La restauration d’une copie indépendante de la base et de l’image passe sur émulateur et Honor ; elle ne restaure pas les clés Android ou les droits SAF. Les migrations 1/2/3 → 4 ont passé Room ; les bases v1/v2 restent des fixtures reconstruites. Une base issue d’une ancienne installation réelle reste à tester.
+L’ancien crash ART n’a pas de cause confirmée. Le nouvel environnement n’a pas reproduit l’incident ; les lanceurs refusent une campagne qui contient un crash ART, y compris système. Les entraînements longs et le comportement après redémarrage ou restrictions constructeur demandent encore des essais. Les douze minutes déjà observées sur Honor concernent un candidat antérieur.
 
-Les réservations HF, conflits, réponse de commit perdue et publication/relecture passent sur un nouveau dépôt privé explicitement autorisé, avec des images synthétiques. La coupure réseau réelle d’un téléchargement reprend en HTTP 206 ; la purge interrompue reprend sans perdre les annotations ni le reçu. Les gros envois multipart et les pannes propres à d’autres fournisseurs restent à qualifier. Aucun dépôt de modèles existant n’a reçu d’écritures de QA.
+## Modèles et qualité
 
-## Apprentissage facultatif Android
+Les résultats du catalogue sont partiels et doivent être repris avec le nouveau runtime. La campagne publique Charlbi du 22 septembre compte **13 variantes réussies sur 25**, dont huit entraînables, un délai dépassé et onze non exécutées. Ce sont des essais d’exécution, pas une mesure de précision.
 
-L’apprentissage est désactivé par défaut. Il utilise uniquement le lot terminé dont l’export a été vérifié. Le nettoyage attend la fin de l’apprentissage et de son évaluation ; annulation et erreur conservent les images. L’original reste intact ; les entraînements suivants reprennent les derniers poids validés de la version entraînée, même avant activation. Le profil entraîné conserve son identifiant. L’activation pour l’inférence reste manuelle. Voir [la filiation](docs/MODEL_LINEAGE.md). En cas d’erreur ou d’annulation, **Modèles → Apprentissage → Abandonner** clôt explicitement la tentative après confirmation, sans activer de poids ni supprimer d’images. Le nettoyage du lot reste une action distincte après vérification de l’export. Une nouvelle tentative peut être lancée explicitement ; un ancien apprentissage terminé ne satisfait pas la condition de nettoyage si l’export du lot a changé.
+Les conversions entraînables fournies ajustent des têtes ou adaptations de sortie avec un encodeur figé. Le test synthétique des couches internes est une autre preuve. Il manque encore des mesures sur un corpus indépendant : précision, erreurs, oubli après entraînement, RAM et latence sur ARM.
 
-Huit conversions HF ont passé inférence, apprentissage, sauvegarde/restauration et reprise Android ; cinq autres ont passé l’inférence. Les encodeurs des conversions HF fournies restent figés. Le réseau de contrôle synthétique modifie séparément ses couches visuelles internes. Voir la [matrice par conversion](docs/LITERT_QUALIFICATION.md) : 13 succès, trois délais dépassés sur émulateur (RF-DETR et deux conversions privées), 15 conversions non exécutées. Aucun gain de précision n’est démontré.
+Un bundle incomplet ne peut pas être remplacé par un simple fichier `.tflite`. Certains modèles demandent plusieurs graphes et des fichiers de prétraitement ou de tokenisation.
 
-Le chemin Interpreter/Flex emploie LiteRT 1.4.2 et Select TF Ops 2.16.1-vds16k1, reconstruit pour corriger le crash Flex 16 Ko. Voir [le runtime](docs/FLEX_16K.md). L’intégration LiteRT 2.2 essayée n’expose pas l’API Java Delegate requise ; sa sauvegarde FlexSave a échoué. Les opérateurs des conversions HF récentes doivent être vérifiés sous le runtime retenu. GPU/NPU et apprentissage distribué ne sont pas intégrés.
+## Données et échanges
 
-Le lot doit contenir au moins 32 images d’apprentissage et 8 de contrôle selon le partage déterministe par hash. Les cibles sont limitées à un million de valeurs par image et stockées sur disque avec empreinte. Les masques et cibles auxiliaires de présence/abstention/supervision sont pris en charge selon le contrat ; les entrées d’apprentissage texte ne le sont pas. Un contrôle réutilisé n’est pas une mesure sur corpus indépendant.
+Les protections contre les interruptions existent et plusieurs pannes SAF, stockage, HF et purge ont été injectées lors des campagnes précédentes. Tous les fournisseurs de stockage, gros transferts multipart et cas de coupure ne sont pas couverts. Le serveur d’agent local réel et certaines intégrations cloud restent aussi à qualifier.
 
-## Modèles et fonctions complémentaires
-
-Les adaptateurs multi-graphes TinyCLIP, EfficientViT-SAM et Florence-2, les tokeniseurs et l’index de similarité sont implémentés. La tokenisation et la persistance de l’index passent leurs tests Android. RepViT, HGNetV2, RTMDet, DINOv2 et TinyCLIP ont passé leur inférence Android. TinyCLIP produit des propositions visibles sur une photo réelle et applique le prompt lors d’une relance explicite. RF-DETR a dépassé 30 minutes dans l’émulateur logiciel ; cela ne démontre pas une incompatibilité du modèle. Les autres conversions et gros bundles restent à qualifier individuellement ; aucune précision ni performance ARM n’est annoncée.
-
-Le défaut de lecture des sorties dynamiques RTMDet est corrigé et le test passe. Le masque dispose d’un éditeur multi-instance (pinceau/gomme), d’un export canonique et d’une projection COCO ; le point SAM temporaire ne devient pas une annotation. La chaîne SAM réelle reste à qualifier. Florence utilise un décodage greedy borné ; précision et tâches réelles restent à mesurer.
-
-Trois workflows exécutables disposent d’un journal et de pauses pour revue, export vérifié et nettoyage. Un planificateur HTTP local optionnel valide les sorties structurées et les consignes ; aucun serveur VLM n’est embarqué. Les tests des gardes ne remplacent pas une intégration avec un véritable serveur d’agent. Voir [WORKFLOWS.md](docs/WORKFLOWS.md).
-
-## Interface et localisation
-
-Les textes applicatifs français et anglais sont implémentés. Le parcours anglais de création/changement de projets, réglages persistés et propositions visibles a passé Compose sur API 28. Les noms et contenus saisis par l’utilisateur restent dans leur langue. L’accueil de la vraie Release est vérifié sur Honor ; TalkBack et une grande police sur tous les écrans restent à qualifier.
+Le registre anti-doublons couvre les fichiers ou pixels identiques dans un même projet. Il ne garantit pas la détection de toutes les images recadrées ou recompressées. **Un export dataset n’est pas une sauvegarde complète du projet.** Les migrations Room gardent l’identité de l’app ; elles ne récupèrent pas les données d’une autre application ni d’une installation désinstallée.
 
 ## Distribution
 
-Aucun poids n’est embarqué dans l’APK. Le build contrôle les extensions et signatures de poids et écrit `app-contents.json`. L’APK Debug universelle reste volumineuse à cause des bibliothèques natives de quatre architectures. Le candidat local Release ARM64 signé de 100,2 Mo démarre et conserve les données sur Honor ; sa suite complète n’a pas été exécutée sous minification. Les 39 tests concernent la variante Debug.
+rc6 utilise la clé durable. Les anciennes rc4/rc5 Debug portent d’autres certificats et ne peuvent pas être mises à jour directement. Garde leurs données. La clé actuelle et sa copie ont été vérifiées sur deux disques du même PC ; une sauvegarde hors machine reste à faire.
 
-La suite Honor nécessite un écran de recette visible pendant les classes sans UI. L’exécution prolongée en arrière-plan, les mesures répétées RAM/latence et la thermique restent ouvertes. Le Honor utilise des pages de 4 Ko : aucun téléphone ARM 16 Ko n’est qualifié. Après mise à jour de DataStore, deux bibliothèques gardent des signalements RELRO expliqués structurellement, sans certification globale de l’APK. La CI distante reste sans nouvelle exécution attestée après le blocage historique de facturation. Le paquet OCI contient des artefacts de qualification, sans image de build qualifiée.
-
-La licence du code est Apache-2.0. Les licences des modèles/datasets et les notices transitives restent indépendantes. Le changement d’applicationId ne migre pas les données d’une autre application.
-
-La clé Debug utilisée sur l’ancienne VM n’est pas disponible sur le poste Windows. La signature rc5 diffère de rc4 et ne permet pas sa mise à jour ; conserver toute installation contenant des données. La [clé durable](docs/SIGNING.md) est désormais fixée et sauvegardée sur un deuxième disque du même PC ; une copie hors machine reste à prévoir. Cette clé ne peut pas mettre à jour les anciennes APK Debug. Le propriétaire confirme qu’aucune installation rc2 n’a été distribuée ; aucune migration rc2 n’est prévue.
+La CI distante est préparée mais n’a pas été exécutée. L’inventaire des 109 dépendances est disponible ; la revue des notices natives transitives reste ouverte. [Signature](docs/SIGNING.md) · [Licences](LICENSING_STATUS.md) · [Priorités](docs/ROADMAP.md).

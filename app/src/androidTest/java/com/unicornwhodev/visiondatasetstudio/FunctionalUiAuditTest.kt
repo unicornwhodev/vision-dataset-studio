@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
@@ -28,7 +27,7 @@ import java.io.File
 import java.util.Locale
 
 class FunctionalUiAuditTest {
-    @get:Rule val rule=createAndroidComposeRule<ComponentActivity>()
+    @get:Rule val rule=createAndroidComposeRule<MainActivity>()
 
     @Test fun englishScreensPersistModelSettingsAndIsolateMultipleProjects()=runBlocking {
         val app=InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
@@ -64,10 +63,14 @@ class FunctionalUiAuditTest {
         }
         try {
             act { createProject("QA English A") };val first=vm.activeProjectId.value;created+=first
-            rule.setContent { val registry=requireNotNull(LocalActivityResultRegistryOwner.current); CompositionLocalProvider(LocalActivityResultRegistryOwner provides registry,LocalContext provides english,LocalConfiguration provides englishConfig) { VisionDatasetStudioTheme(darkTheme=true) { StudioRoot(vm) } } }
+            rule.setStudioTestContent { val registry=requireNotNull(LocalActivityResultRegistryOwner.current); CompositionLocalProvider(LocalActivityResultRegistryOwner provides registry,LocalContext provides english,LocalConfiguration provides englishConfig) { VisionDatasetStudioTheme(darkTheme=true) { StudioRoot(vm) } } }
             englishScreen("Workspace")
             // Create through the actual form, rather than replacing Room with a mock.
             rule.onNodeWithText(english.getString(R.string.controls_new_project_name)).performScrollTo().performTextInput("QA English B")
+            // Wait for IME dismissal before scrolling/clicking: its opening
+            // animation can move the button outside the viewport after lookup.
+            androidx.test.espresso.Espresso.closeSoftKeyboard()
+            rule.waitForIdle()
             rule.onNodeWithText(english.getString(R.string.controls_create_project)).performScrollTo().assertIsDisplayed().performClick()
             rule.waitUntil(30_000){vm.activeProjectId.value!=first && !vm.isBusy.value}
             val second=vm.activeProjectId.value;created+=second

@@ -93,7 +93,7 @@ class WorkClaimCoordinator internal constructor(private val cacheRoot: File, pri
                 val files = toWrite.mapIndexed { index, (path, claim) ->
                     val file = File(tempRoot, "$index.json"); file.writeText(adapter.toJson(claim)); path to file
                 }
-                val result = hf.uploadBatchFiles(repo, settings.destBranch, "Reserve ${files.size} Vision Dataset Studio cases", files, parent)
+                val result = hf.uploadBatchFiles(repo, settings.destBranch, "Reserve ${files.size} Cadryl cases", files, parent)
                 if (result.success) return ClaimSelection(chosen, consumed, skipped)
                 if (!result.conflict) error(result.message.ifBlank { tr("Réservation HF refusée", "HF reservation refused") })
             } finally { tempRoot.deleteRecursively() }
@@ -121,7 +121,7 @@ class WorkClaimCoordinator internal constructor(private val cacheRoot: File, pri
                     val f = File(root,"$index.json"); f.writeText(adapter.toJson(claim)); path to f
                 }
                 if(files.isEmpty())return
-                val result = hf.uploadBatchFiles(project.hfDestRepo, settings.destBranch, "Complete ${files.size} Vision Dataset Studio cases", files, parent)
+                val result = hf.uploadBatchFiles(project.hfDestRepo, settings.destBranch, "Complete ${files.size} Cadryl cases", files, parent)
                 if (result.success) return
                 if (!result.conflict) error(result.message.ifBlank { tr("Synchronisation des décisions refusée", "Decision synchronization refused") })
             } finally { root.deleteRecursively() }

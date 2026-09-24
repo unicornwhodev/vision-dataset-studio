@@ -171,6 +171,7 @@ data class DryRunResult(
     val error: String? = null
 )
 
+@JsonClass(generateAdapter = true)
 data class InferenceDiagnostics(
     val modelSha256: String,
     val adapter: String,

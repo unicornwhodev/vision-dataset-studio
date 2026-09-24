@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.RuntimeSmokeTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-24T01:26:12.178Z" hostname="UNICORN-PC" time="7.109">
+  <properties/>
+  <testcase name="test multi-format export snippet generation" classname="com.unicornwhodev.visiondatasetstudio.RuntimeSmokeTest" time="6.738"/>
+  <testcase name="read string from context" classname="com.unicornwhodev.visiondatasetstudio.RuntimeSmokeTest" time="0.058"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

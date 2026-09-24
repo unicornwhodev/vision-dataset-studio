@@ -1,4 +1,7 @@
-# Workflows and segmentation
+# Guided workflows and masks
+
+Choose a guided path when you want Cadryl to take care of the sequence. It pauses wherever your review or confirmation is needed.
+
 
 [Français](../WORKFLOWS.md) · **English**
 

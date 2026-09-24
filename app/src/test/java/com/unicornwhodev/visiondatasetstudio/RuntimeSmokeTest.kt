@@ -22,7 +22,7 @@ class RuntimeSmokeTest {
   fun `read string from context`() {
     val context = ApplicationProvider.getApplicationContext<Context>()
     val appName = context.getString(R.string.app_name)
-    assertEquals("Vision Dataset Studio", appName)
+    assertEquals("Cadryl", appName)
   }
 
   @Test

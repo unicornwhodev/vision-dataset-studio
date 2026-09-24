@@ -1,0 +1,1211 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-09-23T22:25:22.919589+00:00",
+  "campaign": "native-fix-20260923",
+  "release_published": false,
+  "remote_ci_executed": false,
+  "production_qualified": false,
+  "source_bindings": {
+    "arm64-v8a": {
+      "build": "20260923T220418Z-c21c9b59",
+      "source_base_commit": "bedd1a262063e345e3c741827d5765c9b2936f78",
+      "working_tree_modified": true,
+      "verified_current_input_count": 191,
+      "all_compiled_inputs_match": true,
+      "manifest": {
+        "path": "dist/release-tests/runs/20260923T220418Z-c21c9b59/source-manifest.json",
+        "sha256": "09fb30145d9e83e2c85d876bd09dff62afbe9476d3fd8b66a82976835aa784a4",
+        "bytes": 29284
+      },
+      "build_status": {
+        "path": "dist/release-tests/runs/20260923T220418Z-c21c9b59/status.json",
+        "sha256": "58e69f71c8a1de0ab8c3a646900a3a63a4cf67c63a0f3aa6f95b1afb903b9e64",
+        "bytes": 9398
+      },
+      "unsigned_artifacts": {
+        "app": {
+          "file": "app.apk",
+          "sha256": "750d57210e4cce7de5130d66695bb15a0f0fedf5cea7572db06d6efd0f45ea85",
+          "bytes": 101506075
+        },
+        "tests": {
+          "file": "tests.apk",
+          "sha256": "7ac6eaa942e6334fc16ed08fb41826bc28195c080e8e19b0514d22a36289d186",
+          "bytes": 2402401
+        }
+      }
+    },
+    "x86_64": {
+      "build": "20260923T220649Z-078e9aa3",
+      "source_base_commit": "bedd1a262063e345e3c741827d5765c9b2936f78",
+      "working_tree_modified": true,
+      "verified_current_input_count": 191,
+      "all_compiled_inputs_match": true,
+      "manifest": {
+        "path": "dist/release-tests/runs/20260923T220649Z-078e9aa3/source-manifest.json",
+        "sha256": "09fb30145d9e83e2c85d876bd09dff62afbe9476d3fd8b66a82976835aa784a4",
+        "bytes": 29284
+      },
+      "build_status": {
+        "path": "dist/release-tests/runs/20260923T220649Z-078e9aa3/status.json",
+        "sha256": "312792c747389963e5584712223857abcf6da0c458af503939aba609ce5408c7",
+        "bytes": 9391
+      },
+      "unsigned_artifacts": {
+        "app": {
+          "file": "app.apk",
+          "sha256": "6e6c0f1ee161c0fa3fc3b9385619261b8ed87fcc13c801201128638588551832",
+          "bytes": 117838047
+        },
+        "tests": {
+          "file": "tests.apk",
+          "sha256": "7ac6eaa942e6334fc16ed08fb41826bc28195c080e8e19b0514d22a36289d186",
+          "bytes": 2402401
+        }
+      },
+      "tested_build": "20260923T213109Z-a81fd7c5",
+      "identical_to_tested_unsigned_artifacts": true
+    }
+  },
+  "litert": {
+    "coordinate": "com.unicornwhodev.thirdparty:litert-interpreter:2.2.0-vds16k2",
+    "inputs": {
+      "tag": "v2.2.0",
+      "commit": "145c7523ff08d5e57ab5c582141775eea47da9c7",
+      "source_url": "https://github.com/google-ai-edge/LiteRT/tree/145c7523ff08d5e57ab5c582141775eea47da9c7",
+      "version": "2.2.0-vds16k2",
+      "source_archive": "litert-145c7523ff08d5e57ab5c582141775eea47da9c7.tar.gz",
+      "ndk_archive": "android-ndk-r26d-linux.zip",
+      "jdk_archive": "OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz",
+      "tensorflow_dependency": {
+        "commit": "bcdab1a62e138c8f8784a7477c0be8af6dd0bd0a",
+        "sha256": "c3c552414ab2e59e72511a21c1df566346a7c8f160909325edec6d1ff403d69d"
+      },
+      "inputs": {
+        "litert-145c7523ff08d5e57ab5c582141775eea47da9c7.tar.gz": {
+          "url": "https://github.com/google-ai-edge/LiteRT/archive/145c7523ff08d5e57ab5c582141775eea47da9c7.tar.gz",
+          "sha256": "2c14ef39cadd5f5e1ad6e896ff3925ccfdf2aa41590649bf46dce149217bce20",
+          "bytes": 124451706
+        },
+        "bazel-7.7.0-linux-x86_64": {
+          "url": "https://github.com/bazelbuild/bazel/releases/download/7.7.0/bazel-7.7.0-linux-x86_64",
+          "sha256": "fe7e799cbc9140f986b063e06800a3d4c790525075c877d00a7112669824acbf",
+          "bytes": 57594289
+        },
+        "android-ndk-r26d-linux.zip": {
+          "url": "https://dl.google.com/android/repository/android-ndk-r26d-linux.zip",
+          "sha1": "fcdad75a765a46a9cf6560353f480db251d14765",
+          "sha256": "eefeafe7ccf177de7cc57158da585e7af119bb7504a63604ad719e4b2a328b54",
+          "bytes": 668556491
+        },
+        "OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz": {
+          "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%2B8/OpenJDK17U-jdk_x64_linux_hotspot_17.0.16_8.tar.gz",
+          "sha256": "166774efcf0f722f2ee18eba0039de2d685b350ee14d7b69e6f83437dafd2af1",
+          "bytes": 192062472
+        },
+        "checker-qual-3.43.0.jar": {
+          "url": "https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/3.43.0/checker-qual-3.43.0.jar",
+          "sha256": "3fbc2e98f05854c3df16df9abaa955b91b15b3ecac33623208ed6424640ef0f6",
+          "bytes": 231525
+        },
+        "cpuinfo-ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d.zip": {
+          "url": "https://github.com/pytorch/cpuinfo/archive/ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d.zip",
+          "sha256": "9213f6f81784eb8679f0621ad1c20eac711e063cb9c7712738720609cbdf1c33",
+          "bytes": 3856017
+        }
+      },
+      "cpuinfo": {
+        "commit": "ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d",
+        "archive": "cpuinfo-ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d.zip",
+        "source_url": "https://github.com/pytorch/cpuinfo/tree/ea6b9f1bb6e1001d8b21574d5bc78ddef62e499d",
+        "patch": "third_party/patches/cpuinfo-l2-count.patch",
+        "patch_sha256": "83bb7eabb5a0f422ad59c50fa5096c711293c67bfdd90f0e34701a93bf6dbb20",
+        "original_init_sha256": "8ca11e1894f62e77e2421dc228c16d8d573f541900e4525ccf64209aa5d9220a",
+        "patched_init_sha256": "efcbd71f4d20dc0eff0ec73dfd5ee882c0ff847ca079a109043ad463495b6b21"
+      }
+    },
+    "aar": {
+      "path": "dist/native-litert/maven/com/unicornwhodev/thirdparty/litert-interpreter/2.2.0-vds16k2/litert-interpreter-2.2.0-vds16k2.aar",
+      "sha256": "c1644503243c3c78092f949e2fb3cd47eafaf252bb87e18535eb29da916810ae",
+      "bytes": 8961288
+    },
+    "java_classes_sha256": "8328c2423d4216ba3c84dabcf467b53495b0a041ee456a75fe09c707c4b8109e",
+    "builder_sha256": "fbf9b23be596ed064d7c697796fba6a02a55d0b33f0b04954d4f5195678dcbfa",
+    "libraries": {
+      "x86_64": {
+        "sha256": "84b06e5aa3a3e3de82dc138abc85a195ef815e537e10f36202f537254723c1c0",
+        "bytes": 6619800,
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 6542016,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 6553600,
+            "address": 6553600,
+            "memory_size": 40480,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 6594080,
+            "address": 6610464,
+            "memory_size": 81152,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 6553600,
+            "address": 6553600,
+            "memory_size": 49152,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      },
+      "arm64-v8a": {
+        "sha256": "01b2d4eeb74e19c06586ce880032efb24958bd5b55fe4f8549c2366065c99954",
+        "bytes": 4918728,
+        "segments": [
+          {
+            "type": "LOAD",
+            "offset": 0,
+            "address": 0,
+            "memory_size": 4838256,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 4849664,
+            "address": 4849664,
+            "memory_size": 43376,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "LOAD",
+            "offset": 4893040,
+            "address": 4909424,
+            "memory_size": 219568,
+            "alignment": 16384,
+            "aligned_16k": true
+          },
+          {
+            "type": "GNU_RELRO",
+            "offset": 4849664,
+            "address": 4849664,
+            "memory_size": 49152,
+            "alignment": 1,
+            "aligned_16k": true
+          }
+        ]
+      },
+      "x86": {
+        "sha256": "990256dc126f28e9dc7d02b03653965711dc24766eec4882a613c2b1e98bd81d",
+        "bytes": 7393168,
+        "segments": null
+      },
+      "armeabi-v7a": {
+        "sha256": "a401f014cc5fc21ebb3e4bb123532037f580cc8c92c5da2069b1fde355fcccee",
+        "bytes": 3036176,
+        "segments": null
+      }
+    },
+    "receipt": {
+      "path": "dist/native-litert/maven/com/unicornwhodev/thirdparty/litert-interpreter/2.2.0-vds16k2/build-receipt.json",
+      "sha256": "3bc1252be6a58fb3815f1bdc1f6b252701f39acb69050ddd97b513468f973d85",
+      "bytes": 18387
+    },
+    "upstream_1_4_2_binaries_reused": false,
+    "xnnpack_enabled": true
+  },
+  "artifacts": {
+    "arm_durable_app": {
+      "path": "dist/release-tests/runs/20260923T220418Z-c21c9b59/signing-089d5ecae4f2/app.apk",
+      "sha256": "2bd7fd82436f56074a0127d3bbc9f96f1765d602e43a332f9e5cdb91eaf98cc5",
+      "bytes": 101527862
+    },
+    "arm_durable_tests": {
+      "path": "dist/release-tests/runs/20260923T220418Z-c21c9b59/signing-089d5ecae4f2/tests.apk",
+      "sha256": "9ba041c89f0d833df4f99c510dfa26ac0cd7c97356ca616bb5de2077308333b0",
+      "bytes": 2422649
+    },
+    "arm_emulator_app": {
+      "path": "dist/release-tests/runs/20260923T220418Z-c21c9b59/app-emulator-signed.apk",
+      "sha256": "fdaa85f12601d831b933d6d0e380f73a31e906480aed09d6b531444e04ff5d32",
+      "bytes": 101523766
+    },
+    "arm_emulator_tests": {
+      "path": "dist/release-tests/runs/20260923T220418Z-c21c9b59/tests-emulator-signed.apk",
+      "sha256": "c656fb4de0f7b9256ef5abca4b0967729d3c449c6cc864712c1336ea8bb41692",
+      "bytes": 2414457
+    },
+    "x86_emulator_app": {
+      "path": "dist/release-tests/runs/20260923T213109Z-a81fd7c5/app-emulator-signed.apk",
+      "sha256": "7ac583038da370fd7c22b0645f8c0589dd1c5b0005803147d7ba424e8d6d1516",
+      "bytes": 117858602
+    },
+    "x86_emulator_tests": {
+      "path": "dist/release-tests/runs/20260923T213109Z-a81fd7c5/tests-emulator-signed.apk",
+      "sha256": "c656fb4de0f7b9256ef5abca4b0967729d3c449c6cc864712c1336ea8bb41692",
+      "bytes": 2414457
+    },
+    "independent_ui_driver": {
+      "path": "dist/native-litert/ui-driver-v18/release-qa.apk",
+      "sha256": "a2ef7873608a200c2c6465ad12d2da08893761e7e0dc84aa0fa655dcc2460d3b",
+      "bytes": 9619031
+    }
+  },
+  "signed_payloads_match_unsigned_build": true,
+  "durable_certificate_sha256": "51ef3e4abf953c62c8427deaecf4349aefffc2270c593229315722457f126895",
+  "emulator_certificate_sha256": "16e1c6980c16c5cad26fab306cdfe16bbfe8e1cf039b59f691bb1bebfe558d84",
+  "host_checks": {
+    "jvm_and_lint": {
+      "tests": 70,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "lint": {
+        "Fatal": 0,
+        "Error": 0,
+        "Warning": 94
+      }
+    },
+    "python_tests": 82
+  },
+  "strict_alignment": {
+    "arm_durable": {
+      "apk_sha256": "2bd7fd82436f56074a0127d3bbc9f96f1765d602e43a332f9e5cdb91eaf98cc5",
+      "native_64bit_libraries": [
+        {
+          "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+          "sha256": "323615d67f483b3f3b6875dc8921ca8a1698a596fa36ceea9b5a847deefa2117",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 4020,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4020,
+              "address": 20404,
+              "memory_size": 4044,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 8064,
+              "address": 40832,
+              "memory_size": 912,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 8976,
+              "address": 58128,
+              "memory_size": 16,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 8064,
+              "address": 40832,
+              "memory_size": 8320,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/arm64-v8a/libdatastore_shared_counter.so",
+          "sha256": "deed4546c8dafad0e68ea2c25e4c0a62ca97343614ae386b7ed2af6abb7fa999",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 3304,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 3304,
+              "address": 19688,
+              "memory_size": 1880,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 5184,
+              "address": 37952,
+              "memory_size": 11200,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 5776,
+              "address": 54928,
+              "memory_size": 8,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 5184,
+              "address": 37952,
+              "memory_size": 11200,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/arm64-v8a/libtensorflowlite_flex_jni.so",
+          "sha256": "4702626f330cc07f361c3cc384df4772de7e84bdc7daea0bf3f61b283233bc47",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 87462288,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 87474176,
+              "address": 87474176,
+              "memory_size": 3031568,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 90505744,
+              "address": 90522128,
+              "memory_size": 80064,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 87474176,
+              "address": 87474176,
+              "memory_size": 3047424,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/arm64-v8a/libtensorflowlite_jni.so",
+          "sha256": "01b2d4eeb74e19c06586ce880032efb24958bd5b55fe4f8549c2366065c99954",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 4838256,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4849664,
+              "address": 4849664,
+              "memory_size": 43376,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4893040,
+              "address": 4909424,
+              "memory_size": 219568,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 4849664,
+              "address": 4849664,
+              "memory_size": 49152,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        }
+      ],
+      "runtime_tested": false,
+      "statically_compatible": true,
+      "evidence": {
+        "path": "test-results/native-fix-20260923/final-durable-arm-alignment.json",
+        "sha256": "ee262f5ea5e13f03c4ef938da6378941e8b7cf7b3d32a66e2eac31ae211420b6",
+        "bytes": 4829
+      }
+    },
+    "arm_emulator": {
+      "apk_sha256": "fdaa85f12601d831b933d6d0e380f73a31e906480aed09d6b531444e04ff5d32",
+      "native_64bit_libraries": [
+        {
+          "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+          "sha256": "323615d67f483b3f3b6875dc8921ca8a1698a596fa36ceea9b5a847deefa2117",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 4020,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4020,
+              "address": 20404,
+              "memory_size": 4044,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 8064,
+              "address": 40832,
+              "memory_size": 912,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 8976,
+              "address": 58128,
+              "memory_size": 16,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 8064,
+              "address": 40832,
+              "memory_size": 8320,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/arm64-v8a/libdatastore_shared_counter.so",
+          "sha256": "deed4546c8dafad0e68ea2c25e4c0a62ca97343614ae386b7ed2af6abb7fa999",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 3304,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 3304,
+              "address": 19688,
+              "memory_size": 1880,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 5184,
+              "address": 37952,
+              "memory_size": 11200,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 5776,
+              "address": 54928,
+              "memory_size": 8,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 5184,
+              "address": 37952,
+              "memory_size": 11200,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/arm64-v8a/libtensorflowlite_flex_jni.so",
+          "sha256": "4702626f330cc07f361c3cc384df4772de7e84bdc7daea0bf3f61b283233bc47",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 87462288,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 87474176,
+              "address": 87474176,
+              "memory_size": 3031568,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 90505744,
+              "address": 90522128,
+              "memory_size": 80064,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 87474176,
+              "address": 87474176,
+              "memory_size": 3047424,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/arm64-v8a/libtensorflowlite_jni.so",
+          "sha256": "01b2d4eeb74e19c06586ce880032efb24958bd5b55fe4f8549c2366065c99954",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 4838256,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4849664,
+              "address": 4849664,
+              "memory_size": 43376,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4893040,
+              "address": 4909424,
+              "memory_size": 219568,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 4849664,
+              "address": 4849664,
+              "memory_size": 49152,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        }
+      ],
+      "runtime_tested": false,
+      "statically_compatible": true,
+      "evidence": {
+        "path": "test-results/native-fix-20260923/release-arm64-translated-fixed/strict-alignment.json",
+        "sha256": "96bcae90a231b00457e1f2d376987fce261960d4150b07c317e948cb561a49a4",
+        "bytes": 4829
+      }
+    },
+    "x86_emulator": {
+      "apk_sha256": "7ac583038da370fd7c22b0645f8c0589dd1c5b0005803147d7ba424e8d6d1516",
+      "native_64bit_libraries": [
+        {
+          "path": "lib/x86_64/libandroidx.graphics.path.so",
+          "sha256": "7b0a8d127854f71b882298343d133f31cd5eb22c876e81a6cabff95340230196",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 4332,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4336,
+              "address": 20720,
+              "memory_size": 4256,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 8592,
+              "address": 41360,
+              "memory_size": 936,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 9528,
+              "address": 58680,
+              "memory_size": 16,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 8592,
+              "address": 41360,
+              "memory_size": 7792,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/x86_64/libdatastore_shared_counter.so",
+          "sha256": "c3973140a0e6144a83e7dd7ee3c4e161f42181591feda254e12c8395d3bbacd0",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 3372,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 3376,
+              "address": 19760,
+              "memory_size": 1360,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 4736,
+              "address": 37504,
+              "memory_size": 11648,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 5328,
+              "address": 54480,
+              "memory_size": 8,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 4736,
+              "address": 37504,
+              "memory_size": 11648,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/x86_64/libtensorflowlite_flex_jni.so",
+          "sha256": "f1eb0a955ccb6d5b26563abebcffc607f5a2f670665b0a38cb1b1dcfb296777b",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 102198640,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 102203392,
+              "address": 102203392,
+              "memory_size": 2928600,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 105132000,
+              "address": 105148384,
+              "memory_size": 76832,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 102203392,
+              "address": 102203392,
+              "memory_size": 2932736,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        },
+        {
+          "path": "lib/x86_64/libtensorflowlite_jni.so",
+          "sha256": "84b06e5aa3a3e3de82dc138abc85a195ef815e537e10f36202f537254723c1c0",
+          "segments": [
+            {
+              "type": "LOAD",
+              "offset": 0,
+              "address": 0,
+              "memory_size": 6542016,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 6553600,
+              "address": 6553600,
+              "memory_size": 40480,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "LOAD",
+              "offset": 6594080,
+              "address": 6610464,
+              "memory_size": 81152,
+              "alignment": 16384,
+              "aligned_16k": true
+            },
+            {
+              "type": "GNU_RELRO",
+              "offset": 6553600,
+              "address": 6553600,
+              "memory_size": 49152,
+              "alignment": 1,
+              "aligned_16k": true
+            }
+          ],
+          "elf_aligned_16k": true,
+          "zip_aligned_16k": true
+        }
+      ],
+      "runtime_tested": false,
+      "statically_compatible": true,
+      "evidence": {
+        "path": "test-results/native-fix-20260923/release-api36/strict-alignment.json",
+        "sha256": "cc87a24ec1fc50c5356a4f23fb405a316c93c79c8a4909e7fabca0c7479999cb",
+        "bytes": 4823
+      }
+    }
+  },
+  "android": {
+    "x86_release_runs": [
+      {
+        "outcome": "release_core_suite_passed",
+        "suite": "minified_release_core",
+        "main_sha256": "7ac583038da370fd7c22b0645f8c0589dd1c5b0005803147d7ba424e8d6d1516",
+        "test_sha256": "c656fb4de0f7b9256ef5abca4b0967729d3c449c6cc864712c1336ea8bb41692",
+        "page_size": 16384,
+        "abi": "x86_64",
+        "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+        "art_crashes_before": [],
+        "art_crashes_after": [],
+        "app_kept_visible": false,
+        "test_process_freezing_prevented": false,
+        "tests": {
+          "declared": 40,
+          "passed": 40,
+          "skipped": 0,
+          "failed": 0,
+          "aborted": false,
+          "complete": true
+        },
+        "evidence": {
+          "path": "test-results/native-fix-20260923/release-api36/run-01/status.json",
+          "sha256": "60c9abb4164d42a3b511418bebe50d2ca704c4bf589662da19c27dfe52f08eaa",
+          "bytes": 9866
+        }
+      },
+      {
+        "outcome": "release_core_suite_passed",
+        "suite": "minified_release_core",
+        "main_sha256": "7ac583038da370fd7c22b0645f8c0589dd1c5b0005803147d7ba424e8d6d1516",
+        "test_sha256": "c656fb4de0f7b9256ef5abca4b0967729d3c449c6cc864712c1336ea8bb41692",
+        "page_size": 16384,
+        "abi": "x86_64",
+        "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+        "art_crashes_before": [],
+        "art_crashes_after": [],
+        "app_kept_visible": false,
+        "test_process_freezing_prevented": false,
+        "tests": {
+          "declared": 40,
+          "passed": 40,
+          "skipped": 0,
+          "failed": 0,
+          "aborted": false,
+          "complete": true
+        },
+        "evidence": {
+          "path": "test-results/native-fix-20260923/release-api36/run-02/status.json",
+          "sha256": "da6d43392bea38f20bf4f596973406c7700f754335b5cbc0ec97fd96556fa343",
+          "bytes": 9866
+        }
+      },
+      {
+        "outcome": "release_core_suite_passed",
+        "suite": "minified_release_core",
+        "main_sha256": "7ac583038da370fd7c22b0645f8c0589dd1c5b0005803147d7ba424e8d6d1516",
+        "test_sha256": "c656fb4de0f7b9256ef5abca4b0967729d3c449c6cc864712c1336ea8bb41692",
+        "page_size": 16384,
+        "abi": "x86_64",
+        "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+        "art_crashes_before": [],
+        "art_crashes_after": [],
+        "app_kept_visible": false,
+        "test_process_freezing_prevented": false,
+        "tests": {
+          "declared": 40,
+          "passed": 40,
+          "skipped": 0,
+          "failed": 0,
+          "aborted": false,
+          "complete": true
+        },
+        "evidence": {
+          "path": "test-results/native-fix-20260923/release-api36/run-03/status.json",
+          "sha256": "7bc613b514c3a412655f87c369e0c629b13a0a540d3ff718156b3cdc552e11b7",
+          "bytes": 9866
+        }
+      }
+    ],
+    "arm_translated_release": {
+      "outcome": "release_core_suite_passed",
+      "suite": "minified_release_core",
+      "main_sha256": "fdaa85f12601d831b933d6d0e380f73a31e906480aed09d6b531444e04ff5d32",
+      "test_sha256": "c656fb4de0f7b9256ef5abca4b0967729d3c449c6cc864712c1336ea8bb41692",
+      "page_size": 16384,
+      "abi": "x86_64",
+      "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+      "art_crashes_before": [],
+      "art_crashes_after": [],
+      "app_kept_visible": false,
+      "test_process_freezing_prevented": false,
+      "tests": {
+        "declared": 40,
+        "passed": 40,
+        "skipped": 0,
+        "failed": 0,
+        "aborted": false,
+        "complete": true
+      },
+      "evidence": {
+        "path": "test-results/native-fix-20260923/release-arm64-translated-fixed/run-01/status.json",
+        "sha256": "7f14adb6897d9f11dd3289a9de8290d6498d678cde5f58ae3f4ebc26feb645c4",
+        "bytes": 9866
+      }
+    },
+    "ui_runs": [
+      {
+        "outcome": "release_ui_suite_passed",
+        "suite": "independent_release_ui",
+        "main_sha256": "7ac583038da370fd7c22b0645f8c0589dd1c5b0005803147d7ba424e8d6d1516",
+        "qa_sha256": "a2ef7873608a200c2c6465ad12d2da08893761e7e0dc84aa0fa655dcc2460d3b",
+        "page_size": "16384",
+        "abi": "x86_64",
+        "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+        "art_crashes_before": [],
+        "art_crashes_after": [],
+        "test_process_freezing_prevented": false,
+        "qa_foreground_service": false,
+        "tests": {
+          "declared": 4,
+          "passed": 4,
+          "skipped": 0,
+          "failed": 0,
+          "aborted": false,
+          "complete": true
+        },
+        "evidence": {
+          "path": "test-results/native-fix-20260923/release-ui-api36-fixed/status.json",
+          "sha256": "dd531261e493bd1f7ff982b0a6ffe863cb9283336867cdcc0409e75345d0d1c9",
+          "bytes": 1756
+        }
+      },
+      {
+        "outcome": "release_ui_suite_passed",
+        "suite": "independent_release_ui",
+        "main_sha256": "fdaa85f12601d831b933d6d0e380f73a31e906480aed09d6b531444e04ff5d32",
+        "qa_sha256": "a2ef7873608a200c2c6465ad12d2da08893761e7e0dc84aa0fa655dcc2460d3b",
+        "page_size": "16384",
+        "abi": "x86_64",
+        "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+        "art_crashes_before": [],
+        "art_crashes_after": [],
+        "test_process_freezing_prevented": false,
+        "qa_foreground_service": false,
+        "tests": {
+          "declared": 4,
+          "passed": 4,
+          "skipped": 0,
+          "failed": 0,
+          "aborted": false,
+          "complete": true
+        },
+        "evidence": {
+          "path": "test-results/native-fix-20260923/release-ui-arm64-translated-fixed/status.json",
+          "sha256": "eb64c2567adbc99458ab35d87814e46014eafc133046f6788b038346747bc2f4",
+          "bytes": 1756
+        }
+      }
+    ],
+    "guest_package_abi": "arm64-v8a",
+    "arm_test_host_abi": "x86_64",
+    "arm_native_bridge": "libndk_translation.so",
+    "physical_arm_test": false,
+    "image": "system-images;android-36;google_apis_ps16k;x86_64",
+    "image_revision": 7,
+    "cold_boot": true,
+    "snapshots_disabled": true,
+    "art_build_id": "aacabf6ce0595a0e342c02d33a22c65b",
+    "art_library_sha256": "5bc94faad8f08744616ad28981006248e93152aadc27814ea29cd1145229ced3"
+  },
+  "preservation": {
+    "workflow": {
+      "validated_images": 88,
+      "excluded_rejected": 8,
+      "exported_batch_only": true,
+      "cleanup_waited": true,
+      "explicit_abandonment_unblocks_cleanup": true,
+      "abandonment_never_activates_weights": true,
+      "restart_after_abandonment": true,
+      "cleanup_after_training": true,
+      "steps_before_cancel": 51,
+      "steps_after_resume": 213,
+      "initial_loss": 0.6891881043446455,
+      "final_loss": 0.0030195051496979095,
+      "internal_weights_changed": true,
+      "source_model_preserved": true,
+      "original_sha256_before": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+      "original_sha256_after": "4e87dab654ddae4fcce9e17f2d8e5ead0733f0b539462053541482e74f73be4b",
+      "first_final_weights": "dd7ada72f48a88144bd8cbe064f55b927c28ee023b637ee3d1b4bc4708424523",
+      "second_initial_weights": "dd7ada72f48a88144bd8cbe064f55b927c28ee023b637ee3d1b4bc4708424523",
+      "second_final_weights": "b5ab36a9a901aea0f1383044acc3aa8f0471a8b95a2a0890403b3dbb6730f306",
+      "second_initial_loss": 0.0032974717957017638,
+      "second_final_loss": 0.002246924470688824,
+      "continued_without_activation": true,
+      "missing_checkpoint_refused": true,
+      "runtime": "Android WorkManager / LiteRT CPU"
+    },
+    "internal_layer_training": {
+      "page_size": 16384,
+      "supported_abis": [
+        "x86_64",
+        "arm64-v8a"
+      ],
+      "runtime": "Android LiteRT Interpreter",
+      "optimizer_steps": 48,
+      "initial_loss": 0.6854044694986214,
+      "final_loss": 0.01837361347916884,
+      "internal_weights_before": "953589b2fe25ac8406555116cccc923749b6046d73212281a8a5c3cc8575d959",
+      "internal_weights_after": "a8eaef8107f888d03f1bfd5281f6482257ceba9c82f22a2337f62d5dd59cddfb",
+      "checkpoint_reload_matches": true,
+      "production_hf_models_trained": false,
+      "fixture": "synthetic red/blue images; untrained two-layer visual network"
+    },
+    "synthetic_only": true
+  },
+  "art": {
+    "historical_cause_confirmed": false,
+    "source_level_art_fix_claimed": false,
+    "new_art_crashes_observed": 0,
+    "historical_incidents_detected": 3,
+    "old_environment_rejected_before_install": true,
+    "logs_cleared": false
+  },
+  "honor": {
+    "model": "Honor ELI-NX9",
+    "api": 36,
+    "page_size": 4096,
+    "result": {
+      "outcome": "failed",
+      "suite": "minified_release_core",
+      "main_sha256": "7bcee0cc61d4009717998507eabe6329c335af8322a84ede68b0f1a6ba8aa14b",
+      "test_sha256": "9ba041c89f0d833df4f99c510dfa26ac0cd7c97356ca616bb5de2077308333b0",
+      "page_size": 4096,
+      "abi": "arm64-v8a",
+      "build_fingerprint": "HONOR/ELI-NX9EEA/HNELIX:16/HONORELI-N39/10.0.0.152C430E6R2P1:user/release-keys",
+      "art_crashes_before": [],
+      "app_kept_visible": true,
+      "test_process_freezing_prevented": true,
+      "tests": {
+        "declared": 40,
+        "passed": 14,
+        "skipped": 0,
+        "failed": 0,
+        "aborted": true,
+        "complete": false
+      },
+      "evidence": {
+        "path": "test-results/native-fix-20260923/release-honor/status.json",
+        "sha256": "52d756b24d92383fde0daf9f8a84583d8aa0e421f1540713dd031f2b6cfdf88c",
+        "bytes": 4472
+      }
+    },
+    "runtime_installed": "2.2.0-vds16k1 (intermediate)",
+    "final_runtime_installed": false,
+    "final_runtime_qualified": false,
+    "interruption": "Wireless ADB disconnected after 14 passes; final capture unavailable."
+  },
+  "retained_private_evidence": [
+    {
+      "path": "test-results/native-fix-20260923/art-guard-regression.json",
+      "sha256": "6953c675c7e2e78895cf53a8b81374e5e9d3593f6f83af67811174f0be2218c1",
+      "bytes": 1281
+    },
+    {
+      "path": "test-results/native-fix-20260923/old-environment-rejected/status.json",
+      "sha256": "d637519601a8979b74b3f379afdf98006a3406fe32278eca7f53037869a89d89",
+      "bytes": 2379
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-source-bindings-v2.json",
+      "sha256": "d977641a16554e4c2bce3e0c5a12797256182777afdc82790fdc0150ed4f1c92",
+      "bytes": 2247
+    },
+    {
+      "path": "test-results/native-fix-20260923/litert-receipt-guards-v2.json",
+      "sha256": "df5f83642c976e3725e241a9a69038cbbc127a0b627795f0c507d8bf9b93280d",
+      "bytes": 5299
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-jvm-lint-summary.json",
+      "sha256": "4df5c86f7701e8fc8559a36253fe3402e516691ca8e2429a94e1b08eae8ecda6",
+      "bytes": 144
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-jvm-lint-inventory.log",
+      "sha256": "c654cf1219deab085e8fa80dce8d20cf9bc65e7de50901b1ea88c7f81d92a335",
+      "bytes": 2483
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-python-tests.log",
+      "sha256": "c30a58ec4c21c81ac66d3b0200fef668fef9cdf565db5df0d28bb9835b05a222",
+      "bytes": 449
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-training-evidence/status.json",
+      "sha256": "9374b2e0f8687be32a04e5c3a1a444176b5e1669771ca6c0f872b24cb576f3fb",
+      "bytes": 240
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-training-evidence/android-workflow-evidence.json",
+      "sha256": "4c0294ffb320dbc671379a48c224d7a9022e2feb784af4590d7110f37ff5c0a8",
+      "bytes": 1392
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-training-evidence/android-training-evidence.json",
+      "sha256": "1ebe39e8177aa2571fa1cfd89ab8f09b507de23852bb94f95141cbdebd881c16",
+      "bytes": 573
+    },
+    {
+      "path": "test-results/native-fix-20260923/release-arm64-translated/status.json",
+      "sha256": "20c1d2ab50d858eff131ee92edc25ab937fd89858c2dbdca6796ce1141fead6b",
+      "bytes": 2632
+    },
+    {
+      "path": "test-results/native-fix-20260923/release-ui-api36/status.json",
+      "sha256": "bf62cb1b321afb066131c16b145db2e86564b4f1b89ea6cc9b2f98270e23ff6c",
+      "bytes": 1787
+    },
+    {
+      "path": "test-results/native-fix-20260923/release-honor/status.json",
+      "sha256": "52d756b24d92383fde0daf9f8a84583d8aa0e421f1540713dd031f2b6cfdf88c",
+      "bytes": 4472
+    },
+    {
+      "path": "test-results/native-fix-20260923/final-emulator/status.json",
+      "sha256": "d7595d6e6625c3c8fc55973abea4ef755247e5fdd4d499827fd9a661013ce566",
+      "bytes": 158
+    },
+    {
+      "path": "test-results/native-fix-20260923/honor-before/79b91eac81a8.txt",
+      "sha256": "cc7eab28f86ed9f1f6a84d0fba83eecf47814e5548c79cd49979b85f0189be22",
+      "bytes": 363
+    },
+    {
+      "path": "test-results/native-fix-20260923/honor-before/29e167418aa4.txt",
+      "sha256": "cc7eab28f86ed9f1f6a84d0fba83eecf47814e5548c79cd49979b85f0189be22",
+      "bytes": 363
+    },
+    {
+      "path": "test-results/native-fix-20260923/honor-before/1790179769628.txt",
+      "sha256": "e9a13454ffbbf89646d66b4c9cfe50c7018273f0f3016a2f884f52c1e20cd7d7",
+      "bytes": 501
+    }
+  ],
+  "remaining": [
+    "Historical ART root cause",
+    "Final-runtime physical Honor core/UI/data continuity",
+    "Physical ARM 16 KB",
+    "Extended background on the final runtime",
+    "Remote CI execution",
+    "Per-model final-runtime qualification and independent quality",
+    "Native transitive notices"
+  ],
+  "notes": [
+    "All native fixes are local and uncommitted; historical receipts unchanged.",
+    "The x86 final unsigned pair is byte-identical to the tested pair.",
+    "Signed ARM payloads match, but only emulator-signed final ARM ran.",
+    "40 core tests exclude opt-in model, HF, external fault and preservation campaigns."
+  ]
+}

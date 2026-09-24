@@ -9,7 +9,7 @@ import tarfile
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--serial',required=True)
 p.add_argument('--source',type=Path,required=True)
-p.add_argument('--name',choices=('training-fixture','hf-runtime-fixture'),required=True)
+p.add_argument('--name',choices=('training-fixture','hf-runtime-fixture','long-training-fixture'),required=True)
 a=p.parse_args()
 if os.environ.get('VDS_ALLOW_TEST_INSTALL')!='1':
     p.error('Set VDS_ALLOW_TEST_INSTALL=1 for a dedicated test device')

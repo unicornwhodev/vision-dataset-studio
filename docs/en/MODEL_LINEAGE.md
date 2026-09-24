@@ -1,5 +1,8 @@
 # Keep the original and continue training
 
+The original stays available. The first training run creates a separate version; later runs continue its last validated weights. The [rc6 results](../RC6_RELEASE.md) include a fresh check of this behaviour.
+
+
 [Documentation](../README.md) · [Français](../MODEL_LINEAGE.md)
 
 ![Original preserved, learned version continued](../visuals/current/model-lineage.svg)

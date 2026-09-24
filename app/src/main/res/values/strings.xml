@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Vision Dataset Studio</string>
+    <string name="app_name">Cadryl</string>
     <string name="nav_studio">Studio</string>
     <string name="nav_batch">Batch</string>
     <string name="nav_models">Models</string>
@@ -253,4 +253,7 @@
     <string name="training_abandon">Abandon this training</string>
     <string name="training_phase_abandoned">Training abandoned</string>
     <string name="training_abandon_help">This training run will not resume. No weights will be activated. Images and the candidate remain stored until explicit batch cleanup.</string>
+    <string name="training_notification_channel">Local training</string>
+    <string name="training_notification_title">Training on this device</string>
+    <string name="training_notification_progress">%1$d / %2$d steps · checkpoint saved regularly</string>
 </resources>

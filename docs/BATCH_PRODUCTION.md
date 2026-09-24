@@ -1,5 +1,8 @@
 # Production par lots
 
+Les lots permettent d’avancer sur un petit groupe d’images, de terminer sa relecture et son export, puis de passer à la suite. Cette page explique ce que Cadryl conserve à chaque étape.
+
+
 Le parcours principal est : **importer → préannoter → corriger/valider → exporter et vérifier → apprentissage facultatif → nettoyer → lot suivant**.
 
 L’apprentissage est désactivé par défaut. Il ne se déclenche jamais à la validation d’une image. Lorsqu’il est activé, il utilise exclusivement les images acceptées et les annotations finales du lot dont l’export local ou HF a été vérifié. Un lot non exporté ou incomplet est refusé. Les autres lots et les cas rejetés ne sont pas ajoutés au corpus. L’empreinte du lot et la preuve d’export figurent dans le reçu d’apprentissage.
@@ -32,7 +35,7 @@ La portée est le projet sur cette installation. Une nouvelle installation sans 
 
 L’APK contient le runtime, les adaptateurs, les contrats, le catalogue, les tokeniseurs et la logique de téléchargement/import. Les poids sont téléchargés ou importés après installation et conservés dans le stockage privé Android. Aucun corpus ni poids n’est intégré à l’APK.
 
-Le build contrôle l’archive APK : extensions de poids et signatures LiteRT/GGUF dans assets/raw. `app-contents.json` conserve l’inventaire ; un poids détecté bloque la promotion de l’APK. Les modèles d’essai sont injectés séparément dans le stockage de l’émulateur. La taille de l’APK universelle Debug vient notamment des bibliothèques natives pour quatre architectures.
+Le build contrôle l’archive APK : extensions de poids et signatures LiteRT/GGUF dans assets/raw. `app-contents.json` conserve l’inventaire ; un poids détecté bloque la promotion de l’APK. Les modèles d’essai sont injectés séparément dans le stockage de l’émulateur. rc6 distribue une APK Release ARM64 ; les anciennes APK Debug universelles contenaient les bibliothèques de quatre architectures.
 
 Les graphes d’apprentissage doivent respecter [le contrat LiteRT](LITERT_TRAINING_CONTRACT.md). Le support d’un contrat ne constitue pas une qualification de toutes les conversions HF. Le rapport d’exécution distingue modèles essayés, échecs et essais encore requis.
 

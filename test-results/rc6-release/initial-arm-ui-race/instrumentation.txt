@@ -1,0 +1,162 @@
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest:
+INSTRUMENTATION_STATUS: test=displayPreferencePersistsAndIsRestored
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: qa_step=restart actual Release process
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Atelier|Studio
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Réglages|Settings
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Afficher les conseils|Show guidance
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Afficher les conseils|Show guidance
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=restart actual Release process
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Atelier|Studio
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Réglages|Settings
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Afficher les conseils|Show guidance
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=restart actual Release process
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Atelier|Studio
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Réglages|Settings
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Afficher les conseils|Show guidance
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Afficher les conseils|Show guidance
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=restart actual Release process
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Atelier|Studio
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Réglages|Settings
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Afficher les conseils|Show guidance
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=displayPreferencePersistsAndIsRestored
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=modelImportExportAndQualityRemainAccessible
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: qa_step=restart actual Release process
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Atelier|Studio
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Modèles|Models
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Importer|Import
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Choisir un \.tflite|Choose a \.tflite file
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Export
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Archive locale|Local archive
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Qualité|Quality
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Stockage|Storage
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=modelImportExportAndQualityRemainAccessible
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=createdProjectSurvivesProcessRestart
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: qa_step=restart actual Release process
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Atelier|Studio
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Gérer les projets|Manage projects
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Nom du nouveau projet|New project name
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Project name input
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Settled project name input
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Settled project name input
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Entered project name
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Créer un projet|Create project
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Created project outside input
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Missing control: Created project outside input
+	at com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest.find(ReleaseWorkflowTest.java:98)
+	at com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest.createdProjectSurvivesProcessRestart(ReleaseWorkflowTest.java:163)
+
+INSTRUMENTATION_STATUS: stream=
+Error in createdProjectSurvivesProcessRestart(com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest):
+java.lang.AssertionError: Missing control: Created project outside input
+	at com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest.find(ReleaseWorkflowTest.java:98)
+	at com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest.createdProjectSurvivesProcessRestart(ReleaseWorkflowTest.java:163)
+
+INSTRUMENTATION_STATUS: test=createdProjectSurvivesProcessRestart
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=homeRendersFromOptimizedApk
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: qa_step=restart actual Release process
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Atelier|Studio
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Outils|Tools
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: qa_step=find: Modèles|Models
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=homeRendersFromOptimizedApk
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 14.376
+There was 1 failure:
+1) createdProjectSurvivesProcessRestart(com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest)
+java.lang.AssertionError: Missing control: Created project outside input
+	at com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest.find(ReleaseWorkflowTest.java:98)
+	at com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest.createdProjectSurvivesProcessRestart(ReleaseWorkflowTest.java:163)
+
+FAILURES!!!
+Tests run: 4,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

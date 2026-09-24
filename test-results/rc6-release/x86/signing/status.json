@@ -1,0 +1,23 @@
+{
+  "outcome": "signed_release_test_apks",
+  "build_receipt_sha256": "89ac9d37cdbc8ca827f8bfc63b02cf4d4e42dbb9d901ff25b6cf6673a529575b",
+  "source_manifest_sha256": "74dd2b89c140cbcc081e805c975fcb1166815b68fe304ae93afc0f7e0e79ae31",
+  "certificate_sha256": "51ef3e4abf953c62c8427deaecf4349aefffc2270c593229315722457f126895",
+  "artifacts": {
+    "app": {
+      "file": "app.apk",
+      "sha256": "4fed0f02c11e50a844950d34703bb3e6e087d143cdc5879006189b295fcf9ea6",
+      "bytes": 117895634,
+      "source_sha256": "cb5c2eb40109c4877823d70edaeaef83131ba4adfc2d95d005b908b56d3118f7"
+    },
+    "tests": {
+      "file": "tests.apk",
+      "sha256": "a3aefb6ec5a6e4f4ad046078dc1e90ca3804d1be717485760fed59ec6163d24f",
+      "bytes": 2422649,
+      "source_sha256": "0a1c14d5aa9006a9c14b7ef1010f1567fa28a3a3da2885855618e67b484f9e9a"
+    }
+  },
+  "production_qualified": false,
+  "tests_executed": false,
+  "finished_at": "2026-09-24T01:30:25.699461+00:00"
+}

@@ -1,497 +1,104 @@
 {
-  "schema": 1,
-  "product": "Vision Dataset Studio",
+  "schema": 2,
+  "product": "Cadryl",
   "brand": "Unicorn Who Dev",
-  "version": "4.2.0-rc5",
-  "date": "2026-09-23",
+  "version": "4.2.0-rc6",
+  "version_code": 11,
+  "date": "2026-09-24",
   "namespace": "com.unicornwhodev.visiondatasetstudio",
   "application_id": "com.unicornwhodev.visiondatasetstudio",
   "room_schema_version": 4,
   "source_only": false,
-  "public_release_ready": false,
+  "stable_release_ready": false,
   "license": "Apache-2.0",
   "rights_and_transitive_notices_review": "pending",
   "android": {
-    "current_build_run": "20260923T104142Z-befce3e3596a",
-    "compiled_source_commit": "781f22bd1629f4a50433848f4b5ff102c59b7ca4",
-    "compiled_source_base_commit": "23b038fb63af71cd7b9fb3fc6324081d883d1316",
+    "build_type": "minified-release",
+    "source_manifest": "test-results/rc6-release/arm/build/source-manifest.json",
     "compiled_worktree_hashed": true,
-    "compiled_worktree_committed": true,
-    "source_manifest": "test-results/windows-rc5-release/build/source-manifest.json",
-    "build_outcome": "build_checks_passed",
     "apk_built": true,
     "test_apk_built": true,
+    "room_schema_generated": true,
+    "weights_embedded": false,
     "unit_tests": {
-      "passed": 67,
+      "passed": 70,
       "failed": 0,
+      "errors": 0,
       "skipped": 0
     },
     "lint": {
       "errors": 0,
-      "warnings": 88
+      "warnings": 96
     },
-    "instrumented_tests": {
-      "build_run": "20260923T104142Z-befce3e3596a",
-      "android_tests_passed": 39,
-      "failed": 0,
-      "skipped": 0,
-      "single_green_full_suite": true,
-      "suite": "core",
-      "excluded_classes": [
-        "HfModelRuntimeTest",
-        "ConvertedModelQualificationTest",
-        "NativePhotoInferenceUiTest",
-        "HfLivePublicationTest",
-        "InstalledDataPreservationTest"
-      ],
-      "api": 35,
-      "abi": "x86_64",
-      "page_size": 4096,
-      "evidence": "test-results/windows-rc5-release/api35-4k/status.json"
-    },
-    "physical_device_tested": false,
-    "physical_device_deferred_by_owner": true,
-    "room_schema_generated": true,
-    "ksp_generated_files": 99,
-    "weights_embedded": false,
-    "page_size_16k": {
-      "qualified": false,
-      "flex_crash_fixed": true,
-      "completed_tests": 39,
-      "failed": 0,
-      "skipped": 0,
-      "process_crashed": false,
-      "api": 35,
-      "abi": "x86_64",
-      "page_size": 16384,
-      "core_suite_passed": true,
-      "evidence": "test-results/windows-rc5-release/api35-16k/status.json",
-      "global_static_audit": "test-results/windows-rc5-release/native-apk-audit.json",
-      "remaining_relro_entries": [
-        "lib/arm64-v8a/libandroidx.graphics.path.so",
-        "lib/arm64-v8a/libdatastore_shared_counter.so",
-        "lib/arm64-v8a/libtensorflowlite_jni.so",
-        "lib/x86_64/libandroidx.graphics.path.so",
-        "lib/x86_64/libdatastore_shared_counter.so",
-        "lib/x86_64/libtensorflowlite_jni.so"
-      ],
-      "physical_arm_qualified": false
-    },
+    "core_tests_per_abi": 40,
+    "ui_tests_per_abi": 4,
+    "host_abi": "x86_64",
+    "arm_translation": true,
+    "api": 36,
+    "page_size": 16384,
+    "strict_native_16k_audit_passed": true,
+    "remaining_relro_entries": [],
+    "physical_device_qualified": false,
+    "physical_arm_16k_qualified": false,
     "artifacts": {
-      "app": {
-        "file": "vision-dataset-studio-uwd-debug.apk",
-        "sha256": "5f5154809b0a79c2e8567c2da6d2479140406e65fac1d38008f1932a58738e98",
-        "bytes": 413877313
+      "arm": {
+        "app_sha256": "898ab6eb45b6d7f40255f727e89a59f09978160488b09ed15e892b69e9f51ec8",
+        "tests_sha256": "a3aefb6ec5a6e4f4ad046078dc1e90ca3804d1be717485760fed59ec6163d24f",
+        "qa_sha256": "6fae35862cf6af1848ff34a11fd4d478db1dcdf268ec07abe534b456bd50454a",
+        "physical_arm": false,
+        "package_abi": "arm64-v8a",
+        "host_abi": "x86_64",
+        "outcome": "passed"
       },
-      "tests": {
-        "file": "vision-dataset-studio-uwd-test.apk",
-        "sha256": "0205d79b9609beeaa16b130d0504bfc2dab21ffb025aeb749cff64032a179633",
-        "bytes": 3263018
+      "x86": {
+        "app_sha256": "4fed0f02c11e50a844950d34703bb3e6e087d143cdc5879006189b295fcf9ea6",
+        "tests_sha256": "a3aefb6ec5a6e4f4ad046078dc1e90ca3804d1be717485760fed59ec6163d24f",
+        "qa_sha256": "6fae35862cf6af1848ff34a11fd4d478db1dcdf268ec07abe534b456bd50454a",
+        "physical_arm": false,
+        "package_abi": "x86_64",
+        "host_abi": "x86_64",
+        "outcome": "passed"
       }
     },
-    "arm64_translated_training": {
-      "passed": true,
-      "tests": 2,
-      "page_size": 16384,
-      "physical_arm": false,
-      "execution": "Android native bridge on x86_64",
-      "evidence": "test-results/windows-rc5-release/arm64-translated/status.json"
-    },
-    "source_binding": "162 of 163 recorded files byte-exact; host Gradle bootstrap CRLF-to-LF normalization separately recorded in PACKAGE.json; Android source bytes identical."
+    "evidence": "test-results/rc6-release/summary.json"
   },
-  "portable_tests": {
-    "python_host_suite_passed": 70,
-    "numeric_engine_checks_passed": 72,
-    "training_target_checks_passed": 16,
-    "not_android_execution": true,
-    "python_platform": "Windows, Python 3.11",
-    "other_numeric_results_are_historical": true,
-    "python_host_suite_at_android_build": 63,
-    "packaging_guards_added": 7,
-    "python_host_evidence": "test-results/windows-rc5-release/python-tests-publication.log"
+  "python_tests": {
+    "passed": 87,
+    "failed": 0
   },
-  "stress": {
-    "rows": 200000,
-    "kind": "metadata_only",
-    "runtime": "host SQLite/Python",
-    "android": false
-  },
-  "runtime_validation": {
-    "model_downloaded_and_executed": true,
-    "hf_write_test": false,
-    "phone_memory_measured": false,
-    "phone_model_time_measured": false,
-    "community_model_catalog_live_test": true,
-    "cooperative_claim_live_hf_test": false,
-    "model_downloaded_and_executed_scope": "3 public models on API 28 x86_64 software CPU; synthetic input, no accuracy or ARM benchmark",
-    "real_batch_inference_test": true,
-    "local_http_prompt_fixture_test": true,
-    "studio_pack_android_roundtrip": true,
-    "point_correction_store_android_fixture": true,
-    "export_archive_android_produced": true,
-    "shipped_export_validator_accepts_current_android_archive": true,
-    "community_hf_repvit_android_passed": true,
-    "inference_only_model_import_test": true,
-    "stale_model_digest_blocks_usage": false,
-    "ordinary_preannotation_preserves_saved_annotations": true,
-    "explicit_prompt_rerun_changes_native_outputs": true,
-    "english_project_settings_ui_test": true
+  "signing": {
+    "durable": true,
+    "certificate_sha256": "51ef3e4abf953c62c8427deaecf4349aefffc2270c593229315722457f126895",
+    "compatible_with_rc4_or_rc5_debug": false
   },
   "ci": {
     "prepared": true,
-    "published": true,
-    "executed": false,
+    "current_release_executed": false,
     "api_levels": [
       28,
-      35
+      35,
+      36
     ],
-    "publishes_release": false,
-    "requires_hf_secret": false,
-    "attempted": true,
-    "blocker": "GitHub Actions account billing lock; job not started",
-    "run_url": "https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35539418339",
-    "current_release_executed": false,
-    "attempt_scope": "Historical billing failure; current workflow published but not executed for this release",
-    "current_workflow_published": true,
-    "current_workflow_executed": false,
-    "prepared_page_sizes": [
+    "page_sizes": [
       4096,
       16384
-    ],
-    "native_flex_job_prepared": true
+    ]
   },
-  "data_transition": {
-    "in_place_update_from_previous_application_id": false,
-    "cross_application_data_import_implemented": false
-  },
-  "remote_repository_modified": true,
-  "workstation": {
-    "project_path": "/workspace/projects/vision-dataset-studio",
-    "persistent_volume": true,
-    "kvm_available": false,
-    "vnc_transport": "SSH loopback",
-    "emulator": "API 28 AOSP x86_64 software",
-    "preview": {
-      "width_px": 960,
-      "height_px": 720,
-      "density_dpi": 160,
-      "profile": "workstation"
-    }
-  },
-  "ui_redesign": {
-    "status": "canvas_runtime_passed_with_product_blockers",
-    "direction": "dark_cyan_violet",
-    "requested_by_owner": true,
-    "report": "docs/UI_REDESIGN.md",
-    "build_run": "20260919T203710Z-e9cd5c4ddbbe",
-    "compose_tests": {
-      "total": 2,
-      "passed": 2
-    },
-    "apk_sha256": "abf2f50fe63835ab885f23efc50f0db5033f167f2db72a778061355f8bc03c2d",
-    "manual_editor_checks": {
-      "device": "API 28, 320 dp, software emulator",
-      "fixture": "3 synthetic QA images in separate Recette-UI project",
-      "box_creation": true,
-      "undo_redo": true,
-      "properties_open_close": true,
-      "saved_box_after_activity_restart": true,
-      "canvas_px": [
-        480,
-        515
-      ],
-      "displayed_image_px": [
-        480,
-        360
-      ],
-      "zoom_125_and_fit_100": true,
-      "font_scale_1_3": true,
-      "build_run": "20260919T200729Z-bec11e4607bc",
-      "properties_sidebar_960dp": true,
-      "saved_box_after_emulator_restart": true
-    },
-    "final_home_preview_fix": {
-      "build_run": "20260919T203710Z-e9cd5c4ddbbe",
-      "validated_width_dp": 960,
-      "saved_box_after_apk_update": true
-    },
-    "historical": true
-  },
-  "implementation_audit": {
-    "date": "2026-09-19",
-    "source_commit": "22b9cc332638ab02c98b7de732d4a62cc706643e",
-    "report": "docs/IMPLEMENTATION_AUDIT.md",
-    "evidence": "docs/implementation-audit.json",
-    "complete": false,
-    "android_tests": {
-      "total": 8,
-      "passed": 8,
-      "runs": 2
-    },
-    "new_regression_failures": [
-      "box_raw_coordinate_provenance",
-      "export_validator_batch_path"
-    ],
-    "missing_capabilities": [
-      "continuous_visual_model_training",
-      "integrated_agent_and_tools",
-      "workflow_step_runner",
-      "multi_graph_multimodal_runtime",
-      "usable_embedding_storage_and_search"
-    ],
-    "production_changed": false,
-    "historical": true,
-    "current_status": "See batch_production, native_training and KNOWN_LIMITATIONS.md; this audit describes the earlier commit."
-  },
-  "batch_production": {
-    "primary_workflow": "import, preannotation, human correction, verified export, optional training, cleanup, next batch",
-    "exact_deduplication_scope": "project on this installation; file and decoded pixels SHA-256",
-    "identity_survives_purge": true,
-    "android_two_plus_one_passed": true,
-    "renamed_duplicates_skipped": 2,
-    "training_default_enabled": false,
-    "training_source": "only the processed and verified exported batch",
-    "cleanup_waits_for_training_completion": true,
-    "cleanup_execution_after_training": "passed_on_android",
-    "apk_contains_weights": false,
-    "report": "docs/BATCH_PRODUCTION.md",
-    "explicit_training_abandonment_available": true,
-    "explicit_abandonment_exception": "An interrupted run can be explicitly abandoned; export verification and cleanup confirmation still required"
-  },
-  "native_training": {
-    "execution": "Android only",
-    "runtime": "LiteRT 1.4.2 + Select TF Ops 2.16.1-vds16k1",
-    "fixture_steps": 48,
-    "initial_loss": 0.6854044694986214,
-    "final_loss": 0.01837361347916884,
-    "internal_weights_changed": true,
-    "checkpoint_reload_matches": true,
-    "hf_production_models_qualified": false,
-    "workmanager_export_cancel_resume_passed": true,
-    "workflow_images": 88,
-    "workflow_steps": 213,
-    "workflow_initial_loss": 0.6891881078802196,
-    "workflow_final_loss": 0.0030195051496979095,
-    "current_evidence": "test-results/windows-rc5-release/api35-16k/status.json",
-    "hf_conversion_results_historical": true,
-    "cleanup_after_training_passed": true,
-    "hf_conversions_runtime_passed": 8,
-    "hf_conversions_trainable_total": 20,
-    "hf_backbone_trainable": false,
-    "hf_scope": "heads and output adapters only; encoder frozen",
-    "report": "docs/LITERT_QUALIFICATION.md",
-    "explicit_abandonment_cleanup_test_passed": true,
-    "stale_export_cleanup_rejected": true
-  },
-  "documentation": {
-    "languages": [
-      "fr",
-      "en"
-    ],
-    "index": "docs/README.md",
-    "raw_evidence_language": "original",
-    "app_english_localization": true,
-    "functional_audit": "docs/FUNCTIONAL_AUDIT_2026_09.md"
-  },
-  "source_publication": {
-    "authorized": true,
-    "repository": "https://github.com/unicornwhodev/vision-dataset-studio",
-    "visibility": "public",
-    "tested_source_commit": "781f22bd1629f4a50433848f4b5ff102c59b7ca4",
-    "secret_review": "docs/PUBLICATION_CHECKS.md",
-    "status": "Windows rc5 sources and selected evidence committed and pushed; prerelease published"
-  },
-  "distribution": {
-    "kind": "workstation-tested Debug prerelease",
-    "source_proof": "tools/package_verified_release.py",
-    "oci_package": "ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc5",
-    "oci_kind": "qualification archive, not a runnable build image",
-    "build_image_status": "Prepared, not built; new remote workflow not executed after historical Actions billing failure",
-    "oci_visibility": "private",
-    "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5",
-    "version_in_preparation": null,
-    "latest_published_version": "4.2.0-rc5",
-    "signature": {
-      "certificate_sha256": "16e1c6980c16c5cad26fab306cdfe16bbfe8e1cf039b59f691bb1bebfe558d84",
-      "previous_certificate_sha256": "05d03f7e822372b5d6d503260477a4a39760788c86f7d4a9130af78f0a351251",
-      "compatible_with_rc4": false,
-      "durable_production_signature": false,
-      "previous_private_key_available_on_workstation": false
-    },
-    "oci_digest": "sha256:4ff073508e3639e40ea8e6f5a3051a1f9f183a7b2d111e9a2886caab0c36082c",
-    "publication_receipt": "docs/RC5_PUBLICATION_RECEIPT.json"
-  },
-  "lite_rt_matrix": {
-    "model_conversions_downloaded_verified": 31,
-    "model_conversions_passed": 13,
-    "model_conversions_failed": 0,
-    "model_conversions_pending": 15,
-    "hf_trainable_conversions_passed": 8,
-    "hf_trainable_conversions_total": 20,
-    "evidence": "test-results/functional-audit-20260922/public-model-results.json",
-    "model_conversions_timed_out": 3,
-    "model_retests_pending": 3,
-    "campaign_complete": false,
-    "model_conversions_pending_definition": "Unexecuted conversions, excludes timed-out cases awaiting retest"
-  },
-  "workflows": {
-    "templates": 3,
-    "journal_resume": true,
-    "human_review_required": true,
-    "verified_export_before_learning": true,
-    "cleanup_after_training": true,
-    "local_agent_planner": "implemented; real backend integration pending",
-    "report": "docs/WORKFLOWS.md"
-  },
-  "historical_android_before_windows": {
-    "current_build_run": "20260922T223550Z-3ee0d233110c",
-    "compiled_source_commit": "a0d9737586971ac243252cb147a62010a4398083",
-    "build_outcome": "build_checks_passed",
-    "apk_built": true,
-    "test_apk_built": true,
-    "unit_tests": {
-      "passed": 67,
-      "failed": 0,
-      "skipped": 0
-    },
-    "lint": {
-      "errors": 0,
-      "warnings": 90
-    },
-    "instrumented_tests": {
-      "build_run": "20260922T223550Z-3ee0d233110c",
-      "android_tests_passed": 39,
-      "skipped": 0,
-      "unresolved_failures": 0,
-      "initial_suite": {
-        "tests": 39,
-        "passed": 38,
-        "failed": 1,
-        "runtime_seconds": 371.032,
-        "evidence": "final-device/instrumentation.txt"
-      },
-      "targeted_retry": {
-        "tests": 1,
-        "passed": 1,
-        "failed": 0,
-        "runtime_seconds": 48.567,
-        "evidence": "inference-only-retry/instrumentation.txt"
-      },
-      "resolution": "Completed conversion QA fixtures exceeded the test project storage budget. Moved them reversibly to app no_backup; no code, corpus, database or stored annotations changed. Inference-only import then passed.",
-      "single_green_full_suite": false,
-      "excluded_classes": [
-        "HfModelRuntimeTest",
-        "ConvertedModelQualificationTest",
-        "NativePhotoInferenceUiTest",
-        "HfLivePublicationTest"
-      ],
-      "evidence": "test-results/functional-audit-20260922/core-result.json"
-    },
-    "physical_device_tested": false,
-    "room_schema_generated": true,
-    "weights_embedded": false
-  },
-  "windows_qualification_report": "docs/WINDOWS_QUALIFICATION_2026_09.md",
-  "installed_database_preservation": {
-    "passed": true,
-    "schema_transition": "4 -> 4",
-    "real_application_database": true,
-    "synthetic_human_annotation_preserved": true,
-    "backup_integrity_and_readback": true,
-    "historical_database_migration": false,
-    "evidence": "test-results/data-preservation-5f89951a77fc/status.json"
-  },
-  "distribution_candidate": {
-    "abi": "arm64-v8a",
-    "bytes": 100190260,
-    "signed": false,
-    "physical_device_tested": false,
-    "release_qualified": false,
-    "sha256": "7d360b92f9245cf88af13c5805da538bcd9eede654c910bc69eed63015c2274f",
-    "build_run": "20260923T104437Z-7e7f388b5ee0",
-    "current_candidate_device_tested": false,
-    "historical_minified_x86_startup_and_annotation_readback": true
-  },
-  "runtime_dependency_notices": {
-    "resolved_artifacts": 111,
-    "license_metadata_missing": 0,
-    "embedded_notices_collected": true,
-    "native_transitive_review_complete": false,
-    "legal_clearance": false
-  },
-  "historical_android_before_flex_fix": {
-    "current_build_run": "20260923T011455Z-dd6ec9350f4a",
-    "compiled_source_commit": null,
-    "compiled_source_base_commit": "23b038fb63af71cd7b9fb3fc6324081d883d1316",
-    "compiled_worktree_hashed": true,
-    "compiled_worktree_committed": false,
-    "source_manifest": "dist/android/runs/20260923T011455Z-dd6ec9350f4a/source-manifest.json",
-    "build_outcome": "build_checks_passed",
-    "apk_built": true,
-    "test_apk_built": true,
-    "unit_tests": {
-      "passed": 67,
-      "failed": 0,
-      "skipped": 0
-    },
-    "lint": {
-      "errors": 0,
-      "warnings": 91
-    },
-    "instrumented_tests": {
-      "build_run": "20260923T011455Z-dd6ec9350f4a",
-      "android_tests_passed": 39,
-      "failed": 0,
-      "skipped": 0,
-      "single_green_full_suite": true,
-      "suite": "core",
-      "excluded_classes": [
-        "HfModelRuntimeTest",
-        "ConvertedModelQualificationTest",
-        "NativePhotoInferenceUiTest",
-        "HfLivePublicationTest",
-        "InstalledDataPreservationTest"
-      ],
-      "api": 35,
-      "abi": "x86_64",
-      "page_size": 4096,
-      "evidence": "test-results/windows-qualification-20260923/api35-delivery/status.json"
-    },
-    "physical_device_tested": false,
-    "physical_device_deferred_by_owner": true,
-    "room_schema_generated": true,
-    "ksp_generated_files": 95,
-    "weights_embedded": false,
-    "page_size_16k": {
-      "qualified": false,
-      "completed_tests": 19,
-      "process_crashed": true,
-      "at_test": "OnDeviceTrainingTest.internalVisualWeightsTrainPersistAndReloadOnAndroid",
-      "native_library": "libtensorflowlite_flex_jni.so",
-      "api": 35,
-      "abi": "x86_64",
-      "evidence": "test-results/windows-qualification-20260923/api35-16k/"
-    }
-  },
-  "training_model_lineage": {
-    "original_preserved": true,
-    "learned_profile_stable": true,
-    "subsequent_training_continues_learned_weights": true,
-    "manual_inference_activation": true,
-    "missing_checkpoint_refused": true,
-    "cancellation_resume_passed": true,
-    "process_restart_file_integrity_passed": true,
-    "synthetic_data_only": true,
-    "first_final_weights": "28cb72074ba3d20255ae573e7655fca417946418ae0a74709620a1699e23969a",
-    "second_initial_weights": "28cb72074ba3d20255ae573e7655fca417946418ae0a74709620a1699e23969a",
-    "second_final_weights": "d6e251202182ecbe9ca7cea49edc32d81f02f8ebee202542f1091b79a407e86b",
-    "report": "docs/MODEL_LINEAGE.md",
-    "evidence": "test-results/windows-rc5-release/api35-16k/workflow-training-evidence.json"
-  },
-  "current_session_external_writes": true,
-  "current_session_external_write_scope": [
-    "GitHub main and rc5 tag",
-    "GitHub rc5 prerelease assets",
-    "Existing private GHCR qualification package rc5 tag"
-  ]
+  "remaining": [
+    "Physical rc6 Honor",
+    "Physical ARM 16 KB",
+    "Historical ART root cause",
+    "Extended background on new runtime",
+    "Model catalogue and independent quality",
+    "Remote CI",
+    "Native transitive notices"
+  ],
+  "historical_reports": [
+    "docs/NATIVE_FIX_2026_09.md",
+    "docs/RELEASE_CLOSURE_2026_09.md",
+    "docs/RELEASE_HARDENING_2026_09.md",
+    "docs/P1_QUALIFICATION_2026_09.md",
+    "docs/LITERT_QUALIFICATION.md"
+  ],
+  "previous_product_name": "Vision Dataset Studio"
 }

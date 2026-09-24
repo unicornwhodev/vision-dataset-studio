@@ -1,8 +1,6 @@
 # TensorFlow Flex et pages Android de 16 Ko
 
-Après la publication rc5, la [campagne P1](P1_QUALIFICATION_2026_09.md#les-signalements-natifs)
-a corrigé le signalement DataStore et documenté les deux bibliothèques restantes.
-Le contrôle strict de l’APK reste inchangé ; la recette 16 Ko demeure sur émulateur.
+Le correctif Flex est conservé dans rc6. Graphics Path, DataStore et LiteRT ont depuis été traités séparément : l’audit strict global passe désormais. La [note rc6](RC6_RELEASE.md) donne les résultats actuels ; la dernière section de cette page conserve la campagne historique Flex.
 
 Le binaire Maven d'origine `tensorflow-lite-select-tf-ops:2.16.1` est compilé avec des segments
 de 4 Ko. Son chargement plantait sur l'émulateur API 35 / 16 Ko pendant
@@ -21,11 +19,11 @@ Tous les opérateurs Flex sont conservés, y compris les gradients et Save/Resto
 L'API Java, les notices et les binaires 32 bits proviennent de l'AAR officiel
 2.16.1 dont l'empreinte est vérifiée. Les bibliothèques 64 bits sont réellement
 recompilées, puis dépouillées de leurs symboles de débogage ; leurs en-têtes ELF
-ne sont pas réécrits. LiteRT Interpreter 1.4.2 reste inchangé.
+ne sont pas réécrits. Ce correctif ne remplace pas LiteRT lui-même ; sa version actuelle est décrite dans [la note LiteRT](LITERT_16K_STATUS.md).
 
 ## Reconstruire le runtime
 
-Le package `vision-dataset-studio-flex-2.16.1-vds16k1.zip` de la prérelease rc5
+Le package `vision-dataset-studio-flex-2.16.1-vds16k1.zip` des préreleases rc5/rc6
 contient aussi le runtime vérifié. Après vérification avec `SHA256SUMS`, extraire
 ses chemins `dist/native-flex/maven/...` à la racine du clone. Le build compare
 le reçu, la recette et l’AAR avant usage. La reconstruction source ci-dessous
@@ -83,7 +81,7 @@ Le contrôle Flex ne qualifie pas les autres bibliothèques natives de l'APK.
 `tools/qa/check_apk_page_sizes.py` reste l'audit global distinct. Un émulateur
 x86_64 ne qualifie pas le fonctionnement ni les performances d'un téléphone ARM.
 
-## Résultats du 23 septembre 2026
+## Première campagne Flex — résultats historiques du 23 septembre 2026
 
 Le crash Flex est corrigé : les suites Android de base passent **39/39 sur API 35
 en 4 Ko et 39/39 en 16 Ko**, sans test ignoré. L'apprentissage, la modification des

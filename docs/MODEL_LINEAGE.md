@@ -1,5 +1,8 @@
 # Original conservé et entraînement continu
 
+Tu gardes ton modèle de départ. Le premier entraînement crée sa propre version ; les suivants poursuivent ses derniers poids validés. La [recette rc6](RC6_RELEASE.md) vérifie à nouveau ce comportement.
+
+
 [Documentation](README.md) · [English](en/MODEL_LINEAGE.md)
 
 ![Original et générations entraînées](visuals/current/model-lineage.svg)

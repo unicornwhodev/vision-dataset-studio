@@ -19,9 +19,27 @@ import com.unicornwhodev.visiondatasetstudio.ui.components.*
 import com.unicornwhodev.visiondatasetstudio.data.preferences.ProjectSettings
 import com.unicornwhodev.visiondatasetstudio.domain.inference.ModelConfig
 import com.unicornwhodev.visiondatasetstudio.data.json.StudioJson
+import android.Manifest
+import android.os.Build
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 
 @Composable
 fun TrainingScreen(vm:MainViewModel) {
+    val context=LocalContext.current
+    var pendingNotificationAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val notificationPermission=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        // Android permits a foreground worker when notifications are denied; the app still offers Stop.
+        pendingNotificationAction?.invoke();pendingNotificationAction=null
+    }
+    fun withTrainingNotification(action:() -> Unit) {
+        if(Build.VERSION.SDK_INT>=33 && ContextCompat.checkSelfPermission(context,Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED) {
+            pendingNotificationAction=action;notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else action()
+    }
     val project by vm.projectFlow.collectAsState();val run by vm.trainingRun.collectAsState();val busy by vm.isBusy.collectAsState();val preflight by vm.trainingPreflight.collectAsState()
     val number by vm.activeBatchNumber.collectAsState();val batches by vm.batches.collectAsState()
     val eligible=batches.any{it.batchNumber==number && it.status=="VERIFIED" && it.verificationKind in setOf("local","hf","both")}
@@ -50,7 +68,7 @@ fun TrainingScreen(vm:MainViewModel) {
                 Text(stringResource(R.string.training_model_versions),style=MaterialTheme.typography.bodyMedium)
                 Text(stringResource(R.string.training_batch_only,number),style=MaterialTheme.typography.bodyMedium)
                 Row(verticalAlignment=Alignment.CenterVertically){Text(stringResource(R.string.training_epochs),Modifier.weight(1f));listOf(1,3,10).forEach{n->FilterChip(selected=epochs==n,onClick={epochs=n},enabled=!active && config?.training!=null,label={Text("$n")});Spacer(Modifier.width(6.dp))}}
-                StudioAction(stringResource(R.string.training_start),{vm.startDeviceTraining(epochs)},icon=Icons.Default.ModelTraining,primary=true,enabled=!busy && !active && preflight?.canStart==true)
+                StudioAction(stringResource(R.string.training_start),{withTrainingNotification{vm.startDeviceTraining(epochs)}},icon=Icons.Default.ModelTraining,primary=true,enabled=!busy && !active && preflight?.canStart==true)
                 preflight?.let { state ->
                     Text(stringResource(if(state.canStart)R.string.training_ready else R.string.training_blocked),style=MaterialTheme.typography.titleSmall,color=if(state.canStart)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
                     state.checks.forEach { check -> Row(horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.Top) {
@@ -71,7 +89,7 @@ fun TrainingScreen(vm:MainViewModel) {
                     state.error?.let{Text(it,color=MaterialTheme.colorScheme.error,style=MaterialTheme.typography.bodySmall)}
                     if(active)StudioAction(stringResource(R.string.training_stop),vm::cancelDeviceTraining,icon=Icons.Default.Stop)
                     if(state.phase in setOf("failed","cancelled")) {
-                        StudioAction(stringResource(R.string.training_resume),vm::resumeDeviceTraining,enabled=!busy)
+                        StudioAction(stringResource(R.string.training_resume),{withTrainingNotification{vm.resumeDeviceTraining()}},enabled=!busy)
                         StudioAction(stringResource(R.string.training_abandon),{abandonRunId=state.id},icon=Icons.Default.Close,enabled=!busy)
                     }
                     if(state.phase=="completed")StudioAction(stringResource(R.string.training_activate),vm::activateTrainedModel,icon=Icons.Default.Check,primary=true,enabled=!busy)

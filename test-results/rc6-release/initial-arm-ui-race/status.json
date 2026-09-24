@@ -1,0 +1,52 @@
+{
+  "outcome": "failed",
+  "suite": "independent_release_ui",
+  "started_at": "2026-09-24T00:54:06.179637+00:00",
+  "main_sha256": "ff6c69776ea8ab1f76a7326fd38b7fe5f08bcffa707f168608549c1b06acf280",
+  "qa_sha256": "a2ef7873608a200c2c6465ad12d2da08893761e7e0dc84aa0fa655dcc2460d3b",
+  "production_qualified": false,
+  "debug_core_tests_included": false,
+  "qa_foreground_service": false,
+  "test_process_freezing_prevented": false,
+  "page_size": "16384",
+  "abi": "x86_64",
+  "emulator": true,
+  "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+  "art_crashes_before": [],
+  "tests": {
+    "declared": 4,
+    "passed": 3,
+    "skipped": 0,
+    "failed": 1,
+    "aborted": false,
+    "complete": false,
+    "tests": [
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest",
+        "numtests": "4",
+        "test": "displayPreferencePersistsAndIsRestored",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest",
+        "numtests": "4",
+        "test": "modelImportExportAndQualityRemainAccessible",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest",
+        "numtests": "4",
+        "test": "createdProjectSurvivesProcessRestart",
+        "code": -2
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.releaseqa.ReleaseWorkflowTest",
+        "numtests": "4",
+        "test": "homeRendersFromOptimizedApk",
+        "code": 0
+      }
+    ]
+  },
+  "error": "Release UI suite has failures, skips or incomplete results",
+  "finished_at": "2026-09-24T00:54:22.985034+00:00"
+}

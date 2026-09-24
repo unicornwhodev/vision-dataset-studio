@@ -1,6 +1,7 @@
 package com.unicornwhodev.visiondatasetstudio
 
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.compose.setContent
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onRoot
 import com.unicornwhodev.visiondatasetstudio.data.model.AnnotationStatus
 import com.unicornwhodev.visiondatasetstudio.data.model.SampleEntity
@@ -20,7 +21,7 @@ import org.robolectric.annotation.GraphicsMode
 @Config(qualifiers = RobolectricDeviceQualifiers.Pixel8, sdk = [36])
 class StudioScreenshotTest {
 
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   @Test
   fun sample_thumbnail_screenshot() {
@@ -36,11 +37,14 @@ class StudioScreenshotTest {
       syncStatus = "NOT_EXPORTED"
     )
 
-    composeTestRule.setContent {
-      VisionDatasetStudioTheme {
-        SampleThumbnailCard(sample = sample, onClick = {})
+    composeTestRule.runOnUiThread {
+      composeTestRule.activity.setContent(parent = null) {
+        VisionDatasetStudioTheme {
+          SampleThumbnailCard(sample = sample, onClick = {})
+        }
       }
     }
+    composeTestRule.waitForIdle()
 
     composeTestRule.onRoot().captureRoboImage(filePath = "src/test/screenshots/greeting.png")
   }

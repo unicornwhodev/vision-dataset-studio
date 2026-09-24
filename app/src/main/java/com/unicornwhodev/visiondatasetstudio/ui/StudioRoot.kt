@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import com.unicornwhodev.visiondatasetstudio.R
 import androidx.compose.ui.semantics.*
 import com.unicornwhodev.visiondatasetstudio.ui.screens.*
@@ -55,7 +56,7 @@ fun StudioRoot(viewModel: MainViewModel) {
             if (rail) {
                 Column(Modifier.width(68.dp).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceContainerLowest), horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(Modifier.fillMaxWidth().height(52.dp), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.CenterFocusStrong, "Vision Dataset Studio", Modifier.size(22.dp), tint = MaterialTheme.colorScheme.primary)
+                        Icon(painterResource(R.drawable.ic_cadryl), stringResource(R.string.app_name), Modifier.size(26.dp), tint = Color.Unspecified)
                     }
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
                     Spacer(Modifier.height(12.dp))

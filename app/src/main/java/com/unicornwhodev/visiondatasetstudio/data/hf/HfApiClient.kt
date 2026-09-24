@@ -353,7 +353,7 @@ class HfApiClient(
             val body = object : RequestBody() {
                 override fun contentType() = "application/x-ndjson".toMediaType()
                 override fun writeTo(sink: BufferedSink) {
-                    sink.writeUtf8(json(mapOf("key" to "header", "value" to mapOf("summary" to commitMessage, "description" to "Vision Dataset Studio — reviewed batch", "parentCommit" to parentCommit))) + "\n")
+                    sink.writeUtf8(json(mapOf("key" to "header", "value" to mapOf("summary" to commitMessage, "description" to "Cadryl — reviewed batch", "parentCommit" to parentCommit))) + "\n")
                     for ((path, file) in files) {
                         if (modes[path] == "lfs" && file.length() > 0L) {
                             sink.writeUtf8(json(mapOf("key" to "lfsFile", "value" to mapOf("path" to path, "algo" to "sha256", "oid" to hashes.getValue(path), "size" to file.length()))) + "\n")

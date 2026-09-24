@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-09-24T01:26:24.527Z" hostname="UNICORN-PC" time="0.526">
+  <properties/>
+  <testcase name="canonicalSampleKeepsFourPointStatesThroughExportJson" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.01"/>
+  <testcase name="annotationsRoundTrip" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.001"/>
+  <testcase name="contractRejectsUnknownKeys" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.005"/>
+  <testcase name="nullForNonNullFieldIsRejected" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.0"/>
+  <testcase name="pointingMultiKeepsFourPerTargetStatesAndLegacyBooleans" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.002"/>
+  <testcase name="receiptKeepsLongSizes" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.001"/>
+  <testcase name="historicalDefaultsRemainUnverified" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.0"/>
+  <testcase name="reflectionFallbackForEntitiesKeepsDefaults" classname="com.unicornwhodev.visiondatasetstudio.MoshiV4Test" time="0.505"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

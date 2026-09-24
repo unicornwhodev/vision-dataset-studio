@@ -71,8 +71,9 @@ class InferenceOnlyModelTest {
             val adapter=StudioJson.moshi.adapter(ModelConfig::class.java)
             assertNull(adapter.fromJson(imported.modelConfigJson!!)!!.training)
             assertFalse(ProjectSettings.read(imported).continuousTraining)
-            act{saveModelConfig(adapter.toJson(config))};act{saveActiveModelProfile("QA inference profile")}
-            val profile=vm.db.modelProfileDao().observe().first().single{it.name=="QA inference profile"}
+            val profileName="QA inference profile $id"
+            act{saveModelConfig(adapter.toJson(config))};act{saveActiveModelProfile(profileName)}
+            val profile=vm.db.modelProfileDao().observe().first().single{it.id !in profilesBefore && it.name==profileName}
             vm.db.projectDao().saveProject(vm.db.projectDao().getProjectSync(id)!!.copy(settingsJson=project.settingsJson))
             // A stale stored digest must never prevent selecting a usable model.
             vm.db.modelProfileDao().save(profile.copy(sha256="obsolete-digest"))

@@ -19,8 +19,8 @@ android {
     minSdk = 28
     targetSdk = 36
     testApplicationId = "com.unicornwhodev.visiondatasetstudio.test"
-    versionCode = 10
-    versionName = "4.2.0-rc5"
+    versionCode = 11
+    versionName = "4.2.0-rc6"
 
     testInstrumentationRunner = providers.gradleProperty("vdsInstrumentationRunner").orElse("androidx.test.runner.AndroidJUnitRunner").get().also {
       require(it in setOf("androidx.test.runner.AndroidJUnitRunner", "com.unicornwhodev.visiondatasetstudio.ReleaseContinuityInstrumentation"))
@@ -38,7 +38,7 @@ android {
       val releaseAbis = providers.gradleProperty("vdsReleaseAbis").orElse("arm64-v8a").get().split(",")
       require(releaseAbis.isNotEmpty() && releaseAbis.all { it in setOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64") })
       ndk { abiFilters.addAll(releaseAbis) }
-      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "instrumentation-api.pro")
     }
 
   }
@@ -56,7 +56,11 @@ android {
     includeInBundle = true
   }
   // Flex is already stripped by its pinned native build; preserve its verified SHA.
-  packaging { jniLibs.keepDebugSymbols += "**/libtensorflowlite_flex_jni.so" }
+  packaging {
+    jniLibs.keepDebugSymbols += "**/libtensorflowlite_flex_jni.so"
+    jniLibs.keepDebugSymbols += "**/libandroidx.graphics.path.so"
+    jniLibs.keepDebugSymbols += "**/libtensorflowlite_jni.so"
+  }
 }
 
 dependencies {
@@ -67,6 +71,7 @@ dependencies {
   implementation(libs.androidx.compose.material3)
   implementation(libs.androidx.compose.ui)
   implementation(libs.androidx.compose.ui.graphics)
+  implementation("androidx.graphics:graphics-path:1.0.1-vds16k1")
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.datastore.preferences)
@@ -119,6 +124,15 @@ ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11) } }
 android.sourceSets.getByName("androidTest").assets.srcDir("$projectDir/schemas")
 android.sourceSets.getByName("test").resources.srcDir("$projectDir/schemas")
+
+// Include the same rebuilt JNI in app, JVM and instrumentation dependency graphs.
+configurations.configureEach {
+  resolutionStrategy.dependencySubstitution {
+    substitute(module("androidx.graphics:graphics-path:1.0.1"))
+      .using(module("androidx.graphics:graphics-path:1.0.1-vds16k1"))
+      .because("Pinned source rebuild aligns both LOAD and RELRO for 16 KB pages")
+  }
+}
 dependencies {
     testImplementation("androidx.room:room-testing:2.7.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")

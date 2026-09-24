@@ -1,0 +1,281 @@
+{
+  "outcome": "failed",
+  "suite": "minified_release_core",
+  "production_qualified": false,
+  "started_at": "2026-09-24T00:48:48.476538+00:00",
+  "main_sha256": "8421edeeb967e82baeb2e59eb135c03a53b910dcfdf7f798622e337dc93089ed",
+  "test_sha256": "9ba041c89f0d833df4f99c510dfa26ac0cd7c97356ca616bb5de2077308333b0",
+  "uses_existing_synthetic_fixtures": true,
+  "app_kept_visible": false,
+  "test_process_freezing_prevented": false,
+  "excluded_classes": [
+    "HfModelRuntimeTest",
+    "ConvertedModelQualificationTest",
+    "NativePhotoInferenceUiTest",
+    "HfLivePublicationTest",
+    "InstalledDataPreservationTest",
+    "ExternalFaultQualificationTest",
+    "HfInterruptedDownloadTest",
+    "HfFaultPublicationTest",
+    "PurgeProcessDeathTest",
+    "ReleaseUpdateContinuityTest",
+    "BackgroundTrainingPreparationTest"
+  ],
+  "page_size": 16384,
+  "abi": "x86_64",
+  "android_api": "36",
+  "build_fingerprint": "google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+  "art_crashes_before": [],
+  "tests": {
+    "declared": 40,
+    "passed": 39,
+    "skipped": 0,
+    "failed": 1,
+    "aborted": false,
+    "complete": false,
+    "tests": [
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.AnnotationPreservationTest",
+        "numtests": "40",
+        "test": "automaticPreannotationNeverTouchesExistingRecordsEvenWithStalePendingStatus",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ApplicationIdentityTest",
+        "numtests": "40",
+        "test": "useAppContext",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.BatchProductionTest",
+        "numtests": "40",
+        "test": "uniqueTwoPlusOneSurvivesExportPurgeReopenAndRenamedCopies",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.BatchProductionTest",
+        "numtests": "40",
+        "test": "concurrentClaimsHaveOneOwnerAndDoNotMergeDifferentImages",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.EmbeddingIndexTest",
+        "numtests": "40",
+        "test": "cosineSearchPersistsAndIsolatesModelContracts",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.EnglishLocaleComposeTest",
+        "numtests": "40",
+        "test": "primaryWorkflowsUseEnglishResources",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "publicSsdDownloadInspectAndInfer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "promptIsTransportedToLocalFixtureAndResponseDecoded",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "localExportContainsCanonicalAndRequestedProjections",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "publicEfficientDetDownloadInspectAndInfer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "pointCorrectionStoreLearnsPersistsAndResets",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "realBatchInferencePreservesHumanAndSkipsFinalCases",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "publicClassifierDownloadInspectAndInfer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FeatureImplementationAuditTest",
+        "numtests": "40",
+        "test": "studioPackRetainsPromptAndRejectsUnknownFields",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.FunctionalUiAuditTest",
+        "numtests": "40",
+        "test": "englishScreensPersistModelSettingsAndIsolateMultipleProjects",
+        "code": -2
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.GraphicsPathRuntimeTest",
+        "numtests": "40",
+        "test": "nativeConicConversionProducesFiniteQuadratics",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.HfTokenizerTest",
+        "numtests": "40",
+        "test": "nativeEncodingMatchesPinnedHuggingFaceTokenizer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest",
+        "numtests": "40",
+        "test": "legacyBundleDigestsDoNotBlockLoading",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.InferenceOnlyModelTest",
+        "numtests": "40",
+        "test": "importsSelectsAndInfersWithoutTrainingAndDoesNotBlockCleanup",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.LocalEndpointWorkflowTest",
+        "numtests": "40",
+        "test": "modelPromptThresholdAndAgentInstructionsReachTheLocalServer",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.OnDeviceTrainingTest",
+        "numtests": "40",
+        "test": "internalVisualWeightsTrainPersistAndReloadOnAndroid",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "40",
+        "test": "discardedBatchRetainsCursorAndDeduplicationAfterInterruptedCleanup",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "40",
+        "test": "interruptedCleanupResumesFromDurableReceipt",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "40",
+        "test": "resetBatchPreservesProjectConfigurationAndSharedModelProfile",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "40",
+        "test": "resetProjectForgetsIdentityAndAllowsTheSameCorpusAgain",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.ProjectMaintenanceTest",
+        "numtests": "40",
+        "test": "orphanTrainingCleanupPreservesActiveAndSharedModels",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest",
+        "numtests": "40",
+        "test": "version1To4",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest",
+        "numtests": "40",
+        "test": "version2To4",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.RoomMigrationOnDeviceTest",
+        "numtests": "40",
+        "test": "version3To4",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "40",
+        "test": "changedCopyDoesNotProduceReceipt",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "40",
+        "test": "failedWritePreservesPrivateSource",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "40",
+        "test": "lostReadGrantDoesNotProduceReceipt",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SafV4Test",
+        "numtests": "40",
+        "test": "successfulCopyIsReopenedAndHashed",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.SegmentationCanvasTest",
+        "numtests": "40",
+        "test": "separateMasksCanBePaintedAndSamPromptDoesNotBecomeAnAnnotation",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test",
+        "numtests": "40",
+        "test": "controlsAndCatalogueRenderWithoutDownloadingModels",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.StudioComposeV4Test",
+        "numtests": "40",
+        "test": "compactNavigationKeepsImportAndExportAccessible",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.TrainingWorkflowTest",
+        "numtests": "40",
+        "test": "validatedCorrectionsTrainThroughWorkManagerAndResume",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest",
+        "numtests": "40",
+        "test": "reviewGateRejectionAndFinishedBatchesSurviveResume",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest",
+        "numtests": "40",
+        "test": "journalAndPlannerRejectUnrecognizedToolsAndRemoteEndpoints",
+        "code": 0
+      },
+      {
+        "class": "com.unicornwhodev.visiondatasetstudio.WorkflowExecutionTest",
+        "numtests": "40",
+        "test": "manualAndAssistedTemplatesImportReviewExportCleanAndContinue",
+        "code": 0
+      }
+    ]
+  },
+  "error": "The expected 40 core tests did not all pass",
+  "finished_at": "2026-09-24T00:49:41.147039+00:00"
+}

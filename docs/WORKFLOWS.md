@@ -1,4 +1,7 @@
-# Workflows et segmentation
+# Les parcours guidés et les masques
+
+Choisis un parcours guidé quand tu veux laisser Cadryl enchaîner les étapes. L’app s’arrête dès qu’elle a besoin de ta relecture ou d’une confirmation.
+
 
 **Français** · [English](en/WORKFLOWS.md)
 

@@ -1,4 +1,4 @@
-# Architecture de Vision Dataset Studio
+# Architecture de Cadryl
 
 **Français** · [English](en/ARCHITECTURE.md)
 
@@ -37,8 +37,6 @@ La base persistante empêche les copies identiques entre lots du même projet. E
 
 Le planificateur HTTP facultatif reçoit des compteurs, consignes et templates sur `localhost`/`127.0.0.1`. Il ne reçoit ni corpus ni identifiant HF. Sa réponse structurée choisit un template ; elle ne peut accepter une annotation, publier, purger, changer de source ou activer des poids. Les noms de fichiers, images et sorties des modèles sont des données, pas des instructions. Un serveur réel d’agent reste à qualifier.
 
-## État de qualification
+## Où sont les preuves ?
 
-Les essais rc3 couvrent notamment lots/doublons, garde d’export/nettoyage, migrations, tokenisation, checkpoints et gestes de masque. Les conversions publiques disposent d’une [matrice individuelle](LITERT_QUALIFICATION.md). Les essais sur téléphone ARM, les performances, les destinations HF de recette et certains bundles restent ouverts. Le SDK de conversion et les tests intégrés à l’application sont des campagnes distinctes.
-
-Sources des figures : [DOT architecture](visuals/architecture.fr.dot), [DOT cycle](visuals/batch-flow.fr.dot). [Provenance des captures et reproduction](VISUALS.md).
+Le [rapport actuel](../TEST_REPORT.md) identifie les APK rc6 et les distingue des anciennes campagnes téléphone et interruptions. La [matrice des modèles](LITERT_QUALIFICATION.md) garde les résultats par conversion. Le schéma décrit les responsabilités du code ; il ne valide pas toutes les intégrations à lui seul.

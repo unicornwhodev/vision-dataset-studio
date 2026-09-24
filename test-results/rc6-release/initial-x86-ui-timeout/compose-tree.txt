@@ -1,0 +1,219 @@
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 30000 ms
+operation=null
+active=1790210939835
+Printing with useUnmergedTree = 'true'
+Node #38 at (l=0.0, t=-93.0, r=1080.0, b=2307.0)px
+ |-Node #80 at (l=0.0, t=39.0, r=1080.0, b=1424.0)px
+   IsTraversalGroup = 'true'
+    |-Node #98 at (l=42.0, t=179.0, r=291.0, b=310.0)px
+    | Selected = 'true'
+    | Role = 'Tab'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #100 at (l=109.0, t=224.0, r=225.0, b=261.0)px
+    |    Text = '[Projects]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #102 at (l=291.0, t=179.0, r=540.0, b=310.0)px
+    | Selected = 'false'
+    | Role = 'Tab'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #104 at (l=359.0, t=224.0, r=473.0, b=261.0)px
+    |    Text = '[Sources]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #106 at (l=540.0, t=179.0, r=789.0, b=310.0)px
+    | Selected = 'false'
+    | Role = 'Tab'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #108 at (l=598.0, t=224.0, r=732.0, b=261.0)px
+    |    Text = '[Transfers]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #110 at (l=789.0, t=179.0, r=1038.0, b=310.0)px
+    | Selected = 'false'
+    | Role = 'Tab'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #112 at (l=862.0, t=224.0, r=965.0, b=261.0)px
+    |    Text = '[Models]'
+    |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #115 at (l=0.0, t=313.0, r=1080.0, b=1424.0)px
+    | IsTraversalGroup = 'true'
+    | VerticalScrollAxisRange = 'ScrollAxisRange(value=93.0, maxValue=1842.0, reverseScrolling=false)'
+    | Actions = [ScrollBy, ScrollByOffset]
+    |  |-Node #119 at (l=115.0, t=305.0, r=886.0, b=345.0)px
+    |  | Text = '[My projects]'
+    |  | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #120 at (l=923.0, t=273.0, r=1028.0, b=378.0)px
+    |  | Role = 'Button'
+    |  | Focused = 'false'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #121 at (l=952.0, t=302.0, r=999.0, b=349.0)px
+    |  |    ContentDescription = '[Help: My projects]'
+    |  |    Role = 'Image'
+    |  |-Node #122 at (l=42.0, t=415.0, r=1038.0, b=520.0)px
+    |  | Role = 'Button'
+    |  | [Disabled]
+    |  | Actions = [OnClick]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #126 at (l=189.0, t=441.0, r=975.0, b=494.0)px
+    |  |    Text = '[QA English A]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #127 at (l=42.0, t=557.0, r=1038.0, b=662.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #131 at (l=189.0, t=583.0, r=975.0, b=636.0)px
+    |  |    Text = '[QA_Release_instrumented_1790210784518]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #132 at (l=42.0, t=699.0, r=1038.0, b=804.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #136 at (l=189.0, t=725.0, r=975.0, b=778.0)px
+    |  |    Text = '[My studio]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #137 at (l=42.0, t=841.0, r=1038.0, b=946.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #141 at (l=189.0, t=867.0, r=975.0, b=920.0)px
+    |  |    Text = '[QA workflow 379257114900]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #142 at (l=42.0, t=983.0, r=1038.0, b=1088.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #146 at (l=189.0, t=1009.0, r=975.0, b=1062.0)px
+    |  |    Text = '[QA apprentissage Android]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #147 at (l=42.0, t=1125.0, r=1038.0, b=1230.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #151 at (l=189.0, t=1151.0, r=975.0, b=1204.0)px
+    |  |    Text = '[My studio]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #152 at (l=42.0, t=1256.0, r=1038.0, b=1424.0)px
+    |  | EditableText = 'QA English B'
+    |  | TextSelectionRange = 'TextRange(12, 12)'
+    |  | IsEditable = 'true'
+    |  | ImeAction = 'Default'
+    |  | Focused = 'true'
+    |  | Actions = [GetTextLayoutResult, SetText, InsertTextAtCursor, SetSelection, PerformImeAction, OnClick, OnLongClick, PasteText, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #161 at (l=84.0, t=1253.0, r=333.0, b=1301.0)px
+    |  |  | Text = '[New project name]'
+    |  |  | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |  |-Node #158 at (l=84.0, t=1323.0, r=996.0, b=1379.0)px
+    |  |    Actions = [MagnifierPositionInRoot]
+    |  |-Node #162 at (l=42.0, t=1451.0, r=395.0, b=1556.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #164 at (l=105.0, t=1477.0, r=332.0, b=1530.0)px
+    |  |    Text = '[Create project]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #165 at (l=42.0, t=1593.0, r=325.0, b=1698.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #167 at (l=105.0, t=1619.0, r=262.0, b=1672.0)px
+    |  |    Text = '[Configure]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #169 at (l=42.0, t=1743.0, r=198.0, b=1783.0)px
+    |  | Text = '[Local data]'
+    |  | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #170 at (l=42.0, t=1810.0, r=594.0, b=1915.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #172 at (l=105.0, t=1836.0, r=531.0, b=1889.0)px
+    |  |    Text = '[Delete batch · keep history]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #173 at (l=42.0, t=1952.0, r=359.0, b=2057.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #175 at (l=105.0, t=1978.0, r=296.0, b=2031.0)px
+    |  |    Text = '[Reset batch]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #176 at (l=42.0, t=2094.0, r=381.0, b=2199.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #178 at (l=105.0, t=2120.0, r=318.0, b=2173.0)px
+    |  |    Text = '[Reset project]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #179 at (l=42.0, t=2236.0, r=329.0, b=2341.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #181 at (l=74.0, t=2262.0, r=297.0, b=2315.0)px
+    |  |    Text = '[Delete project]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #186 at (l=115.0, t=2492.0, r=886.0, b=2532.0)px
+    |  | Text = '[Presets]'
+    |  | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #187 at (l=923.0, t=2460.0, r=1028.0, b=2565.0)px
+    |  | Role = 'Button'
+    |  | Focused = 'false'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #188 at (l=952.0, t=2489.0, r=999.0, b=2536.0)px
+    |  |    ContentDescription = '[Help: Presets]'
+    |  |    Role = 'Image'
+    |  |-Node #189 at (l=42.0, t=2602.0, r=386.0, b=2707.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #191 at (l=105.0, t=2628.0, r=323.0, b=2681.0)px
+    |  |    Text = '[Import preset]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #192 at (l=42.0, t=2744.0, r=383.0, b=2849.0)px
+    |  | Focused = 'false'
+    |  | Role = 'Button'
+    |  | Actions = [OnClick, RequestFocus]
+    |  | MergeDescendants = 'true'
+    |  |  |-Node #194 at (l=105.0, t=2770.0, r=320.0, b=2823.0)px
+    |  |    Text = '[Export preset]'
+    |  |    Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |  |-Node #196 at (l=42.0, t=2886.0, r=282.0, b=2991.0)px
+    |    Focused = 'false'
+    |    Role = 'Button'
+    |    Actions = [OnClick, RequestFocus]
+    |    MergeDescendants = 'true'
+    |     |-Node #200 at (l=100.0, t=2912.0, r=282.0, b=2965.0)px
+    |       Text = '[Learn more]'
+    |       Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #85 at (l=11.0, t=56.0, r=116.0, b=161.0)px
+    | Role = 'Button'
+    | Focused = 'false'
+    | Actions = [OnClick, RequestFocus]
+    | MergeDescendants = 'true'
+    |  |-Node #86 at (l=37.0, t=82.0, r=90.0, b=135.0)px
+    |    ContentDescription = '[Back]'
+    |    Role = 'Image'
+    |-Node #88 at (l=126.0, t=66.0, r=338.0, b=115.0)px
+    | Text = '[Workspace]'
+    | Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]
+    |-Node #89 at (l=126.0, t=115.0, r=296.0, b=149.0)px
+      Text = '[QA English A]'
+      Actions = [SetTextSubstitution, ShowTextSubstitution, ClearTextSubstitution, GetTextLayoutResult]

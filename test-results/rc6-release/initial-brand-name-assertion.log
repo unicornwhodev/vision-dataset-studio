@@ -1,0 +1,101 @@
+Reusing configuration cache.
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateDebugResources FROM-CACHE
+> Task :app:processDebugNavigationResources FROM-CACHE
+> Task :app:packageDebugResources
+> Task :app:parseDebugLocalResources FROM-CACHE
+> Task :app:generateDebugRFile FROM-CACHE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:mergeDebugResources
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
+> Task :app:processDebugResources
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:packageDebugUnitTestForUnitTest
+> Task :app:processDebugUnitTestManifest
+> Task :app:generateDebugUnitTestConfig
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:extractProguardFiles UP-TO-DATE
+Exception in thread "AWT-EventQueue-0" java.lang.NullPointerException: Cannot invoke "ksp.com.intellij.openapi.application.Application.getService(java.lang.Class)" because the return value of "ksp.com.intellij.openapi.application.ApplicationManager.getApplication()" is null
+	at ksp.com.intellij.openapi.fileEditor.FileDocumentManager.getInstance(FileDocumentManager.java:35)
+	at ksp.com.intellij.openapi.fileTypes.BinaryFileTypeDecompilers.lambda$notifyDecompilerSetChange$1(BinaryFileTypeDecompilers.java:29)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:318)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:87)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:742)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+> Task :app:kspDebugKotlin
+> Task :app:compileDebugKotlin
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/LiteRtTrainingSession.kt:63:80 Java type mismatch: inferred type is 'Any?', but 'Any' was expected.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/domain/inference/MaskCodec.kt:74:83 Condition is always 'true'.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/components/StudioComponents.kt:87:36 'val Icons.Filled.HelpOutline: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.HelpOutline.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/AnnotationEditorScreen.kt:310:142 'val Icons.Filled.Assignment: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.Assignment.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/AnnotationEditorScreen.kt:586:38 'val Icons.Filled.KeyboardArrowLeft: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.KeyboardArrowLeft.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/AnnotationEditorScreen.kt:586:185 'val Icons.Filled.KeyboardArrowRight: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.KeyboardArrowRight.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/ModelLibraryScreen.kt:135:56 'val Icons.Filled.InsertDriveFile: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.InsertDriveFile.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/QualityDashboardScreen.kt:54:131 'val Icons.Filled.ArrowForward: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ArrowForward.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioHomeScreen.kt:65:79 'val Icons.Filled.ArrowForward: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ArrowForward.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/main/java/com/unicornwhodev/visiondatasetstudio/ui/screens/StudioHomeScreen.kt:179:42 Condition is always 'true'.
+
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:generateDebugLintReportModel
+> Task :app:generateDebugAndroidTestLintModel
+> Task :app:generateDebugUnitTestLintModel
+> Task :app:kspDebugUnitTestKotlin
+
+> Task :app:compileDebugUnitTestKotlin
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/test/java/com/unicornwhodev/visiondatasetstudio/MoshiV4Test.kt:35:22 'fun createTempFile(prefix: String = ..., suffix: String? = ..., directory: File? = ...): File' is deprecated. Avoid creating temporary files in the default temp location with this function due to too wide permissions on the newly created file. Use kotlin.io.path.createTempFile instead or resort to java.io.File.createTempFile.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/test/java/com/unicornwhodev/visiondatasetstudio/RuntimeSmokeTest.kt:82:86 Unchecked cast of 'Map<*, *>?' to 'Map<String, Any>'.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/test/java/com/unicornwhodev/visiondatasetstudio/StabilizationTest.kt:15:17 'fun createTempDir(prefix: String = ..., suffix: String? = ..., directory: File? = ...): File' is deprecated. Avoid creating temporary directories in the default temp location with this function due to too wide permissions on the newly created directory. Use kotlin.io.path.createTempDirectory instead.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/test/java/com/unicornwhodev/visiondatasetstudio/StabilizationTest.kt:25:17 'fun createTempDir(prefix: String = ..., suffix: String? = ..., directory: File? = ...): File' is deprecated. Avoid creating temporary directories in the default temp location with this function due to too wide permissions on the newly created directory. Use kotlin.io.path.createTempDirectory instead.
+w: file:///D:/Dev/project/vision-dataset-studio/app/src/test/java/com/unicornwhodev/visiondatasetstudio/StabilizationTest.kt:202:18 'fun createTempDir(prefix: String = ..., suffix: String? = ..., directory: File? = ...): File' is deprecated. Avoid creating temporary directories in the default temp location with this function due to too wide permissions on the newly created directory. Use kotlin.io.path.createTempDirectory instead.
+
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :app:lintAnalyzeDebug
+
+> Task :app:testDebugUnitTest
+
+RuntimeSmokeTest > read string from context FAILED
+    org.junit.ComparisonFailure at RuntimeSmokeTest.kt:25
+
+70 tests completed, 1 failed
+
+> Task :app:testDebugUnitTest FAILED
+> Task :app:finalizeTestRoborazziDebug SKIPPED
+> Task :app:lintAnalyzeDebugAndroidTest
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///D:/Dev/project/vision-dataset-studio/app/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1m 40s
+38 actionable tasks: 22 executed, 4 from cache, 12 up-to-date
+Configuration cache entry reused.

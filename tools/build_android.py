@@ -20,6 +20,9 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from qa.check_flex_runtime import AAR_NAME, LOCAL_MAVEN, MACHINES, verify_flex
+from qa.check_graphics_runtime import verify_graphics
+from qa.check_litert_runtime import AAR as LITERT_AAR, verify_litert
+from qa.check_graphics_runtime import AAR as GRAPHICS_AAR
 
 APP_ID = 'com.unicornwhodev.visiondatasetstudio'
 GRADLE_VERSION = '9.3.1'
@@ -94,12 +97,14 @@ def sdk_tool(directory: Path, name: str, platform: str | None = None) -> Path:
 
 def source_manifest(root: Path) -> dict:
     names = subprocess.check_output(['git', 'ls-files', '-c', '-o', '--exclude-standard', '-z'], cwd=root).decode('utf-8').split('\0')
-    compiled = lambda name: (name.startswith(('app/', 'gradle/')) and name != 'app/.gitignore') or name in ('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'tools/build_android.py', 'tools/gradle_bootstrap.py', 'tools/build_flex_runtime.py', 'tools/qa/check_flex_runtime.py', 'tools/qa/check_apk_page_sizes.py')
+    compiled = lambda name: (name.startswith(('app/', 'gradle/', 'release-qa/')) and not name.endswith('/.gitignore')) or name in ('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'tools/build_android.py', 'tools/gradle_bootstrap.py', 'tools/build_flex_runtime.py', 'tools/build_graphics_path.py', 'config/graphics-path-source.json', 'tools/qa/check_graphics_runtime.py', 'tools/qa/check_flex_runtime.py', 'tools/qa/check_apk_page_sizes.py', 'tools/build_litert_runtime.py', 'config/litert-source.json', 'tools/qa/check_litert_runtime.py', 'third_party/patches/cpuinfo-l2-count.patch')
     native = root / LOCAL_MAVEN / AAR_NAME
     return {
         'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root).decode().strip(),
         'files': {name: digest(root / name) for name in sorted(set(names)) if name and compiled(name)},
         'native_runtime': {'file': native.relative_to(root).as_posix(), 'sha256': digest(native)} if native.is_file() else None,
+        'native_runtimes': {p.relative_to(ROOT).as_posix(): digest(root / p.relative_to(ROOT))
+                            for p in (LITERT_AAR, GRAPHICS_AAR) if (root / p.relative_to(ROOT)).is_file()},
     }
 
 
@@ -160,6 +165,8 @@ class Attempt:
         self.fail_on_command(key + '-identity', [str(sdk_tool(tools, 'aapt')), 'dump', 'badging', str(source)])
         verify_badging((self.out / (key + '-identity.log')).read_text(encoding='utf-8'), app_id)
         if key == 'app':
+            atomic_json(self.out / 'litert-16k.json', verify_litert(source))
+            atomic_json(self.out / 'graphics-16k.json', verify_graphics(source))
             alignment = verify_flex(source)
             expected = self.state['flex_runtime']['libraries']
             if any(row['sha256'] != expected[abi]['sha256'] for abi, row in alignment['libraries'].items()):
@@ -182,6 +189,8 @@ def main(root: Path = ROOT) -> int:
     exit_code = 1
     try:
         attempt.state['flex_runtime'] = verify_local_flex(root)
+        attempt.state['graphics_runtime'] = verify_graphics()
+        attempt.state['litert_runtime'] = verify_litert()
         attempt.save()
         java = shutil.which('java')
         if not java: raise Blocked('JDK 17+ missing.')

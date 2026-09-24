@@ -1,0 +1,468 @@
+{
+  "schema": 1,
+  "date": "2026-09-23",
+  "application_id": "com.unicornwhodev.visiondatasetstudio",
+  "source_base_commit": "bedd1a262063e345e3c741827d5765c9b2936f78",
+  "uncommitted_changes": true,
+  "publication_performed": false,
+  "github_actions_run": false,
+  "production_qualified": false,
+  "release_business_suite_complete": false,
+  "physical_arm_16k_tested": false,
+  "source_consistency": {
+    "arm64_release": {
+      "production_inputs_unchanged_since_build": true,
+      "later_test_source_changes": [
+        "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/BackgroundTrainingPreparationTest.kt",
+        "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/GraphicsPathRuntimeTest.kt",
+        "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/ReleaseContinuityInstrumentation.java",
+        "release-qa/build.gradle.kts",
+        "release-qa/src/main/AndroidManifest.xml",
+        "release-qa/src/main/java/com/unicornwhodev/visiondatasetstudio/releaseqa/ReleaseWorkflowTest.java"
+      ],
+      "build_source_manifest": {
+        "path": "dist/distribution/runs/20260923T150230Z-fc5fa7ed3023/source-manifest.json",
+        "sha256": "c6cc5889e7e70b41b9bf9be3f13eda7446ccce9c342c4488a86166684a85a660",
+        "bytes": 28004
+      }
+    },
+    "x86_64_release": {
+      "production_inputs_unchanged_since_build": true,
+      "later_test_source_changes": [
+        "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/ReleaseContinuityInstrumentation.java",
+        "release-qa/build.gradle.kts",
+        "release-qa/src/main/AndroidManifest.xml",
+        "release-qa/src/main/java/com/unicornwhodev/visiondatasetstudio/releaseqa/ReleaseWorkflowTest.java"
+      ],
+      "build_source_manifest": {
+        "path": "dist/distribution/runs/20260923T161743Z-0828880ace66/source-manifest.json",
+        "sha256": "c78836e2936703136fa14f7b9735d258935de1d9ed8a3a045b5f0994a570897e",
+        "bytes": 28004
+      }
+    },
+    "debug": {
+      "production_inputs_unchanged_since_build": true,
+      "later_test_source_changes": [
+        "app/src/androidTest/java/com/unicornwhodev/visiondatasetstudio/ReleaseContinuityInstrumentation.java",
+        "release-qa/build.gradle.kts",
+        "release-qa/src/main/AndroidManifest.xml",
+        "release-qa/src/main/java/com/unicornwhodev/visiondatasetstudio/releaseqa/ReleaseWorkflowTest.java"
+      ],
+      "build_source_manifest": {
+        "path": "dist/android/runs/20260923T161611Z-95c3fdee3269/source-manifest.json",
+        "sha256": "c78836e2936703136fa14f7b9735d258935de1d9ed8a3a045b5f0994a570897e",
+        "bytes": 28004
+      }
+    }
+  },
+  "artifacts": {
+    "arm64_release": {
+      "path": "dist/distribution/runs/20260923T150230Z-fc5fa7ed3023/signing-ad7e19f21e13/vision-dataset-studio.apk",
+      "sha256": "554ad720c7ab8cd75aaaa88933273217910f8498968f7d84e2f07cd06bc132e1",
+      "bytes": 100240050
+    },
+    "x86_64_emulator_release": {
+      "path": "dist/distribution/runs/20260923T161743Z-0828880ace66/emulator-signing/vision-dataset-studio.apk",
+      "sha256": "f4ad1df33e5a78f77e6e3b3e01121b61fefce65d1e3c758513f78a1c3252759e",
+      "bytes": 116660902
+    },
+    "release_ui_driver": {
+      "path": "dist/release-hardening-20260923/release-ui-v13/release-qa.apk",
+      "sha256": "23ee4e9db9f2d42428b7cce2300515528e1c09e53bee2f3b80777c6035b35195",
+      "bytes": 9619031
+    }
+  },
+  "signing": {
+    "arm64_certificate_sha256": "51ef3e4abf953c62c8427deaecf4349aefffc2270c593229315722457f126895",
+    "emulator_signature": "Windows Debug; qualification only"
+  },
+  "build": {
+    "run_id": "20260923T161611Z-95c3fdee3269",
+    "jvm_passed": 70,
+    "ksp_generated_files": 99,
+    "lint_errors": 0,
+    "lint_warnings": 95,
+    "python_passed": 79,
+    "python_log": {
+      "path": "test-results/release-hardening-20260923/python-tests-final.log",
+      "sha256": "e0dc32d1c1b0dda6aebd5eb280e72b281e5a51b510fb207958cf5d177608a819",
+      "bytes": 446
+    }
+  },
+  "debug_core": {
+    "honor": {
+      "outcome": "core_suite_passed",
+      "passed": 40,
+      "skipped": 0,
+      "test_seconds": 365.0,
+      "abi": "arm64-v8a",
+      "page_size": 4096,
+      "test_process_freezing_prevented": true,
+      "qa_foreground_service": false,
+      "debug_qa_foreground_activity": true,
+      "main_sha256": "7dee2d1408265b9873deb499c66c16089f9751a4df121abd245f161688d650d8",
+      "qa_sha256": "e633c93c58b04c6b6998fe6b582552f97e5ac201a548b4b75580fccf27bbedb2",
+      "evidence": [
+        {
+          "path": "test-results/release-hardening-20260923/honor-core-2/status.json",
+          "sha256": "37d9bb42aa067cebdbf02a20bda1174f13aafc00277c0020d62e43056613e7fd",
+          "bytes": 27812
+        },
+        {
+          "path": "test-results/release-hardening-20260923/honor-core-2/instrumentation.txt",
+          "sha256": "9fd70e94e38ca33d36d3c36fe968927d09d304fe9f2bbb761ede0e6e080a5c13",
+          "bytes": 29563
+        }
+      ],
+      "manual_qa_activity_restarts": 2
+    },
+    "emulator_16k": {
+      "outcome": "core_suite_passed",
+      "passed": 40,
+      "skipped": 0,
+      "test_seconds": 32.419,
+      "abi": "x86_64",
+      "page_size": 16384,
+      "test_process_freezing_prevented": false,
+      "qa_foreground_service": false,
+      "debug_qa_foreground_activity": false,
+      "main_sha256": "84a67692440129c7bcad94b0e156ec26512fca22ac495e58d278aa724695b8c5",
+      "qa_sha256": "3ef0ca56df38a4d7ce5e53030b745e1104866469a40075a8a0c6a81ebc5f6d12",
+      "evidence": [
+        {
+          "path": "test-results/release-hardening-20260923/emulator-16k-core-2/status.json",
+          "sha256": "5d51b2605dda79bb1ac418ab1b84b6e5d514200495f47ceb03972de1cb521994",
+          "bytes": 19567
+        },
+        {
+          "path": "test-results/release-hardening-20260923/emulator-16k-core-2/instrumentation.txt",
+          "sha256": "329bcecc0e147261c96cda5236024525a2c2a1c1e536ab245e7cb32445e67f32",
+          "bytes": 29563
+        }
+      ]
+    }
+  },
+  "release_ui": {
+    "honor_host_adb": {
+      "outcome": "host_release_ui_passed",
+      "suite": "host_adb_ui_fresh_xml",
+      "passed": [
+        "home_renders",
+        "model_import_export_quality_navigation",
+        "created_project_survives_process_restart",
+        "display_preference_persists_and_is_restored"
+      ],
+      "abi": "arm64-v8a",
+      "page_size": 4096,
+      "main_sha256": "554ad720c7ab8cd75aaaa88933273217910f8498968f7d84e2f07cd06bc132e1",
+      "instrumentation": false,
+      "qa_foreground_service": false,
+      "freezing_exemption": false,
+      "seconds": 67.093795,
+      "evidence": [
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/status.json",
+          "sha256": "8c2a0dc3870964a47936f27fe2622b09c0669cb214e1946a9be6f116c4a815f1",
+          "bytes": 688
+        }
+      ],
+      "ui_snapshots": [
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-001.xml",
+          "sha256": "fb048de2f2e925b153629df2397d6e4ab929f1c84bab06fedc702caaef12b053",
+          "bytes": 23249
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-002.xml",
+          "sha256": "fb048de2f2e925b153629df2397d6e4ab929f1c84bab06fedc702caaef12b053",
+          "bytes": 23249
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-003.xml",
+          "sha256": "fb048de2f2e925b153629df2397d6e4ab929f1c84bab06fedc702caaef12b053",
+          "bytes": 23249
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-004.xml",
+          "sha256": "7ad126705a2a71aae184349f6f9469eabe6181a0d37b67ae09ce3a028bf7980e",
+          "bytes": 32688
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-005.xml",
+          "sha256": "dc922164053064e753c033ba8206af7133b8b956065120c3a09fdd68df041df3",
+          "bytes": 20940
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-006.xml",
+          "sha256": "dc922164053064e753c033ba8206af7133b8b956065120c3a09fdd68df041df3",
+          "bytes": 20940
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-007.xml",
+          "sha256": "1947d76f10e92b91d93320176845b7b039fde8a0c32569bbfa521de52ec22ee5",
+          "bytes": 25815
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-008.xml",
+          "sha256": "1947d76f10e92b91d93320176845b7b039fde8a0c32569bbfa521de52ec22ee5",
+          "bytes": 25815
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-009.xml",
+          "sha256": "2eff71b845f8ac502139109bfb8ed313855bf68c96a784394461616e4e96da0e",
+          "bytes": 14369
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-010.xml",
+          "sha256": "fb048de2f2e925b153629df2397d6e4ab929f1c84bab06fedc702caaef12b053",
+          "bytes": 23249
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-011.xml",
+          "sha256": "fb048de2f2e925b153629df2397d6e4ab929f1c84bab06fedc702caaef12b053",
+          "bytes": 23249
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-012.xml",
+          "sha256": "6fe7e6022bb4281a4bbddf9077e61038e8bd3fbd6ef76d3e8c5795f3dbea137f",
+          "bytes": 23671
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-013.xml",
+          "sha256": "8a96886c6824be2f493f3cdb236c8436ace218cc8fc5963c385e087d567d7eed",
+          "bytes": 23637
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-014.xml",
+          "sha256": "50ad34fa22e5bbfb68206d33e6483c97ec6af7b26f483005141edb3712256047",
+          "bytes": 24009
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-015.xml",
+          "sha256": "e45209e86c2a94c0ae2cc24b6c9a5aec653d262cd7eb60194c85d0fda01b95dd",
+          "bytes": 23679
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-016.xml",
+          "sha256": "c1e74a9e5585b5d027646b4ced96525a3f2c4626c8a7633aae0c0a5d12545e47",
+          "bytes": 23254
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-017.xml",
+          "sha256": "c1e74a9e5585b5d027646b4ced96525a3f2c4626c8a7633aae0c0a5d12545e47",
+          "bytes": 23254
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-018.xml",
+          "sha256": "c1e74a9e5585b5d027646b4ced96525a3f2c4626c8a7633aae0c0a5d12545e47",
+          "bytes": 23254
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-019.xml",
+          "sha256": "9e61b8892ddcfd6bdea9ff02e0d5c96956b4cdd31c268120e56fea8573027ee8",
+          "bytes": 28456
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-020.xml",
+          "sha256": "c1e74a9e5585b5d027646b4ced96525a3f2c4626c8a7633aae0c0a5d12545e47",
+          "bytes": 23254
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-021.xml",
+          "sha256": "c1e74a9e5585b5d027646b4ced96525a3f2c4626c8a7633aae0c0a5d12545e47",
+          "bytes": 23254
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-022.xml",
+          "sha256": "ddac1f948a4e237e443dd4eb707bb508b5d7b1eb48854370f30f8c31eeb785b0",
+          "bytes": 28457
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-023.xml",
+          "sha256": "c1e74a9e5585b5d027646b4ced96525a3f2c4626c8a7633aae0c0a5d12545e47",
+          "bytes": 23254
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-024.xml",
+          "sha256": "c1e74a9e5585b5d027646b4ced96525a3f2c4626c8a7633aae0c0a5d12545e47",
+          "bytes": 23254
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-host-1/ui-025.xml",
+          "sha256": "9e61b8892ddcfd6bdea9ff02e0d5c96956b4cdd31c268120e56fea8573027ee8",
+          "bytes": 28456
+        }
+      ]
+    },
+    "emulator_16k_instrumented": {
+      "outcome": "release_ui_suite_passed",
+      "passed": 4,
+      "skipped": 0,
+      "test_seconds": 25.837,
+      "abi": "x86_64",
+      "page_size": 16384,
+      "test_process_freezing_prevented": false,
+      "qa_foreground_service": false,
+      "debug_qa_foreground_activity": false,
+      "main_sha256": "f4ad1df33e5a78f77e6e3b3e01121b61fefce65d1e3c758513f78a1c3252759e",
+      "qa_sha256": "23ee4e9db9f2d42428b7cce2300515528e1c09e53bee2f3b80777c6035b35195",
+      "evidence": [
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-emulator-13/status.json",
+          "sha256": "fbd09f7f358abb6e3907d870ef9431a0abe9bae984ece1ca302fb8425c652455",
+          "bytes": 1583
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-emulator-13/instrumentation.txt",
+          "sha256": "f2d643ee1566f51842d55cc7718480c6446ee1c6af626a7aafad29f7fd0cf352",
+          "bytes": 7500
+        }
+      ]
+    },
+    "honor_instrumented": {
+      "outcome": "incomplete",
+      "complete": false,
+      "passed_before_timeout": 2,
+      "error": "Release UI instrumentation exceeded 300 seconds",
+      "qa_foreground_service": true,
+      "test_process_freezing_prevented": true,
+      "evidence": [
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-9/status.json",
+          "sha256": "47d3f9f50bc0365df50c6f9b5f9ca95f7bb8b6d5e04b6fc464d5c9dea3f91f9f",
+          "bytes": 627
+        },
+        {
+          "path": "test-results/release-hardening-20260923/release-ui-honor-9/instrumentation.txt",
+          "sha256": "74556b0a1f5018e5713fe37883c985b63d269423705073a860af33e3495aab65",
+          "bytes": 5669
+        }
+      ]
+    }
+  },
+  "background_training": {
+    "seconds": 720.266,
+    "samples": 25,
+    "same_process": true,
+    "instrumentation_during_observation": false,
+    "freezing_exemption_during_observation": false,
+    "synthetic_images": 256,
+    "training_images": 209,
+    "validation_images": 47,
+    "epochs": 30,
+    "checkpoint_at_stop": 6202,
+    "final": {
+      "phase": "completed",
+      "completed_steps": 6270,
+      "total_steps": 6270,
+      "checkpoint_verified": true,
+      "original_preserved": true,
+      "annotations_and_images_preserved": true,
+      "separate_model_copy": true,
+      "human_annotation_contents_verified": true,
+      "weights_changed": true,
+      "initial_loss": 0.6893638011458387,
+      "validation_loss": 0.0001397659590968032
+    },
+    "memory_kib": {
+      "pss_before": 95324,
+      "pss_after": 99141,
+      "rss_before": 251512,
+      "rss_after": 255960,
+      "peak_measured": false
+    },
+    "evidence": [
+      {
+        "path": "test-results/release-hardening-20260923/background-observation-2/status.json",
+        "sha256": "2205a1290f96c480246bfd74ba4a4418ff85b29bcb865c65305f939237b817f7",
+        "bytes": 13781
+      },
+      {
+        "path": "test-results/release-hardening-20260923/background-stopped-probe.txt",
+        "sha256": "a7cd331baa90f50e3ccd5bf138a9cb13a314f7eb4cd63542239e7ebae84f4b79",
+        "bytes": 507
+      },
+      {
+        "path": "test-results/release-hardening-20260923/background-completed-probe.txt",
+        "sha256": "e9a13454ffbbf89646d66b4c9cfe50c7018273f0f3016a2f884f52c1e20cd7d7",
+        "bytes": 501
+      },
+      {
+        "path": "test-results/release-hardening-20260923/background-final-preservation.txt",
+        "sha256": "13adee8a3280ecb2bbe5a2f628ad0560d5d8eacc23dcc07e7e61f3d0b5940f0a",
+        "bytes": 505
+      }
+    ]
+  },
+  "release_data_continuity": {
+    "cases_passed": 2,
+    "evidence": [
+      {
+        "path": "test-results/release-hardening-20260923/final-continuity/status.json",
+        "sha256": "11be77f8aceb4624dbd2cce3a6b96f0520c93497a9b39b194d33e96d01fe3808",
+        "bytes": 654
+      },
+      {
+        "path": "test-results/release-hardening-20260923/final-continuity/29e167418aa4.txt",
+        "sha256": "da64e047a5a41de9459565d57f486637d39a2dbf216fffba84a0f4c812014c77",
+        "bytes": 367
+      },
+      {
+        "path": "test-results/release-hardening-20260923/final-continuity/79b91eac81a8.txt",
+        "sha256": "da64e047a5a41de9459565d57f486637d39a2dbf216fffba84a0f4c812014c77",
+        "bytes": 367
+      }
+    ]
+  },
+  "native_alignment": {
+    "arm": {
+      "strict_passed": false,
+      "remaining_findings": [
+        "lib/arm64-v8a/libtensorflowlite_jni.so"
+      ],
+      "evidence": {
+        "path": "test-results/release-hardening-20260923/native-alignment-arm.json",
+        "sha256": "38707b4796d0506b2880a0c84c4a4afa8d48eab9b0fe33aab2daaff7cb4736b6",
+        "bytes": 4832
+      }
+    },
+    "x86": {
+      "strict_passed": false,
+      "remaining_findings": [
+        "lib/x86_64/libtensorflowlite_jni.so"
+      ],
+      "evidence": {
+        "path": "test-results/release-hardening-20260923/native-alignment-x86.json",
+        "sha256": "b0e8e873304c72eba78f1adf36ce701b1a68898d3853663aefc4bdfdba31b76b",
+        "bytes": 4826
+      }
+    }
+  },
+  "dependency_notices": {
+    "artifacts": 110,
+    "missing_license_metadata": 0,
+    "native_transitive_review_complete": false,
+    "inventory_sha256": "7a6cdc05fcb1bf74f5d02feaa30f9e0c6ba17665868678b82294c04bc4c872a1"
+  },
+  "secret_review": {
+    "raw_findings": 34,
+    "reviewed_non_secret_findings": 34,
+    "unresolved_findings": 0,
+    "classification_counts": {
+      "public_signing_key_digest": 18,
+      "public_source_file_sha256": 16
+    },
+    "scope": "Working tree only; historical Git objects and ignored private files were not scanned",
+    "files_scanned": 604,
+    "raw_report_sha256": "4d946c92bd3336b5594210c972a1d24cf2554482fbad07860605f4b2cbc351f1"
+  },
+  "limitations": [
+    "Full minified Release business coverage remains open",
+    "Honor UI instrumentation timed out; four independent host ADB UI scenarios passed",
+    "LiteRT 1.4.2 GNU_RELRO end remains unaligned",
+    "No physical ARM 16 KB device tested",
+    "No overnight, reboot or OEM battery-policy qualification",
+    "Synthetic corpus only; no model accuracy claim",
+    "No new remote CI execution or publication"
+  ]
+}

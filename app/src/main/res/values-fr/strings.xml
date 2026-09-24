@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Vision Dataset Studio</string>
+    <string name="app_name">Cadryl</string>
     <string name="nav_studio">Atelier</string>
     <string name="nav_batch">Lot</string>
     <string name="nav_models">Modèles</string>
@@ -253,4 +253,7 @@
     <string name="training_abandon">Abandonner cet apprentissage</string>
     <string name="training_phase_abandoned">Apprentissage abandonné</string>
     <string name="training_abandon_help">Cet apprentissage ne sera pas repris. Aucun poids ne sera activé. Les images et le candidat restent conservés jusqu’au nettoyage explicite du lot.</string>
+    <string name="training_notification_channel">Apprentissage local</string>
+    <string name="training_notification_title">Apprentissage sur cet appareil</string>
+    <string name="training_notification_progress">%1$d / %2$d étapes · checkpoint sauvegardé régulièrement</string>
 </resources>

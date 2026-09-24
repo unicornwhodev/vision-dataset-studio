@@ -1,0 +1,59 @@
+{
+  "commit": "794e3806700833665f48f56f7dd3581642a6057f",
+  "files": [
+    {
+      "name": "CMakeLists.txt",
+      "sha256": "dc981826c335432c08cdbee3fd880fa38b5b3938247da67c7bdebc8d34ac35f5"
+    },
+    {
+      "name": "Conic.cpp",
+      "sha256": "49b3da93aa43480cf9cd481590be48705cb9340c52e5d09635efbd0ece07be83"
+    },
+    {
+      "name": "Conic.h",
+      "sha256": "cd315ad7c8d030c72e96893e9a0feec463d72d2066209a203dedcf0925398a6f"
+    },
+    {
+      "name": "libandroidx.graphics.path.map",
+      "sha256": "bc338abd36eeb27059572903ad167cf4231a36ca92be4eae3574501aa83f0d8c"
+    },
+    {
+      "name": "math/compiler.h",
+      "sha256": "d53e85383580e5dbf81cbcb24426b0fe1bf419b4837540242dbdca3f1df4cf66"
+    },
+    {
+      "name": "math/TVecHelpers.h",
+      "sha256": "1b0d6b06c5bbd6b438f9d8440ac78cf93fb8a713761badc59a4412b6457c1014"
+    },
+    {
+      "name": "math/vec2.h",
+      "sha256": "09e1a8eb3f8fdf9c1071500f1a4933f67caeb6d0f765d5c44ba968370de9fcb1"
+    },
+    {
+      "name": "Path.h",
+      "sha256": "4ee841338063d8c6f71ff4c655ecf52559f6c6df9af79835388dae1ebcd8b982"
+    },
+    {
+      "name": "PathIterator.cpp",
+      "sha256": "3705946b43bf894e013f46ccc940f9923f43285340f8fc2128f95c59238ec7f8"
+    },
+    {
+      "name": "PathIterator.h",
+      "sha256": "a16e99b0273fb7205607eb0cf51fc7be518a55f3446a304f92ecab353e77be6f"
+    },
+    {
+      "name": "pathway.cpp",
+      "sha256": "4be68d6fdb6376e95560f7c49a79aa0cd97218d758cf11ea3230ac9124485800"
+    },
+    {
+      "name": "scalar.h",
+      "sha256": "b1d2bba80a4c9272d84473b6f09f700972b016f7579842d3a87bdbbdb2af1edc"
+    }
+  ],
+  "upstream": {
+    "aar": "8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03",
+    "pom": "866fb357c7146f5f7678ad44e4bc6c2823d568defce1ed2805bb6c899606b228"
+  },
+  "version": "1.0.1-vds16k1",
+  "source_url": "https://github.com/androidx/androidx/tree/794e3806700833665f48f56f7dd3581642a6057f/graphics/graphics-path/src/main/cpp"
+}

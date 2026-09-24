@@ -1,0 +1,55 @@
+{
+  "product": "Cadryl",
+  "version": "4.2.0-rc6",
+  "version_code": 11,
+  "date": "2026-09-24",
+  "suite": "minified Release core and independent UI",
+  "physical_arm_qualified": false,
+  "physical_arm_16k_qualified": false,
+  "ci_executed": false,
+  "strict_native_16k_passed": true,
+  "production_qualified": false,
+  "results": {
+    "arm": {
+      "app_sha256": "898ab6eb45b6d7f40255f727e89a59f09978160488b09ed15e892b69e9f51ec8",
+      "tests_sha256": "a3aefb6ec5a6e4f4ad046078dc1e90ca3804d1be717485760fed59ec6163d24f",
+      "qa_sha256": "6fae35862cf6af1848ff34a11fd4d478db1dcdf268ec07abe534b456bd50454a",
+      "physical_arm": false,
+      "package_abi": "arm64-v8a",
+      "host_abi": "x86_64",
+      "outcome": "passed"
+    },
+    "x86": {
+      "app_sha256": "4fed0f02c11e50a844950d34703bb3e6e087d143cdc5879006189b295fcf9ea6",
+      "tests_sha256": "a3aefb6ec5a6e4f4ad046078dc1e90ca3804d1be717485760fed59ec6163d24f",
+      "qa_sha256": "6fae35862cf6af1848ff34a11fd4d478db1dcdf268ec07abe534b456bd50454a",
+      "physical_arm": false,
+      "package_abi": "x86_64",
+      "host_abi": "x86_64",
+      "outcome": "passed"
+    }
+  },
+  "host": {
+    "jvm": {
+      "passed": 70,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "lint": {
+      "errors": 0,
+      "warnings": 96
+    },
+    "python": {
+      "passed": 87,
+      "failed": 0
+    }
+  },
+  "private_host_log_sha256": {
+    "brand-jvm-lint-final.log": "b249c66685f691ef5ffde8ea8181b6c15ec4441823966fc3cdc6de703d6f42ef",
+    "brand-python-tests.log": "139d2939e162e4caf8ecd891e17896ed1192fda6f65ca270e5d6e65cb057fafa"
+  },
+  "initial_attempts_retained": true,
+  "source_receipt_refresh": "Only the JVM display-name assertion changed after device QA; both signed app/test pairs are byte-identical to the tested APKs.",
+  "root_usage": "Dedicated emulator only, synthetic fixture staging/readback; all app tests non-debuggable, ADB restored to shell UID 2000."
+}

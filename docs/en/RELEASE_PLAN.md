@@ -1,69 +1,28 @@
-# Windows qualification prerelease — 4.2.0-rc5
+# Ship Cadryl
 
-**Verified publication :** [v4.2.0-rc5](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc5) · [JSON](../RC5_PUBLICATION_RECEIPT.json).
+[Documentation](README.md) · [Français](../RELEASE_PLAN.md)
 
-Build `20260923T104142Z-befce3e3596a` passed 67 JVM tests and 39/39 Android core
-tests on both 4 KB and 16 KB API 35 emulators. The Python suite passed 70 tests
-before packaging (63 at build time plus seven packaging checks). The original
-model stays intact; later training continues its separate learned version.
+Current delivery: **4.2.0-rc6**, a prerelease signed with the durable key. Files keep their technical `vision-dataset-studio` names for existing links and scripts. [rc6 contents and results](../RC6_RELEASE.md).
 
-**rc5 cannot update rc4:** the Windows Debug certificate differs from the one
-used on the previous VM, whose private key is unavailable on this workstation.
-Keep existing installations and their data. Do not uninstall an installation
-containing data to work around the signature mismatch. Private signing keys
-are excluded from Git and packages.
+## Published files
 
-Assets: Debug user APK, qualification ZIP with instrumentation APK and selected
-evidence, rebuilt Flex local Maven runtime, unsigned 100.2 MB ARM64 Release
-candidate, `PACKAGE.json` and `SHA256SUMS`. The unsigned candidate is not directly
-installable. GHCR distributes an artifact package and retains its existing
-private visibility; GitHub release assets are public.
+- `vision-dataset-studio.apk`: ARM64 Release app, Android 9+, no model weights.
+- `vision-dataset-studio-4.2.0-rc6-qualification.zip`: ARM64/x86_64 app/test APKs, UI driver, docs, notices and selected evidence.
+- Maven ZIPs for Flex `2.16.1-vds16k1`, Graphics Path `1.0.1-vds16k1` and LiteRT `2.2.0-vds16k2`.
+- `PACKAGE.json`, `PUBLICATION_CHECKS.json` and `SHA256SUMS`: provenance and integrity.
 
-`tools/package_verified_release.py` verifies 162 of 163 recorded files byte for
-byte against Git blobs. The only difference is CRLF-to-LF normalization of the
-host Python bootstrap script; both hashes are recorded. Android source bytes
-are identical. `PACKAGE.json` binds the tested bytes to that commit;
-the original receipts retain their earlier base commit. Physical ARM, whole-app
-16 KB qualification, real HF writes, model quality, durable signing and the
-remaining native transitive notices are still open. Remote CI has not run for
-this build. See the [Windows evidence](../WINDOWS_QUALIFICATION_2026_09.md),
-[publication checks](../PUBLICATION_CHECKS.md) and [packaging command](../RELEASE_PLAN.md).
+Assets are available through the [GitHub release](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc6). The [GHCR package](https://github.com/users/unicornwhodev/packages/container/package/vision-dataset-studio-qualification) remains private. It holds artifacts, not a runnable container.
 
-## Historical rc4 distribution
+## Prepare a release
 
-# Publication — 4.2.0-rc4
+Build both Release app/test pairs, sign with the same durable key and test the signed bytes. Retain failures and partial results. Select public evidence without secrets, weights or user datasets. Follow [Release testing](../RELEASE_TESTING.md).
 
-[Français](../RELEASE_PLAN.md). Public repository: [unicornwhodev/vision-dataset-studio](https://github.com/unicornwhodev/vision-dataset-studio). Apache-2.0 licence.
+After review and commit, `tools/package_native_release.py` checks a clean tree, compiled sources against Git, APKs against signing/test receipts and strict native alignment. It refuses to overwrite an existing delivery folder. Its build, signing, evidence and UI-driver arguments must identify the exact tested attempts.
 
-rc4 is a **Debug qualification prerelease**. It publishes the current development snapshot requested by the owner, with the partial LiteRT matrix and open defects. It is not a stable release.
+Review archives before upload. Use a new tag rather than overwriting an existing release. Verify GitHub asset hashes and sizes after publication, then pull back and check the OCI layers. [Publication checks](../PUBLICATION_CHECKS.md).
 
-## Artifacts
+## Updates
 
-- `vision-dataset-studio.apk`: the single user-facing APK, with no model weights.
-- `vision-dataset-studio-4.2.0-rc4-qualification.zip`: user APK, test-only instrumentation APK, receipts, results, FR/EN documentation and licence.
-- `PACKAGE.json`, `SHA256SUMS` and OCI digest: provenance and integrity.
+Keep the Android ID and [durable key](../SIGNING.md), then increase `versionCode`. rc4/rc5 Debug certificate incompatibility stays explicit. Uninstalling is not a data migration.
 
-`ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc4` distributes that archive as OCI, **not a runnable image**. It is linked to the GitHub repository; package visibility is currently private and separate from repository visibility. Release assets are public. With authorized GHCR access:
-
-```bash
-oras pull ghcr.io/unicornwhodev/vision-dataset-studio-qualification:v4.2.0-rc4
-```
-
-`tools/package_workstation_release.py` requires a clean Git tree, a complete compiled-source manifest matching the commit, APK hashes and Android evidence from the same build. It refuses embedded weights and failed or skipped instrumented suites. Development-build model receipts remain distinct.
-
-```bash
-python3 tools/package_workstation_release.py --build-dir dist/rc4-build \
-  --evidence test-results/stabilization-rc4 --version 4.2.0-rc4
-```
-
-The historical rc2 packager and CI packager remain separate. No CI receipt is fabricated. The [latest Actions attempt](https://github.com/unicornwhodev/vision-dataset-studio/actions/runs/35539418339) was refused before execution because of an account billing issue. The build Dockerfile is not qualified.
-
-## Signing and resumption
-
-The rc4 Debug key is backed up outside Git for future builds. The owner confirmed that nobody downloaded rc2; no rc2 distribution migration is planned. A future stable release requires durable signing, notice review and physical-device QA.
-
-Sources, SDK, emulators, conversions and evidence remain under `/workspace` on the persistent volume. APKs and public evidence are also backed up to the Chromebook before pod shutdown. No credentials, weights or private keys are published.
-
-## rc4 QA
-
-The rc4 build evidence is in [`test-results/stabilization-rc4/`](../../test-results/stabilization-rc4/). The core suite runs separately from the two model classes requiring explicit fixtures/options. EdgeNeXt and RepViT have separate Android receipts; unexecuted models remain unqualified. September 20 and the preceding stabilization build retain their original evidence and build identifiers.
+Prepared CI has not run for this delivery. Hardware gaps, the historical ART cause and pending native notices remain visible. rc6 is not labelled stable. The [rc5 publication receipt](../RC5_PUBLICATION_RECEIPT.json) is retained.

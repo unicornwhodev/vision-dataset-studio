@@ -297,6 +297,8 @@ class DeviceTrainingWorker(context:Context,parameters:WorkerParameters):Coroutin
         if(TrainingPolicy.finished(run.phase) || run.phase=="cancelled")return@withLock Result.success()
         var durableSteps=run.completedSteps
         try {
+            setForeground(TrainingForeground.info(applicationContext,id,run))
+            var notifiedAt=android.os.SystemClock.elapsedRealtime()
             require(run.sourceBatchNumber>0 && run.exportSnapshot.isNotBlank() && run.exportProof.isNotBlank()) { tr("Ancienne préparation sans export vérifié; préparez le lot exporté", "Old preparation without a verified export; prepare the exported batch") }
             val model=File(run.modelFile);require(model.isFile && model.canRead()) { tr("Poids absents ou illisibles", "Weights missing or unreadable") }
             require(HashUtils.computeSha256(model)==run.modelSha256){tr("Copie du modèle altérée", "Working model copy modified")}
@@ -331,9 +333,14 @@ class DeviceTrainingWorker(context:Context,parameters:WorkerParameters):Coroutin
                             // Only an obsolete private candidate checkpoint is reclaimed; the active model is separate.
                             previous?.let{val old=File(it.prefix).parentFile!!;if(old.canonicalPath.startsWith(directory.canonicalPath+File.separator))old.deleteRecursively()}
                             setProgress(workDataOf("steps" to run.completedSteps,"total" to run.totalSteps))
+                            val now=android.os.SystemClock.elapsedRealtime()
+                            if(now-notifiedAt>=1000L) {
+                                setForeground(TrainingForeground.info(applicationContext,id,run));notifiedAt=now
+                            }
                         }
                     }
                     run=run.copy(phase="evaluating");store.write(run)
+                    setForeground(TrainingForeground.info(applicationContext,id,run))
                     val score=evaluate();val probe=session.weightProbe()
                     val improved=score<requireNotNull(run.initialLoss)*.99 && (probe==null || probe!=run.initialWeightProbe)
                     run=run.copy(phase=if(improved)"completed" else "rejected",validationLoss=score,finalWeightProbe=probe)

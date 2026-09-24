@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-24T01:26:19.532Z" hostname="UNICORN-PC" time="4.993">
+  <properties/>
+  <testcase name="fullResponseRestartsInsteadOfAppending" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="1.984"/>
+  <testcase name="realHubPlainTextLfsAcknowledgementAllowsCommit" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.792"/>
+  <testcase name="emptyLfsAcknowledgementAllowsCommit" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.122"/>
+  <testcase name="commitConflictPreservesPinnedParent" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.254"/>
+  <testcase name="wrongRangeNeverOverwritesFinalFile" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.147"/>
+  <testcase name="overSizeResponseRejected" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.084"/>
+  <testcase name="occupiedPathIsNeverOverwritten" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.113"/>
+  <testcase name="failedLfsAcknowledgementForbidsCommit" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.105"/>
+  <testcase name="disconnectedDownloadResumesHashedPrefix" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.49"/>
+  <testcase name="remoteReceiptVerifiesWithoutLocalPayload" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.118"/>
+  <testcase name="lostCommitReplyIsNotAutomaticallyReplayed" classname="com.unicornwhodev.visiondatasetstudio.HfTransferV4Test" time="0.783"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

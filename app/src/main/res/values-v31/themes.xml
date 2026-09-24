@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Cadryl.Starting" parent="Theme.VisionDatasetStudio">
+        <item name="android:windowSplashScreenBackground">#0B101B</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_cadryl_splash</item>
+        <item name="android:statusBarColor">#0B101B</item>
+        <item name="android:navigationBarColor">#0B101B</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>

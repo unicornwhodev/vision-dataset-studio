@@ -1,5 +1,5 @@
 {
-  "artifacts": 110,
+  "artifacts": 109,
   "missing_license_metadata": [],
   "legal_clearance": false,
   "native_transitive_notices_reviewed": false,
@@ -827,12 +827,12 @@
       "embedded_notices": []
     },
     {
-      "coordinate": "androidx.graphics:graphics-path:1.0.1",
-      "artifact_sha256": "8ca4032b6d79b351f0b59ad4b580eddbb9423e1652f7c958830687f1eee2ec03",
+      "coordinate": "androidx.graphics:graphics-path:1.0.1-vds16k1",
+      "artifact_sha256": "a8ddf03d4761acd62f10cea9b89de6b535b898e86d78cc3c5dc438c15de7ed15",
       "pom_provenance": [
         {
-          "file": "graphics-path-1.0.1.pom",
-          "sha256": "866fb357c7146f5f7678ad44e4bc6c2823d568defce1ed2805bb6c899606b228"
+          "file": "graphics-path-1.0.1-vds16k1.pom",
+          "sha256": "8c9c34c91b606a1ceb0de0e5b7126e207a4abf582b3cd0a6f2f6cd363acef7f5"
         }
       ],
       "declared_licenses": [
@@ -842,7 +842,9 @@
           "distribution": "repo"
         }
       ],
-      "embedded_notices": []
+      "embedded_notices": [
+        "NOTICE.vds-16k"
+      ]
     },
     {
       "coordinate": "androidx.interpolator:interpolator:1.0.0",
@@ -1537,46 +1539,6 @@
       "embedded_notices": []
     },
     {
-      "coordinate": "com.google.ai.edge.litert:litert-api:1.4.2",
-      "artifact_sha256": "66c2ba8086bd5cbf89bec2bd81c3de6c1a852312829cd55bc30c9dd26ffa357c",
-      "pom_provenance": [
-        {
-          "file": "litert-api-1.4.2.pom",
-          "sha256": "da9af6af75d05c7af53571cf45833fdbd80271a99306b397090dac199c38c0d8"
-        }
-      ],
-      "declared_licenses": [
-        {
-          "name": "The Apache Software License, Version 2.0",
-          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "distribution": ""
-        }
-      ],
-      "embedded_notices": [
-        "LICENSE"
-      ]
-    },
-    {
-      "coordinate": "com.google.ai.edge.litert:litert:1.4.2",
-      "artifact_sha256": "9b02cdf9db0a698b341b59e75c54ab8221d6304577cc43830d01024caf1fca74",
-      "pom_provenance": [
-        {
-          "file": "litert-1.4.2.pom",
-          "sha256": "9528ce669b5bb545a03cd14d92f429064af04a644f2cd8e306e7705e8bf40a30"
-        }
-      ],
-      "declared_licenses": [
-        {
-          "name": "The Apache Software License, Version 2.0",
-          "url": "http://www.apache.org/licenses/LICENSE-2.0.txt",
-          "distribution": ""
-        }
-      ],
-      "embedded_notices": [
-        "LICENSE"
-      ]
-    },
-    {
       "coordinate": "com.google.flatbuffers:flatbuffers-java:1.12.0",
       "artifact_sha256": "3f8c088b4dd04a9858721f2e162508c94db0dd86f961e306ee63ef2eda871bf7",
       "pom_provenance": [
@@ -1743,6 +1705,28 @@
         }
       ],
       "embedded_notices": []
+    },
+    {
+      "coordinate": "com.unicornwhodev.thirdparty:litert-interpreter:2.2.0-vds16k2",
+      "artifact_sha256": "c1644503243c3c78092f949e2fb3cd47eafaf252bb87e18535eb29da916810ae",
+      "pom_provenance": [
+        {
+          "file": "litert-interpreter-2.2.0-vds16k2.pom",
+          "sha256": "0b65a93ada207911c02cce96aecd1f52b96ee0c08992993cb1a303aca6fd57fe"
+        }
+      ],
+      "declared_licenses": [
+        {
+          "name": "Apache License 2.0",
+          "url": "https://www.apache.org/licenses/LICENSE-2.0",
+          "distribution": "repo"
+        }
+      ],
+      "embedded_notices": [
+        "LICENSE",
+        "LICENSE.cpuinfo",
+        "NOTICE.vds-16k"
+      ]
     },
     {
       "coordinate": "io.coil-kt:coil-base:2.7.0",

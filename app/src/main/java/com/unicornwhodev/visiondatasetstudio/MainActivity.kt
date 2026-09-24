@@ -18,6 +18,7 @@ import com.unicornwhodev.visiondatasetstudio.ui.theme.VisionDatasetStudioTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_VisionDatasetStudio)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {

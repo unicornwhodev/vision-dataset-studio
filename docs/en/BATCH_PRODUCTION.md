@@ -1,5 +1,8 @@
 # Batch production
 
+Batches keep the job manageable: work on a small set of images, finish its review and export, then move on. This page explains what Cadryl keeps at each step.
+
+
 [Français](../BATCH_PRODUCTION.md) · **English**
 
 The main workflow is **import → preannotate → human correction/review → verified export → optional learning → cleanup → next batch**.
@@ -34,6 +37,6 @@ The scope is one project on this installation. A separate project or a new insta
 
 The APK includes runtimes, adapters, contracts, catalogue, tokenization and download/import logic. Weights are obtained after installation and stored in Android private storage. No user corpus or model weights are bundled.
 
-The build scans weight extensions and LiteRT/GGUF headers under assets/raw. `app-contents.json` records the result, and a detected weight prevents APK promotion. QA models are staged separately on the emulator. The universal debug APK remains large because it carries native libraries for four architectures.
+The build scans weight extensions and LiteRT/GGUF headers under assets/raw. `app-contents.json` records the result, and a detected weight prevents APK promotion. QA models are staged separately on the emulator. rc6 distributes an ARM64 Release APK; older universal Debug APKs included native libraries for four architectures.
 
 Trainable graphs must satisfy the [LiteRT contract](LITERT_TRAINING_CONTRACT.md). Implementing a contract does not qualify every HF conversion. The [validation report](VALIDATION.md) separates executed tests, failures and pending work.

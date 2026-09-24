@@ -2,6 +2,7 @@ package com.unicornwhodev.visiondatasetstudio.ui.components
 
 import com.unicornwhodev.visiondatasetstudio.core.i18n.tr
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import com.unicornwhodev.visiondatasetstudio.R
 
 import androidx.compose.animation.*
@@ -36,7 +37,9 @@ fun StudioTopBar(title: String, eyebrow: String? = null, onBack: (() -> Unit)? =
     Column {
         Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background).heightIn(min = 52.dp).padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, tr("Retour", "Back"), Modifier.size(20.dp)) }
-            else Spacer(Modifier.width(16.dp))
+            else Box(Modifier.width(48.dp), contentAlignment = Alignment.Center) {
+                Icon(painterResource(R.drawable.ic_cadryl), stringResource(R.string.app_name), Modifier.size(26.dp), tint = Color.Unspecified)
+            }
             Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (eyebrow != null) Text(eyebrow, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)

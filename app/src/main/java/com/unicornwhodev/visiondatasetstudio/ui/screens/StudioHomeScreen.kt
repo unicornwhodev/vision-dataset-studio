@@ -80,7 +80,7 @@ fun StudioHomeScreen(viewModel: MainViewModel) {
         }
     }
     Scaffold(contentWindowInsets = WindowInsets(0), topBar = {
-        StudioTopBar(project?.name ?: tr("Atelier", "Studio"), tr("Atelier  /  Lot ${batch.toString().padStart(2, '0')}", "Studio  /  Batch ${batch.toString().padStart(2, '0')}"), actions = {
+        StudioTopBar(project?.name ?: tr("Atelier", "Studio"), tr("Cadryl  /  Lot ${batch.toString().padStart(2, '0')}", "Cadryl  /  Batch ${batch.toString().padStart(2, '0')}"), actions = {
             IconButton(onClick = { viewModel.navigateTo(Screen.Workflow) }, enabled = !busy) { Icon(Icons.Default.AccountTree, tr("Workflows et agent", "Workflows and agent"), Modifier.size(19.dp)) }
             IconButton(onClick = { viewModel.navigateTo(Screen.Controls) }, enabled = !busy, modifier = Modifier.testTag("controls_shortcut")) {
                 Icon(Icons.Default.FolderOpen, tr("Gérer les projets", "Manage projects"), Modifier.size(19.dp))

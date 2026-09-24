@@ -14,6 +14,8 @@ import uuid
 import zipfile
 from build_android import ROOT, APP_ID, atomic_json, digest, sdk_dir, sdk_tool, source_manifest, verify_badging, weight_inventory, verify_local_flex
 from qa.check_flex_runtime import MACHINES, verify_flex
+from qa.check_graphics_runtime import verify_graphics
+from qa.check_litert_runtime import verify_litert
 
 
 def main():
@@ -29,6 +31,8 @@ def main():
     code = 1
     try:
         state['flex_runtime'] = verify_local_flex(ROOT)
+        state['graphics_runtime'] = verify_graphics()
+        state['litert_runtime'] = verify_litert()
         before = source_manifest(ROOT)
         atomic_json(out / 'source-manifest.json', before)
         # Keep old candidates in dist/distribution; avoid unused incremental ZIP
@@ -48,7 +52,9 @@ def main():
         badging = subprocess.check_output([str(sdk_tool(tools, 'aapt')), 'dump', 'badging', str(source)], text=True, encoding='utf-8')
         (out / 'identity.txt').write_text(badging, encoding='utf-8')
         verify_badging(badging, APP_ID)
+        atomic_json(out / 'litert-16k.json', verify_litert(source, [args.abi]))
         if args.abi in MACHINES:
+            atomic_json(out / 'graphics-16k.json', verify_graphics(source))
             alignment = verify_flex(source, [args.abi])
             if alignment['libraries'][args.abi]['sha256'] != state['flex_runtime']['libraries'][args.abi]['sha256']:
                 raise RuntimeError('Packaged Flex differs from its native build receipt; refresh the Gradle dependency cache.')

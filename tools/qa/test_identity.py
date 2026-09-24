@@ -37,7 +37,7 @@ class IdentityTests(unittest.TestCase):
         text=next((ROOT/'app/src/androidTest').rglob('SafV4Test.kt')).read_text(encoding='utf-8')
         self.assertIn('context.packageName}.documents/',text)
     def test_version_and_database_versions_distinct(self):
-        self.assertIn('versionName = "4.2.0-rc5"',(ROOT/'app/build.gradle.kts').read_text(encoding='utf-8'))
+        self.assertIn('versionName = "4.2.0-rc6"',(ROOT/'app/build.gradle.kts').read_text(encoding='utf-8'))
         db=next((ROOT/'app/src/main').rglob('AppDatabase.kt')).read_text(encoding='utf-8')
         self.assertIn('version = 4',db)
         self.assertNotIn('fallbackToDestructiveMigration',db)

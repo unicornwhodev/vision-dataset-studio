@@ -1,0 +1,7 @@
+{
+  "source": "launch.mp4",
+  "method": "ffmpeg fps=10, frame 7 (approximately 0.65 seconds)",
+  "frame": "splash.png",
+  "source_sha256": "c7bd534593da4a7f3167beff3bc522edb4847970b060e5ba3748cc1ee36b3c6c",
+  "unretouched": true
+}

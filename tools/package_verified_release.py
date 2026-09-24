@@ -103,7 +103,8 @@ def main():
         raise RuntimeError('Public evidence must contain exactly the reviewed tracked files')
     built = read(build_dir / 'source-manifest.json')
     current = source_manifest(ROOT)
-    if built['files'] != current['files'] or built['native_runtime'] != current['native_runtime']:
+    if (built['files'] != current['files'] or built['native_runtime'] != current['native_runtime']
+            or built.get('native_runtimes') != current.get('native_runtimes')):
         raise RuntimeError('Current compiled inputs differ from the tested build')
     normalized = []
     for path, expected in built['files'].items():

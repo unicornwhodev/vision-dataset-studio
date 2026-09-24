@@ -42,6 +42,9 @@ public final class ReleaseContinuityInstrumentation extends Instrumentation {
     @Override public void onStart() {
         Bundle result=new Bundle();
         try {
+            if(arguments.containsKey("backgroundCase")) {
+                inspectBackground(result);finish(Activity.RESULT_OK,result);return;
+            }
             String caseId=arguments.getString("preservationCase");
             require(caseId!=null && caseId.matches("[a-f0-9]{12}"),"Select an existing synthetic preservation fixture");
             Context context=getTargetContext();
@@ -76,5 +79,52 @@ public final class ReleaseContinuityInstrumentation extends Instrumentation {
             result.putString("stream",failure.getClass().getName()+": "+failure.getMessage()+"\n");
             finish(Activity.RESULT_CANCELED,result);
         }
+    }
+
+    private void inspectBackground(Bundle result) throws Exception {
+        Context context=getTargetContext();
+        require((context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)==0,"Expected real Release");
+        String caseId=arguments.getString("backgroundCase");
+        require(caseId!=null && caseId.matches("[0-9]{13}"),"Explicit synthetic background case required");
+        JSONObject marker=json(new File(context.getFilesDir(),"long-training-fixture/preparation.json"));
+        require(marker.getLong("project_id")==Long.parseLong(caseId),"Preparation marker does not match");
+        JSONObject run=json(new File(context.getFilesDir(),"training/"+caseId+".json"));
+        require(run.getString("id").equals(marker.getString("run_id")),"Training run changed");
+        require(hash(new File(marker.getString("original_model"))).equals(marker.getString("original_sha256")),"Original model changed");
+        require(!new File(run.getString("modelFile")).getCanonicalPath().equals(new File(marker.getString("original_model")).getCanonicalPath()),"Training must use a separate model copy");
+        var samples=run.getJSONArray("samples");
+        for(int i=0;i<samples.length();i++) {
+            var sample=samples.getJSONObject(i);
+            require(hash(new File(sample.getString("image"))).equals(sample.getString("sha256")),"Training image changed");
+        }
+        boolean checkpointVerified=false;
+        if(!run.isNull("checkpoint")) {
+            var checkpoint=run.getJSONObject("checkpoint");var hashes=checkpoint.getJSONObject("files");
+            File directory=new File(checkpoint.getString("prefix")).getParentFile();
+            var keys=hashes.keys();int count=0;
+            while(keys.hasNext()) {String key=keys.next();require(hash(new File(directory,key)).equals(hashes.getString(key)),"Checkpoint bytes changed");count++;}
+            require(count>0,"Empty checkpoint");checkpointVerified=true;
+        }
+        try(SQLiteDatabase db=SQLiteDatabase.openDatabase(context.getDatabasePath("vision_dataset_studio.db").getPath(),null,SQLiteDatabase.OPEN_READONLY)) {
+            try(Cursor c=db.rawQuery("SELECT count(*) FROM annotations a JOIN samples s ON a.sampleId=s.sampleId WHERE s.projectId=?",new String[]{caseId})) {
+                require(c.moveToFirst() && c.getInt(0)==marker.getInt("images"),"Human annotations missing");
+            }
+            try(Cursor c=db.rawQuery("SELECT s.sourceRowIndex,a.dataJson FROM annotations a JOIN samples s ON a.sampleId=s.sampleId WHERE s.projectId=?",new String[]{caseId})) {
+                while(c.moveToNext()) {
+                    int index=c.getInt(0);var annotation=new JSONObject(c.getString(1));var tags=annotation.getJSONArray("tags");
+                    require(tags.length()==1,"Synthetic human tags changed");var tag=tags.getJSONObject(0);
+                    require(tag.getString("id").equals("tag-"+index) && tag.getString("label").equals(index%2==0?"rouge":"bleu")
+                        && tag.getBoolean("isHumanVerified") && tag.getString("sourceProvenance").equals("human"),"Synthetic human annotation changed");
+                }
+            }
+        }
+        JSONObject evidence=new JSONObject().put("project_id",caseId).put("phase",run.getString("phase"))
+            .put("completed_steps",run.getInt("completedSteps")).put("total_steps",run.getInt("totalSteps"))
+            .put("checkpoint_verified",checkpointVerified).put("original_preserved",true).put("annotations_and_images_preserved",true)
+            .put("separate_model_copy",true).put("human_annotation_contents_verified",true)
+            .put("weights_changed",!run.isNull("initialWeightProbe") && !run.isNull("finalWeightProbe") && !run.getString("initialWeightProbe").equals(run.getString("finalWeightProbe")))
+            .put("initial_loss",run.opt("initialLoss")).put("validation_loss",run.opt("validationLoss"))
+            .put("error",run.opt("error"));
+        result.putString("release_training_evidence",evidence.toString());result.putString("stream","Actual Release training data inspected\n");
     }
 }

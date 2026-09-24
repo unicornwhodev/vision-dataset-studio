@@ -11,7 +11,7 @@ class QaPresenceActivity:Activity() {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(TextView(this).apply {
-            text="Vision Dataset Studio\nAndroid QA in progress"
+            text="Cadryl\nAndroid QA in progress"
             textSize=22f
             gravity=android.view.Gravity.CENTER
             setTextColor(0xff55ddff.toInt())

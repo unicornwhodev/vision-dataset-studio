@@ -1,16 +1,23 @@
-# Roadmap
+# What comes next for Cadryl
 
-[Documentation](../README.md) · [Français](../ROADMAP.md)
+[Documentation](README.md) · [Français](../ROADMAP.md)
 
-Qualification priorities on **23 September 2026**. rc5 is a published Debug prerelease, not a stable release.
+The priority is a reliable phone workflow. New features should follow feedback on that foundation.
 
-| Priority | Recorded progress | Required next evidence |
-|---|---|---|
-| **P0 · Reproducible build and coherent QA** | Windows build, generated KSP, 70 JVM/75 Python tests, Debug 39/39 on Honor 4 KB and emulator 16 KB; Flex crash fixed | Reproduce on another installation while binding sources, runtime, APKs and receipts |
-| **P1 · Data, devices and transfers** | Local 2+1 cycle, restored Room copy, physical Honor; real ENOSPC, SAF revocation, lost volume, HF interruption/conflict/lost response and interrupted purge checked | Prolonged background operation, physical ARM 16 KB, cloud providers, large multipart transfers, actual legacy user database and remote CI |
-| **P2 · Models and quality** | 13 conversion passes, including 8 with learning; RTMDet fixed | 15 unexecuted conversions and 3 timeouts; SAM/Florence integration; independent-dataset accuracy and forgetting |
-| **P3 · Durable distribution** | Durable key and second-disk backup verified; actual signed 100.2 MB ARM64 Release on Honor; 110-dependency inventory | Off-machine key backup, full Release-variant suite, publication of the next candidate and native transitive notice review |
+## Finish candidate acceptance
 
-Core tests do not replace per-model tests. Current HF conversions retain frozen visual backbones. Exact save/restore does not prove accuracy or generalization. Two native libraries retain explained RELRO findings; this is not whole-APK certification. rc5's Windows certificate cannot update rc4; preserve existing installations containing data. [P1 evidence and limits (FR)](../P1_QUALIFICATION_2026_09.md).
+- Run the final runtime and both Release suites on Honor, then check a signed update with data preserved.
+- Test a physical ARM phone with 16 KB pages. Strict alignment is fixed; hardware evidence is missing.
+- Repeat longer sessions and observe background restrictions. Keep any ART crash traces; the historical cause is still unknown.
 
-[Android matrix](../ANDROID_QUALIFICATION.md) · [LiteRT evidence](LITERT_QUALIFICATION.md) · [Limits](KNOWN_LIMITATIONS.md) · [Publication](RELEASE_PLAN.md).
+## Data and reproducibility
+
+Extend interruption and large-transfer coverage using authorised test destinations. Check an older database from real use, working from a backup. Reproduce the build on another machine and run the prepared CI.
+
+## Model quality
+
+Rerun the catalogue on the new runtime, complete missing variants and bundles, then measure quality on independent data. The Charlbi campaign currently has 13/25 passes, one timeout and eleven unrun variants. Its eight successful training runs do not establish an accuracy improvement.
+
+## Durable distribution
+
+Keep the same signing key, add an off-machine backup, finish native notice review and track APK size. Models remain separate downloads. Use the [known limits](KNOWN_LIMITATIONS.md) and [test results](VALIDATION.md) before each release.
