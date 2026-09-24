@@ -2,7 +2,7 @@
 
 [Documentation](README.md) · [Français](../RELEASE_PLAN.md)
 
-Current delivery: **4.2.0-rc6**, a prerelease signed with the durable key. Files keep their technical `vision-dataset-studio` names for existing links and scripts. [rc6 contents and results](../RC6_RELEASE.md).
+Current delivery: **4.2.0-rc6**, a prerelease signed with the durable key, [published and verified](../RC6_PUBLICATION_RECEIPT.json). Files keep their technical `vision-dataset-studio` names for existing links and scripts. [rc6 contents and results](../RC6_RELEASE.md).
 
 ## Published files
 

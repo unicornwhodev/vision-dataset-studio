@@ -2,7 +2,7 @@
 
 [Documentation](README.md) · [English](en/RELEASE_PLAN.md)
 
-La livraison actuelle est **4.2.0-rc6**, une prérelease signée avec la clé durable. Les fichiers gardent leurs noms techniques `vision-dataset-studio` pour conserver les liens et les scripts existants. [Contenu et résultats rc6](RC6_RELEASE.md).
+La livraison actuelle est **4.2.0-rc6**, une prérelease signée avec la clé durable, [publiée et vérifiée](RC6_PUBLICATION_RECEIPT.json). Les fichiers gardent leurs noms techniques `vision-dataset-studio` pour conserver les liens et les scripts existants. [Contenu et résultats rc6](RC6_RELEASE.md).
 
 ## Ce qui est distribué
 

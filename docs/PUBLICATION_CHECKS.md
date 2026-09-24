@@ -12,6 +12,10 @@ Gitleaks analyse l’arbre exact destiné au commit et l’historique disponible
 
 Les archives sont aussi inventoriées et relues, y compris leurs APK, AAR et JAR imbriqués. Le contrôle vérifie les chemins, les CRC et l’absence des fichiers privés interdits. `PUBLICATION_CHECKS.json` accompagne les fichiers livrés et donne les résultats de cette sélection précise.
 
+## Publication rc6 vérifiée
+
+Le [reçu du 24 septembre](RC6_PUBLICATION_RECEIPT.json) confirme les dix assets GitHub et les huit couches OCI retéléchargées. Les 706 fichiers sélectionnés, l’index, l’historique de 30 commits et les 16 archives imbriquées ont été contrôlés. Les signalements relus sont des empreintes publiques de sources et de clés ; aucun secret n’a été confirmé. Les reçus bruts sont conservés sans normalisation de fins de ligne.
+
 ## Après l’envoi
 
 Les noms, tailles et SHA-256 des assets GitHub doivent correspondre aux fichiers locaux. Le tag doit pointer sur le commit de compilation. Les couches du package GHCR sont téléchargées de nouveau et comparées octet par octet par SHA-256.

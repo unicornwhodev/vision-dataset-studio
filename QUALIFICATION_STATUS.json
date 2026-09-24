@@ -100,5 +100,15 @@
     "docs/P1_QUALIFICATION_2026_09.md",
     "docs/LITERT_QUALIFICATION.md"
   ],
-  "previous_product_name": "Vision Dataset Studio"
+  "previous_product_name": "Vision Dataset Studio",
+  "publication": {
+    "tag": "v4.2.0-rc6",
+    "release": "https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc6",
+    "source_commit": "e95a7477f5397c33b5738a3094f3c71e0bbf29b3",
+    "verified_at": "2026-09-24T01:49:13.804006+00:00",
+    "assets_verified": 10,
+    "receipt": "docs/RC6_PUBLICATION_RECEIPT.json",
+    "oci_digest": "sha256:8e81c74bd267156a28d167a32e40342262c62cece2123761de9d579b4484a0a5",
+    "package_visibility": "private"
+  }
 }

@@ -5,6 +5,7 @@ APK Release ARM64 minifiée de **101,6 Mo**, signée avec la clé durable sauveg
 Aucun poids de modèle n’est embarqué.
 
 [Release](https://github.com/unicornwhodev/vision-dataset-studio/releases/tag/v4.2.0-rc6)
+· [Publication vérifiée](RC6_PUBLICATION_RECEIPT.json)
 · [Preuves sélectionnées](../test-results/rc6-release/README.md)
 · [Synthèse JSON](../test-results/rc6-release/summary.json)
 · [Reconstruction LiteRT](LITERT_16K_STATUS.md)

@@ -26,7 +26,7 @@ The native build notes cover [Flex](../FLEX_16K.md), [Graphics Path](../GRAPHICS
 
 [Validation](VALIDATION.md) · [Android acceptance matrix](../ANDROID_QUALIFICATION.md) · [Release testing](../RELEASE_TESTING.md) · [Signing](../SIGNING.md) · [Distribution](RELEASE_PLAN.md) · [Roadmap](ROADMAP.md).
 
-The **[rc6 release note](../RC6_RELEASE.md)** describes the current candidate and includes an English summary. Dated reports retain their original builds and scope; older results do not qualify a new APK.
+The **[rc6 release note](../RC6_RELEASE.md)** describes the current candidate and includes an English summary. The [publication receipt](../RC6_PUBLICATION_RECEIPT.json) verifies all ten release assets. Dated reports retain their original builds and scope; older results do not qualify a new APK.
 
 ## Models and licensing
 
