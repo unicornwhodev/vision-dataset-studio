@@ -94,6 +94,16 @@ def main():
     public_files = {n for n in names if n.startswith(prefix)}
     if not public_files or public_files != {p.relative_to(ROOT).as_posix() for p in evidence.rglob('*') if p.is_file()}:
         raise ValueError('Evidence must contain exactly the reviewed tracked files')
+    for name in public_files:
+        if hashlib.sha256(git('show', head + ':' + name)).hexdigest() != digest(ROOT / name):
+            raise ValueError('Raw evidence bytes differ from Git: ' + name)
+    evidence_manifest = read(evidence / 'EVIDENCE_MANIFEST.json')
+    if {prefix + row['path'] for row in evidence_manifest} != public_files - {prefix + 'EVIDENCE_MANIFEST.json'}:
+        raise ValueError('Evidence manifest does not cover the exact published selection')
+    for row in evidence_manifest:
+        path = evidence / row['path']
+        if digest(path) != row['sha256'] or path.stat().st_size != row['bytes']:
+            raise ValueError('Evidence changed since review: ' + row['path'])
     current = source_manifest(ROOT)
     for name, expected in current['files'].items():
         if hashlib.sha256(git('show', head + ':' + name)).hexdigest() != expected:

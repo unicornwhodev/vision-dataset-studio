@@ -1,3 +1,5 @@
 # Build inputs have identical bytes on Windows and Unix, independently of core.autocrlf.
 * text=auto eol=lf
 *.bat text eol=crlf
+# Qualification receipts are immutable raw evidence, including Windows line endings.
+/test-results/rc6-release/** -text
